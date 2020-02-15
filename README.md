@@ -108,7 +108,7 @@ var post1 = context.Posts
                    .FirstOrDefault();  // Async methods are supported too.
 ```
 
-NOTE: It doesn't matter where the `Cacheable` method is located in this expression tree. [It just adds](/src/EFCoreSecondLevelCacheInterceptor/EFCachedQueryExtensions.cs) the standard `TagWith` method to mark this query as `Cacheable`. Later `SecondLevelCacheInterceptor` will use this tag to identity the `Cacheable` queries.
+NOTE: It doesn't matter where the `Cacheable` method is located in this expression tree. [It just adds](/src/EFCoreSecondLevelCacheInterceptor/EFCachedQueryExtensions.cs) the standard `TagWith` method to mark this query as `Cacheable`. Later `SecondLevelCacheInterceptor` will use this tag to identify the `Cacheable` queries.
 
 ## Samples
 
