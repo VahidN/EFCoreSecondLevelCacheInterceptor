@@ -16,7 +16,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         {
             const decimal loopCount = 1000;
 
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Warning, (context, debugLoggerProvider) =>
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Warning, false, (context, debugLoggerProvider) =>
             {
                 Stopwatch watch = new Stopwatch();
                 watch.Start();

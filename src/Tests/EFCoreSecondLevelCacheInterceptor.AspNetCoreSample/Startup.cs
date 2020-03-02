@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer;
+using System;
 
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 {
@@ -23,14 +24,17 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEFSecondLevelCache(options =>
-                options.UseMemoryCacheProvider()
+            {
+                options.UseMemoryCacheProvider();
 
-            // Installing Redis on Windows: http://taswar.zeytinsoft.com/intro-to-redis-for-net-developers/
-            // Install the Redis binaries in the default NuGet tools directory: https://www.nuget.org/packages/Redis-64/
-            // Different ways to configure Redis: https://stackexchange.github.io/StackExchange.Redis/Configuration#configuration-options
-            // Redis Desktop Manager: https://github.com/uglide/RedisDesktopManager
-            // options.UseRedisCacheProvider(Configuration["RedisConfiguration"])
-            );
+                // Installing Redis on Windows: http://taswar.zeytinsoft.com/intro-to-redis-for-net-developers/
+                // Install the Redis binaries in the default NuGet tools directory: https://www.nuget.org/packages/Redis-64/
+                // Different ways to configure Redis: https://stackexchange.github.io/StackExchange.Redis/Configuration#configuration-options
+                // Redis Desktop Manager: https://github.com/uglide/RedisDesktopManager
+                // options.UseRedisCacheProvider(Configuration["RedisConfiguration"])
+
+                options.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
+            });
 
             var connectionString = Configuration["ConnectionStrings:ApplicationDbContextConnection"];
             if (connectionString.Contains("%CONTENTROOTPATH%"))

@@ -29,6 +29,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// Invalidates all of the cache entries which are dependent on any of the specified root keys.
         /// </summary>
         bool InvalidateCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy);
+
+        /// <summary>
+        /// Is `insert`, `update` or `delete`?
+        /// </summary>
+        bool IsCrudCommand(string text);
     }
 
     /// <summary>
@@ -95,7 +100,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public bool InvalidateCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
         {
             var commandText = command.CommandText;
-            if (!isCrudCommand(commandText))
+            if (!IsCrudCommand(commandText))
             {
                 return false;
             }
@@ -108,14 +113,17 @@ namespace EFCoreSecondLevelCacheInterceptor
             return true;
         }
 
-        private static bool isCrudCommand(string text)
+        /// <summary>
+        /// Is `insert`, `update` or `delete`?
+        /// </summary>
+        public bool IsCrudCommand(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
                 return false;
             }
 
-            string[] crudMarkers = { "insert ", "update ", "delete " };
+            string[] crudMarkers = { "insert ", "update ", "delete ", "create " };
 
             var lines = text.Split('\n');
             foreach (var line in lines)

@@ -19,6 +19,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             typeof(EntityFrameworkQueryableExtensions).GetTypeInfo().GetDeclaredMethod(nameof(EntityFrameworkQueryableExtensions.AsNoTracking));
 
         /// <summary>
+        /// IsNotCachable Marker
+        /// </summary>
+        public static readonly string IsNotCachableMarker = $"{nameof(EFCoreSecondLevelCacheInterceptor)}{nameof(NotCacheable)}";
+
+        /// <summary>
         /// Returns a new query where the entities returned will be cached.
         /// </summary>
         /// <typeparam name="TType">Entity type.</typeparam>
@@ -34,6 +39,30 @@ namespace EFCoreSecondLevelCacheInterceptor
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(expirationMode).Timeout(timeout).CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+        }
+
+        /// <summary>
+        /// Returns a new query where the entities returned will note be cached.
+        /// </summary>
+        /// <typeparam name="TType">Entity type.</typeparam>
+        /// <param name="query">The input EF query.</param>
+        /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
+        public static IQueryable<TType> NotCacheable<TType>(this IQueryable<TType> query)
+        {
+            sanityCheck(query);
+            return query.TagWith(IsNotCachableMarker);
+        }
+
+        /// <summary>
+        /// Returns a new query where the entities returned will note be cached.
+        /// </summary>
+        /// <typeparam name="TType">Entity type.</typeparam>
+        /// <param name="query">The input EF query.</param>
+        /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
+        public static IQueryable<TType> NotCacheable<TType>(this DbSet<TType> query) where TType : class
+        {
+            sanityCheck(query);
+            return query.TagWith(IsNotCachableMarker);
         }
 
         /// <summary>

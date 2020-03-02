@@ -45,7 +45,10 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             return serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
         }
 
-        public static IServiceProvider GetConfiguredContextServiceProvider(bool useRedis, LogLevel logLevel)
+        public static IServiceProvider GetConfiguredContextServiceProvider(
+            bool useRedis,
+            LogLevel logLevel,
+            bool cacheAllQueries)
         {
             var services = new ServiceCollection();
             services.AddOptions();
@@ -70,6 +73,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 {
                     options.UseMemoryCacheProvider();
                 }
+
+                if (cacheAllQueries)
+                {
+                    options.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
+                }
             });
 
             services.AddConfiguredMsSqlDbContext(getConnectionString(basePath, configuration));
@@ -93,12 +101,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         public static void RunInContext(
             bool useRedis,
             LogLevel logLevel,
+            bool cacheAllQueries,
             params Action<ApplicationDbContext, DebugLoggerProvider>[] actions)
         {
             _semaphoreSlim.Wait();
             try
             {
-                var serviceProvider = GetConfiguredContextServiceProvider(useRedis, logLevel);
+                var serviceProvider = GetConfiguredContextServiceProvider(useRedis, logLevel, cacheAllQueries);
                 serviceProvider.GetRequiredService<IEFCacheServiceProvider>().ClearAllCachedEntries();
                 using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {
@@ -120,12 +129,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         public static async Task RunInContextAsync(
             bool useRedis,
             LogLevel logLevel,
+            bool cacheAllQueries,
             params Func<ApplicationDbContext, DebugLoggerProvider, Task>[] actions)
         {
             await _semaphoreSlim.WaitAsync();
             try
             {
-                var serviceProvider = GetConfiguredContextServiceProvider(useRedis, logLevel);
+                var serviceProvider = GetConfiguredContextServiceProvider(useRedis, logLevel, cacheAllQueries);
                 serviceProvider.GetRequiredService<IEFCacheServiceProvider>().ClearAllCachedEntries();
                 using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {

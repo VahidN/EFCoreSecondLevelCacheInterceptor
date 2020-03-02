@@ -15,7 +15,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestInsertingDataIntoTheSameTableShouldInvalidateTheCacheAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
                 (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -63,42 +63,42 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestInsertingDataToOtherTablesShouldNotInvalidateTheCacheDependencyAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, (context, loggerProvider) =>
-              {
-                  var isActive = true;
-                  var name = "Product4";
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false, (context, loggerProvider) =>
+               {
+                   var isActive = true;
+                   var name = "Product4";
 
-                  var list1 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
-                      .OrderBy(product => product.ProductNumber)
-                      .Where(product => product.IsActive == isActive && product.ProductName == name)
-                      .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
-                      .ToList();
-                  Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
-                  Assert.IsTrue(!list1.Any());
+                   var list1 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
+                       .OrderBy(product => product.ProductNumber)
+                       .Where(product => product.IsActive == isActive && product.ProductName == name)
+                       .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                       .ToList();
+                   Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
+                   Assert.IsTrue(!list1.Any());
 
-                  var list2 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
-                      .OrderBy(product => product.ProductNumber)
-                      .Where(product => product.IsActive == isActive && product.ProductName == name)
-                      .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
-                      .ToList();
-                  Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
-                  Assert.IsTrue(!list2.Any());
+                   var list2 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
+                       .OrderBy(product => product.ProductNumber)
+                       .Where(product => product.IsActive == isActive && product.ProductName == name)
+                       .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                       .ToList();
+                   Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
+                   Assert.IsTrue(!list2.Any());
 
-                  var user = new User
-                  {
-                      Name = $"User {RandomNumberProvider.Next()}"
-                  };
-                  context.Users.Add(user);
-                  context.SaveChanges();
+                   var user = new User
+                   {
+                       Name = $"User {RandomNumberProvider.Next()}"
+                   };
+                   context.Users.Add(user);
+                   context.SaveChanges();
 
-                  var list3 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
-                      .OrderBy(product => product.ProductNumber)
-                      .Where(product => product.IsActive == isActive && product.ProductName == name)
-                      .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
-                      .ToList();
-                  Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
-                  Assert.IsTrue(!list3.Any());
-              });
+                   var list3 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
+                       .OrderBy(product => product.ProductNumber)
+                       .Where(product => product.IsActive == isActive && product.ProductName == name)
+                       .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                       .ToList();
+                   Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
+                   Assert.IsTrue(!list3.Any());
+               });
         }
 
         [DataTestMethod]
@@ -106,7 +106,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestInsertingDataToRelatedTablesShouldInvalidateTheCacheDependencyAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
                 (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -150,7 +150,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestTransactionRollbackShouldNotInvalidateTheCacheDependencyAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
                 (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -208,39 +208,39 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestRemoveDataShouldInvalidateTheCacheAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, (context, loggerProvider) =>
-              {
-                  var isActive = false;
-                  var name = "Product4";
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false, (context, loggerProvider) =>
+               {
+                   var isActive = false;
+                   var name = "Product4";
 
-                  var list1 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
-                      .OrderBy(product => product.ProductNumber)
-                      .Where(product => product.IsActive == isActive && product.ProductName == name)
-                      .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
-                      .ToList();
-                  Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
-                  Assert.IsNotNull(list1);
+                   var list1 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
+                       .OrderBy(product => product.ProductNumber)
+                       .Where(product => product.IsActive == isActive && product.ProductName == name)
+                       .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                       .ToList();
+                   Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
+                   Assert.IsNotNull(list1);
 
-                  var list2 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
-                      .OrderBy(product => product.ProductNumber)
-                      .Where(product => product.IsActive == isActive && product.ProductName == name)
-                      .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
-                      .ToList();
-                  Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
-                  Assert.IsTrue(list2.Any());
+                   var list2 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
+                       .OrderBy(product => product.ProductNumber)
+                       .Where(product => product.IsActive == isActive && product.ProductName == name)
+                       .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                       .ToList();
+                   Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
+                   Assert.IsTrue(list2.Any());
 
-                  var product1 = context.Products.First(product => product.ProductName == name);
-                  product1.Notes = $"Test ... {RandomNumberProvider.Next()}";
-                  context.SaveChanges();
+                   var product1 = context.Products.First(product => product.ProductName == name);
+                   product1.Notes = $"Test ... {RandomNumberProvider.Next()}";
+                   context.SaveChanges();
 
-                  var list3 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
-                      .OrderBy(product => product.ProductNumber)
-                      .Where(product => product.IsActive == isActive && product.ProductName == name)
-                      .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
-                      .ToList();
-                  Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
-                  Assert.IsNotNull(list3);
-              });
+                   var list3 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
+                       .OrderBy(product => product.ProductNumber)
+                       .Where(product => product.IsActive == isActive && product.ProductName == name)
+                       .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                       .ToList();
+                   Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
+                   Assert.IsNotNull(list3);
+               });
         }
 
         [DataTestMethod]
@@ -248,7 +248,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestRemoveTptDataShouldInvalidateTheCacheAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
                 (context, loggerProvider) =>
                 {
                     var list1 = context.Posts.OfType<Page>().Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45)).ToList();
@@ -271,7 +271,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestAddThenRemoveDataShouldInvalidateTheCacheAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
                 (context, loggerProvider) =>
                 {
                     User user1;
@@ -335,7 +335,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestCachingByteArrays(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
                 (context, loggerProvider) =>
                 {
                     User user1;

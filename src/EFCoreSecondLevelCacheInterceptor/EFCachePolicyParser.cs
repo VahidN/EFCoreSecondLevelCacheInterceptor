@@ -1,5 +1,5 @@
 using System;
-using System.Linq;
+using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -29,6 +29,20 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class EFCachePolicyParser : IEFCachePolicyParser
     {
+        private readonly CacheAllQueriesOptions _cacheAllQueriesOptions;
+        private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
+
+        /// <summary>
+        /// EFCachePolicy Parser Utils
+        /// </summary>
+        public EFCachePolicyParser(
+            IOptions<CacheAllQueriesOptions> cacheAllQueriesOptions,
+            IEFCacheDependenciesProcessor cacheDependenciesProcessor)
+        {
+            _cacheAllQueriesOptions = cacheAllQueriesOptions?.Value;
+            _cacheDependenciesProcessor = cacheDependenciesProcessor;
+        }
+
         /// <summary>
         /// Does `commandText` contain nameof(EFCachePolicy)?
         /// </summary>
@@ -61,6 +75,20 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// Converts the `commandText` to an instance of `EFCachePolicy`
         /// </summary>
         public EFCachePolicy GetEFCachePolicy(string commandText)
+        {
+            return getParsedPolicy(commandText) ?? getGlobalPolicy(commandText);
+        }
+
+        private EFCachePolicy getGlobalPolicy(string commandText)
+        {
+            return _cacheAllQueriesOptions?.IsActive == true
+                && !_cacheDependenciesProcessor.IsCrudCommand(commandText)
+                && !commandText.Contains(EFCachedQueryExtensions.IsNotCachableMarker)
+                ? new EFCachePolicy().ExpirationMode(_cacheAllQueriesOptions.ExpirationMode).Timeout(_cacheAllQueriesOptions.Timeout)
+                : null;
+        }
+
+        private EFCachePolicy getParsedPolicy(string commandText)
         {
             if (!HasEFCachePolicy(commandText))
             {
