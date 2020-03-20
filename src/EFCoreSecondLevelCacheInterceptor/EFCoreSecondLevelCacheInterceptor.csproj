@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Entity Framework Core Second Level Caching Library.</Description>
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>1.1.2</VersionPrefix>
     <Authors>Vahid Nasiri</Authors>
     <TargetFrameworks>netstandard2.0;net461;</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFrameworks>
@@ -19,17 +19,17 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="3.1.2" />
   </ItemGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
     <DefineConstants>NET4_6_1</DefineConstants>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="3.1.2" />
   </ItemGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <DefineConstants>NETSTANDARD2_0</DefineConstants>

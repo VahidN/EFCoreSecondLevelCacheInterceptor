@@ -11,10 +11,10 @@
     <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.2" />
     <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
   </ItemGroup>
 </Project>
