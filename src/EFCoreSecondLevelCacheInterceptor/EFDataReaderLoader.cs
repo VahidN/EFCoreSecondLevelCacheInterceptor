@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Data;
 using System.Data.Common;
+using System.IO;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -223,13 +224,53 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             _rowValues = new object[_dbReader.FieldCount];
-            _dbReader.GetValues(_rowValues);
+
+            for (var i = 0; i < _dbReader.FieldCount; i++)
+            {
+                if (isBinary(i))
+                {
+                    _rowValues[i] = getSqlBytes(i);
+                }
+                else
+                {
+                    _rowValues[i] = _dbReader.GetValue(i);
+                }
+            }
+
             _tableRows?.Add(new EFTableRow
             {
                 Depth = _dbReader.Depth,
                 Values = _rowValues
             });
             return true;
+        }
+
+        private byte[] getSqlBytes(int ordinal)
+        {
+            byte[] buffer;
+            using (var stream = _dbReader.GetStream(ordinal))
+            {
+                if (stream.Length > int.MaxValue)
+                {
+                    throw new InvalidOperationException($"Stream[{ordinal}] length {stream.Length} is too large.");
+                }
+
+                buffer = new byte[stream.Length];
+                if (stream.Position != 0)
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                }
+
+                stream.Read(buffer, 0, checked((int)stream.Length));
+            }
+            return buffer;
+        }
+
+        private bool isBinary(int ordinal)
+        {
+            string typeName = _tableRows.GetFieldTypeName(ordinal);
+            return typeName == "Microsoft.SqlServer.Types.SqlGeography"
+                    || typeName == "Microsoft.SqlServer.Types.SqlGeometry";
         }
 
         /// <summary>

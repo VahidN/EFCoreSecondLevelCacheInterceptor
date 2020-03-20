@@ -130,6 +130,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public Type GetFieldType(int ordinal) => Type.GetType(getColumnInfo(ordinal).TypeName);
 
+        /// <summary>
+        /// Gets the Type that is the data type of the object.
+        /// </summary>
+        public string GetFieldTypeName(int ordinal) => getColumnInfo(ordinal).TypeName;
+
         private EFTableColumnInfo getColumnInfo(int ordinal)
         {
             var dbColumnInfo = _columnsInfo[ordinal];

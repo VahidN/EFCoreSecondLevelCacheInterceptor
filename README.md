@@ -130,7 +130,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             // ...
 ```
 
-This will put the whole system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some queries from this global cache, apply the `NotCacheable()` method to them.
+This will put the whole system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some of the queries from this global cache, apply the `NotCacheable()` method to them.
 
 ## Samples
 
