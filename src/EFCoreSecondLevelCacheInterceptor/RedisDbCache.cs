@@ -109,12 +109,14 @@ namespace EFCoreSecondLevelCacheInterceptor
             foreach (var endPoint in _connection.GetEndPoints())
             {
                 var server = _connection.GetServer(endPoint);
-				if(!server.IsConnected)
-				{
-					continue;
-				}
-				
-                var keys = string.IsNullOrWhiteSpace(pattern) ? server.Keys() : server.Keys(pattern: $"*{pattern}*");
+                if (!server.IsConnected)
+                {
+                    continue;
+                }
+
+                var keys = string.IsNullOrWhiteSpace(pattern) ?
+                                server.Keys(_database.Database) :
+                                server.Keys(_database.Database, pattern: $"*{pattern}*");
                 foreach (var key in keys)
                 {
                     _database.KeyDelete(key);
