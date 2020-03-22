@@ -50,7 +50,31 @@ namespace Issue9SQLiteInt32
                         ByteArrayValue = new byte[] { 1, 2 },
                         UintValue = 1,
                         UlongValue = 1,
-                        UshortValue = 1
+                        UshortValue = 1,
+                        NumericDecimalValue = 1.1M
+                    });
+
+                    context.People.Add(new Person
+                    {
+                        Name = "Vahid",
+                        AddDate = DateTime.UtcNow,
+                        UpdateDate = null,
+                        Points = 1000,
+                        IsActive = true,
+                        ByteValue = 1,
+                        CharValue = 'C',
+                        DateTimeOffsetValue = DateTimeOffset.UtcNow,
+                        DecimalValue = 1,
+                        DoubleValue = 2,
+                        FloatValue = 3,
+                        GuidValue = Guid.NewGuid(),
+                        TimeSpanValue = TimeSpan.FromDays(1),
+                        ShortValue = 2,
+                        ByteArrayValue = new byte[] { 1, 2 },
+                        UintValue = 1,
+                        UlongValue = 1,
+                        UshortValue = 1,
+                        NumericDecimalValue = 2
                     });
 
                     context.SaveChanges();

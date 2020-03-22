@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Issue9SQLiteInt32.Entities
 {
@@ -41,5 +42,8 @@ namespace Issue9SQLiteInt32.Entities
         public ulong UlongValue { set; get; }
 
         public ulong UshortValue { set; get; }
+
+        [Column(TypeName = "numeric")]
+        public decimal NumericDecimalValue { get; set; }
     }
 }

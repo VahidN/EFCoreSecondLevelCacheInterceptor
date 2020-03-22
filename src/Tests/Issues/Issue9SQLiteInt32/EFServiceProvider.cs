@@ -46,7 +46,6 @@ namespace Issue9SQLiteInt32
             services.AddOptions();
 
             services.AddLogging(cfg => cfg.AddConsole().AddDebug());
-            services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider());
 
             var basePath = Directory.GetCurrentDirectory();
             Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
@@ -55,6 +54,12 @@ namespace Issue9SQLiteInt32
                                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                                 .Build();
             services.AddSingleton(_ => configuration);
+
+            services.AddEFSecondLevelCache(options =>
+                options.UseMemoryCacheProvider()
+            // options.UseRedisCacheProvider(configuration["RedisConfiguration"])
+            );
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     options

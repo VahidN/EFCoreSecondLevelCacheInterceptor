@@ -198,9 +198,15 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override decimal GetDecimal(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value.GetType() == typeof(string))
+            var valueType = value.GetType();
+            if (valueType == typeof(string))
             {
                 return decimal.Parse(value.ToString(), NumberStyles.Number | NumberStyles.AllowExponent, CultureInfo.InvariantCulture);
+            }
+
+            if (valueType != typeof(decimal))
+            {
+                return (decimal)Convert.ChangeType(value, typeof(decimal));
             }
 
             return (decimal)value;
