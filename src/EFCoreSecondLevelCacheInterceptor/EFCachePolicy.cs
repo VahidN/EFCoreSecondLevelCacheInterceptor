@@ -63,6 +63,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public ISet<string> CacheItemsDependencies { get; private set; } = new SortedSet<string>();
 
         /// <summary>
+        /// Determines the default Cacheable method
+        /// </summary>
+        public bool IsDefaultCacheableMethod { set; get; }
+
+        /// <summary>
         /// Tells the compiler to insert the line number of the containing member instead of a parameter’s default value
         /// </summary>
         public EFCachePolicy CallerLineNumber(int lineNumber)
@@ -123,6 +128,15 @@ namespace EFCoreSecondLevelCacheInterceptor
         }
 
         /// <summary>
+        /// Determines the default Cacheable method
+        /// </summary>
+        public EFCachePolicy DefaultCacheableMethod(bool state)
+        {
+            IsDefaultCacheableMethod = state;
+            return this;
+        }
+
+        /// <summary>
         /// Determines the Expiration time of the cache.
         /// </summary>
         public static string Configure(Action<EFCachePolicy> options)
@@ -137,7 +151,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public override string ToString()
         {
-            return $"{nameof(EFCachePolicy)}[{CacheCallerMemberName}(line {CacheCallerLineNumber})] {PartsSeparator} {CacheExpirationMode}{ItemsSeparator}{CacheTimeout}{ItemsSeparator}{CacheSaltKey}{ItemsSeparator}{string.Join(CacheDependenciesSeparator, CacheItemsDependencies)}".TrimEnd(ItemsSeparator);
+            return $"{nameof(EFCachePolicy)}[{CacheCallerMemberName}(line {CacheCallerLineNumber})] {PartsSeparator} {CacheExpirationMode}{ItemsSeparator}{CacheTimeout}{ItemsSeparator}{CacheSaltKey}{ItemsSeparator}{string.Join(CacheDependenciesSeparator, CacheItemsDependencies)}{ItemsSeparator}{IsDefaultCacheableMethod}".TrimEnd(ItemsSeparator);
         }
     }
 }

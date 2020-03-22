@@ -150,7 +150,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
-                options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes).CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes).DefaultCacheableMethod(true).CallerMemberName(methodName).CallerLineNumber(lineNumber)));
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
-                options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes).CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes).DefaultCacheableMethod(true).CallerMemberName(methodName).CallerLineNumber(lineNumber)));
         }
 
         /// <summary>

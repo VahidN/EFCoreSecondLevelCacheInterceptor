@@ -103,7 +103,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return null;
             }
 
-            var options = parts[1].Split(new[] { EFCachePolicy.ItemsSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            var options = parts[1].Split(new[] { EFCachePolicy.ItemsSeparator }, StringSplitOptions.None);
             if (options.Length < 2)
             {
                 return null;
@@ -121,7 +121,14 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             var saltKey = options.Length >= 3 ? options[2] : string.Empty;
 
-            var cacheDependencies = options.Length == 4 ? options[3].Split(new[] { EFCachePolicy.CacheDependenciesSeparator }, StringSplitOptions.RemoveEmptyEntries) : Array.Empty<string>();
+            var cacheDependencies = options.Length >= 4 ? options[3].Split(new[] { EFCachePolicy.CacheDependenciesSeparator }, StringSplitOptions.RemoveEmptyEntries) : Array.Empty<string>();
+
+            var isDefaultCacheableMethod = options.Length >= 5 && bool.Parse(options[4]);
+            if (isDefaultCacheableMethod && _cacheAllQueriesOptions?.IsActive == true)
+            {
+                expirationMode = _cacheAllQueriesOptions.ExpirationMode;
+                timeout = _cacheAllQueriesOptions.Timeout;
+            }
 
             return new EFCachePolicy().ExpirationMode(expirationMode).SaltKey(saltKey).Timeout(timeout).CacheDependencies(cacheDependencies);
         }

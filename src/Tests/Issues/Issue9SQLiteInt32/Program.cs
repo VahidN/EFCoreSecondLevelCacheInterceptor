@@ -20,6 +20,13 @@ namespace Issue9SQLiteInt32
                 {
                     Console.WriteLine($"{person.Id}, {person.Name}");
                 }
+
+                cachedPeople = context.People.Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(51)).ToList();
+                cachedPeople = context.People.Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(51)).ToList();
+                foreach (var person in cachedPeople)
+                {
+                    Console.WriteLine($"{person.Id}, {person.Name}");
+                }
             });
         }
 
