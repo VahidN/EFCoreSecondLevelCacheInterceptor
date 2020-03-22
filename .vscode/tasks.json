@@ -14,6 +14,16 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "buildIssue9SQLiteInt32",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/Tests/Issues/Issue9SQLiteInt32/Issue9SQLiteInt32.csproj",
+            ],
+            "problemMatcher": "$tsc"
+        },
+        {
             "label": "buildIssue4SpatialType",
             "command": "dotnet",
             "type": "process",

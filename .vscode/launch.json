@@ -16,6 +16,17 @@
             "console": "internalConsole"
         },
         {
+            "name": "Issue9SQLiteInt32",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "buildIssue9SQLiteInt32",
+            "program": "${workspaceFolder}/src/Tests/Issues/Issue9SQLiteInt32/bin/Debug/netcoreapp3.1/Issue9SQLiteInt32.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Tests/Issues/Issue9SQLiteInt32",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",

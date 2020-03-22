@@ -24,6 +24,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandExecutedEventData eventData,
             int result)
         {
+            if (eventData.Context == null)
+            {
+                return base.NonQueryExecuted(command, eventData, result);
+            }
+
             return getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result);
         }
 
@@ -36,6 +41,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             int result,
             CancellationToken cancellationToken = default)
         {
+            if (eventData.Context == null)
+            {
+                return base.NonQueryExecutedAsync(command, eventData, result, cancellationToken);
+            }
+
             return Task.FromResult(getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result));
         }
 
@@ -47,6 +57,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandEventData eventData,
             InterceptionResult<int> result)
         {
+            if (eventData.Context == null)
+            {
+                return base.NonQueryExecuting(command, eventData, result);
+            }
+
             return getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result);
         }
 
@@ -59,6 +74,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             InterceptionResult<int> result,
             CancellationToken cancellationToken = default)
         {
+            if (eventData.Context == null)
+            {
+                return base.NonQueryExecutingAsync(command, eventData, result, cancellationToken);
+            }
+
             return Task.FromResult(getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result));
         }
 
@@ -70,6 +90,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandExecutedEventData eventData,
             DbDataReader result)
         {
+            if (eventData.Context == null)
+            {
+                return base.ReaderExecuted(command, eventData, result);
+            }
+
             return getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result);
         }
 
@@ -82,6 +107,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             DbDataReader result,
             CancellationToken cancellationToken = default)
         {
+            if (eventData.Context == null)
+            {
+                return base.ReaderExecutedAsync(command, eventData, result, cancellationToken);
+            }
+
             return Task.FromResult(getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result));
         }
 
@@ -93,6 +123,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandEventData eventData,
             InterceptionResult<DbDataReader> result)
         {
+            if (eventData.Context == null)
+            {
+                return base.ReaderExecuting(command, eventData, result);
+            }
+
             return getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result);
         }
 
@@ -105,6 +140,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             InterceptionResult<DbDataReader> result,
             CancellationToken cancellationToken = default)
         {
+            if (eventData.Context == null)
+            {
+                return base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
+            }
+
             return Task.FromResult(getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result));
         }
 
@@ -116,6 +156,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandExecutedEventData eventData,
             object result)
         {
+            if (eventData.Context == null)
+            {
+                return base.ScalarExecuted(command, eventData, result);
+            }
+
             return getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result);
         }
 
@@ -128,6 +173,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             object result,
             CancellationToken cancellationToken = default)
         {
+            if (eventData.Context == null)
+            {
+                return base.ScalarExecutedAsync(command, eventData, result, cancellationToken);
+            }
+
             return Task.FromResult(getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result));
         }
 
@@ -139,6 +189,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandEventData eventData,
             InterceptionResult<object> result)
         {
+            if (eventData.Context == null)
+            {
+                return base.ScalarExecuting(command, eventData, result);
+            }
+
             return getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result);
         }
 
@@ -151,6 +206,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             InterceptionResult<object> result,
             CancellationToken cancellationToken = default)
         {
+            if (eventData.Context == null)
+            {
+                return base.ScalarExecutingAsync(command, eventData, result, cancellationToken);
+            }
+
             return Task.FromResult(getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result));
         }
 

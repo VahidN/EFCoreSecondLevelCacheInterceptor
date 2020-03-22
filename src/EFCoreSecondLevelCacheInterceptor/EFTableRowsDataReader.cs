@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Data;
 using System.Data.Common;
+using System.Globalization;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -123,12 +124,30 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the value of the specified column as a Boolean.
         /// </summary>
-        public override bool GetBoolean(int ordinal) => (bool)GetValue(ordinal);
+        public override bool GetBoolean(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value.GetType() == typeof(long))
+            {
+                return (long)value != 0;
+            }
+
+            return (bool)value;
+        }
 
         /// <summary>
         /// Gets the value of the specified column as a byte.
         /// </summary>
-        public override byte GetByte(int ordinal) => (byte)GetValue(ordinal);
+        public override byte GetByte(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value.GetType() == typeof(long))
+            {
+                return (byte)(long)value;
+            }
+
+            return (byte)value;
+        }
 
         /// <summary>
         /// Reads a stream of bytes from the specified column offset into the buffer an array starting at the given buffer offset.
@@ -138,7 +157,21 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the value of the specified column as a single character.
         /// </summary>
-        public override char GetChar(int ordinal) => (char)GetValue(ordinal);
+        public override char GetChar(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value.GetType() == typeof(string))
+            {
+                var val = value.ToString();
+                if (val.Length == 1)
+                {
+                    return val[0];
+                }
+                return checked((char)GetInt64(ordinal));
+            }
+
+            return (char)value;
+        }
 
         /// <summary>
         /// Reads a stream of characters from the specified column offset into the buffer as an array starting at the given buffer offset.
@@ -148,12 +181,30 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the value of the specified column as a DateTime object.
         /// </summary>
-        public override DateTime GetDateTime(int ordinal) => (DateTime)GetValue(ordinal);
+        public override DateTime GetDateTime(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value.GetType() == typeof(string))
+            {
+                return DateTime.Parse(value.ToString(), CultureInfo.InvariantCulture);
+            }
+
+            return (DateTime)value;
+        }
 
         /// <summary>
         /// Gets the value of the specified column as a Decimal object.
         /// </summary>
-        public override decimal GetDecimal(int ordinal) => (decimal)GetValue(ordinal);
+        public override decimal GetDecimal(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value.GetType() == typeof(string))
+            {
+                return decimal.Parse(value.ToString(), NumberStyles.Number | NumberStyles.AllowExponent, CultureInfo.InvariantCulture);
+            }
+
+            return (decimal)value;
+        }
 
         /// <summary>
         /// Gets the value of the specified column as a double-precision floating point number.
@@ -168,22 +219,58 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the value of the specified column as a single-precision floating point number.
         /// </summary>
-        public override float GetFloat(int ordinal) => (float)GetValue(ordinal);
+        public override float GetFloat(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value.GetType() == typeof(double))
+            {
+                return (float)(double)value;
+            }
+
+            return (float)value;
+        }
 
         /// <summary>
         /// Gets the value of the specified column as a globally unique identifier (GUID).
         /// </summary>
-        public override Guid GetGuid(int ordinal) => (Guid)GetValue(ordinal);
+        public override Guid GetGuid(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value.GetType() == typeof(string))
+            {
+                return new Guid(value.ToString());
+            }
+
+            return (Guid)value;
+        }
 
         /// <summary>
         /// Gets the value of the specified column as a 16-bit signed integer.
         /// </summary>
-        public override short GetInt16(int ordinal) => (short)GetValue(ordinal);
+        public override short GetInt16(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value.GetType() == typeof(long))
+            {
+                return (short)(long)value;
+            }
+
+            return (short)value;
+        }
 
         /// <summary>
         /// Gets the value of the specified column as a 32-bit signed integer.
         /// </summary>
-        public override int GetInt32(int ordinal) => (int)GetValue(ordinal);
+        public override int GetInt32(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value.GetType() == typeof(long))
+            {
+                return (int)(long)value;
+            }
+
+            return (int)value;
+        }
 
         /// <summary>
         /// Gets the value of the specified column as a 64-bit signed integer.
