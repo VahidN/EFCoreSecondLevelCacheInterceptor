@@ -43,7 +43,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// If you specify the `Cacheable()` method, its setting will override this global setting.
         /// If you want to exclude some queries from this global cache, apply the `NotCacheable()` method to them.
         /// </summary>
-        /// <param name="expirationMode">Defines the expiration mode of the cache item.</param>
+        /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
         /// <param name="timeout">The expiration timeout.</param>
         public EFCoreSecondLevelCacheOptions CacheAllQueries(CacheExpirationMode expirationMode, TimeSpan timeout)
         {
@@ -67,11 +67,48 @@ namespace EFCoreSecondLevelCacheInterceptor
         }
 
         /// <summary>
+        /// You can introduce a custom IEFCacheServiceProvider to be used as the CacheProvider.
+        /// If you specify the `Cacheable()` method options, its setting will override this global setting.
+        /// </summary>
+        /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
+        /// <param name="timeout">The expiration timeout.</param>
+        /// <typeparam name="T">Implements IEFCacheServiceProvider</typeparam>
+        public EFCoreSecondLevelCacheOptions UseCustomCacheProvider<T>(CacheExpirationMode expirationMode, TimeSpan timeout) where T : IEFCacheServiceProvider
+        {
+            CacheProvider = typeof(T);
+            CacheAllQueriesOptions = new CacheAllQueriesOptions
+            {
+                ExpirationMode = expirationMode,
+                Timeout = timeout,
+                IsActive = true
+            };
+            return this;
+        }
+
+        /// <summary>
         /// Introduces the built-in `EFMemoryCacheServiceProvider` to be used as the CacheProvider.
         /// </summary>
         public EFCoreSecondLevelCacheOptions UseMemoryCacheProvider()
         {
             CacheProvider = typeof(EFMemoryCacheServiceProvider);
+            return this;
+        }
+
+        /// <summary>
+        /// Introduces the built-in `EFMemoryCacheServiceProvider` to be used as the CacheProvider.
+        /// If you specify the `Cacheable()` method options, its setting will override this global setting.
+        /// </summary>
+        /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
+        /// <param name="timeout">The expiration timeout.</param>
+        public EFCoreSecondLevelCacheOptions UseMemoryCacheProvider(CacheExpirationMode expirationMode, TimeSpan timeout)
+        {
+            CacheProvider = typeof(EFMemoryCacheServiceProvider);
+            CacheAllQueriesOptions = new CacheAllQueriesOptions
+            {
+                ExpirationMode = expirationMode,
+                Timeout = timeout,
+                IsActive = true
+            };
             return this;
         }
 
@@ -83,6 +120,29 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             CacheProvider = typeof(EFRedisCacheServiceProvider);
             RedisConfiguration = configuration;
+            return this;
+        }
+
+        /// <summary>
+        /// Introduces the built-in `EFRedisCacheServiceProvider` to be used as the CacheProvider.
+        /// If you specify the `Cacheable()` method options, its setting will override this global setting.
+        /// </summary>
+        /// <param name="configuration">The string configuration to use for the multiplexer.</param>
+        /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
+        /// <param name="timeout">The expiration timeout.</param>
+        public EFCoreSecondLevelCacheOptions UseRedisCacheProvider(
+            string configuration,
+            CacheExpirationMode expirationMode,
+            TimeSpan timeout)
+        {
+            CacheProvider = typeof(EFRedisCacheServiceProvider);
+            RedisConfiguration = configuration;
+            CacheAllQueriesOptions = new CacheAllQueriesOptions
+            {
+                ExpirationMode = expirationMode,
+                Timeout = timeout,
+                IsActive = true
+            };
             return this;
         }
     }
