@@ -88,6 +88,7 @@ If you want to use the Redis as the preferred cache provider, use `options.UseRe
 3- Setting up the cache invalidation:
 
 This library doesn't need any settings for the cache invalidation. It watches for all of the CRUD operations using its interceptor and then invalidates the related cache entries automatically.
+But if you want to invalidate the whole cache manually, inject the `IEFCacheServiceProvider` service and then call its `ClearAllCachedEntries()` method.
 
 4- To cache the results of the normal queries like:
 
@@ -109,6 +110,25 @@ var post1 = context.Posts
 ```
 
 NOTE: It doesn't matter where the `Cacheable` method is located in this expression tree. [It just adds](/src/EFCoreSecondLevelCacheInterceptor/EFCachedQueryExtensions.cs) the standard `TagWith` method to mark this query as `Cacheable`. Later `SecondLevelCacheInterceptor` will use this tag to identify the `Cacheable` queries.
+
+Also it's possibe to set the `Cacheable()` method's settings globally:
+
+```csharp
+services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)));
+```
+
+In this case the above query will become:
+
+```csharp
+var post1 = context.Posts
+                   .Where(x => x.Id > 0)
+                   .OrderBy(x => x.Id)
+                   .Cacheable()
+                   .FirstOrDefault();  // Async methods are supported too.
+```
+
+If you specify the settings of the `Cacheable()` method explicitly such as `Cacheable(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(5))`, its setting will override the global setting. 
+
 
 ## Caching all of the queries
 
