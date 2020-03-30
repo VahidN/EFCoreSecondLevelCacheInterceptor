@@ -141,9 +141,15 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override byte GetByte(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value.GetType() == typeof(long))
+            var valueType = value.GetType();
+            if (valueType == typeof(long))
             {
                 return (byte)(long)value;
+            }
+
+            if (valueType != typeof(byte))
+            {
+                return (byte)Convert.ChangeType(value, typeof(byte));
             }
 
             return (byte)value;

@@ -14,6 +14,26 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "buildIssue12PostgreSql",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/Tests/Issues/Issue12PostgreSql/Issue12PostgreSql.csproj",
+            ],
+            "problemMatcher": "$tsc"
+        },				
+        {
+            "label": "buildIssue12MySQL",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/Tests/Issues/Issue12MySQL/Issue12MySQL.csproj",
+            ],
+            "problemMatcher": "$tsc"
+        },		
+        {
             "label": "buildIssue9SQLiteInt32",
             "command": "dotnet",
             "type": "process",

@@ -27,6 +27,28 @@
             "console": "internalConsole"
         },
         {
+            "name": "Issue12PostgreSql",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "buildIssue12PostgreSql",
+            "program": "${workspaceFolder}/src/Tests/Issues/Issue12PostgreSql/bin/Debug/netcoreapp3.1/Issue12PostgreSql.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Tests/Issues/Issue12PostgreSql",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },				
+        {
+            "name": "Issue12MySQL",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "buildIssue12MySQL",
+            "program": "${workspaceFolder}/src/Tests/Issues/Issue12MySQL/bin/Debug/netcoreapp3.1/Issue12MySQL.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Tests/Issues/Issue12MySQL",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },		
+        {
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
