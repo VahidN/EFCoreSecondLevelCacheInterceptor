@@ -74,6 +74,22 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [TestMethod]
+        public void TestGetCacheDependenciesWorksForInsertsWithBacktick()
+        {
+            const string commandText = @"SET NOCOUNT ON;
+        INSERT INTO `Products` (`IsActive`, `Notes`, `ProductName`, `ProductNumber`, `UserId`)
+        VALUES (@p0, @p1, @p2, @p3, @p4);
+        SELECT `ProductId`
+        FROM `Products`
+        WHERE @@ROWCOUNT = 1 AND `ProductId` = scope_identity();";
+            var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
+            var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), new SortedSet<string> { "Posts", "Users", "Products" }, commandText);
+
+            var inUseTableNames = new SortedSet<string> { "Products" };
+            CollectionAssert.AreEqual(expected: inUseTableNames, actual: cacheDependencies);
+        }
+
+        [TestMethod]
         public void TestGetCacheDependenciesWorksForDeletes()
         {
             const string commandText = @"SET NOCOUNT ON;

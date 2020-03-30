@@ -41,8 +41,13 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
     {
-        private readonly ConcurrentDictionary<Type, Lazy<SortedSet<string>>> _tableNames = new ConcurrentDictionary<Type, Lazy<SortedSet<string>>>();
-        private static readonly Regex _insideSquareBracketsOrQuotes = new Regex(@"(?:FROM|JOIN|INTO|UPDATE)\s[\[""](.*?)[\]""]\s*", options: RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private readonly ConcurrentDictionary<Type, Lazy<SortedSet<string>>> _tableNames =
+                    new ConcurrentDictionary<Type, Lazy<SortedSet<string>>>();
+
+        private static readonly Regex _insideSquareBracketsOrQuotes =
+                    new Regex(@"(?:FROM|JOIN|INTO|UPDATE)\s[\[""`](.*?)[\]""`]\s*",
+                    options: RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         private readonly ILogger<EFCacheDependenciesProcessor> _logger;
         private readonly IEFCacheServiceProvider _cacheServiceProvider;
 
