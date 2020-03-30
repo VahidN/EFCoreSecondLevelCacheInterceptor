@@ -127,9 +127,15 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override bool GetBoolean(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value.GetType() == typeof(long))
+            var valueType = value.GetType();
+            if (valueType == typeof(long))
             {
                 return (long)value != 0;
+            }
+
+            if (valueType == typeof(ulong))
+            {
+                return (ulong)value != 0;
             }
 
             return (bool)value;
@@ -190,9 +196,9 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override DateTime GetDateTime(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value.GetType() == typeof(string))
+            if (value.GetType() != typeof(DateTime))
             {
-                return DateTime.Parse(value.ToString(), CultureInfo.InvariantCulture);
+                return DateTime.Parse(value.ToString());
             }
 
             return (DateTime)value;
@@ -234,9 +240,15 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override float GetFloat(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value.GetType() == typeof(double))
+            var valueType = value.GetType();
+            if (valueType == typeof(double))
             {
                 return (float)(double)value;
+            }
+
+            if (valueType != typeof(float))
+            {
+                return (float)Convert.ChangeType(value, typeof(float));
             }
 
             return (float)value;
@@ -262,9 +274,15 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override short GetInt16(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value.GetType() == typeof(long))
+            var valueType = value.GetType();
+            if (valueType == typeof(long))
             {
                 return (short)(long)value;
+            }
+
+            if (valueType != typeof(short))
+            {
+                return (short)Convert.ChangeType(value, typeof(short));
             }
 
             return (short)value;
@@ -276,9 +294,15 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override int GetInt32(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value.GetType() == typeof(long))
+            var valueType = value.GetType();
+            if (valueType == typeof(long))
             {
                 return (int)(long)value;
+            }
+
+            if (valueType != typeof(int))
+            {
+                return (int)Convert.ChangeType(value, typeof(int));
             }
 
             return (int)value;
