@@ -15,7 +15,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public async Task TestSecondLevelCacheUsingAsyncMethodsDoesNotHitTheDatabase(bool useRedis)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Information, false,
+            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false,
                 async (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -68,7 +68,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public async Task TestSecondLevelCacheUsingDifferentAsyncMethods(bool useRedis)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Information, false,
+            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false,
                 async (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -121,7 +121,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public async Task TestSecondLevelCacheUsingTwoCountAsyncMethods(bool useRedis)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Information, false,
+            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false,
                 async (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -150,7 +150,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public async Task TestSecondLevelCacheUsingFindAsyncMethods(bool useRedis)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Information, false,
+            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false,
                 async (context, loggerProvider) =>
                 {
                     var product1 = context.Products.TagWith("query 1").Find(1);

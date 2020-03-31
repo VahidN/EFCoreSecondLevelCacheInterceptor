@@ -29,7 +29,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         {
             var serviceProvider = EFServiceProvider.GetConfiguredContextServiceProvider(
                     useRedis: false,
-                    logLevel: LogLevel.Information,
+                    logLevel: LogLevel.Debug,
                     cacheAllQueries: false);
             var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>();
             serviceScope.Initialize();

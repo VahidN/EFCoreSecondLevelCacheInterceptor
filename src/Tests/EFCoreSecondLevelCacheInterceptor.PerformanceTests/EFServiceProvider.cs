@@ -44,7 +44,7 @@ namespace EFCoreSecondLevelCacheInterceptor.PerformanceTests
             services.AddOptions();
 
             services.AddLogging(cfg => cfg.AddConsole().AddDebug().SetMinimumLevel(LogLevel.Warning));
-            services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider());
+            services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider().DisableLogging(true));
 
             var basePath = Directory.GetCurrentDirectory();
             Console.WriteLine($"Using `{basePath}` as the ContentRootPath");

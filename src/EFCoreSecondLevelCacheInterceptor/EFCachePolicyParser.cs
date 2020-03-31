@@ -29,17 +29,17 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class EFCachePolicyParser : IEFCachePolicyParser
     {
-        private readonly CacheAllQueriesOptions _cacheAllQueriesOptions;
+        private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
         private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
 
         /// <summary>
         /// EFCachePolicy Parser Utils
         /// </summary>
         public EFCachePolicyParser(
-            IOptions<CacheAllQueriesOptions> cacheAllQueriesOptions,
+            IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
             IEFCacheDependenciesProcessor cacheDependenciesProcessor)
         {
-            _cacheAllQueriesOptions = cacheAllQueriesOptions?.Value;
+            _cacheSettings = cacheSettings?.Value;
             _cacheDependenciesProcessor = cacheDependenciesProcessor;
         }
 
@@ -81,10 +81,11 @@ namespace EFCoreSecondLevelCacheInterceptor
 
         private EFCachePolicy getGlobalPolicy(string commandText)
         {
-            return _cacheAllQueriesOptions?.IsActive == true
+            var cacheAllQueriesOptions = _cacheSettings.CacheAllQueriesOptions;
+            return cacheAllQueriesOptions.IsActive
                 && !_cacheDependenciesProcessor.IsCrudCommand(commandText)
                 && !commandText.Contains(EFCachedQueryExtensions.IsNotCachableMarker)
-                ? new EFCachePolicy().ExpirationMode(_cacheAllQueriesOptions.ExpirationMode).Timeout(_cacheAllQueriesOptions.Timeout)
+                ? new EFCachePolicy().ExpirationMode(cacheAllQueriesOptions.ExpirationMode).Timeout(cacheAllQueriesOptions.Timeout)
                 : null;
         }
 
@@ -124,10 +125,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             var cacheDependencies = options.Length >= 4 ? options[3].Split(new[] { EFCachePolicy.CacheDependenciesSeparator }, StringSplitOptions.RemoveEmptyEntries) : Array.Empty<string>();
 
             var isDefaultCacheableMethod = options.Length >= 5 && bool.Parse(options[4]);
-            if (isDefaultCacheableMethod && _cacheAllQueriesOptions?.IsActive == true)
+            var cacheAllQueriesOptions = _cacheSettings.CacheAllQueriesOptions;
+            if (isDefaultCacheableMethod && cacheAllQueriesOptions.IsActive)
             {
-                expirationMode = _cacheAllQueriesOptions.ExpirationMode;
-                timeout = _cacheAllQueriesOptions.Timeout;
+                expirationMode = cacheAllQueriesOptions.ExpirationMode;
+                timeout = cacheAllQueriesOptions.Timeout;
             }
 
             return new EFCachePolicy().ExpirationMode(expirationMode).SaltKey(saltKey).Timeout(timeout).CacheDependencies(cacheDependencies);

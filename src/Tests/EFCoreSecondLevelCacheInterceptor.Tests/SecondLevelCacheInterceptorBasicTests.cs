@@ -14,7 +14,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestIncludeMethodAffectsKeyCache(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var firstProductIncludeTags = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
                                                                .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
@@ -33,7 +33,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestQueriesUsingDifferentParameterValuesWillNotUseTheCache(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var list1 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
                        .OrderBy(product => product.ProductNumber)
@@ -73,7 +73,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var isActive = true;
             var name = "Product2";
 
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var list2 = context.Products
@@ -101,7 +101,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestSecondLevelCacheUsingDifferentSyncMethods(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -155,7 +155,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestSecondLevelCacheUsingTwoCountMethods(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var isActive = true;
                    var name = "Product3";
@@ -183,7 +183,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestSecondLevelCacheUsingProjections(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var isActive = true;
                    var name = "Product1";
@@ -213,7 +213,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestIncludeMethodAndProjectionAffectsKeyCache(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var product1IncludeTags = context.Products
@@ -262,7 +262,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestNullValuesWillUseTheCache(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var item1 = context.Products
                        .OrderBy(product => product.ProductNumber)
@@ -287,7 +287,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestEqualsMethodWillUseTheCache(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var item1 = context.Products
                        .Where(product => product.ProductId == 2 && product.ProductName.Equals("Product1"))
@@ -317,7 +317,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void Test2DifferentCollectionsWillNotUseTheCache(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var collection1 = new[] { 1, 2, 3 };

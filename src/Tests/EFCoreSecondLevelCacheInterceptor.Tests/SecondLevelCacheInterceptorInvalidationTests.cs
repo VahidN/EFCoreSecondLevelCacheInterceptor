@@ -15,7 +15,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestInsertingDataIntoTheSameTableShouldInvalidateTheCacheAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -63,7 +63,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestInsertingDataToOtherTablesShouldNotInvalidateTheCacheDependencyAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var isActive = true;
                    var name = "Product4";
@@ -106,7 +106,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestInsertingDataToRelatedTablesShouldInvalidateTheCacheDependencyAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -150,7 +150,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestTransactionRollbackShouldNotInvalidateTheCacheDependencyAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -208,7 +208,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestRemoveDataShouldInvalidateTheCacheAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var isActive = false;
                    var name = "Product4";
@@ -248,7 +248,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestRemoveTptDataShouldInvalidateTheCacheAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var list1 = context.Posts.OfType<Page>().Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45)).ToList();
@@ -271,7 +271,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestAddThenRemoveDataShouldInvalidateTheCacheAutomatically(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     User user1;
@@ -335,7 +335,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public void TestCachingByteArrays(bool useRedis)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Information, false,
+            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     User user1;

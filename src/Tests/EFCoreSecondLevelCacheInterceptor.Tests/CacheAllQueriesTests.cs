@@ -15,7 +15,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public async Task TestCacheAllQueriesWorks(bool useRedis)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Information, true,
+            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, true,
                 async (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -42,7 +42,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public async Task TestCacheAllQueriesWithNotCacheableWorks(bool useRedis)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Information, true,
+            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, true,
                 async (context, loggerProvider) =>
                 {
                     var isActive = true;

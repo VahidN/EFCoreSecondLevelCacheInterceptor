@@ -28,15 +28,37 @@ namespace EFCoreSecondLevelCacheInterceptor
     }
 
     /// <summary>
+    /// Global Cache Settings
+    /// </summary>
+    public class EFCoreSecondLevelCacheSettings
+    {
+        /// <summary>
+        /// The selected cache provider
+        /// </summary>
+        public Type CacheProvider { get; set; }
+
+        /// <summary>
+        /// Redis connection string
+        /// </summary>
+        public string RedisConfiguration { get; set; }
+
+        /// <summary>
+        /// CacheAllQueries Options
+        /// </summary>
+        public CacheAllQueriesOptions CacheAllQueriesOptions { get; set; } = new CacheAllQueriesOptions();
+
+        /// <summary>
+        /// Should the debug level loggig be disabled?
+        /// </summary>
+        public bool DisableLogging { set; get; }
+    }
+
+    /// <summary>
     /// Defines EFCoreSecondLevel's Options
     /// </summary>
     public class EFCoreSecondLevelCacheOptions
     {
-        internal Type CacheProvider { get; set; }
-
-        internal string RedisConfiguration { get; set; }
-
-        internal CacheAllQueriesOptions CacheAllQueriesOptions { get; set; }
+        internal EFCoreSecondLevelCacheSettings Settings { get; } = new EFCoreSecondLevelCacheSettings();
 
         /// <summary>
         /// Puts the whole system in cache. In this case calling the `Cacheable()` methods won't be necessary.
@@ -47,7 +69,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="timeout">The expiration timeout.</param>
         public EFCoreSecondLevelCacheOptions CacheAllQueries(CacheExpirationMode expirationMode, TimeSpan timeout)
         {
-            CacheAllQueriesOptions = new CacheAllQueriesOptions
+            Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
             {
                 ExpirationMode = expirationMode,
                 Timeout = timeout,
@@ -62,7 +84,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <typeparam name="T">Implements IEFCacheServiceProvider</typeparam>
         public EFCoreSecondLevelCacheOptions UseCustomCacheProvider<T>() where T : IEFCacheServiceProvider
         {
-            CacheProvider = typeof(T);
+            Settings.CacheProvider = typeof(T);
             return this;
         }
 
@@ -75,8 +97,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <typeparam name="T">Implements IEFCacheServiceProvider</typeparam>
         public EFCoreSecondLevelCacheOptions UseCustomCacheProvider<T>(CacheExpirationMode expirationMode, TimeSpan timeout) where T : IEFCacheServiceProvider
         {
-            CacheProvider = typeof(T);
-            CacheAllQueriesOptions = new CacheAllQueriesOptions
+            Settings.CacheProvider = typeof(T);
+            Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
             {
                 ExpirationMode = expirationMode,
                 Timeout = timeout,
@@ -90,7 +112,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public EFCoreSecondLevelCacheOptions UseMemoryCacheProvider()
         {
-            CacheProvider = typeof(EFMemoryCacheServiceProvider);
+            Settings.CacheProvider = typeof(EFMemoryCacheServiceProvider);
             return this;
         }
 
@@ -102,8 +124,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="timeout">The expiration timeout.</param>
         public EFCoreSecondLevelCacheOptions UseMemoryCacheProvider(CacheExpirationMode expirationMode, TimeSpan timeout)
         {
-            CacheProvider = typeof(EFMemoryCacheServiceProvider);
-            CacheAllQueriesOptions = new CacheAllQueriesOptions
+            Settings.CacheProvider = typeof(EFMemoryCacheServiceProvider);
+            Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
             {
                 ExpirationMode = expirationMode,
                 Timeout = timeout,
@@ -118,8 +140,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="configuration">The string configuration to use for the multiplexer.</param>
         public EFCoreSecondLevelCacheOptions UseRedisCacheProvider(string configuration)
         {
-            CacheProvider = typeof(EFRedisCacheServiceProvider);
-            RedisConfiguration = configuration;
+            Settings.CacheProvider = typeof(EFRedisCacheServiceProvider);
+            Settings.RedisConfiguration = configuration;
             return this;
         }
 
@@ -135,14 +157,24 @@ namespace EFCoreSecondLevelCacheInterceptor
             CacheExpirationMode expirationMode,
             TimeSpan timeout)
         {
-            CacheProvider = typeof(EFRedisCacheServiceProvider);
-            RedisConfiguration = configuration;
-            CacheAllQueriesOptions = new CacheAllQueriesOptions
+            Settings.CacheProvider = typeof(EFRedisCacheServiceProvider);
+            Settings.RedisConfiguration = configuration;
+            Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
             {
                 ExpirationMode = expirationMode,
                 Timeout = timeout,
                 IsActive = true
             };
+            return this;
+        }
+
+        /// <summary>
+        /// Should the debug level loggig be disabled?
+        /// Set it to true for maximum performance.
+        /// </summary>
+        public EFCoreSecondLevelCacheOptions DisableLogging(bool value = false)
+        {
+            Settings.DisableLogging = value;
             return this;
         }
     }
@@ -178,24 +210,21 @@ namespace EFCoreSecondLevelCacheInterceptor
             var cacheOptions = new EFCoreSecondLevelCacheOptions();
             options.Invoke(cacheOptions);
 
-            if (cacheOptions.CacheProvider == null)
+            if (cacheOptions.Settings.CacheProvider == null)
             {
                 services.TryAddSingleton<IEFCacheServiceProvider, EFMemoryCacheServiceProvider>();
             }
             else
             {
-                if (cacheOptions.CacheProvider == typeof(EFRedisCacheServiceProvider))
+                if (cacheOptions.Settings.CacheProvider == typeof(EFRedisCacheServiceProvider))
                 {
-                    services.TryAddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(cacheOptions.RedisConfiguration));
+                    services.TryAddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(cacheOptions.Settings.RedisConfiguration));
                     services.TryAddSingleton<IRedisDbCache, RedisDbCache>();
                 }
-                services.TryAddSingleton(typeof(IEFCacheServiceProvider), cacheOptions.CacheProvider);
+                services.TryAddSingleton(typeof(IEFCacheServiceProvider), cacheOptions.Settings.CacheProvider);
             }
 
-            if (cacheOptions.CacheAllQueriesOptions != null)
-            {
-                services.TryAddSingleton(Options.Create(cacheOptions.CacheAllQueriesOptions));
-            }
+            services.TryAddSingleton(Options.Create(cacheOptions.Settings));
         }
     }
 }

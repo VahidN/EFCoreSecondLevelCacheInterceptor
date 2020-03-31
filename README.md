@@ -44,7 +44,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEFSecondLevelCache(options =>
-                options.UseMemoryCacheProvider()
+                options.UseMemoryCacheProvider().DisableLogging(true)
 
             // Installing Redis on Windows: http://taswar.zeytinsoft.com/intro-to-redis-for-net-developers/
             // Install the Redis binaries in the default NuGet tools directory: https://www.nuget.org/packages/Redis-64/
@@ -114,7 +114,7 @@ NOTE: It doesn't matter where the `Cacheable` method is located in this expressi
 Also it's possibe to set the `Cacheable()` method's settings globally:
 
 ```csharp
-services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)));
+services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true));
 ```
 
 In this case the above query will become:
@@ -127,8 +127,7 @@ var post1 = context.Posts
                    .FirstOrDefault();  // Async methods are supported too.
 ```
 
-If you specify the settings of the `Cacheable()` method explicitly such as `Cacheable(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(5))`, its setting will override the global setting. 
-
+If you specify the settings of the `Cacheable()` method explicitly such as `Cacheable(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(5))`, its setting will override the global setting.
 
 ## Caching all of the queries
 
@@ -143,7 +142,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider();
+                options.UseMemoryCacheProvider().DisableLogging(true);
                 options.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
             });
 

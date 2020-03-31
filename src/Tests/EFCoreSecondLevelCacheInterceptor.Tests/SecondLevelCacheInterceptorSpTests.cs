@@ -15,7 +15,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public async Task TestCacheableWorksWithSPs(bool useRedis)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Information, false, async (context, loggerProvider) =>
+            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false, async (context, loggerProvider) =>
                    {
                        var blogId = 1;
                        var blogs = await context.Set<BlogData>()
@@ -39,7 +39,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(true)]
         public async Task TestCacheInvalidationWorksWithSPs(bool useRedis)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Information, false, async (context, loggerProvider) =>
+            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false, async (context, loggerProvider) =>
                    {
                        var blogId = 1;
                        var blogs = await context.Set<BlogData>()
