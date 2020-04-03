@@ -124,6 +124,7 @@ services.AddSingleton(typeof(ICacheManagerConfiguration),
                 .WithEndpoint("localhost", 6379)
                 // Enables keyspace notifications to react on eviction/expiration of items.
                 // Make sure that all servers are configured correctly and 'notify-keyspace-events' is at least set to 'Exe', otherwise CacheManager will not retrieve any events.
+				// You can try 'Egx' or 'eA' value for the `notify-keyspace-events` too.
                 // See https://redis.io/topics/notifications#configuration for configuration details.
                 .EnableKeyspaceEvents();
         })

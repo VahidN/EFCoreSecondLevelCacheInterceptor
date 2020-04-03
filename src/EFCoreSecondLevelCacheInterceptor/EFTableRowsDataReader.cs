@@ -127,6 +127,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override bool GetBoolean(int ordinal)
         {
             var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
             var valueType = value.GetType();
             if (valueType == typeof(long))
             {
@@ -147,6 +152,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override byte GetByte(int ordinal)
         {
             var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
             var valueType = value.GetType();
             if (valueType == typeof(long))
             {
@@ -172,6 +182,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override char GetChar(int ordinal)
         {
             var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
             if (value.GetType() == typeof(string))
             {
                 var val = value.ToString();
@@ -196,6 +211,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override DateTime GetDateTime(int ordinal)
         {
             var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
             if (value.GetType() != typeof(DateTime))
             {
                 return DateTime.Parse(value.ToString());
@@ -210,6 +230,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override decimal GetDecimal(int ordinal)
         {
             var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
             var valueType = value.GetType();
             if (valueType == typeof(string))
             {
@@ -227,7 +252,16 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the value of the specified column as a double-precision floating point number.
         /// </summary>
-        public override double GetDouble(int ordinal) => (double)GetValue(ordinal);
+        public override double GetDouble(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
+            return (double)value;
+        }
 
         /// <summary>
         /// Returns an IEnumerator that iterates through the SqlDataReader.
@@ -240,6 +274,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override float GetFloat(int ordinal)
         {
             var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
             var valueType = value.GetType();
             if (valueType == typeof(double))
             {
@@ -260,6 +299,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override Guid GetGuid(int ordinal)
         {
             var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
             if (value.GetType() == typeof(string))
             {
                 return new Guid(value.ToString());
@@ -274,6 +318,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override short GetInt16(int ordinal)
         {
             var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
             var valueType = value.GetType();
             if (valueType == typeof(long))
             {
@@ -294,6 +343,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override int GetInt32(int ordinal)
         {
             var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
             var valueType = value.GetType();
             if (valueType == typeof(long))
             {
@@ -311,12 +365,30 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the value of the specified column as a 64-bit signed integer.
         /// </summary>
-        public override long GetInt64(int ordinal) => (long)GetValue(ordinal);
+        public override long GetInt64(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
+            return (long)value;
+        }
 
         /// <summary>
         /// Gets the value of the specified column as a string.
         /// </summary>
-        public override string GetString(int ordinal) => (string)GetValue(ordinal);
+        public override string GetString(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            if (value == null)
+            {
+                return default;
+            }
+
+            return (string)value;
+        }
 
         /// <summary>
         /// Gets the value of the specified column in its native format.
@@ -335,6 +407,10 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets a value that indicates whether the column contains non-existent or missing values.
         /// </summary>
-        public override bool IsDBNull(int ordinal) => _rowValues[ordinal] is DBNull;
+        public override bool IsDBNull(int ordinal)
+        {
+            var value = _rowValues[ordinal];
+            return value is null || value is DBNull;
+        }
     }
 }

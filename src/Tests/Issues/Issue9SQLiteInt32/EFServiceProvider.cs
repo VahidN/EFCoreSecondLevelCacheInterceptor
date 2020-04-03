@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Issue9SQLiteInt32.DataLayer;
 using EFCoreSecondLevelCacheInterceptor;
 using Microsoft.EntityFrameworkCore;
+using CacheManager.Core;
+using Newtonsoft.Json;
 
 namespace Issue9SQLiteInt32
 {
@@ -49,15 +51,17 @@ namespace Issue9SQLiteInt32
 
             var basePath = Directory.GetCurrentDirectory();
             Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
-            var configuration = new ConfigurationBuilder()
+            var configuration = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
                                 .SetBasePath(basePath)
                                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                                 .Build();
             services.AddSingleton(_ => configuration);
 
             services.AddEFSecondLevelCache(options =>
-                options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5))
+                //options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5))
+                options.UseCacheManagerCoreProvider()
             );
+            addCacheManagerCoreRedis(services);
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 {
@@ -80,6 +84,40 @@ namespace Issue9SQLiteInt32
             }
             Console.WriteLine($"Using {connectionString}");
             return connectionString;
+        }
+
+        private static void addCacheManagerCoreRedis(ServiceCollection services)
+        {
+            var jss = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Objects // set this if you have binary data
+            };
+
+            const string redisConfigurationKey = "redis";
+            services.AddSingleton(typeof(ICacheManagerConfiguration),
+                new CacheManager.Core.ConfigurationBuilder()
+                    .WithJsonSerializer(serializationSettings: jss, deserializationSettings: jss)
+                    .WithUpdateMode(CacheUpdateMode.Up)
+                    .WithRedisConfiguration(redisConfigurationKey, config =>
+                    {
+                        config.WithAllowAdmin()
+                            .WithDatabase(0)
+                            .WithEndpoint("localhost", 6379)
+                            // Enables keyspace notifications to react on eviction/expiration of items.
+                            // Make sure that all servers are configured correctly and 'notify-keyspace-events' is at least set to 'Exe', otherwise CacheManager will not retrieve any events.
+                            // See https://redis.io/topics/notifications#configuration for configuration details.
+                            .EnableKeyspaceEvents();
+                    })
+                    .WithMaxRetries(100)
+                    .WithRetryTimeout(50)
+                    .WithRedisCacheHandle(redisConfigurationKey)
+                    .WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10))
+                    .DisablePerformanceCounters()
+                    .DisableStatistics()
+                    .Build());
+            services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
         }
     }
 }
