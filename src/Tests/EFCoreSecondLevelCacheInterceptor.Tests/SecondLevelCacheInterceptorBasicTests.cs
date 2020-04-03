@@ -11,7 +11,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     {
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestIncludeMethodAffectsKeyCache(TestCacheProvider cacheProvider)
@@ -32,7 +31,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestQueriesUsingDifferentParameterValuesWillNotUseTheCache(TestCacheProvider cacheProvider)
@@ -71,7 +69,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestSecondLevelCacheInTwoDifferentContextsDoesNotHitTheDatabase(TestCacheProvider cacheProvider)
@@ -104,7 +101,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestSecondLevelCacheUsingDifferentSyncMethods(TestCacheProvider cacheProvider)
@@ -160,7 +156,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestSecondLevelCacheUsingTwoCountMethods(TestCacheProvider cacheProvider)
@@ -190,7 +185,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestSecondLevelCacheUsingProjections(TestCacheProvider cacheProvider)
@@ -222,7 +216,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestIncludeMethodAndProjectionAffectsKeyCache(TestCacheProvider cacheProvider)
@@ -273,7 +266,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestNullValuesWillUseTheCache(TestCacheProvider cacheProvider)
@@ -300,7 +292,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestEqualsMethodWillUseTheCache(TestCacheProvider cacheProvider)
@@ -332,7 +323,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void Test2DifferentCollectionsWillNotUseTheCache(TestCacheProvider cacheProvider)

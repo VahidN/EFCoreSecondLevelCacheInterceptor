@@ -12,7 +12,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     {
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestInsertingDataIntoTheSameTableShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
@@ -62,7 +61,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestInsertingDataToOtherTablesShouldNotInvalidateTheCacheDependencyAutomatically(TestCacheProvider cacheProvider)
@@ -107,7 +105,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestInsertingDataToRelatedTablesShouldInvalidateTheCacheDependencyAutomatically(TestCacheProvider cacheProvider)
@@ -153,7 +150,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestTransactionRollbackShouldNotInvalidateTheCacheDependencyAutomatically(TestCacheProvider cacheProvider)
@@ -213,7 +209,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestRemoveDataShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
@@ -255,7 +250,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestRemoveTptDataShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
@@ -280,7 +274,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestAddThenRemoveDataShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
@@ -346,7 +339,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void TestCachingByteArrays(TestCacheProvider cacheProvider)

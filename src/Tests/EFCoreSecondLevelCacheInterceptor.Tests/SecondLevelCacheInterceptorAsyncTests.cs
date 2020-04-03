@@ -12,7 +12,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     {
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public async Task TestSecondLevelCacheUsingAsyncMethodsDoesNotHitTheDatabase(TestCacheProvider cacheProvider)
@@ -67,7 +66,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public async Task TestSecondLevelCacheUsingDifferentAsyncMethods(TestCacheProvider cacheProvider)
@@ -122,7 +120,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public async Task TestSecondLevelCacheUsingTwoCountAsyncMethods(TestCacheProvider cacheProvider)
@@ -153,7 +150,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         /*[DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public async Task TestSecondLevelCacheUsingFindAsyncMethods(TestCacheProvider cacheProvider)

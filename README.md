@@ -46,11 +46,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             services.AddEFSecondLevelCache(options =>
                 options.UseMemoryCacheProvider().DisableLogging(true)
 
-            // Installing Redis on Windows: http://taswar.zeytinsoft.com/intro-to-redis-for-net-developers/
-            // Install the Redis binaries in the default NuGet tools directory: https://www.nuget.org/packages/Redis-64/
-            // Different ways to configure Redis: https://stackexchange.github.io/StackExchange.Redis/Configuration#configuration-options
-            // Redis Desktop Manager: https://github.com/uglide/RedisDesktopManager
-            // options.UseRedisCacheProvider(Configuration["RedisConfiguration"])
+            // Please use the `CacheManager.Core` for the Redis cache provider.
             );
 
             var connectionString = Configuration["ConnectionStrings:ApplicationDbContextConnection"];
@@ -66,7 +62,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 }
 ```
 
-If you want to use the Redis as the preferred cache provider, use `options.UseRedisCacheProvider(Configuration["RedisConfiguration"])`.
+If you want to use the Redis as the preferred cache provider, please use the `CacheManager.Core` provider.
 
 Also here you can use the [CacheManager.Core](https://github.com/MichaCo/CacheManager), as a highly configurable cache manager too.
 To use its in-memory caching mechanism, add these entries to the `.csproj` file:

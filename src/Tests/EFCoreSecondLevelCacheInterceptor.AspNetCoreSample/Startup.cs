@@ -25,15 +25,8 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider();
-
-                // Installing Redis on Windows: http://taswar.zeytinsoft.com/intro-to-redis-for-net-developers/
-                // Install the Redis binaries in the default NuGet tools directory: https://www.nuget.org/packages/Redis-64/
-                // Different ways to configure Redis: https://stackexchange.github.io/StackExchange.Redis/Configuration#configuration-options
-                // Redis Desktop Manager: https://github.com/uglide/RedisDesktopManager
-                // options.UseRedisCacheProvider(Configuration["RedisConfiguration"])
-
-                options.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
+                options.UseMemoryCacheProvider()
+                    .CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
             });
 
             var connectionString = Configuration["ConnectionStrings:ApplicationDbContextConnection"];

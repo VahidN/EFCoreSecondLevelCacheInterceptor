@@ -2,7 +2,6 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using StackExchange.Redis;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -135,40 +134,6 @@ namespace EFCoreSecondLevelCacheInterceptor
         }
 
         /// <summary>
-        /// Introduces the built-in `EFRedisCacheServiceProvider` to be used as the CacheProvider.
-        /// </summary>
-        /// <param name="configuration">The string configuration to use for the multiplexer.</param>
-        public EFCoreSecondLevelCacheOptions UseRedisCacheProvider(string configuration)
-        {
-            Settings.CacheProvider = typeof(EFRedisCacheServiceProvider);
-            Settings.RedisConfiguration = configuration;
-            return this;
-        }
-
-        /// <summary>
-        /// Introduces the built-in `EFRedisCacheServiceProvider` to be used as the CacheProvider.
-        /// If you specify the `Cacheable()` method options, its setting will override this global setting.
-        /// </summary>
-        /// <param name="configuration">The string configuration to use for the multiplexer.</param>
-        /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
-        /// <param name="timeout">The expiration timeout.</param>
-        public EFCoreSecondLevelCacheOptions UseRedisCacheProvider(
-            string configuration,
-            CacheExpirationMode expirationMode,
-            TimeSpan timeout)
-        {
-            Settings.CacheProvider = typeof(EFRedisCacheServiceProvider);
-            Settings.RedisConfiguration = configuration;
-            Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
-            {
-                ExpirationMode = expirationMode,
-                Timeout = timeout,
-                IsActive = true
-            };
-            return this;
-        }
-
-        /// <summary>
         /// Introduces the built-in `CacheManagerCoreProvider` to be used as the CacheProvider.
         /// </summary>
         public EFCoreSecondLevelCacheOptions UseCacheManagerCoreProvider()
@@ -219,7 +184,6 @@ namespace EFCoreSecondLevelCacheInterceptor
             Action<EFCoreSecondLevelCacheOptions> options)
         {
             services.AddMemoryCache();
-            services.TryAddSingleton<IRedisSerializationProvider, RedisSerializationProvider>();
             services.TryAddSingleton<IReaderWriterLockProvider, ReaderWriterLockProvider>();
             services.TryAddSingleton<IEFCacheKeyProvider, EFCacheKeyProvider>();
             services.TryAddSingleton<IEFCachePolicyParser, EFCachePolicyParser>();
@@ -243,11 +207,6 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
             else
             {
-                if (cacheOptions.Settings.CacheProvider == typeof(EFRedisCacheServiceProvider))
-                {
-                    services.TryAddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(cacheOptions.Settings.RedisConfiguration));
-                    services.TryAddSingleton<IRedisDbCache, RedisDbCache>();
-                }
                 services.TryAddSingleton(typeof(IEFCacheServiceProvider), cacheOptions.Settings.CacheProvider);
             }
 

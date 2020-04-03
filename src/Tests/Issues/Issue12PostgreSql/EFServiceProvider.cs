@@ -57,7 +57,6 @@ namespace Issue12PostgreSql
 
             services.AddEFSecondLevelCache(options =>
                 options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5))
-            // options.UseRedisCacheProvider(configuration["RedisConfiguration"])
             );
 
             services.AddDbContext<ApplicationDbContext>(options =>

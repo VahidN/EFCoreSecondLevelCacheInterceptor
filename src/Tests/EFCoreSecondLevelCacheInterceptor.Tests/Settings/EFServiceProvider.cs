@@ -14,7 +14,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     public enum TestCacheProvider
     {
         BuiltInInMemory,
-        BuiltInRedis,
         CacheManagerCoreInMemory,
         CacheManagerCoreRedis
     }
@@ -60,23 +59,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             return serviceProvider.GetRequiredService<T>();
         }
 
-        public static IEFCacheServiceProvider GetRedisCacheServiceProvider()
-        {
-            var services = new ServiceCollection();
-
-            var basePath = Directory.GetCurrentDirectory();
-            Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
-            var configuration = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
-                                .SetBasePath(basePath)
-                                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                                .Build();
-            services.AddSingleton(_ => configuration);
-
-            services.AddEFSecondLevelCache(options => options.UseRedisCacheProvider(configuration["RedisConfiguration"]));
-            var serviceProvider = services.BuildServiceProvider();
-            return serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
-        }
-
         public static IServiceProvider GetConfiguredContextServiceProvider(
             TestCacheProvider cacheProvider,
             LogLevel logLevel,
@@ -101,9 +83,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 {
                     case TestCacheProvider.BuiltInInMemory:
                         options.UseMemoryCacheProvider();
-                        break;
-                    case TestCacheProvider.BuiltInRedis:
-                        options.UseRedisCacheProvider(configuration["RedisConfiguration"]);
                         break;
                     case TestCacheProvider.CacheManagerCoreInMemory:
                         options.UseCacheManagerCoreProvider();

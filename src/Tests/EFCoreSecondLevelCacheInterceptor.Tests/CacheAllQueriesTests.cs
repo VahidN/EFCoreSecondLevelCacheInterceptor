@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     {
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public async Task TestCacheAllQueriesWorks(TestCacheProvider cacheProvider)
@@ -41,7 +39,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public async Task TestCacheAllQueriesWithNotCacheableWorks(TestCacheProvider cacheProvider)

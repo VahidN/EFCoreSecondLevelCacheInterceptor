@@ -14,7 +14,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             return cacheProvider switch
             {
                 TestCacheProvider.BuiltInInMemory => EFServiceProvider.GetInMemoryCacheServiceProvider(),
-                TestCacheProvider.BuiltInRedis => EFServiceProvider.GetRedisCacheServiceProvider(),
                 TestCacheProvider.CacheManagerCoreInMemory => EFServiceProvider.GetCacheManagerCoreInMemory(),
                 TestCacheProvider.CacheManagerCoreRedis => EFServiceProvider.GetCacheManagerCoreRedis(),
                 _ => throw new NotSupportedException($"{cacheProvider} is not supported."),
@@ -23,7 +22,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public virtual void TestCacheInvalidationWithTwoRoots(TestCacheProvider cacheProvider)
@@ -67,7 +65,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public virtual void TestCacheInvalidationWithOneRoot(TestCacheProvider cacheProvider)
@@ -110,7 +107,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public virtual void TestObjectCacheInvalidationWithOneRoot(TestCacheProvider cacheProvider)
@@ -156,7 +152,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public virtual void TestCacheInvalidationWithSimilarRoots(TestCacheProvider cacheProvider)
@@ -200,7 +195,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public virtual void TestInsertingNullValues(TestCacheProvider cacheProvider)
@@ -222,7 +216,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public virtual void TestParallelInsertsAndRemoves(TestCacheProvider cacheProvider)

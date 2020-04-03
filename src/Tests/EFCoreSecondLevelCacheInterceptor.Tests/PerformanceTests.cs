@@ -11,7 +11,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     {
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
-        [DataRow(TestCacheProvider.BuiltInRedis)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         public void PerformanceTest(TestCacheProvider cacheProvider)
