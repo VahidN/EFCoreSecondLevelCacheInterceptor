@@ -10,13 +10,15 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     public class PerformanceTests
     {
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void PerformanceTest(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void PerformanceTest(TestCacheProvider cacheProvider)
         {
             const decimal loopCount = 1000;
 
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Warning, false, (context, debugLoggerProvider) =>
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Warning, false, (context, debugLoggerProvider) =>
             {
                 Stopwatch watch = new Stopwatch();
                 watch.Start();

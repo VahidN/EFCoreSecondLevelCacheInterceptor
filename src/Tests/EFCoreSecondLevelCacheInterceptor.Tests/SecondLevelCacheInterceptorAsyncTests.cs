@@ -11,11 +11,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     public class SecondLevelCacheInterceptorAsyncTests
     {
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public async Task TestSecondLevelCacheUsingAsyncMethodsDoesNotHitTheDatabase(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public async Task TestSecondLevelCacheUsingAsyncMethodsDoesNotHitTheDatabase(TestCacheProvider cacheProvider)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false,
+            await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false,
                 async (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -64,11 +66,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public async Task TestSecondLevelCacheUsingDifferentAsyncMethods(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public async Task TestSecondLevelCacheUsingDifferentAsyncMethods(TestCacheProvider cacheProvider)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false,
+            await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false,
                 async (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -117,11 +121,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public async Task TestSecondLevelCacheUsingTwoCountAsyncMethods(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public async Task TestSecondLevelCacheUsingTwoCountAsyncMethods(TestCacheProvider cacheProvider)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false,
+            await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false,
                 async (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -146,11 +152,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         /*[DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public async Task TestSecondLevelCacheUsingFindAsyncMethods(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public async Task TestSecondLevelCacheUsingFindAsyncMethods(TestCacheProvider cacheProvider)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false,
+            await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false,
                 async (context, loggerProvider) =>
                 {
                     var product1 = context.Products.TagWith("query 1").Find(1);

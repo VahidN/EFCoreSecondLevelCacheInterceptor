@@ -9,18 +9,26 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     [TestClass]
     public class EFCacheServiceProviderTests
     {
-        protected virtual IEFCacheServiceProvider GetCacheServiceProvider(bool useRedis)
+        protected virtual IEFCacheServiceProvider GetCacheServiceProvider(TestCacheProvider cacheProvider)
         {
-            return useRedis ? EFServiceProvider.GetInMemoryCacheServiceProvider() :
-                              EFServiceProvider.GetRedisCacheServiceProvider();
+            return cacheProvider switch
+            {
+                TestCacheProvider.BuiltInInMemory => EFServiceProvider.GetInMemoryCacheServiceProvider(),
+                TestCacheProvider.BuiltInRedis => EFServiceProvider.GetRedisCacheServiceProvider(),
+                TestCacheProvider.CacheManagerCoreInMemory => EFServiceProvider.GetCacheManagerCoreInMemory(),
+                TestCacheProvider.CacheManagerCoreRedis => EFServiceProvider.GetCacheManagerCoreRedis(),
+                _ => throw new NotSupportedException($"{cacheProvider} is not supported."),
+            };
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public virtual void TestCacheInvalidationWithTwoRoots(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public virtual void TestCacheInvalidationWithTwoRoots(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(useRedis);
+            var cacheService = GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
             var key1 = new EFCacheKey
             {
@@ -58,11 +66,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public virtual void TestCacheInvalidationWithOneRoot(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public virtual void TestCacheInvalidationWithOneRoot(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(useRedis);
+            var cacheService = GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
             var key1 = new EFCacheKey
             {
@@ -99,11 +109,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public virtual void TestObjectCacheInvalidationWithOneRoot(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public virtual void TestObjectCacheInvalidationWithOneRoot(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(useRedis);
+            var cacheService = GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
             const string rootCacheKey = "EFSecondLevelCache.Core.AspNetCoreSample.DataLayer.Entities.Product";
 
@@ -143,11 +155,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public virtual void TestCacheInvalidationWithSimilarRoots(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public virtual void TestCacheInvalidationWithSimilarRoots(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(useRedis);
+            var cacheService = GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
             var key1 = new EFCacheKey
             {
@@ -185,11 +199,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public virtual void TestInsertingNullValues(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public virtual void TestInsertingNullValues(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(useRedis);
+            var cacheService = GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
             var key1 = new EFCacheKey
             {
@@ -205,11 +221,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public virtual void TestParallelInsertsAndRemoves(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public virtual void TestParallelInsertsAndRemoves(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(useRedis);
+            var cacheService = GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
 
             var tests = new List<Action>();

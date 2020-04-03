@@ -169,6 +169,33 @@ namespace EFCoreSecondLevelCacheInterceptor
         }
 
         /// <summary>
+        /// Introduces the built-in `CacheManagerCoreProvider` to be used as the CacheProvider.
+        /// </summary>
+        public EFCoreSecondLevelCacheOptions UseCacheManagerCoreProvider()
+        {
+            Settings.CacheProvider = typeof(EFCacheManagerCoreProvider);
+            return this;
+        }
+
+        /// <summary>
+        /// Introduces the built-in `CacheManagerCoreProvider` to be used as the CacheProvider.
+        /// If you specify the `Cacheable()` method options, its setting will override this global setting.
+        /// </summary>
+        /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
+        /// <param name="timeout">The expiration timeout.</param>
+        public EFCoreSecondLevelCacheOptions UseCacheManagerCoreProvider(CacheExpirationMode expirationMode, TimeSpan timeout)
+        {
+            Settings.CacheProvider = typeof(EFCacheManagerCoreProvider);
+            Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
+            {
+                ExpirationMode = expirationMode,
+                Timeout = timeout,
+                IsActive = true
+            };
+            return this;
+        }
+
+        /// <summary>
         /// Should the debug level loggig be disabled?
         /// Set it to true for maximum performance.
         /// </summary>

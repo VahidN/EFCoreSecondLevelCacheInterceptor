@@ -28,7 +28,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         private static void startDb()
         {
             var serviceProvider = EFServiceProvider.GetConfiguredContextServiceProvider(
-                    useRedis: false,
+                    TestCacheProvider.BuiltInInMemory,
                     logLevel: LogLevel.Debug,
                     cacheAllQueries: false);
             var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>();

@@ -10,11 +10,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     public class SecondLevelCacheInterceptorBasicTests
     {
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void TestIncludeMethodAffectsKeyCache(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void TestIncludeMethodAffectsKeyCache(TestCacheProvider cacheProvider)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var firstProductIncludeTags = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
                                                                .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
@@ -29,11 +31,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void TestQueriesUsingDifferentParameterValuesWillNotUseTheCache(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void TestQueriesUsingDifferentParameterValuesWillNotUseTheCache(TestCacheProvider cacheProvider)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var list1 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
                        .OrderBy(product => product.ProductNumber)
@@ -66,14 +70,16 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void TestSecondLevelCacheInTwoDifferentContextsDoesNotHitTheDatabase(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void TestSecondLevelCacheInTwoDifferentContextsDoesNotHitTheDatabase(TestCacheProvider cacheProvider)
         {
             var isActive = true;
             var name = "Product2";
 
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var list2 = context.Products
@@ -97,11 +103,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void TestSecondLevelCacheUsingDifferentSyncMethods(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void TestSecondLevelCacheUsingDifferentSyncMethods(TestCacheProvider cacheProvider)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -151,11 +159,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void TestSecondLevelCacheUsingTwoCountMethods(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void TestSecondLevelCacheUsingTwoCountMethods(TestCacheProvider cacheProvider)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var isActive = true;
                    var name = "Product3";
@@ -165,7 +175,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                                    .Where(product => product.IsActive == isActive && product.ProductName == name)
                                    .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
                                    .Count();
-                   Assert.AreEqual(0, loggerProvider.GetCacheHitCount(), $"useRedis: {useRedis}");
+                   Assert.AreEqual(0, loggerProvider.GetCacheHitCount(), $"cacheProvider: {cacheProvider}");
                    Assert.IsTrue(count > 0);
 
                    count = context.Products
@@ -179,11 +189,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void TestSecondLevelCacheUsingProjections(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void TestSecondLevelCacheUsingProjections(TestCacheProvider cacheProvider)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var isActive = true;
                    var name = "Product1";
@@ -209,11 +221,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void TestIncludeMethodAndProjectionAffectsKeyCache(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void TestIncludeMethodAndProjectionAffectsKeyCache(TestCacheProvider cacheProvider)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var product1IncludeTags = context.Products
@@ -258,11 +272,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void TestNullValuesWillUseTheCache(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void TestNullValuesWillUseTheCache(TestCacheProvider cacheProvider)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var item1 = context.Products
                        .OrderBy(product => product.ProductNumber)
@@ -283,11 +299,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void TestEqualsMethodWillUseTheCache(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void TestEqualsMethodWillUseTheCache(TestCacheProvider cacheProvider)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false, (context, loggerProvider) =>
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false, (context, loggerProvider) =>
                {
                    var item1 = context.Products
                        .Where(product => product.ProductId == 2 && product.ProductName.Equals("Product1"))
@@ -313,11 +331,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public void Test2DifferentCollectionsWillNotUseTheCache(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void Test2DifferentCollectionsWillNotUseTheCache(TestCacheProvider cacheProvider)
         {
-            EFServiceProvider.RunInContext(useRedis, LogLevel.Debug, false,
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var collection1 = new[] { 1, 2, 3 };

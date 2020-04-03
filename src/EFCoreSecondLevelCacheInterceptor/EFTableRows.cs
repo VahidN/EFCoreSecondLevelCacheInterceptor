@@ -11,9 +11,15 @@ namespace EFCoreSecondLevelCacheInterceptor
     [Serializable]
     public class EFTableRows
     {
-        private readonly List<EFTableRow> _rows = new List<EFTableRow>();
+        /// <summary>
+        /// Rows of the table
+        /// </summary>
+        public List<EFTableRow> Rows { set; get; } = new List<EFTableRow>();
 
-        private readonly Dictionary<int, EFTableColumnInfo> _columnsInfo;
+        /// <summary>
+        /// TableColumn's Info
+        /// </summary>
+        public Dictionary<int, EFTableColumnInfo> ColumnsInfo { set; get; }
 
         /// <summary>
         /// Gets the number of columns in the current row.
@@ -28,7 +34,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets a value that indicates whether the SqlDataReader contains one or more rows.
         /// </summary>
-        public bool HasRows => _rows?.Count > 0;
+        public bool HasRows => Rows?.Count > 0;
 
         /// <summary>
         /// Gets the number of rows changed, inserted, or deleted by execution of the Transact-SQL statement.
@@ -43,7 +49,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Number of Db rows.
         /// </summary>
-        public int RowsCount => _rows?.Count ?? 0;
+        public int RowsCount => Rows?.Count ?? 0;
 
         /// <summary>
         /// Gets or sets the Get(index)
@@ -56,7 +62,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
             set
             {
-                _rows[index] = value;
+                Rows[index] = value;
             }
         }
 
@@ -65,10 +71,10 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public EFTableRows(DbDataReader reader)
         {
-            _columnsInfo = new Dictionary<int, EFTableColumnInfo>(reader.FieldCount);
+            ColumnsInfo = new Dictionary<int, EFTableColumnInfo>(reader.FieldCount);
             for (int i = 0; i < reader.FieldCount; i++)
             {
-                _columnsInfo.Add(i, new EFTableColumnInfo
+                ColumnsInfo.Add(i, new EFTableColumnInfo
                 {
                     Ordinal = i,
                     Name = reader.GetName(i),
@@ -83,7 +89,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public EFTableRows()
         {
-            _columnsInfo = new Dictionary<int, EFTableColumnInfo>();
+            ColumnsInfo = new Dictionary<int, EFTableColumnInfo>();
         }
 
         /// <summary>
@@ -93,21 +99,21 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             if (item != null)
             {
-                _rows.Add(item);
+                Rows.Add(item);
             }
         }
 
         /// <summary>
         /// returns the value of the given index.
         /// </summary>
-        public EFTableRow Get(int index) => _rows[index];
+        public EFTableRow Get(int index) => Rows[index];
 
         /// <summary>
         /// Gets the column ordinal, given the name of the column.
         /// </summary>
         public int GetOrdinal(string name)
         {
-            var keyValuePair = _columnsInfo.FirstOrDefault(pair => pair.Value.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            var keyValuePair = ColumnsInfo.FirstOrDefault(pair => pair.Value.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
             if (keyValuePair.Value != null)
             {
                 return keyValuePair.Value.Ordinal;
@@ -137,7 +143,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
         private EFTableColumnInfo getColumnInfo(int ordinal)
         {
-            var dbColumnInfo = _columnsInfo[ordinal];
+            var dbColumnInfo = ColumnsInfo[ordinal];
             if (dbColumnInfo != null)
             {
                 return dbColumnInfo;

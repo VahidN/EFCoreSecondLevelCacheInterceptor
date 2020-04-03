@@ -11,11 +11,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     public class CacheAllQueriesTests
     {
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public async Task TestCacheAllQueriesWorks(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public async Task TestCacheAllQueriesWorks(TestCacheProvider cacheProvider)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, true,
+            await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, true,
                 async (context, loggerProvider) =>
                 {
                     var isActive = true;
@@ -38,11 +40,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public async Task TestCacheAllQueriesWithNotCacheableWorks(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public async Task TestCacheAllQueriesWithNotCacheableWorks(TestCacheProvider cacheProvider)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, true,
+            await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, true,
                 async (context, loggerProvider) =>
                 {
                     var isActive = true;

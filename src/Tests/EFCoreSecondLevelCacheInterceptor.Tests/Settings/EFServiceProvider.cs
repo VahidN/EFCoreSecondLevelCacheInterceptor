@@ -6,9 +6,19 @@ using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using CacheManager.Core;
+using Newtonsoft.Json;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests
 {
+    public enum TestCacheProvider
+    {
+        BuiltInInMemory,
+        BuiltInRedis,
+        CacheManagerCoreInMemory,
+        CacheManagerCoreRedis
+    }
+
     public static class EFServiceProvider
     {
         private static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
@@ -16,6 +26,28 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         public static IEFCacheServiceProvider GetInMemoryCacheServiceProvider()
         {
             return GetRequiredService<IEFCacheServiceProvider>();
+        }
+
+        public static IEFCacheServiceProvider GetCacheManagerCoreInMemory()
+        {
+            var services = new ServiceCollection();
+            services.AddOptions();
+            services.AddLogging(cfg => cfg.AddConsole().AddDebug());
+            services.AddEFSecondLevelCache(options => options.UseCacheManagerCoreProvider());
+            addCacheManagerCoreInMemory(services);
+            var serviceProvider = services.BuildServiceProvider();
+            return serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
+        }
+
+        public static IEFCacheServiceProvider GetCacheManagerCoreRedis()
+        {
+            var services = new ServiceCollection();
+            services.AddOptions();
+            services.AddLogging(cfg => cfg.AddConsole().AddDebug());
+            services.AddEFSecondLevelCache(options => options.UseCacheManagerCoreProvider());
+            addCacheManagerCoreRedis(services);
+            var serviceProvider = services.BuildServiceProvider();
+            return serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
         }
 
         public static T GetRequiredService<T>()
@@ -34,7 +66,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
             var basePath = Directory.GetCurrentDirectory();
             Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
-            var configuration = new ConfigurationBuilder()
+            var configuration = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
                                 .SetBasePath(basePath)
                                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                                 .Build();
@@ -46,7 +78,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         public static IServiceProvider GetConfiguredContextServiceProvider(
-            bool useRedis,
+            TestCacheProvider cacheProvider,
             LogLevel logLevel,
             bool cacheAllQueries)
         {
@@ -54,7 +86,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             services.AddOptions();
             var basePath = Directory.GetCurrentDirectory();
             Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
-            var configuration = new ConfigurationBuilder()
+            var configuration = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
                                 .SetBasePath(basePath)
                                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                                 .Build();
@@ -65,13 +97,22 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
             services.AddEFSecondLevelCache(options =>
             {
-                if (useRedis)
+                switch (cacheProvider)
                 {
-                    options.UseRedisCacheProvider(configuration["RedisConfiguration"]);
-                }
-                else
-                {
-                    options.UseMemoryCacheProvider();
+                    case TestCacheProvider.BuiltInInMemory:
+                        options.UseMemoryCacheProvider();
+                        break;
+                    case TestCacheProvider.BuiltInRedis:
+                        options.UseRedisCacheProvider(configuration["RedisConfiguration"]);
+                        break;
+                    case TestCacheProvider.CacheManagerCoreInMemory:
+                        options.UseCacheManagerCoreProvider();
+                        addCacheManagerCoreInMemory(services);
+                        break;
+                    case TestCacheProvider.CacheManagerCoreRedis:
+                        options.UseCacheManagerCoreProvider();
+                        addCacheManagerCoreRedis(services);
+                        break;
                 }
 
                 if (cacheAllQueries)
@@ -83,6 +124,53 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             services.AddConfiguredMsSqlDbContext(getConnectionString(basePath, configuration));
 
             return services.BuildServiceProvider();
+        }
+
+        private static void addCacheManagerCoreRedis(ServiceCollection services)
+        {
+            var jss = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Objects // set this if you have binary data
+            };
+
+            const string redisConfigurationKey = "redis";
+            services.AddSingleton(typeof(ICacheManagerConfiguration),
+                new CacheManager.Core.ConfigurationBuilder()
+                    .WithJsonSerializer(serializationSettings: jss, deserializationSettings: jss)
+                    .WithUpdateMode(CacheUpdateMode.Up)
+                    .WithRedisConfiguration(redisConfigurationKey, config =>
+                    {
+                        config.WithAllowAdmin()
+                            .WithDatabase(0)
+                            .WithEndpoint("localhost", 6379)
+                            // Enables keyspace notifications to react on eviction/expiration of items.
+                            // Make sure that all servers are configured correctly and 'notify-keyspace-events' is at least set to 'Exe', otherwise CacheManager will not retrieve any events.
+                            // See https://redis.io/topics/notifications#configuration for configuration details.
+                            .EnableKeyspaceEvents();
+                    })
+                    .WithMaxRetries(100)
+                    .WithRetryTimeout(50)
+                    .WithRedisCacheHandle(redisConfigurationKey)
+                    .WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10))
+                    .DisablePerformanceCounters()
+                    .DisableStatistics()
+                    .Build());
+            services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
+        }
+
+        private static void addCacheManagerCoreInMemory(ServiceCollection services)
+        {
+            services.AddSingleton(typeof(ICacheManagerConfiguration),
+                                        new CacheManager.Core.ConfigurationBuilder()
+                                            .WithJsonSerializer()
+                                            .WithMicrosoftMemoryCacheHandle(instanceName: "MemoryCache1")
+                                            .WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10))
+                                            .DisablePerformanceCounters()
+                                            .DisableStatistics()
+                                            .Build());
+            services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
         }
 
         private static string getConnectionString(string basePath, IConfigurationRoot configuration)
@@ -99,7 +187,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         public static void RunInContext(
-            bool useRedis,
+            TestCacheProvider cacheProvider,
             LogLevel logLevel,
             bool cacheAllQueries,
             params Action<ApplicationDbContext, DebugLoggerProvider>[] actions)
@@ -107,7 +195,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             _semaphoreSlim.Wait();
             try
             {
-                var serviceProvider = GetConfiguredContextServiceProvider(useRedis, logLevel, cacheAllQueries);
+                var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
                 serviceProvider.GetRequiredService<IEFCacheServiceProvider>().ClearAllCachedEntries();
                 using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {
@@ -127,7 +215,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         public static async Task RunInContextAsync(
-            bool useRedis,
+            TestCacheProvider cacheProvider,
             LogLevel logLevel,
             bool cacheAllQueries,
             params Func<ApplicationDbContext, DebugLoggerProvider, Task>[] actions)
@@ -135,7 +223,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             await _semaphoreSlim.WaitAsync();
             try
             {
-                var serviceProvider = GetConfiguredContextServiceProvider(useRedis, logLevel, cacheAllQueries);
+                var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
                 serviceProvider.GetRequiredService<IEFCacheServiceProvider>().ClearAllCachedEntries();
                 using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {

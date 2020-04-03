@@ -68,6 +68,81 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 
 If you want to use the Redis as the preferred cache provider, use `options.UseRedisCacheProvider(Configuration["RedisConfiguration"])`.
 
+Also here you can use the [CacheManager.Core](https://github.com/MichaCo/CacheManager), as a highly configurable cache manager too.
+To use its in-memory caching mechanism, add these entries to the `.csproj` file:
+
+```xml
+  <ItemGroup>
+    <PackageReference Include="CacheManager.Core" Version="1.2.0" />
+    <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="1.2.0" />
+    <PackageReference Include="CacheManager.Serialization.Json" Version="1.2.0" />
+  </ItemGroup>
+```
+
+Then register its required services:
+
+```csharp
+namespace EFSecondLevelCache.Core.AspNetCoreSample
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddEFSecondLevelCache(options =>
+                options.UseCacheManagerCoreProvider().DisableLogging(true)
+            );
+
+            // Add an in-memory cache service provider
+            services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
+            services.AddSingleton(typeof(ICacheManagerConfiguration),
+                new CacheManager.Core.ConfigurationBuilder()
+                        .WithJsonSerializer()
+                        .WithMicrosoftMemoryCacheHandle(instanceName: "MemoryCache1")
+                        .WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10))
+                        .Build());
+        }
+    }
+}
+```
+
+If you want to use the Redis as the preferred cache provider with `CacheManager.Core`, first install the `CacheManager.StackExchange.Redis` package and then register its required services:
+
+```csharp
+// Add Redis cache service provider
+var jss = new JsonSerializerSettings
+{
+    NullValueHandling = NullValueHandling.Ignore,
+    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+    TypeNameHandling = TypeNameHandling.Objects // set this if you have binary data
+};
+
+const string redisConfigurationKey = "redis";
+services.AddSingleton(typeof(ICacheManagerConfiguration),
+    new CacheManager.Core.ConfigurationBuilder()
+        .WithJsonSerializer(serializationSettings: jss, deserializationSettings: jss)
+        .WithUpdateMode(CacheUpdateMode.Up)
+        .WithRedisConfiguration(redisConfigurationKey, config =>
+        {
+            config.WithAllowAdmin()
+                .WithDatabase(0)
+                .WithEndpoint("localhost", 6379)
+                // Enables keyspace notifications to react on eviction/expiration of items.
+                // Make sure that all servers are configured correctly and 'notify-keyspace-events' is at least set to 'Exe', otherwise CacheManager will not retrieve any events.
+                // See https://redis.io/topics/notifications#configuration for configuration details.
+                .EnableKeyspaceEvents();
+        })
+        .WithMaxRetries(100)
+        .WithRetryTimeout(50)
+        .WithRedisCacheHandle(redisConfigurationKey)
+        .WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10))
+        .Build());
+services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
+
+services.AddEFSecondLevelCache(options =>
+    options.UseCacheManagerCoreProvider().DisableLogging(true)
+);
+```
+
 2- [Add SecondLevelCacheInterceptor](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/MsSqlServiceCollectionExtensions.cs) to your `DbContextOptionsBuilder` pipeline:
 
 ```csharp
@@ -84,6 +159,8 @@ If you want to use the Redis as the preferred cache provider, use `options.UseRe
             optionsBuilder.AddInterceptors(new SecondLevelCacheInterceptor());
         }
 ```
+
+`SecondLevelCacheInterceptor` uses the built-in IoC container to retrieve the registered services. So after introducing it, you should retrieve the db-context's instances using the dependency injection system.
 
 3- Setting up the cache invalidation:
 

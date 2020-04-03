@@ -11,11 +11,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     public class SecondLevelCacheInterceptorSpTests
     {
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public async Task TestCacheableWorksWithSPs(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public async Task TestCacheableWorksWithSPs(TestCacheProvider cacheProvider)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false, async (context, loggerProvider) =>
+            await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false, async (context, loggerProvider) =>
                    {
                        var blogId = 1;
                        var blogs = await context.Set<BlogData>()
@@ -35,11 +37,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
-        [DataRow(false)]
-        [DataRow(true)]
-        public async Task TestCacheInvalidationWorksWithSPs(bool useRedis)
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.BuiltInRedis)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public async Task TestCacheInvalidationWorksWithSPs(TestCacheProvider cacheProvider)
         {
-            await EFServiceProvider.RunInContextAsync(useRedis, LogLevel.Debug, false, async (context, loggerProvider) =>
+            await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false, async (context, loggerProvider) =>
                    {
                        var blogId = 1;
                        var blogs = await context.Set<BlogData>()
