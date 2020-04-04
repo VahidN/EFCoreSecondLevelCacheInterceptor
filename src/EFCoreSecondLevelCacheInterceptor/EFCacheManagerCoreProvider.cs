@@ -11,14 +11,14 @@ namespace EFCoreSecondLevelCacheInterceptor
     {
         private readonly IReaderWriterLockProvider _readerWriterLockProvider;
         private readonly ICacheManager<ISet<string>> _dependenciesCacheManager;
-        private readonly ICacheManager<object> _valuesCacheManager;
+        private readonly ICacheManager<EFCachedData> _valuesCacheManager;
 
         /// <summary>
         /// Using IMemoryCache as a cache service.
         /// </summary>
         public EFCacheManagerCoreProvider(
             ICacheManager<ISet<string>> dependenciesCacheManager,
-            ICacheManager<object> valuesCacheManager,
+            ICacheManager<EFCachedData> valuesCacheManager,
             IReaderWriterLockProvider readerWriterLockProvider)
         {
             _readerWriterLockProvider = readerWriterLockProvider;
@@ -62,7 +62,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 }
                 else
                 {
-                    _valuesCacheManager.Add(new CacheItem<object>(
+                    _valuesCacheManager.Add(new CacheItem<EFCachedData>(
                         cacheKey.KeyHash,
                         value,
                         cachePolicy.CacheExpirationMode == CacheExpirationMode.Absolute ? ExpirationMode.Absolute : ExpirationMode.Sliding,

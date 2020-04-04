@@ -18,6 +18,32 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         CacheManagerCoreRedis
     }
 
+    public class SpecialTypesConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(TimeSpan) || objectType == typeof(TimeSpan?)
+                    || objectType == typeof(DateTime) || objectType == typeof(DateTime?)
+                    || objectType == typeof(DateTimeOffset) || objectType == typeof(DateTimeOffset?);
+        }
+
+        public override bool CanRead => true;
+
+        public override bool CanWrite => true;
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) => reader.Value;
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            writer.WriteStartObject();
+            writer.WritePropertyName("$type"); // Deserializer helper
+            writer.WriteValue(value.GetType().FullName);
+            writer.WritePropertyName("$value");
+            writer.WriteValue(value);
+            writer.WriteEndObject();
+        }
+    }
+
     public static class EFServiceProvider
     {
         private static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
@@ -111,7 +137,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             {
                 NullValueHandling = NullValueHandling.Ignore,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                TypeNameHandling = TypeNameHandling.Objects // set this if you have binary data
+                TypeNameHandling = TypeNameHandling.Objects, // set this if you have binary data
+                Converters = { new SpecialTypesConverter() }
             };
 
             const string redisConfigurationKey = "redis";

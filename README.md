@@ -109,7 +109,8 @@ var jss = new JsonSerializerSettings
 {
     NullValueHandling = NullValueHandling.Ignore,
     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-    TypeNameHandling = TypeNameHandling.Objects // set this if you have binary data
+    TypeNameHandling = TypeNameHandling.Objects, // set this if you have binary data
+    Converters = { new SpecialTypesConverter() }
 };
 
 const string redisConfigurationKey = "redis";
@@ -124,7 +125,7 @@ services.AddSingleton(typeof(ICacheManagerConfiguration),
                 .WithEndpoint("localhost", 6379)
                 // Enables keyspace notifications to react on eviction/expiration of items.
                 // Make sure that all servers are configured correctly and 'notify-keyspace-events' is at least set to 'Exe', otherwise CacheManager will not retrieve any events.
-				// You can try 'Egx' or 'eA' value for the `notify-keyspace-events` too.
+                // You can try 'Egx' or 'eA' value for the `notify-keyspace-events` too.
                 // See https://redis.io/topics/notifications#configuration for configuration details.
                 .EnableKeyspaceEvents();
         })
@@ -139,6 +140,8 @@ services.AddEFSecondLevelCache(options =>
     options.UseCacheManagerCoreProvider().DisableLogging(true)
 );
 ```
+
+[Here is](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/Settings/EFServiceProvider.cs#L21) the definition of the SpecialTypesConverter.
 
 2- [Add SecondLevelCacheInterceptor](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/MsSqlServiceCollectionExtensions.cs) to your `DbContextOptionsBuilder` pipeline:
 

@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
 {
-    public partial class V2020_02_08_1422 : Migration
+    public partial class V2020_04_03_2333 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -50,7 +51,25 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: false),
-                    UserStatus = table.Column<int>(nullable: false)
+                    UserStatus = table.Column<int>(nullable: false),
+                    ImageData = table.Column<byte[]>(nullable: true),
+                    AddDate = table.Column<DateTime>(nullable: true),
+                    UpdateDate = table.Column<DateTime>(nullable: true),
+                    Points = table.Column<long>(nullable: false),
+                    IsActive = table.Column<bool>(nullable: false),
+                    ByteValue = table.Column<byte>(nullable: false),
+                    CharValue = table.Column<string>(nullable: false),
+                    DateTimeOffsetValue = table.Column<DateTimeOffset>(nullable: true),
+                    DecimalValue = table.Column<decimal>(nullable: false),
+                    DoubleValue = table.Column<double>(nullable: false),
+                    FloatValue = table.Column<float>(nullable: false),
+                    GuidValue = table.Column<Guid>(nullable: false),
+                    TimeSpanValue = table.Column<TimeSpan>(nullable: true),
+                    ShortValue = table.Column<short>(nullable: false),
+                    ByteArrayValue = table.Column<byte[]>(nullable: true),
+                    UintValue = table.Column<long>(nullable: false),
+                    UlongValue = table.Column<decimal>(nullable: false),
+                    UshortValue = table.Column<decimal>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -154,8 +173,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "Name", "UserStatus" },
-                values: new object[] { 1, "User1", 0 });
+                columns: new[] { "Id", "AddDate", "ByteArrayValue", "ByteValue", "CharValue", "DateTimeOffsetValue", "DecimalValue", "DoubleValue", "FloatValue", "GuidValue", "ImageData", "IsActive", "Name", "Points", "ShortValue", "TimeSpanValue", "UintValue", "UlongValue", "UpdateDate", "UserStatus", "UshortValue" },
+                values: new object[] { 1, null, new byte[] { 1, 2 }, (byte)1, "C", null, 1.1m, 1.3, 1.2f, new Guid("236bbe40-b861-433c-8789-b152a99cfe3e"), null, true, "User1", 1000L, (short)2, null, 1L, 1m, null, 0, 1m });
 
             migrationBuilder.InsertData(
                 table: "Posts",

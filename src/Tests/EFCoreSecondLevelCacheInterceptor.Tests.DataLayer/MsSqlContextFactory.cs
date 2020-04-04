@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer
 {
@@ -12,6 +12,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer
         public ApplicationDbContext CreateDbContext(string[] args)
         {
             var services = new ServiceCollection();
+
+            services.AddLogging(cfg => cfg.AddConsole().AddDebug());
 
             var basePath = Directory.GetCurrentDirectory();
             Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
@@ -27,9 +29,12 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer
                 connectionString = connectionString.Replace("%CONTENTROOTPATH%", basePath);
             }
 
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseConfiguredMsSql(connectionString);
-            return new ApplicationDbContext(optionsBuilder.Options);
+            services.AddEFSecondLevelCache(options =>
+                options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)));
+
+            services.AddConfiguredMsSqlDbContext(connectionString);
+
+            return services.BuildServiceProvider().GetService<ApplicationDbContext>();
         }
     }
 }

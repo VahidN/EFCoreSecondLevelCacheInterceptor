@@ -285,13 +285,38 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                     const string user1Name = "User1";
                     if (!context.Users.Any(user => user.Name == user1Name))
                     {
-                        user1 = new User { Name = user1Name };
+                        user1 = new User
+                        {
+                            Name = user1Name,
+                            AddDate = new DateTime(2020, 4, 3, 17, 50, 39, 503),
+                            UpdateDate = null,
+                            Points = 1000,
+                            IsActive = true,
+                            ByteValue = 1,
+                            CharValue = 'C',
+                            DateTimeOffsetValue = new DateTimeOffset(new DateTime(2020, 4, 3, 17, 50, 39, 503)),
+                            DecimalValue = 1.1M,
+                            DoubleValue = 1.3,
+                            FloatValue = 1.2f,
+                            GuidValue = new Guid("236bbe40-b861-433c-8789-b152a99cfe3e"),
+                            TimeSpanValue = new TimeSpan(1, 0, 0, 0, 0),
+                            ShortValue = 2,
+                            ByteArrayValue = new byte[] { 1, 2 },
+                            UintValue = 1,
+                            UlongValue = 1,
+                            UshortValue = 1
+                        };
                         user1 = context.Users.Add(user1).Entity;
                     }
                     else
                     {
                         user1 = context.Users.First(user => user.Name == user1Name);
                     }
+
+                    var userOne = context.Users.Cacheable().First(user => user.Name == user1Name);
+                    userOne = context.Users.Cacheable().First(user => user.Name == user1Name);
+                    Assert.IsNotNull(userOne);
+                    loggerProvider.ClearItems();
 
                     var product = new Product
                     {

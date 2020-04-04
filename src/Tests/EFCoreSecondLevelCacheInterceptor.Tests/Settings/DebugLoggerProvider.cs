@@ -22,6 +22,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         {
         }
 
+        public void ClearItems()
+    {
+        _itemsQueue.Clear();
+    }
+
         public int GetCacheHitCount()
         {
             var count = _itemsQueue.Count(item => item.EventId == CacheableEventId.CacheHit);

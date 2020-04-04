@@ -15,7 +15,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.1")
+                .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -261,15 +261,67 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime?>("AddDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("ByteArrayValue")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte>("ByteValue")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("CharValue")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(1)");
+
+                    b.Property<DateTimeOffset?>("DateTimeOffsetValue")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("DecimalValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<double>("DoubleValue")
+                        .HasColumnType("float");
+
+                    b.Property<float>("FloatValue")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("GuidValue")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<byte[]>("ImageData")
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("Points")
+                        .HasColumnType("bigint");
+
+                    b.Property<short>("ShortValue")
+                        .HasColumnType("smallint");
+
+                    b.Property<TimeSpan?>("TimeSpanValue")
+                        .HasColumnType("time");
+
+                    b.Property<long>("UintValue")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("UlongValue")
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("UserStatus")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("UshortValue")
+                        .HasColumnType("decimal(20,0)");
 
                     b.HasKey("Id");
 
@@ -279,8 +331,21 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         new
                         {
                             Id = 1,
+                            ByteArrayValue = new byte[] { 1, 2 },
+                            ByteValue = (byte)1,
+                            CharValue = "C",
+                            DecimalValue = 1.1m,
+                            DoubleValue = 1.3,
+                            FloatValue = 1.2f,
+                            GuidValue = new Guid("236bbe40-b861-433c-8789-b152a99cfe3e"),
+                            IsActive = true,
                             Name = "User1",
-                            UserStatus = 0
+                            Points = 1000L,
+                            ShortValue = (short)2,
+                            UintValue = 1L,
+                            UlongValue = 1m,
+                            UserStatus = 0,
+                            UshortValue = 1m
                         });
                 });
 

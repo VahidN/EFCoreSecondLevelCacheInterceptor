@@ -1,4 +1,5 @@
-﻿using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities;
+﻿using System;
+using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer
@@ -162,7 +163,29 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer
             modelBuilder.Entity<User>(entity =>
             {
                 entity.Property(e => e.Name).IsRequired();
-                entity.HasData(new User { Id = 1, Name = "User1", UserStatus = UserStatus.Active });
+                entity.HasData(new User
+                {
+                    Id = 1,
+                    Name = "User1",
+                    UserStatus = UserStatus.Active,
+                    AddDate = null,
+                    UpdateDate = null,
+                    Points = 1000,
+                    IsActive = true,
+                    ByteValue = 1,
+                    CharValue = 'C',
+                    DateTimeOffsetValue = null,
+                    DecimalValue = 1.1M,
+                    DoubleValue = 1.3,
+                    FloatValue = 1.2f,
+                    GuidValue = new Guid("236bbe40-b861-433c-8789-b152a99cfe3e"),
+                    TimeSpanValue = null,
+                    ShortValue = 2,
+                    ByteArrayValue = new byte[] { 1, 2 },
+                    UintValue = 1,
+                    UlongValue = 1,
+                    UshortValue = 1
+                });
             });
 
             modelBuilder.Entity<BlogData>().HasNoKey();

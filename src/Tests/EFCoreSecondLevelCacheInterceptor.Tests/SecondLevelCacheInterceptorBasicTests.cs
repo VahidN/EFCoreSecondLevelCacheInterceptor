@@ -1,8 +1,11 @@
 using System;
 using System.Linq;
+using CacheManager.Serialization.Json;
+using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests
 {
@@ -347,6 +350,68 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                         .FirstOrDefault();
                     Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
                     Assert.IsNotNull(item2);
+                });
+        }
+
+        [TestMethod]
+        public void TestJsonNet()
+        {
+            var rnd = new Random();
+            var user1 = new User
+            {
+                Name = $"User {rnd.Next(1, 100000)}",
+                AddDate = DateTime.UtcNow,
+                UpdateDate = null,
+                Points = 1000,
+                IsActive = true,
+                ByteValue = 1,
+                CharValue = 'C',
+                DateTimeOffsetValue = DateTimeOffset.UtcNow,
+                DecimalValue = 1.1M,
+                DoubleValue = 1.3,
+                FloatValue = 1.2f,
+                GuidValue = Guid.NewGuid(),
+                TimeSpanValue = TimeSpan.FromMinutes(1),
+                ShortValue = 2,
+                ByteArrayValue = new byte[] { 1, 2 },
+                UintValue = 1,
+                UlongValue = 1,
+                UshortValue = 1
+            };
+
+            var jss = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Objects, // set this if you have binary data
+                Converters = { new SpecialTypesConverter() }
+            };
+            var jcs = new JsonCacheSerializer(jss, jss);
+            var json = jcs.Serialize(user1);
+            var user = jcs.Deserialize(json, typeof(object));
+            Assert.IsNotNull(user);
+        }
+
+        [DataTestMethod]
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void TestUsersWithAllDataTypes(TestCacheProvider cacheProvider)
+        {
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false,
+                (context, loggerProvider) =>
+                {
+                    var items1 = context.Users
+                        .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                        .ToList();
+                    Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
+                    Assert.IsNotNull(items1);
+
+                    var items2 = context.Users
+                        .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                        .ToList();
+                    Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
+                    Assert.IsNotNull(items2);
                 });
         }
     }
