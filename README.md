@@ -109,7 +109,7 @@ var jss = new JsonSerializerSettings
 {
     NullValueHandling = NullValueHandling.Ignore,
     ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-    TypeNameHandling = TypeNameHandling.Objects, // set this if you have binary data
+    TypeNameHandling = TypeNameHandling.Auto,
     Converters = { new SpecialTypesConverter() }
 };
 
@@ -143,7 +143,7 @@ services.AddEFSecondLevelCache(options =>
 
 [Here is](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/Settings/EFServiceProvider.cs#L21) the definition of the SpecialTypesConverter.
 
-- Note: If you don't want to use the above cache providers, implement your custom `IEFCacheServiceProvider` and then introduce it using the `options.UseCustomCacheProvider<T>()` method.
+Note: If you don't want to use the above cache providers, implement your custom `IEFCacheServiceProvider` and then introduce it using the `options.UseCustomCacheProvider<T>()` method.
 
 2- [Add SecondLevelCacheInterceptor](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/MsSqlServiceCollectionExtensions.cs) to your `DbContextOptionsBuilder` pipeline:
 

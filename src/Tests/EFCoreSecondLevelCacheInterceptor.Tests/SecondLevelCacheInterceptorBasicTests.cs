@@ -383,7 +383,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             {
                 NullValueHandling = NullValueHandling.Ignore,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                TypeNameHandling = TypeNameHandling.Objects, // set this if you have binary data
+                TypeNameHandling = TypeNameHandling.Auto,
                 Converters = { new SpecialTypesConverter() }
             };
             var jcs = new JsonCacheSerializer(jss, jss);
