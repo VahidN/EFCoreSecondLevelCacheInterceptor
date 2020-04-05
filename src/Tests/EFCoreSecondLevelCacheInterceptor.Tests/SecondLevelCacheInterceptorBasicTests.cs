@@ -414,5 +414,28 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                     Assert.IsNotNull(items2);
                 });
         }
+
+        [DataTestMethod]
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        public void TestAllDateTypes(TestCacheProvider cacheProvider)
+        {
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false,
+                (context, loggerProvider) =>
+                {
+                    var items1 = context.DateTypes
+                        .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                        .ToList();
+                    Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
+                    Assert.IsNotNull(items1);
+
+                    var items2 = context.DateTypes
+                        .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                        .ToList();
+                    Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
+                    Assert.IsNotNull(items2);
+                });
+        }
     }
 }

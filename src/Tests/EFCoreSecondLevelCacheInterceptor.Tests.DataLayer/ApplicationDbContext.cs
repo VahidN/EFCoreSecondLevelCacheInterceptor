@@ -12,6 +12,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer
         public virtual DbSet<Tag> Tags { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Blog> Blogs { get; set; }
+        public virtual DbSet<DateType> DateTypes { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         { }

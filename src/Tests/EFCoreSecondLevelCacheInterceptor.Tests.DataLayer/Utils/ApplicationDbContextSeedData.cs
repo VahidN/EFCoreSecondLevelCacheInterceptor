@@ -15,8 +15,26 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Utils
                 {
                     addSP(context);
                     addUser(context);
+                    addDateType(context);
                 }
             }
+        }
+
+        private static void addDateType(ApplicationDbContext context)
+        {
+            var rnd = new Random();
+            var isEven = rnd.Next(1, 100000) % 2 == 0;
+            var dateType1 = new DateType
+            {
+                AddDate = isEven ? (DateTime?)null : DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
+                AddDateValue = isEven ? (DateTimeOffset?)null : DateTimeOffset.UtcNow,
+                UpdateDateValue = DateTimeOffset.UtcNow,
+                RelativeAddTimeValue = isEven ? (TimeSpan?)null : TimeSpan.FromMinutes(6),
+                RelativeUpdateTimeValue = TimeSpan.FromMinutes(6)
+            };
+            context.DateTypes.Add(dateType1);
+            context.SaveChanges();
         }
 
         private static void addUser(ApplicationDbContext context)
