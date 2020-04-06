@@ -21,7 +21,7 @@ namespace EFCoreSecondLevelCacheInterceptor.WorkerServiceWithLamar
             _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
 
-            // Note: Don't inject the `ApplicationDbContext` here. Because it will become a `signelton`.
+            // Note: Don't inject the `ApplicationDbContext` here. Because it will become a `singleton`.
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
