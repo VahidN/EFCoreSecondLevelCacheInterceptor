@@ -23,9 +23,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         public void ClearItems()
-    {
-        _itemsQueue.Clear();
-    }
+        {
+            _itemsQueue.Clear();
+        }
 
         public int GetCacheHitCount()
         {

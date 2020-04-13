@@ -1,8 +1,12 @@
 using System;
+using System.IO;
 using System.Linq;
 using CacheManager.Serialization.Json;
+using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -436,6 +440,53 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                     Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
                     Assert.IsNotNull(items2);
                 });
+        }
+
+        [DataTestMethod]
+        public void TestInstantiatingContextWithoutDI()
+        {
+            var services = new ServiceCollection();
+            services.AddOptions();
+            var basePath = Directory.GetCurrentDirectory();
+            Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
+            var configuration = new ConfigurationBuilder()
+                                .SetBasePath(basePath)
+                                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                                .Build();
+            services.AddSingleton(_ => configuration);
+
+            var loggerProvider = new DebugLoggerProvider();
+            services.AddLogging(cfg => cfg.AddConsole().AddDebug().AddProvider(loggerProvider).SetMinimumLevel(LogLevel.Debug));
+
+            services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider());
+
+            var loggerFactory = new LoggerFactory(new[] { loggerProvider });
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
+                    .UseLoggerFactory(loggerFactory)
+                    .UseSqlServer(
+                        EFServiceProvider.GetConnectionString(basePath, configuration),
+                        sqlServerOptionsBuilder =>
+                        {
+                            sqlServerOptionsBuilder.CommandTimeout((int)TimeSpan.FromMinutes(3).TotalSeconds);
+                            sqlServerOptionsBuilder.EnableRetryOnFailure();
+                            sqlServerOptionsBuilder.MigrationsAssembly(typeof(MsSqlServiceCollectionExtensions).Assembly.FullName);
+                        }).AddInterceptors(new SecondLevelCacheInterceptor());
+            var options = (DbContextOptions<ApplicationDbContext>)optionsBuilder.Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                var items1 = context.DateTypes
+                    .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                    .ToList();
+                Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
+                Assert.IsNotNull(items1);
+
+                var items2 = context.DateTypes
+                    .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                    .ToList();
+                Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
+                Assert.IsNotNull(items2);
+            }
         }
     }
 }

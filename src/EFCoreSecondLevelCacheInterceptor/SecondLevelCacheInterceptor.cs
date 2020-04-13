@@ -1,6 +1,4 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Data.Common;
@@ -14,7 +12,17 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class SecondLevelCacheInterceptor : DbCommandInterceptor
     {
-        private IDbCommandInterceptorProcessor _processor;
+        private readonly IDbCommandInterceptorProcessor _processor;
+
+        /// <summary>
+        /// Entity Framework Core Second Level Caching Library
+        /// </summary>
+        public SecondLevelCacheInterceptor()
+        {
+            var serviceProvider = EFServiceCollectionExtensions.ServiceCollection?.BuildServiceProvider()
+                ?? throw new InvalidOperationException("Please add `AddEFSecondLevelCache()` method to your `IServiceCollection`.");
+            _processor = serviceProvider.GetRequiredService<IDbCommandInterceptorProcessor>();
+        }
 
         /// <summary>
         /// Called immediately after EF calls System.Data.Common.DbCommand.ExecuteNonQuery
@@ -29,7 +37,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.NonQueryExecuted(command, eventData, result);
             }
 
-            return getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result);
+            return _processor.ProcessExecutedCommands(command, eventData.Context, result);
         }
 
         /// <summary>
@@ -46,7 +54,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.NonQueryExecutedAsync(command, eventData, result, cancellationToken);
             }
 
-            return Task.FromResult(getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result));
+            return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
         }
 
         /// <summary>
@@ -62,7 +70,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.NonQueryExecuting(command, eventData, result);
             }
 
-            return getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result);
+            return _processor.ProcessExecutingCommands(command, eventData.Context, result);
         }
 
         /// <summary>
@@ -79,7 +87,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.NonQueryExecutingAsync(command, eventData, result, cancellationToken);
             }
 
-            return Task.FromResult(getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result));
+            return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
         }
 
         /// <summary>
@@ -95,7 +103,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.ReaderExecuted(command, eventData, result);
             }
 
-            return getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result);
+            return _processor.ProcessExecutedCommands(command, eventData.Context, result);
         }
 
         /// <summary>
@@ -112,7 +120,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.ReaderExecutedAsync(command, eventData, result, cancellationToken);
             }
 
-            return Task.FromResult(getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result));
+            return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
         }
 
         /// <summary>
@@ -128,7 +136,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.ReaderExecuting(command, eventData, result);
             }
 
-            return getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result);
+            return _processor.ProcessExecutingCommands(command, eventData.Context, result);
         }
 
         /// <summary>
@@ -145,7 +153,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
             }
 
-            return Task.FromResult(getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result));
+            return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
         }
 
         /// <summary>
@@ -161,7 +169,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.ScalarExecuted(command, eventData, result);
             }
 
-            return getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result);
+            return _processor.ProcessExecutedCommands(command, eventData.Context, result);
         }
 
         /// <summary>
@@ -178,7 +186,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.ScalarExecutedAsync(command, eventData, result, cancellationToken);
             }
 
-            return Task.FromResult(getProcessor(eventData.Context).ProcessExecutedCommands(command, eventData.Context, result));
+            return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
         }
 
         /// <summary>
@@ -194,7 +202,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.ScalarExecuting(command, eventData, result);
             }
 
-            return getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result);
+            return _processor.ProcessExecutingCommands(command, eventData.Context, result);
         }
 
         /// <summary>
@@ -211,21 +219,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return base.ScalarExecutingAsync(command, eventData, result, cancellationToken);
             }
 
-            return Task.FromResult(getProcessor(eventData.Context).ProcessExecutingCommands(command, eventData.Context, result));
-        }
-
-        private IDbCommandInterceptorProcessor getProcessor(DbContext context)
-        {
-            if (_processor != null)
-            {
-                return _processor;
-            }
-            _processor = context.GetService<IDbCommandInterceptorProcessor>();
-            if (_processor == null)
-            {
-                throw new InvalidOperationException("Please add `AddEFSecondLevelCache()` method to your `IServiceCollection`.");
-            }
-            return _processor;
+            return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
         }
     }
 }

@@ -126,7 +126,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 }
             });
 
-            services.AddConfiguredMsSqlDbContext(getConnectionString(basePath, configuration));
+            services.AddConfiguredMsSqlDbContext(GetConnectionString(basePath, configuration));
 
             return services.BuildServiceProvider();
         }
@@ -179,7 +179,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
         }
 
-        private static string getConnectionString(string basePath, IConfigurationRoot configuration)
+        public static string GetConnectionString(string basePath, IConfigurationRoot configuration)
         {
             var testsFolder = basePath.Split(new[] { "\\Tests\\" }, StringSplitOptions.RemoveEmptyEntries)[0];
             var contentRootPath = Path.Combine(testsFolder, "Tests", "EFCoreSecondLevelCacheInterceptor.AspNetCoreSample");

@@ -162,8 +162,6 @@ Note: If you don't want to use the above cache providers, implement your custom 
         }
 ```
 
-`SecondLevelCacheInterceptor` uses the built-in IoC container to retrieve the registered services. So after introducing it, you should retrieve the db-context's instances using the dependency injection system.
-
 3- Setting up the cache invalidation:
 
 This library doesn't need any settings for the cache invalidation. It watches for all of the CRUD operations using its interceptor and then invalidates the related cache entries automatically.
