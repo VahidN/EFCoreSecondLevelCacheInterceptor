@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -44,10 +43,6 @@ namespace EFCoreSecondLevelCacheInterceptor
     {
         private readonly ConcurrentDictionary<Type, Lazy<SortedSet<string>>> _tableNames =
                     new ConcurrentDictionary<Type, Lazy<SortedSet<string>>>();
-
-        private static readonly Regex _insideSquareBracketsOrQuotes =
-                    new Regex(@"(?:FROM|JOIN|INTO|UPDATE)\s[\[""`](.*?)[\]""`]\s*",
-                    options: RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private readonly ILogger<EFCacheDependenciesProcessor> _logger;
         private readonly IEFCacheServiceProvider _cacheServiceProvider;
@@ -164,12 +159,53 @@ namespace EFCoreSecondLevelCacheInterceptor
                             LazyThreadSafetyMode.ExecutionAndPublication)).Value;
         }
 
-        private static SortedSet<string> getSqlCommandTableNames(string sql)
+        private static SortedSet<string> getSqlCommandTableNames(string commandText)
         {
+            string[] tableMarkers = { "FROM", "JOIN", "INTO", "UPDATE" };
+
             var tables = new SortedSet<string>();
-            foreach (Match match in _insideSquareBracketsOrQuotes.Matches(sql))
+
+            var sqlItems = commandText.Split(new[] { " ", "\r\n", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            var sqlItemsLength = sqlItems.Length;
+            for (var i = 0; i < sqlItemsLength; i++)
             {
-                tables.Add(match.Groups[1].Value);
+                foreach (var marker in tableMarkers)
+                {
+                    if (!sqlItems[i].Equals(marker, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    ++i;
+                    if (i >= sqlItemsLength)
+                    {
+                        continue;
+                    }
+
+                    var tableName = string.Empty;
+
+                    var tableNameParts = sqlItems[i].Split(new[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+                    if (tableNameParts.Length == 1)
+                    {
+                        tableName = tableNameParts[0].Trim();
+                    }
+                    else if (tableNameParts.Length >= 2)
+                    {
+                        tableName = tableNameParts[1].Trim();
+                    }
+
+                    if (string.IsNullOrWhiteSpace(tableName))
+                    {
+                        continue;
+                    }
+
+                    tableName = tableName.Replace("[", "")
+                                        .Replace("]", "")
+                                        .Replace("'", "")
+                                        .Replace("`", "")
+                                        .Replace("\"", "");
+                    tables.Add(tableName);
+                }
             }
             return tables;
         }
