@@ -189,6 +189,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             Action<EFCoreSecondLevelCacheOptions> options)
         {
             services.AddMemoryCache();
+            services.TryAddSingleton<IEFDebugLogger, EFDebugLogger>();
             services.TryAddSingleton<IReaderWriterLockProvider, ReaderWriterLockProvider>();
             services.TryAddSingleton<IEFCacheKeyProvider, EFCacheKeyProvider>();
             services.TryAddSingleton<IEFCachePolicyParser, EFCachePolicyParser>();

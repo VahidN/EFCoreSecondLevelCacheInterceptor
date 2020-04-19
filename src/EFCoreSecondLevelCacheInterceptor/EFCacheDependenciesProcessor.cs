@@ -5,8 +5,6 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -44,21 +42,18 @@ namespace EFCoreSecondLevelCacheInterceptor
         private readonly ConcurrentDictionary<Type, Lazy<SortedSet<string>>> _tableNames =
                     new ConcurrentDictionary<Type, Lazy<SortedSet<string>>>();
 
-        private readonly ILogger<EFCacheDependenciesProcessor> _logger;
+        private readonly IEFDebugLogger _logger;
         private readonly IEFCacheServiceProvider _cacheServiceProvider;
-        private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
 
         /// <summary>
         /// Cache Dependencies Calculator
         /// </summary>
         public EFCacheDependenciesProcessor(
-            ILogger<EFCacheDependenciesProcessor> logger,
-            IEFCacheServiceProvider cacheServiceProvider,
-            IOptions<EFCoreSecondLevelCacheSettings> cacheSettings)
+            IEFDebugLogger logger,
+            IEFCacheServiceProvider cacheServiceProvider)
         {
             _logger = logger;
             _cacheServiceProvider = cacheServiceProvider;
-            _cacheSettings = cacheSettings.Value;
         }
 
         /// <summary>
@@ -86,7 +81,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             cacheDependencies = cachePolicy.CacheItemsDependencies as SortedSet<string>;
             if (cacheDependencies?.Any() != true)
             {
-                if (!_cacheSettings.DisableLogging) _logger.LogDebug($"It's not possible to calculate the related table names of the current query[{commandText}]. Please use EFCachePolicy.Configure(options => options.CacheDependencies(\"real_table_name_1\", \"real_table_name_2\")) to specify them explicitly.");
+                _logger.LogDebug($"It's not possible to calculate the related table names of the current query[{commandText}]. Please use EFCachePolicy.Configure(options => options.CacheDependencies(\"real_table_name_1\", \"real_table_name_2\")) to specify them explicitly.");
                 cacheDependencies = new SortedSet<string> { EFCachePolicy.EFUnknownsCacheDependency };
             }
             logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies);
@@ -95,7 +90,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
         private void logProcess(SortedSet<string> tableNames, SortedSet<string> textsInsideSquareBrackets, SortedSet<string> cacheDependencies)
         {
-            if (!_cacheSettings.DisableLogging) _logger.LogDebug($"ContextTableNames: {string.Join(", ", tableNames)}, PossibleQueryTableNames: {string.Join(", ", textsInsideSquareBrackets)} -> CacheDependencies: {string.Join(", ", cacheDependencies)}.");
+            _logger.LogDebug($"ContextTableNames: {string.Join(", ", tableNames)}, PossibleQueryTableNames: {string.Join(", ", textsInsideSquareBrackets)} -> CacheDependencies: {string.Join(", ", cacheDependencies)}.");
         }
 
         /// <summary>
@@ -113,7 +108,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             cacheDependencies.Add(EFCachePolicy.EFUnknownsCacheDependency);
             _cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey { CacheDependencies = cacheDependencies });
 
-            if (!_cacheSettings.DisableLogging) _logger.LogDebug(CacheableEventId.QueryResultInvalidated, $"Invalidated [{string.Join(", ", cacheDependencies)}] dependencies.");
+            _logger.LogDebug(CacheableEventId.QueryResultInvalidated, $"Invalidated [{string.Join(", ", cacheDependencies)}] dependencies.");
             return true;
         }
 

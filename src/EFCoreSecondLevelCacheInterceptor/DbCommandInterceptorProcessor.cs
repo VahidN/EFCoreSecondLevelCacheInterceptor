@@ -3,8 +3,6 @@ using System.Data.Common;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -33,26 +31,23 @@ namespace EFCoreSecondLevelCacheInterceptor
         private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
         private readonly IEFCacheKeyProvider _cacheKeyProvider;
         private readonly IEFCachePolicyParser _cachePolicyParser;
-        private readonly ILogger<DbCommandInterceptorProcessor> _logger;
-        private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+        private readonly IEFDebugLogger _logger;
 
         /// <summary>
         /// Helps processing SecondLevelCacheInterceptor
         /// </summary>
         public DbCommandInterceptorProcessor(
-            IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
+            IEFDebugLogger logger,
             IEFCacheServiceProvider cacheService,
             IEFCacheDependenciesProcessor cacheDependenciesProcessor,
             IEFCacheKeyProvider cacheKeyProvider,
-            IEFCachePolicyParser cachePolicyParser,
-            ILogger<DbCommandInterceptorProcessor> logger)
+            IEFCachePolicyParser cachePolicyParser)
         {
             _cacheService = cacheService;
             _cacheDependenciesProcessor = cacheDependenciesProcessor;
             _cacheKeyProvider = cacheKeyProvider;
             _cachePolicyParser = cachePolicyParser;
             _logger = logger;
-            _cacheSettings = cacheSettings.Value;
         }
 
         /// <summary>
@@ -62,7 +57,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             if (result is EFTableRowsDataReader rowsReader)
             {
-                if (!_cacheSettings.DisableLogging) _logger.LogDebug(CacheableEventId.CacheHit, $"Using the TableRows[{rowsReader.TableName}] from the cache.");
+                _logger.LogDebug(CacheableEventId.CacheHit, $"Using the TableRows[{rowsReader.TableName}] from the cache.");
                 return result;
             }
 
@@ -79,7 +74,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 if (result is int data)
                 {
                     _cacheService.InsertValue(efCacheKey, new EFCachedData { NonQuery = data }, cachePolicy);
-                    if (!_cacheSettings.DisableLogging) _logger.LogDebug(CacheableEventId.QueryResultCached, $"[{data}] added to the cache[{efCacheKey}].");
+                    _logger.LogDebug(CacheableEventId.QueryResultCached, $"[{data}] added to the cache[{efCacheKey}].");
                     return result;
                 }
 
@@ -92,14 +87,14 @@ namespace EFCoreSecondLevelCacheInterceptor
                     }
 
                     _cacheService.InsertValue(efCacheKey, new EFCachedData { TableRows = tableRows }, cachePolicy);
-                    if (!_cacheSettings.DisableLogging) _logger.LogDebug(CacheableEventId.QueryResultCached, $"TableRows[{tableRows.TableName}] added to the cache[{efCacheKey}].");
+                    _logger.LogDebug(CacheableEventId.QueryResultCached, $"TableRows[{tableRows.TableName}] added to the cache[{efCacheKey}].");
                     return (T)(object)new EFTableRowsDataReader(tableRows);
                 }
 
                 if (result is object)
                 {
                     _cacheService.InsertValue(efCacheKey, new EFCachedData { Scalar = result }, cachePolicy);
-                    if (!_cacheSettings.DisableLogging) _logger.LogDebug(CacheableEventId.QueryResultCached, $"[{result}] added to the cache[{efCacheKey}].");
+                    _logger.LogDebug(CacheableEventId.QueryResultCached, $"[{result}] added to the cache[{efCacheKey}].");
                     return result;
                 }
             }
@@ -118,7 +113,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 var efCacheKey = _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
                 if (!(_cacheService.GetValue(efCacheKey, cachePolicy) is EFCachedData cacheResult))
                 {
-                    if (!_cacheSettings.DisableLogging) _logger.LogDebug($"[{efCacheKey}] was not present in the cache.");
+                    _logger.LogDebug($"[{efCacheKey}] was not present in the cache.");
                     return result;
                 }
 
@@ -126,25 +121,25 @@ namespace EFCoreSecondLevelCacheInterceptor
                 {
                     if (cacheResult.IsNull)
                     {
-                        if (!_cacheSettings.DisableLogging) _logger.LogDebug("Suppressed result with an empty TableRows.");
+                        _logger.LogDebug("Suppressed result with an empty TableRows.");
                         return (T)Convert.ChangeType(InterceptionResult<DbDataReader>.SuppressWithResult(new EFTableRowsDataReader(new EFTableRows())), typeof(T));
                     }
 
-                    if (!_cacheSettings.DisableLogging) _logger.LogDebug($"Suppressed result with a TableRows[{cacheResult.TableRows.TableName}] from the cache[{efCacheKey}].");
+                    _logger.LogDebug($"Suppressed result with a TableRows[{cacheResult.TableRows.TableName}] from the cache[{efCacheKey}].");
                     return (T)Convert.ChangeType(InterceptionResult<DbDataReader>.SuppressWithResult(new EFTableRowsDataReader(cacheResult.TableRows)), typeof(T));
                 }
 
                 if (result is InterceptionResult<int>)
                 {
                     int cachedResult = cacheResult.IsNull ? default : cacheResult.NonQuery;
-                    if (!_cacheSettings.DisableLogging) _logger.LogDebug($"Suppressed result with {cachedResult} from the cache[{efCacheKey}].");
+                    _logger.LogDebug($"Suppressed result with {cachedResult} from the cache[{efCacheKey}].");
                     return (T)Convert.ChangeType(InterceptionResult<int>.SuppressWithResult(cachedResult), typeof(T));
                 }
 
                 if (result is InterceptionResult<object>)
                 {
                     object cachedResult = cacheResult.IsNull ? default : cacheResult.Scalar;
-                    if (!_cacheSettings.DisableLogging) _logger.LogDebug($"Suppressed result with {cachedResult} from the cache[{efCacheKey}].");
+                    _logger.LogDebug($"Suppressed result with {cachedResult} from the cache[{efCacheKey}].");
                     return (T)Convert.ChangeType(InterceptionResult<object>.SuppressWithResult(cachedResult), typeof(T));
                 }
             }

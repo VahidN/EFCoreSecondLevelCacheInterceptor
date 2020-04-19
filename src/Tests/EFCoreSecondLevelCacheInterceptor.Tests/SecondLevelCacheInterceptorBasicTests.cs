@@ -458,7 +458,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var loggerProvider = new DebugLoggerProvider();
             services.AddLogging(cfg => cfg.AddConsole().AddDebug().AddProvider(loggerProvider).SetMinimumLevel(LogLevel.Debug));
 
-            services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider());
+            services.AddEFSecondLevelCache(options =>
+                    options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(50))
+            );
 
             var loggerFactory = new LoggerFactory(new[] { loggerProvider });
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -476,13 +478,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             using (var context = new ApplicationDbContext(options))
             {
                 var items1 = context.DateTypes
-                    .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                    .Cacheable()
                     .ToList();
                 Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
                 Assert.IsNotNull(items1);
 
                 var items2 = context.DateTypes
-                    .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                    .Cacheable()
                     .ToList();
                 Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
                 Assert.IsNotNull(items2);

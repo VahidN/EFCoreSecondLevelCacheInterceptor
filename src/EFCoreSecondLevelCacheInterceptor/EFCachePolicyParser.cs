@@ -31,16 +31,19 @@ namespace EFCoreSecondLevelCacheInterceptor
     {
         private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
         private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
+        private readonly IEFDebugLogger _logger;
 
         /// <summary>
         /// EFCachePolicy Parser Utils
         /// </summary>
         public EFCachePolicyParser(
             IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
-            IEFCacheDependenciesProcessor cacheDependenciesProcessor)
+            IEFCacheDependenciesProcessor cacheDependenciesProcessor,
+            IEFDebugLogger logger)
         {
             _cacheSettings = cacheSettings?.Value;
             _cacheDependenciesProcessor = cacheDependenciesProcessor;
+            _logger = logger;
         }
 
         /// <summary>
@@ -76,7 +79,12 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public EFCachePolicy GetEFCachePolicy(string commandText)
         {
-            return getParsedPolicy(commandText) ?? getGlobalPolicy(commandText);
+            var efCachePolicy = getParsedPolicy(commandText) ?? getGlobalPolicy(commandText);
+            if (efCachePolicy != null)
+            {
+                _logger.LogDebug($"Using EFCachePolicy: {efCachePolicy}");
+            }
+            return efCachePolicy;
         }
 
         private EFCachePolicy getGlobalPolicy(string commandText)
