@@ -113,7 +113,6 @@ namespace Issue9SQLiteInt32
                     .WithMaxRetries(100)
                     .WithRetryTimeout(50)
                     .WithRedisCacheHandle(redisConfigurationKey)
-                    .WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10))
                     .DisablePerformanceCounters()
                     .DisableStatistics()
                     .Build());

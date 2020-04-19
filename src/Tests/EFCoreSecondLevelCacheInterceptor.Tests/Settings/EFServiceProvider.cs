@@ -159,7 +159,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                     .WithMaxRetries(100)
                     .WithRetryTimeout(50)
                     .WithRedisCacheHandle(redisConfigurationKey)
-                    .WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10))
                     .DisablePerformanceCounters()
                     .DisableStatistics()
                     .Build());
@@ -172,7 +171,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                                         new CacheManager.Core.ConfigurationBuilder()
                                             .WithJsonSerializer()
                                             .WithMicrosoftMemoryCacheHandle(instanceName: "MemoryCache1")
-                                            .WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10))
                                             .DisablePerformanceCounters()
                                             .DisableStatistics()
                                             .Build());
