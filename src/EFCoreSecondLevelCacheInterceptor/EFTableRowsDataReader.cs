@@ -143,6 +143,11 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return (ulong)value != 0;
             }
 
+            if (valueType != typeof(bool))
+            {
+                return (ulong)Convert.ChangeType(value, typeof(ulong)) != 0;
+            }
+
             return (bool)value;
         }
 
