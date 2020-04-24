@@ -59,10 +59,10 @@ namespace Issue12PostgreSql
                 options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5))
             );
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<ApplicationDbContext>((serviceProvider, optionsBuilder) =>
                 {
-                    options
-                        .AddInterceptors(new SecondLevelCacheInterceptor())
+                    optionsBuilder
+                        .AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())
                         .UseNpgsql(configuration["ConnectionStrings:ApplicationDbContextConnection"]);
                 });
 

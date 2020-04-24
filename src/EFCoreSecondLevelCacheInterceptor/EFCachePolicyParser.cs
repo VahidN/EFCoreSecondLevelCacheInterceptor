@@ -82,7 +82,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             var efCachePolicy = getParsedPolicy(commandText) ?? getGlobalPolicy(commandText);
             if (efCachePolicy != null)
             {
-                _logger.LogDebug($"Using EFCachePolicy: {efCachePolicy}");
+                _logger.LogDebug($"Using EFCachePolicy: {efCachePolicy}.");
             }
             return efCachePolicy;
         }

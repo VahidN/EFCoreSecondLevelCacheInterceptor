@@ -55,10 +55,10 @@ namespace Issue4SpatialType
                                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                                 .Build();
             services.AddSingleton(_ => configuration);
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
                 {
                     options
-                        .AddInterceptors(new SecondLevelCacheInterceptor())
+                        .AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())
                         .UseSqlServer(GetConnectionString(basePath, configuration),
                             optionsBuilder => optionsBuilder.UseNetTopologySuite()
                         );

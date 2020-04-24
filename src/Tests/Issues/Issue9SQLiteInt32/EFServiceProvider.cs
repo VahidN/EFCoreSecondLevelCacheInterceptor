@@ -63,10 +63,10 @@ namespace Issue9SQLiteInt32
             );
             addCacheManagerCoreRedis(services);
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<ApplicationDbContext>((serviceProvider, optionsBuilder) =>
                 {
-                    options
-                        .AddInterceptors(new SecondLevelCacheInterceptor())
+                    optionsBuilder
+                        .AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())
                         .UseSqlite(GetConnectionString(basePath, configuration));
                 });
 

@@ -25,7 +25,8 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider()
+                options.UseMemoryCacheProvider(CacheExpirationMode.Absolute,TimeSpan.FromMinutes(30))
+				    .DisableLogging(false)
                     .CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
             });
 

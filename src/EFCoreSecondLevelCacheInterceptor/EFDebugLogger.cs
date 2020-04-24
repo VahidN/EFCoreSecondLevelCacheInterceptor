@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -11,12 +12,12 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Formats and writes a debug log message.
         /// </summary>
-        void LogDebug(string message, params object[] args);
+        void LogDebug(string message);
 
         /// <summary>
         /// Formats and writes a debug log message.
         /// </summary>
-        void LogDebug(EventId eventId, string message, params object[] args);
+        void LogDebug(EventId eventId, string message);
     }
 
     /// <summary>
@@ -26,6 +27,7 @@ namespace EFCoreSecondLevelCacheInterceptor
     {
         private readonly bool _disableLogging;
         private readonly ILogger<EFDebugLogger> _logger;
+        private readonly string _signature = $"InstanceId: {Guid.NewGuid()}, Started @{DateTime.UtcNow} UTC.";
 
         /// <summary>
         /// Formats and writes a debug log message.
@@ -41,22 +43,22 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Formats and writes a debug log message.
         /// </summary>
-        public void LogDebug(string message, params object[] args)
+        public void LogDebug(string message)
         {
             if (!_disableLogging)
             {
-                _logger.LogDebug(message, args);
+                _logger.LogDebug($"{_signature} {message}");
             }
         }
 
         /// <summary>
         /// Formats and writes a debug log message.
         /// </summary>
-        public void LogDebug(EventId eventId, string message, params object[] args)
+        public void LogDebug(EventId eventId, string message)
         {
             if (!_disableLogging)
             {
-                _logger.LogDebug(eventId, message, args);
+                _logger.LogDebug(eventId, $"{_signature} {message}");
             }
         }
     }

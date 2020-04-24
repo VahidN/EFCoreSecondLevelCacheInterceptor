@@ -177,11 +177,6 @@ namespace EFCoreSecondLevelCacheInterceptor
     public static class EFServiceCollectionExtensions
     {
         /// <summary>
-        /// A collection of service descriptors.
-        /// </summary>
-        internal static IServiceCollection ServiceCollection { get; set; }
-
-        /// <summary>
         /// Registers the required services of the EFCoreSecondLevelCacheInterceptor.
         /// </summary>
         public static IServiceCollection AddEFSecondLevelCache(
@@ -196,10 +191,10 @@ namespace EFCoreSecondLevelCacheInterceptor
             services.TryAddSingleton<IEFCacheDependenciesProcessor, EFCacheDependenciesProcessor>();
             services.TryAddSingleton<IMemoryCacheChangeTokenProvider, EFMemoryCacheChangeTokenProvider>();
             services.TryAddSingleton<IDbCommandInterceptorProcessor, DbCommandInterceptorProcessor>();
+            services.TryAddSingleton<SecondLevelCacheInterceptor>();
 
             configOptions(services, options);
 
-            ServiceCollection = services;
             return services;
         }
 

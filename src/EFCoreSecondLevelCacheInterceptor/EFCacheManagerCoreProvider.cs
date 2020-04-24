@@ -46,24 +46,26 @@ namespace EFCoreSecondLevelCacheInterceptor
                     value = new EFCachedData { IsNull = true };
                 }
 
+                var keyHash = cacheKey.KeyHash;
+
                 foreach (var rootCacheKey in cacheKey.CacheDependencies)
                 {
-                    _dependenciesCacheManager.AddOrUpdate(rootCacheKey, new HashSet<string> { cacheKey.KeyHash },
+                    _dependenciesCacheManager.AddOrUpdate(rootCacheKey, new HashSet<string> { keyHash },
                         updateValue: set =>
                         {
-                            set.Add(cacheKey.KeyHash);
+                            set.Add(keyHash);
                             return set;
                         });
                 }
 
                 if (cachePolicy == null)
                 {
-                    _valuesCacheManager.Add(cacheKey.KeyHash, value);
+                    _valuesCacheManager.Add(keyHash, value);
                 }
                 else
                 {
                     _valuesCacheManager.Add(new CacheItem<EFCachedData>(
-                        cacheKey.KeyHash,
+                        keyHash,
                         value,
                         cachePolicy.CacheExpirationMode == CacheExpirationMode.Absolute ? ExpirationMode.Absolute : ExpirationMode.Sliding,
                         cachePolicy.CacheTimeout));

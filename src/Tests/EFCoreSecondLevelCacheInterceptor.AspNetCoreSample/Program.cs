@@ -20,13 +20,14 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
                             .ConfigureLogging((hostingContext, logging) =>
                                     {
                                         logging.ClearProviders();
-                                        logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                                        
                                         logging.AddDebug();
 
                                         if (hostingContext.HostingEnvironment.IsDevelopment())
                                         {
                                             logging.AddConsole();
                                         }
+										logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
                                     })
                             .UseStartup<Startup>();
                 });

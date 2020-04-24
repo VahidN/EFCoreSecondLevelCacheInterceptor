@@ -8,25 +8,19 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer
     {
         public static IServiceCollection AddConfiguredMsSqlDbContext(this IServiceCollection services, string connectionString)
         {
-            services.AddDbContextPool<ApplicationDbContext>(optionsBuilder => optionsBuilder.UseConfiguredMsSql(connectionString));
+            services.AddDbContextPool<ApplicationDbContext>((serviceProvider, optionsBuilder) =>
+                    optionsBuilder
+                        .UseSqlServer(
+                            connectionString,
+                            sqlServerOptionsBuilder =>
+                            {
+                                sqlServerOptionsBuilder
+                                    .CommandTimeout((int)TimeSpan.FromMinutes(3).TotalSeconds)
+                                    .EnableRetryOnFailure()
+                                    .MigrationsAssembly(typeof(MsSqlServiceCollectionExtensions).Assembly.FullName);
+                            })
+                        .AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>()));
             return services;
-        }
-
-        public static void UseConfiguredMsSql(this DbContextOptionsBuilder optionsBuilder, string connectionString)
-        {
-            optionsBuilder.UseSqlServer(
-                        connectionString,
-                        sqlServerOptionsBuilder =>
-                        {
-                            sqlServerOptionsBuilder.CommandTimeout((int)TimeSpan.FromMinutes(3).TotalSeconds);
-                            sqlServerOptionsBuilder.EnableRetryOnFailure();
-                            sqlServerOptionsBuilder.MigrationsAssembly(typeof(MsSqlServiceCollectionExtensions).Assembly.FullName);
-                        });
-            optionsBuilder.AddInterceptors(new SecondLevelCacheInterceptor());
-            optionsBuilder.ConfigureWarnings(warnings =>
-            {
-                // ...
-            });
         }
     }
 }

@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,12 +14,14 @@ namespace EFCoreSecondLevelCacheInterceptor
 
         /// <summary>
         /// Entity Framework Core Second Level Caching Library
+        /// Please use
+        /// services.AddDbContextPool&lt;ApplicationDbContext&gt;((serviceProvider, optionsBuilder) =&gt;
+        ///                   optionsBuilder.UseSqlServer(...).AddInterceptors(serviceProvider.GetRequiredService&lt;SecondLevelCacheInterceptor&gt;()));
+        /// to register it.
         /// </summary>
-        public SecondLevelCacheInterceptor()
+        public SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processor)
         {
-            var serviceProvider = EFServiceCollectionExtensions.ServiceCollection?.BuildServiceProvider()
-                ?? throw new InvalidOperationException("Please add `AddEFSecondLevelCache()` method to your `IServiceCollection`.");
-            _processor = serviceProvider.GetRequiredService<IDbCommandInterceptorProcessor>();
+            _processor = processor;
         }
 
         /// <summary>

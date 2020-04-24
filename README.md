@@ -146,18 +146,25 @@ Note: If you don't want to use the above cache providers, implement your custom 
 2- [Add SecondLevelCacheInterceptor](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/MsSqlServiceCollectionExtensions.cs) to your `DbContextOptionsBuilder` pipeline:
 
 ```csharp
-        public static void UseConfiguredMsSql(this DbContextOptionsBuilder optionsBuilder, string connectionString)
+    public static class MsSqlServiceCollectionExtensions
+    {
+        public static IServiceCollection AddConfiguredMsSqlDbContext(this IServiceCollection services, string connectionString)
         {
-            optionsBuilder.UseSqlServer(
-                        connectionString,
-                        sqlServerOptionsBuilder =>
-                        {
-                            sqlServerOptionsBuilder.CommandTimeout((int)TimeSpan.FromMinutes(3).TotalSeconds);
-                            sqlServerOptionsBuilder.EnableRetryOnFailure();
-                            sqlServerOptionsBuilder.MigrationsAssembly(typeof(MsSqlServiceCollectionExtensions).Assembly.FullName);
-                        });
-            optionsBuilder.AddInterceptors(new SecondLevelCacheInterceptor());
+            services.AddDbContextPool<ApplicationDbContext>((serviceProvider, optionsBuilder) =>
+                    optionsBuilder
+                        .UseSqlServer(
+                            connectionString,
+                            sqlServerOptionsBuilder =>
+                            {
+                                sqlServerOptionsBuilder
+                                    .CommandTimeout((int)TimeSpan.FromMinutes(3).TotalSeconds)
+                                    .EnableRetryOnFailure()
+                                    .MigrationsAssembly(typeof(MsSqlServiceCollectionExtensions).Assembly.FullName);
+                            })
+                        .AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>()));
+            return services;
         }
+    }
 ```
 
 3- Setting up the cache invalidation:

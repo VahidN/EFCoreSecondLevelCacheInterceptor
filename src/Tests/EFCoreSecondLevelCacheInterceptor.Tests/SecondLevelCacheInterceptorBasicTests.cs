@@ -461,6 +461,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             services.AddEFSecondLevelCache(options =>
                     options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(50))
             );
+            var serviceProvider = services.BuildServiceProvider();
 
             var loggerFactory = new LoggerFactory(new[] { loggerProvider });
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -472,7 +473,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                             sqlServerOptionsBuilder.CommandTimeout((int)TimeSpan.FromMinutes(3).TotalSeconds);
                             sqlServerOptionsBuilder.EnableRetryOnFailure();
                             sqlServerOptionsBuilder.MigrationsAssembly(typeof(MsSqlServiceCollectionExtensions).Assembly.FullName);
-                        }).AddInterceptors(new SecondLevelCacheInterceptor());
+                        })
+                    .AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>());
             var options = (DbContextOptions<ApplicationDbContext>)optionsBuilder.Options;
 
             using (var context = new ApplicationDbContext(options))

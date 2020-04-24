@@ -57,7 +57,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             if (result is EFTableRowsDataReader rowsReader)
             {
-                _logger.LogDebug(CacheableEventId.CacheHit, $"Using the TableRows[{rowsReader.TableName}] from the cache.");
+                _logger.LogDebug(CacheableEventId.CacheHit, $"Returning the cached TableRows[{rowsReader.TableName}].");
                 return result;
             }
 
@@ -121,27 +121,29 @@ namespace EFCoreSecondLevelCacheInterceptor
                 {
                     if (cacheResult.IsNull)
                     {
-                        _logger.LogDebug("Suppressed result with an empty TableRows.");
+                        _logger.LogDebug("Suppressed the result with an empty TableRows.");
                         return (T)Convert.ChangeType(InterceptionResult<DbDataReader>.SuppressWithResult(new EFTableRowsDataReader(new EFTableRows())), typeof(T));
                     }
 
-                    _logger.LogDebug($"Suppressed result with a TableRows[{cacheResult.TableRows.TableName}] from the cache[{efCacheKey}].");
+                    _logger.LogDebug($"Suppressed the result with the TableRows[{cacheResult.TableRows.TableName}] from the cache[{efCacheKey}].");
                     return (T)Convert.ChangeType(InterceptionResult<DbDataReader>.SuppressWithResult(new EFTableRowsDataReader(cacheResult.TableRows)), typeof(T));
                 }
 
                 if (result is InterceptionResult<int>)
                 {
                     int cachedResult = cacheResult.IsNull ? default : cacheResult.NonQuery;
-                    _logger.LogDebug($"Suppressed result with {cachedResult} from the cache[{efCacheKey}].");
+                    _logger.LogDebug($"Suppressed the result with {cachedResult} from the cache[{efCacheKey}].");
                     return (T)Convert.ChangeType(InterceptionResult<int>.SuppressWithResult(cachedResult), typeof(T));
                 }
 
                 if (result is InterceptionResult<object>)
                 {
                     object cachedResult = cacheResult.IsNull ? default : cacheResult.Scalar;
-                    _logger.LogDebug($"Suppressed result with {cachedResult} from the cache[{efCacheKey}].");
+                    _logger.LogDebug($"Suppressed the result with {cachedResult} from the cache[{efCacheKey}].");
                     return (T)Convert.ChangeType(InterceptionResult<object>.SuppressWithResult(cachedResult), typeof(T));
                 }
+
+                _logger.LogDebug($"Skipped the result with {result?.GetType()} type.");
             }
 
             return result;

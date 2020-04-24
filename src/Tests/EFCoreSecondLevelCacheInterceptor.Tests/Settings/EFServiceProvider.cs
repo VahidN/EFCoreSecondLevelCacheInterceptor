@@ -50,7 +50,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         public static IEFCacheServiceProvider GetInMemoryCacheServiceProvider()
         {
-            return GetRequiredService<IEFCacheServiceProvider>();
+            var cacheServiceProvider = GetRequiredService<IEFCacheServiceProvider>();
+            return cacheServiceProvider;
         }
 
         public static IEFCacheServiceProvider GetCacheManagerCoreInMemory()
@@ -61,7 +62,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             services.AddEFSecondLevelCache(options => options.UseCacheManagerCoreProvider());
             addCacheManagerCoreInMemory(services);
             var serviceProvider = services.BuildServiceProvider();
-            return serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
+            var cacheProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
+            cacheProvider.ClearAllCachedEntries();
+            return cacheProvider;
         }
 
         public static IEFCacheServiceProvider GetCacheManagerCoreRedis()
@@ -72,7 +75,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             services.AddEFSecondLevelCache(options => options.UseCacheManagerCoreProvider());
             addCacheManagerCoreRedis(services);
             var serviceProvider = services.BuildServiceProvider();
-            return serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
+            var cacheProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
+            cacheProvider.ClearAllCachedEntries();
+            return cacheProvider;
         }
 
         public static T GetRequiredService<T>()
@@ -200,7 +205,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             try
             {
                 var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
-                serviceProvider.GetRequiredService<IEFCacheServiceProvider>().ClearAllCachedEntries();
+                var cacheServiceProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
+                cacheServiceProvider.ClearAllCachedEntries();
                 using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {
                     foreach (var action in actions)
@@ -228,7 +234,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             try
             {
                 var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
-                serviceProvider.GetRequiredService<IEFCacheServiceProvider>().ClearAllCachedEntries();
+                var cacheServiceProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
+                cacheServiceProvider.ClearAllCachedEntries();
                 using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {
                     foreach (var action in actions)
