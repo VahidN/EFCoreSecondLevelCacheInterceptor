@@ -361,26 +361,27 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         public void TestJsonNet()
         {
             var rnd = new Random();
-            var user1 = new User
+            var utcNow = DateTimeOffset.UtcNow;
+            var userInfo = new object[]  // EFTableRow -> public object[] Values { get; set; }
             {
-                Name = $"User {rnd.Next(1, 100000)}",
-                AddDate = DateTime.UtcNow,
-                UpdateDate = null,
-                Points = 1000,
-                IsActive = true,
-                ByteValue = 1,
-                CharValue = 'C',
-                DateTimeOffsetValue = DateTimeOffset.UtcNow,
-                DecimalValue = 1.1M,
-                DoubleValue = 1.3,
-                FloatValue = 1.2f,
-                GuidValue = Guid.NewGuid(),
-                TimeSpanValue = TimeSpan.FromMinutes(1),
-                ShortValue = 2,
-                ByteArrayValue = new byte[] { 1, 2 },
-                UintValue = 1,
-                UlongValue = 1,
-                UshortValue = 1
+                $"User {rnd.Next(1, 100000)}",
+                DateTime.UtcNow,
+                null,
+                1000,
+                true,
+                1,
+                'C',
+                utcNow,
+                1.1M,
+                1.3,
+                1.2f,
+                Guid.NewGuid(),
+                TimeSpan.FromMinutes(1),
+                2,
+                new byte[] { 1, 2 },
+                1,
+                1,
+                1
             };
 
             var jss = new JsonSerializerSettings
@@ -390,10 +391,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 TypeNameHandling = TypeNameHandling.Auto,
                 Converters = { new SpecialTypesConverter() }
             };
-            var jcs = new JsonCacheSerializer(jss, jss);
-            var json = jcs.Serialize(user1);
-            var user = jcs.Deserialize(json, typeof(object));
-            Assert.IsNotNull(user);
+            var jcs = new JsonCacheSerializer(jss, jss); // This is how the CacheManagerCore uses the Json.NET
+            var json = jcs.Serialize(userInfo);
+            var userData = jcs.Deserialize(json, typeof(object[])) as object[];
+            Assert.IsNotNull(userData);
+            Assert.AreEqual(utcNow, userData[7]);
         }
 
         [DataTestMethod]
