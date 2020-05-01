@@ -9,24 +9,15 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     [TestClass]
     public class EFCacheServiceProviderTests
     {
-        protected virtual IEFCacheServiceProvider GetCacheServiceProvider(TestCacheProvider cacheProvider)
-        {
-            return cacheProvider switch
-            {
-                TestCacheProvider.BuiltInInMemory => EFServiceProvider.GetInMemoryCacheServiceProvider(),
-                TestCacheProvider.CacheManagerCoreInMemory => EFServiceProvider.GetCacheManagerCoreInMemory(),
-                TestCacheProvider.CacheManagerCoreRedis => EFServiceProvider.GetCacheManagerCoreRedis(),
-                _ => throw new NotSupportedException($"{cacheProvider} is not supported."),
-            };
-        }
-
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public virtual void TestCacheInvalidationWithTwoRoots(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(cacheProvider);
+            var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
             var key1 = new EFCacheKey
             {
@@ -67,9 +58,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public virtual void TestCacheInvalidationWithOneRoot(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(cacheProvider);
+            var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
             var key1 = new EFCacheKey
             {
@@ -109,9 +102,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public virtual void TestObjectCacheInvalidationWithOneRoot(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(cacheProvider);
+            var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
             const string rootCacheKey = "EFSecondLevelCache.Core.AspNetCoreSample.DataLayer.Entities.Product";
 
@@ -154,9 +149,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public virtual void TestCacheInvalidationWithSimilarRoots(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(cacheProvider);
+            var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
             var key1 = new EFCacheKey
             {
@@ -197,9 +194,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public virtual void TestInsertingNullValues(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(cacheProvider);
+            var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
             var key1 = new EFCacheKey
             {
@@ -218,9 +217,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public virtual void TestParallelInsertsAndRemoves(TestCacheProvider cacheProvider)
         {
-            var cacheService = GetCacheServiceProvider(cacheProvider);
+            var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
 
             var tests = new List<Action>();

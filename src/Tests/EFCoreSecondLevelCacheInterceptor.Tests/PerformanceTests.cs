@@ -13,6 +13,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public void PerformanceTest(TestCacheProvider cacheProvider)
         {
             const decimal loopCount = 1000;

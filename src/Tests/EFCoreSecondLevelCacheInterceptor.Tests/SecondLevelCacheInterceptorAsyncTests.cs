@@ -14,6 +14,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public async Task TestSecondLevelCacheUsingAsyncMethodsDoesNotHitTheDatabase(TestCacheProvider cacheProvider)
         {
             await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false,
@@ -68,6 +70,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public async Task TestSecondLevelCacheUsingDifferentAsyncMethods(TestCacheProvider cacheProvider)
         {
             await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false,
@@ -122,6 +126,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public async Task TestSecondLevelCacheUsingTwoCountAsyncMethods(TestCacheProvider cacheProvider)
         {
             await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false,
@@ -152,6 +158,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public async Task TestSecondLevelCacheUsingFindAsyncMethods(TestCacheProvider cacheProvider)
         {
             await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false,

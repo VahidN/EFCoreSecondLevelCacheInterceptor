@@ -22,7 +22,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
         private static void clearAllCachedEntries()
         {
-            EFServiceProvider.GetCacheManagerCoreRedis().ClearAllCachedEntries();
+            EFServiceProvider.GetCacheServiceProvider(TestCacheProvider.CacheManagerCoreRedis).ClearAllCachedEntries();
         }
 
         private static void startDb()

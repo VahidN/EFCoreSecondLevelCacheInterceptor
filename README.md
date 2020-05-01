@@ -24,7 +24,9 @@ You can also view the [package page](http://www.nuget.org/packages/EFCoreSecondL
 
 ## Usage
 
-1- [Register the required services](/src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample/Startup.cs) of `EFCoreSecondLevelCacheInterceptor`:
+### 1- [Register a preferred cache provider](/src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample/Startup.cs):
+
+#### Using the built-in In-Memory cache provider
 
 ```csharp
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
@@ -46,7 +48,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             services.AddEFSecondLevelCache(options =>
                 options.UseMemoryCacheProvider().DisableLogging(true)
 
-            // Please use the `CacheManager.Core` for the Redis cache provider.
+            // Please use the `CacheManager.Core` or `EasyCaching.Redis` for the Redis cache provider.
             );
 
             var connectionString = Configuration["ConnectionStrings:ApplicationDbContextConnection"];
@@ -62,7 +64,102 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 }
 ```
 
-If you want to use the Redis as the preferred cache provider, please use the `CacheManager.Core` provider.
+### Using EasyCaching.Core as the cache provider
+
+Here you can use the [EasyCaching.Core](https://github.com/dotnetcore/EasyCaching), as a highly configurable cache manager too.
+To use its in-memory caching mechanism, add this entry to the `.csproj` file:
+
+```xml
+  <ItemGroup>
+    <PackageReference Include="EasyCaching.InMemory" Version="0.8.8" />
+  </ItemGroup>
+```
+
+Then register its required services:
+
+```csharp
+namespace EFSecondLevelCache.Core.AspNetCoreSample
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            const string providerName1 = "InMemory1";
+            services.AddEFSecondLevelCache(options =>
+                    options.UseEasyCachingCoreProvider(providerName1).DisableLogging(true)
+            );
+
+            // Add an in-memory cache service provider
+            // More info: https://easycaching.readthedocs.io/en/latest/In-Memory/
+            services.AddEasyCaching(options =>
+            {
+                // use memory cache with your own configuration
+                options.UseInMemory(config =>
+                {
+                    config.DBConfig = new InMemoryCachingOptions
+                    {
+                        // scan time, default value is 60s
+                        ExpirationScanFrequency = 60,
+                        // total count of cache items, default value is 10000
+                        SizeLimit = 100,
+
+                        // enable deep clone when reading object from cache or not, default value is true.
+                        EnableReadDeepClone = false,
+                        // enable deep clone when writing object to cache or not, default value is false.
+                        EnableWriteDeepClone = false,
+                    };
+                    // the max random second will be added to cache's expiration, default value is 120
+                    config.MaxRdSecond = 120;
+                    // whether enable logging, default is false
+                    config.EnableLogging = false;
+                    // mutex key's alive time(ms), default is 5000
+                    config.LockMs = 5000;
+                    // when mutex key alive, it will sleep some time, default is 300
+                    config.SleepMs = 300;
+                }, providerName);
+            });
+        }
+    }
+}
+```
+
+If you want to use the Redis as the preferred cache provider with `EasyCaching.Core`, first install the following package:
+
+```xml
+  <ItemGroup>
+    <PackageReference Include="EasyCaching.Redis" Version="0.8.8" />
+  </ItemGroup>
+```
+
+And then register its required services:
+
+```csharp
+namespace EFSecondLevelCache.Core.AspNetCoreSample
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            const string providerName1 = "Redis1";
+            services.AddEFSecondLevelCache(options =>
+                    options.UseEasyCachingCoreProvider(providerName1).DisableLogging(true)
+            );
+
+            // More info: https://easycaching.readthedocs.io/en/latest/Redis/
+            services.AddEasyCaching(option =>
+            {
+                option.UseRedis(config =>
+                {
+                    config.DBConfig.AllowAdmin = true;
+                    config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("127.0.0.1", 6379));
+                }, providerName);
+            });
+        }
+    }
+}
+```
+
+### Using CacheManager.Core as the cache provider [It's not actively maintained]
 
 Also here you can use the [CacheManager.Core](https://github.com/MichaCo/CacheManager), as a highly configurable cache manager too.
 To use its in-memory caching mechanism, add these entries to the `.csproj` file:
@@ -141,9 +238,11 @@ services.AddEFSecondLevelCache(options =>
 
 [Here is](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/Settings/EFServiceProvider.cs#L21) the definition of the SpecialTypesConverter.
 
-Note: If you don't want to use the above cache providers, implement your custom `IEFCacheServiceProvider` and then introduce it using the `options.UseCustomCacheProvider<T>()` method.
+### Using a custom cache provider
 
-2- [Add SecondLevelCacheInterceptor](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/MsSqlServiceCollectionExtensions.cs) to your `DbContextOptionsBuilder` pipeline:
+If you don't want to use the above cache providers, implement your custom `IEFCacheServiceProvider` and then introduce it using the `options.UseCustomCacheProvider<T>()` method.
+
+### 2- [Add SecondLevelCacheInterceptor](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/MsSqlServiceCollectionExtensions.cs) to your `DbContextOptionsBuilder` pipeline:
 
 ```csharp
     public static class MsSqlServiceCollectionExtensions
@@ -167,12 +266,12 @@ Note: If you don't want to use the above cache providers, implement your custom 
     }
 ```
 
-3- Setting up the cache invalidation:
+### 3- Setting up the cache invalidation:
 
 This library doesn't need any settings for the cache invalidation. It watches for all of the CRUD operations using its interceptor and then invalidates the related cache entries automatically.
 But if you want to invalidate the whole cache manually, inject the `IEFCacheServiceProvider` service and then call its `ClearAllCachedEntries()` method.
 
-4- To cache the results of the normal queries like:
+### 4- To cache the results of the normal queries like:
 
 ```csharp
 var post1 = context.Posts
@@ -193,7 +292,7 @@ var post1 = context.Posts
 
 NOTE: It doesn't matter where the `Cacheable` method is located in this expression tree. [It just adds](/src/EFCoreSecondLevelCacheInterceptor/EFCachedQueryExtensions.cs) the standard `TagWith` method to mark this query as `Cacheable`. Later `SecondLevelCacheInterceptor` will use this tag to identify the `Cacheable` queries.
 
-Also it's possibe to set the `Cacheable()` method's settings globally:
+Also it's possible to set the `Cacheable()` method's settings globally:
 
 ```csharp
 services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true));

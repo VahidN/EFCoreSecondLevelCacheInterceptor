@@ -37,9 +37,9 @@ namespace EFCoreSecondLevelCacheInterceptor
         public Type CacheProvider { get; set; }
 
         /// <summary>
-        /// Redis connection string
+        /// Selected caching provider name
         /// </summary>
-        public string RedisConfiguration { get; set; }
+        public string ProviderName { get; set; }
 
         /// <summary>
         /// CacheAllQueries Options
@@ -151,6 +151,36 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFCoreSecondLevelCacheOptions UseCacheManagerCoreProvider(CacheExpirationMode expirationMode, TimeSpan timeout)
         {
             Settings.CacheProvider = typeof(EFCacheManagerCoreProvider);
+            Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
+            {
+                ExpirationMode = expirationMode,
+                Timeout = timeout,
+                IsActive = true
+            };
+            return this;
+        }
+
+        /// <summary>
+        /// Introduces the built-in `EasyCachingCoreProvider` to be used as the CacheProvider.
+        /// </summary>
+        public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(string providerName)
+        {
+            Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
+            Settings.ProviderName = providerName;
+            return this;
+        }
+
+        /// <summary>
+        /// Introduces the built-in `EasyCachingCoreProvider` to be used as the CacheProvider.
+        /// If you specify the `Cacheable()` method options, its setting will override this global setting.
+        /// </summary>
+        /// <param name="providerName">Selected caching provider name.</param>
+        /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
+        /// <param name="timeout">The expiration timeout.</param>
+        public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(string providerName, CacheExpirationMode expirationMode, TimeSpan timeout)
+        {
+            Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
+            Settings.ProviderName = providerName;
             Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
             {
                 ExpirationMode = expirationMode,

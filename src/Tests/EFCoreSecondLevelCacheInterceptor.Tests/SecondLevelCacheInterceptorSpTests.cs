@@ -14,6 +14,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public async Task TestCacheableWorksWithSPs(TestCacheProvider cacheProvider)
         {
             await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false, async (context, loggerProvider) =>
@@ -39,6 +41,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.BuiltInInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public async Task TestCacheInvalidationWorksWithSPs(TestCacheProvider cacheProvider)
         {
             await EFServiceProvider.RunInContextAsync(cacheProvider, LogLevel.Debug, false, async (context, loggerProvider) =>
