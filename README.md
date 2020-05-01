@@ -22,7 +22,7 @@ PM> Install-Package EFCoreSecondLevelCacheInterceptor
 
 You can also view the [package page](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor/) on NuGet.
 
-## Usage (1 & 2 are mandatory)
+## Usage ([1](#1--register-a-preferred-cache-provider) & [2](#2--add-secondlevelcacheinterceptor-to-your-dbcontextoptionsbuilder-pipeline) are mandatory)
 
 ### 1- [Register a preferred cache provider](/src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample/Startup.cs):
 
