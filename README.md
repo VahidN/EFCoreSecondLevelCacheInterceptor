@@ -116,7 +116,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
                     config.LockMs = 5000;
                     // when mutex key alive, it will sleep some time, default is 300
                     config.SleepMs = 300;
-                }, providerName);
+                }, providerName1);
             });
         }
     }
@@ -152,7 +152,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
                 {
                     config.DBConfig.AllowAdmin = true;
                     config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("127.0.0.1", 6379));
-                }, providerName);
+                }, providerName1);
             });
         }
     }
