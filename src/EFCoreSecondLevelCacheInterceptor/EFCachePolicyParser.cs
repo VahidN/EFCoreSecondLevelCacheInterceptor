@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor
@@ -29,6 +30,8 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class EFCachePolicyParser : IEFCachePolicyParser
     {
+        internal const string EFCachePolicyTagPrefix = "-- EFCachePolicy";
+
         private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
         private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
         private readonly IEFDebugLogger _logger;
@@ -59,19 +62,19 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public string RemoveEFCachePolicyTag(string commandText)
         {
-            var startIndex = commandText.IndexOf(nameof(EFCachePolicy), StringComparison.Ordinal);
+            var startIndex = commandText.IndexOf(EFCachePolicyTagPrefix, StringComparison.Ordinal);
             if (startIndex == -1)
             {
                 return commandText;
             }
 
-            var endIndex = commandText.IndexOf('\n');
+            var endIndex = commandText.IndexOf('\n', startIndex);
             if (endIndex == -1)
             {
                 return commandText;
             }
 
-            return commandText.Remove(startIndex, endIndex - startIndex);
+            return commandText.Remove(startIndex, (endIndex - startIndex) + 1);
         }
 
         /// <summary>
@@ -104,9 +107,10 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return null;
             }
 
-            var firstLine = commandText.Split('\n')[0].Trim();
+            var commandTextLines = commandText.Split('\n');
+            var efCachePolicyCommentLine = commandTextLines.First(textLine => textLine.StartsWith(EFCachePolicyTagPrefix)).Trim();
 
-            var parts = firstLine.Split(new[] { EFCachePolicy.PartsSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = efCachePolicyCommentLine.Split(new[] { EFCachePolicy.PartsSeparator }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 2)
             {
                 return null;
