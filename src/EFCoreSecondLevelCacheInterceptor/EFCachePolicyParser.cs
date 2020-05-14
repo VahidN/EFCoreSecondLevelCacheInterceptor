@@ -15,7 +15,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         EFCachePolicy GetEFCachePolicy(string commandText);
 
         /// <summary>
-        /// Does `commandText` contain nameof(EFCachePolicy)?
+        /// Does `commandText` contain EFCachePolicyTagPrefix?
         /// </summary>
         bool HasEFCachePolicy(string commandText);
 
@@ -30,7 +30,10 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class EFCachePolicyParser : IEFCachePolicyParser
     {
-        internal const string EFCachePolicyTagPrefix = "-- EFCachePolicy";
+        /// <summary>
+        /// EFCachePolicy Tag Prefix
+        /// </summary>
+        public static readonly string EFCachePolicyTagPrefix = $"-- {nameof(EFCachePolicy)}";
 
         private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
         private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
@@ -50,11 +53,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         }
 
         /// <summary>
-        /// Does `commandText` contain nameof(EFCachePolicy)?
+        /// Does `commandText` contain EFCachePolicyTagPrefix?
         /// </summary>
         public bool HasEFCachePolicy(string commandText)
         {
-            return !string.IsNullOrWhiteSpace(commandText) && commandText.Contains(nameof(EFCachePolicy));
+            return !string.IsNullOrWhiteSpace(commandText) && commandText.Contains(EFCachePolicyTagPrefix);
         }
 
         /// <summary>

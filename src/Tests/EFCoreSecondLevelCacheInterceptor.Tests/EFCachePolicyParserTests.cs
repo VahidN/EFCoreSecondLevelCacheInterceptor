@@ -51,7 +51,7 @@ ORDER BY [p].[Id]";
         [TestMethod]
         public void TestGetEFCachePolicyWithAllParts()
         {
-            string commandText = EFCachePolicy.Configure(options =>
+            string commandText = "-- " + EFCachePolicy.Configure(options =>
                     options.ExpirationMode(CacheExpirationMode.Absolute)
                     .Timeout(TimeSpan.FromMinutes(45))
                     .SaltKey("saltKey")
@@ -62,6 +62,7 @@ ORDER BY [p].[Id]";
             var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
             var cachePolicy = cachePolicyParser.GetEFCachePolicy(commandText);
 
+            Assert.IsNotNull(cachePolicy);
             Assert.AreEqual(expected: CacheExpirationMode.Absolute, actual: cachePolicy.CacheExpirationMode);
             Assert.AreEqual(expected: TimeSpan.FromMinutes(45), actual: cachePolicy.CacheTimeout);
             Assert.AreEqual(expected: "saltKey", actual: cachePolicy.CacheSaltKey);
