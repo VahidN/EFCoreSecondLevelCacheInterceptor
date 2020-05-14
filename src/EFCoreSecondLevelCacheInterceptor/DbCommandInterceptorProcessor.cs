@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -32,6 +33,10 @@ namespace EFCoreSecondLevelCacheInterceptor
         private readonly IEFCacheKeyProvider _cacheKeyProvider;
         private readonly IEFCachePolicyParser _cachePolicyParser;
         private readonly IEFDebugLogger _logger;
+        private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+
+        private readonly ConditionalWeakTable<DbCommand, EFCachePolicy> _cachePolicyLookup
+            = new ConditionalWeakTable<DbCommand, EFCachePolicy>();
 
         /// <summary>
         /// Helps processing SecondLevelCacheInterceptor
@@ -41,13 +46,15 @@ namespace EFCoreSecondLevelCacheInterceptor
             IEFCacheServiceProvider cacheService,
             IEFCacheDependenciesProcessor cacheDependenciesProcessor,
             IEFCacheKeyProvider cacheKeyProvider,
-            IEFCachePolicyParser cachePolicyParser)
+            IEFCachePolicyParser cachePolicyParser,
+            IOptions<EFCoreSecondLevelCacheSettings> cacheSettingsOptions)
         {
             _cacheService = cacheService;
             _cacheDependenciesProcessor = cacheDependenciesProcessor;
             _cacheKeyProvider = cacheKeyProvider;
             _cachePolicyParser = cachePolicyParser;
             _logger = logger;
+            _cacheSettings = cacheSettingsOptions?.Value;
         }
 
         /// <summary>
@@ -66,7 +73,18 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return result;
             }
 
-            var cachePolicy = _cachePolicyParser.GetEFCachePolicy(command.CommandText);
+            EFCachePolicy cachePolicy;
+            if (_cacheSettings?.RemoveCachePolicyTagBeforeExecution == true
+                && _cachePolicyLookup.TryGetValue(command, out var cachePolicyFromDictionary))
+            {
+                cachePolicy = cachePolicyFromDictionary;
+                _cachePolicyLookup.Remove(command);
+            }
+            else
+            {
+                cachePolicy = _cachePolicyParser.GetEFCachePolicy(command.CommandText);
+            }
+
             if (cachePolicy != null)
             {
                 var efCacheKey = _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
@@ -110,6 +128,12 @@ namespace EFCoreSecondLevelCacheInterceptor
             var cachePolicy = _cachePolicyParser.GetEFCachePolicy(command.CommandText);
             if (cachePolicy != null)
             {
+                if (_cacheSettings?.RemoveCachePolicyTagBeforeExecution == true)
+                {
+                    _cachePolicyLookup.Add(command, cachePolicy);
+                    command.CommandText = _cachePolicyParser.RemoveEFCachePolicyTag(command.CommandText);
+                }
+
                 var efCacheKey = _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
                 if (!(_cacheService.GetValue(efCacheKey, cachePolicy) is EFCachedData cacheResult))
                 {

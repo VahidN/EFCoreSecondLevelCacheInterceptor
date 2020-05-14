@@ -77,6 +77,14 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return commandText;
             }
 
+            var additionalNewlineIndex = commandText.IndexOf('\n', endIndex + 1) - endIndex;
+            if (additionalNewlineIndex == 1 || additionalNewlineIndex == 2)
+            {
+                // EF's TagWith(..) method inserts an additional line break between
+                // comments which we can remove as well
+                endIndex += additionalNewlineIndex;
+            }
+
             return commandText.Remove(startIndex, (endIndex - startIndex) + 1);
         }
 

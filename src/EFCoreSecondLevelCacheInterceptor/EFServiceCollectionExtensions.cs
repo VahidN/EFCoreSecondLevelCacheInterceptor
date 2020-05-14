@@ -50,6 +50,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// Should the debug level loggig be disabled?
         /// </summary>
         public bool DisableLogging { set; get; }
+
+        /// <summary>
+        /// Should the cache policy tag comment be removed from the command text?
+        /// </summary>
+        public bool RemoveCachePolicyTagBeforeExecution { get; set; }
     }
 
     /// <summary>
@@ -197,6 +202,16 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFCoreSecondLevelCacheOptions DisableLogging(bool value = false)
         {
             Settings.DisableLogging = value;
+            return this;
+        }
+
+        /// <summary>
+        /// Should the cache policy tag comment be removed from the command text?
+        /// Set it to true for improved performance in query plan cache scenarios.
+        /// </summary>
+        public EFCoreSecondLevelCacheOptions RemoveCachePolicyTagBeforeExecution(bool value)
+        {
+            Settings.RemoveCachePolicyTagBeforeExecution = value;
             return this;
         }
     }

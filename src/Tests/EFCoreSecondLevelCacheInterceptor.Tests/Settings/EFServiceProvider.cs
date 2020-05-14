@@ -10,6 +10,7 @@ using CacheManager.Core;
 using Newtonsoft.Json;
 using EasyCaching.InMemory;
 using CacheManager.Redis;
+using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests
 {
@@ -102,7 +103,10 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         public static IServiceProvider GetConfiguredContextServiceProvider(
             TestCacheProvider cacheProvider,
             LogLevel logLevel,
-            bool cacheAllQueries)
+            bool cacheAllQueries,
+            Action<IServiceCollection> configureServices = null,
+            Action<EFCoreSecondLevelCacheOptions> configureCacheOptions = null,
+            Action<DbContextOptionsBuilder> configureDbContextOptions = null)
         {
             var services = new ServiceCollection();
             services.AddOptions();
@@ -116,6 +120,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
 
             var loggerProvider = new DebugLoggerProvider();
             services.AddLogging(cfg => cfg.AddConsole().AddDebug().AddProvider(loggerProvider).SetMinimumLevel(logLevel));
+
+            configureServices?.Invoke(services);
 
             services.AddEFSecondLevelCache(options =>
             {
@@ -148,9 +154,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 {
                     options.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
                 }
+
+                configureCacheOptions?.Invoke(options);
             });
 
-            services.AddConfiguredMsSqlDbContext(GetConnectionString(basePath, configuration));
+            services.AddConfiguredMsSqlDbContext(GetConnectionString(basePath, configuration), configureDbContextOptions);
 
             return services.BuildServiceProvider();
         }
@@ -266,11 +274,21 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             LogLevel logLevel,
             bool cacheAllQueries,
             params Action<ApplicationDbContext, DebugLoggerProvider>[] actions)
+            => RunInContext(cacheProvider, logLevel, cacheAllQueries, null, null, null, actions);
+
+        public static void RunInContext(
+            TestCacheProvider cacheProvider,
+            LogLevel logLevel,
+            bool cacheAllQueries,
+            Action<IServiceCollection> configureServices,
+            Action<EFCoreSecondLevelCacheOptions> configureCacheOptions,
+            Action<DbContextOptionsBuilder> configureDbContextOptions,
+            params Action<ApplicationDbContext, DebugLoggerProvider>[] actions)
         {
             _semaphoreSlim.Wait();
             try
             {
-                var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
+                var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries, configureServices, configureCacheOptions, configureDbContextOptions);
                 var cacheServiceProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
                 cacheServiceProvider.ClearAllCachedEntries();
                 using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
@@ -290,16 +308,26 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             }
         }
 
+        public static Task RunInContextAsync(
+            TestCacheProvider cacheProvider,
+            LogLevel logLevel,
+            bool cacheAllQueries,
+            params Func<ApplicationDbContext, DebugLoggerProvider, Task>[] actions)
+            => RunInContextAsync(cacheProvider, logLevel, cacheAllQueries, null, null, null, actions);
+
         public static async Task RunInContextAsync(
             TestCacheProvider cacheProvider,
             LogLevel logLevel,
             bool cacheAllQueries,
+            Action<IServiceCollection> configureServices,
+            Action<EFCoreSecondLevelCacheOptions> configureCacheOptions,
+            Action<DbContextOptionsBuilder> configureDbContextOptions,
             params Func<ApplicationDbContext, DebugLoggerProvider, Task>[] actions)
         {
             await _semaphoreSlim.WaitAsync();
             try
             {
-                var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
+                var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries, configureServices, configureCacheOptions, configureDbContextOptions);
                 var cacheServiceProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
                 cacheServiceProvider.ClearAllCachedEntries();
                 using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
