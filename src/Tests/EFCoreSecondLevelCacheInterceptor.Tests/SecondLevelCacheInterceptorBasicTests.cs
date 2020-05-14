@@ -469,6 +469,41 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         }
 
         [DataTestMethod]
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
+        public void TestSecondLevelCache_with_additional_tags_does_not_hit_the_database(TestCacheProvider cacheProvider)
+        {
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false,
+                (context, loggerProvider) =>
+                {
+                    var isActive = true;
+                    var productName = "Product2";
+
+                    var list1 = context.Products
+                        .TagWith("Custom Tag")
+                        .OrderBy(product => product.ProductNumber)
+                        .Where(product => product.IsActive == isActive && product.ProductName == productName)
+                        .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                        .ToList();
+                    Assert.IsTrue(list1.Any());
+                    Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
+
+                    var list2 = context.Products
+                        .TagWith("Custom Tag")
+                        .OrderBy(product => product.ProductNumber)
+                        .Where(product => product.IsActive == isActive && product.ProductName == productName)
+                        .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                        .ToList();
+
+                    Assert.IsTrue(list2.Any());
+                    Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
+                });
+        }
+
+        [DataTestMethod]
         public void TestInstantiatingContextWithoutDI()
         {
             var services = new ServiceCollection();
