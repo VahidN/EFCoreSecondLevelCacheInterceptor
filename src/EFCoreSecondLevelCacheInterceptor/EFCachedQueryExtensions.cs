@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 
@@ -30,15 +29,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="query">The input EF query.</param>
         /// <param name="expirationMode">Defines the expiration mode of the cache item.</param>
         /// <param name="timeout">The expiration timeout.</param>
-        /// <param name="methodName">Tells the compiler to insert the name of the containing member instead of a parameter’s default value</param>
-        /// <param name="lineNumber">Tells the compiler to insert the line number of the containing member instead of a parameter’s default value</param>
         /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
         public static IQueryable<TType> Cacheable<TType>(
-            this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+            this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout)
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
-                options.ExpirationMode(expirationMode).Timeout(timeout).CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                options.ExpirationMode(expirationMode).Timeout(timeout)));
         }
 
         /// <summary>
@@ -79,17 +76,14 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// This array will be used to invalidate the related cache of all related queries automatically.
         /// </param>
         /// <param name="saltKey">If you think the computed hash of the query to calculate the cache-key is not enough, set this value.</param>
-        /// <param name="methodName">Tells the compiler to insert the name of the containing member instead of a parameter’s default value</param>
-        /// <param name="lineNumber">Tells the compiler to insert the line number of the containing member instead of a parameter’s default value</param>
         /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
         public static IQueryable<TType> Cacheable<TType>(
-            this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies, string saltKey, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+            this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies, string saltKey)
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(expirationMode).Timeout(timeout)
-                .CacheDependencies(cacheDependencies).SaltKey(saltKey)
-                .CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                .CacheDependencies(cacheDependencies).SaltKey(saltKey)));
         }
 
         /// <summary>
@@ -105,16 +99,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// `cacheDependencies` determines which tables are used in this final query.
         /// This array will be used to invalidate the related cache of all related queries automatically.
         /// </param>
-        /// <param name="methodName">Tells the compiler to insert the name of the containing member instead of a parameter’s default value</param>
-        /// <param name="lineNumber">Tells the compiler to insert the line number of the containing member instead of a parameter’s default value</param>
         /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
         public static IQueryable<TType> Cacheable<TType>(
-            this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+            this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies)
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
-                options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)
-                .CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)));
         }
 
         /// <summary>
@@ -125,16 +116,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="expirationMode">Defines the expiration mode of the cache item.</param>
         /// <param name="timeout">The expiration timeout.</param>
         /// <param name="saltKey">If you think the computed hash of the query to calculate the cache-key is not enough, set this value.</param>
-        /// <param name="methodName">Tells the compiler to insert the name of the containing member instead of a parameter’s default value</param>
-        /// <param name="lineNumber">Tells the compiler to insert the line number of the containing member instead of a parameter’s default value</param>
         /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
         public static IQueryable<TType> Cacheable<TType>(
-            this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string saltKey, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+            this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string saltKey)
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
-                options.ExpirationMode(expirationMode).Timeout(timeout).SaltKey(saltKey)
-                .CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                options.ExpirationMode(expirationMode).Timeout(timeout).SaltKey(saltKey)));
         }
 
         /// <summary>
@@ -142,15 +130,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         /// <typeparam name="TType">Entity type.</typeparam>
         /// <param name="query">The input EF query.</param>
-        /// <param name="methodName">Tells the compiler to insert the name of the containing member instead of a parameter’s default value</param>
-        /// <param name="lineNumber">Tells the compiler to insert the line number of the containing member instead of a parameter’s default value</param>
         /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
         public static IQueryable<TType> Cacheable<TType>(
-            this IQueryable<TType> query, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0)
+            this IQueryable<TType> query)
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
-                options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes).DefaultCacheableMethod(true).CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes).DefaultCacheableMethod(true)));
         }
 
         /// <summary>
@@ -158,15 +144,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         /// <typeparam name="TType">Entity type.</typeparam>
         /// <param name="query">The input EF query.</param>
-        /// <param name="methodName">Tells the compiler to insert the name of the containing member instead of a parameter’s default value</param>
-        /// <param name="lineNumber">Tells the compiler to insert the line number of the containing member instead of a parameter’s default value</param>
         /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
         public static IQueryable<TType> Cacheable<TType>(
-            this DbSet<TType> query, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0) where TType : class
+            this DbSet<TType> query) where TType : class
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
-                options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes).DefaultCacheableMethod(true).CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes).DefaultCacheableMethod(true)));
         }
 
         /// <summary>
@@ -176,16 +160,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="query">The input EF query.</param>
         /// <param name="expirationMode">Defines the expiration mode of the cache item.</param>
         /// <param name="timeout">The expiration timeout.</param>
-        /// <param name="methodName">Tells the compiler to insert the name of the containing member instead of a parameter’s default value</param>
-        /// <param name="lineNumber">Tells the compiler to insert the line number of the containing member instead of a parameter’s default value</param>
         /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
         public static IQueryable<TType> Cacheable<TType>(
-            this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0) where TType : class
+            this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout) where TType : class
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
-                options.ExpirationMode(expirationMode).Timeout(timeout)
-                .CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                options.ExpirationMode(expirationMode).Timeout(timeout)));
         }
 
         /// <summary>
@@ -202,17 +183,14 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// This array will be used to invalidate the related cache of all related queries automatically.
         /// </param>
         /// <param name="saltKey">If you think the computed hash of the query to calculate the cache-key is not enough, set this value.</param>
-        /// <param name="methodName">Tells the compiler to insert the name of the containing member instead of a parameter’s default value</param>
-        /// <param name="lineNumber">Tells the compiler to insert the line number of the containing member instead of a parameter’s default value</param>
         /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
         public static IQueryable<TType> Cacheable<TType>(
-            this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies, string saltKey, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0) where TType : class
+            this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies, string saltKey) where TType : class
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(expirationMode).Timeout(timeout)
-                .CacheDependencies(cacheDependencies).SaltKey(saltKey)
-                .CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                .CacheDependencies(cacheDependencies).SaltKey(saltKey)));
         }
 
         /// <summary>
@@ -228,16 +206,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// `cacheDependencies` determines which tables are used in this final query.
         /// This array will be used to invalidate the related cache of all related queries automatically.
         /// </param>
-        /// <param name="methodName">Tells the compiler to insert the name of the containing member instead of a parameter’s default value</param>
-        /// <param name="lineNumber">Tells the compiler to insert the line number of the containing member instead of a parameter’s default value</param>
         /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
         public static IQueryable<TType> Cacheable<TType>(
-            this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0) where TType : class
+            this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies) where TType : class
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
-                options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)
-                .CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)));
         }
 
         /// <summary>
@@ -248,16 +223,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="expirationMode">Defines the expiration mode of the cache item.</param>
         /// <param name="timeout">The expiration timeout.</param>
         /// <param name="saltKey">If you think the computed hash of the query to calculate the cache-key is not enough, set this value.</param>
-        /// <param name="methodName">Tells the compiler to insert the name of the containing member instead of a parameter’s default value</param>
-        /// <param name="lineNumber">Tells the compiler to insert the line number of the containing member instead of a parameter’s default value</param>
         /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
         public static IQueryable<TType> Cacheable<TType>(
-            this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string saltKey, [CallerMemberName] string methodName = null, [CallerLineNumber] int lineNumber = 0) where TType : class
+            this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string saltKey) where TType : class
         {
             sanityCheck(query);
             return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
-                options.ExpirationMode(expirationMode).Timeout(timeout).SaltKey(saltKey)
-                .CallerMemberName(methodName).CallerLineNumber(lineNumber)));
+                options.ExpirationMode(expirationMode).Timeout(timeout).SaltKey(saltKey)));
         }
 
         private static void sanityCheck<TType>(IQueryable<TType> query)

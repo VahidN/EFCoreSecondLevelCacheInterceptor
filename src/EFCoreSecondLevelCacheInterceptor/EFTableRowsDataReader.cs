@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
+using System.Linq;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -20,6 +22,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         private bool _isClosed;
 
         private readonly int _rowsCount;
+
+        private readonly IDictionary<int, Type> _valueTypes;
 
         /// <summary>
         /// Gets the number of columns in the current row.
@@ -59,7 +63,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             _tableRows = tableRows;
             _rowsCount = _tableRows.RowsCount;
-            FieldCount = _tableRows?.FieldCount ?? 0;
+            FieldCount = _tableRows.FieldCount;
+            _valueTypes = new Dictionary<int, Type>(FieldCount);
         }
 
         /// <summary>
@@ -132,7 +137,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return default;
             }
 
-            var valueType = value.GetType();
+            var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(long))
             {
                 return (long)value != 0;
@@ -151,6 +156,18 @@ namespace EFCoreSecondLevelCacheInterceptor
             return (bool)value;
         }
 
+        private Type getOrdinalValueType(int ordinal, object value)
+        {
+            if (_valueTypes.TryGetValue(ordinal, out var valueType))
+            {
+                return valueType;
+            }
+
+            valueType = value.GetType();
+            _valueTypes.Add(ordinal, valueType);
+            return valueType;
+        }
+
         /// <summary>
         /// Gets the value of the specified column as a byte.
         /// </summary>
@@ -162,7 +179,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return default;
             }
 
-            var valueType = value.GetType();
+            var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(long))
             {
                 return (byte)(long)value;
@@ -192,7 +209,8 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return default;
             }
 
-            if (value.GetType() == typeof(string))
+            var valueType = getOrdinalValueType(ordinal, value);
+            if (valueType == typeof(string))
             {
                 var val = value.ToString();
                 if (val.Length == 1)
@@ -221,7 +239,8 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return default;
             }
 
-            if (value.GetType() != typeof(DateTime))
+            var valueType = getOrdinalValueType(ordinal, value);
+            if (valueType != typeof(DateTime))
             {
                 return DateTime.Parse(value.ToString());
             }
@@ -240,7 +259,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return default;
             }
 
-            var valueType = value.GetType();
+            var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(string))
             {
                 return decimal.Parse(value.ToString(), NumberStyles.Number | NumberStyles.AllowExponent, CultureInfo.InvariantCulture);
@@ -284,7 +303,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return default;
             }
 
-            var valueType = value.GetType();
+            var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(double))
             {
                 return (float)(double)value;
@@ -309,7 +328,8 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return default;
             }
 
-            if (value.GetType() == typeof(string))
+            var valueType = getOrdinalValueType(ordinal, value);
+            if (valueType == typeof(string))
             {
                 return new Guid(value.ToString());
             }
@@ -328,7 +348,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return default;
             }
 
-            var valueType = value.GetType();
+            var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(long))
             {
                 return (short)(long)value;
@@ -353,7 +373,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return default;
             }
 
-            var valueType = value.GetType();
+            var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(long))
             {
                 return (int)(long)value;

@@ -28,6 +28,8 @@ You can also view the [package page](http://www.nuget.org/packages/EFCoreSecondL
 
 #### Using the built-in In-Memory cache provider
 
+![performance](/src/Tests/EFCoreSecondLevelCacheInterceptor.PerformanceTests/int-pref.png)
+
 ```csharp
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 {

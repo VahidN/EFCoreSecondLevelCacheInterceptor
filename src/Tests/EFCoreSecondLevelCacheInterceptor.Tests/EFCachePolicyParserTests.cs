@@ -55,8 +55,6 @@ ORDER BY [p].[Id]";
                     options.ExpirationMode(CacheExpirationMode.Absolute)
                     .Timeout(TimeSpan.FromMinutes(45))
                     .SaltKey("saltKey")
-                    .CallerMemberName("methodName")
-                    .CallerLineNumber(10)
                     .CacheDependencies("item 1", "item 2"));
 
             var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
@@ -90,7 +88,6 @@ ORDER BY [p].[Id]";
 
             var expectedResult =
 @"-- CustomTagAbove
-
 
 -- CustomTagBelow
 

@@ -30,7 +30,7 @@ namespace EFCoreSecondLevelCacheInterceptor.PerformanceTests
                                 .With(BaselineRatioColumn.RatioMean)
                                 .With(RankColumn.Arabic)
                                 .With(Job.Default.With(CoreRuntime.Core31)
-                                    .WithIterationCount(20)
+                                    .WithIterationCount(30)
                                     .WithInvocationCount(16)
                                     .WithIterationTime(TimeInterval.FromSeconds(1000))
                                     .WithWarmupCount(4)

@@ -29,16 +29,6 @@ namespace EFCoreSecondLevelCacheInterceptor
         public const string EFUnknownsCacheDependency = nameof(EFUnknownsCacheDependency);
 
         /// <summary>
-        /// Tells the compiler to insert the name of the containing member instead of a parameter’s default value
-        /// </summary>
-        public string CacheCallerMemberName { get; private set; }
-
-        /// <summary>
-        /// Tells the compiler to insert the line number of the containing member instead of a parameter’s default value
-        /// </summary>
-        public int CacheCallerLineNumber { get; private set; }
-
-        /// <summary>
         /// Defines the expiration mode of the cache item.
         /// Its default value is Absolute.
         /// </summary>
@@ -66,24 +56,6 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// Determines the default Cacheable method
         /// </summary>
         public bool IsDefaultCacheableMethod { set; get; }
-
-        /// <summary>
-        /// Tells the compiler to insert the line number of the containing member instead of a parameter’s default value
-        /// </summary>
-        public EFCachePolicy CallerLineNumber(int lineNumber)
-        {
-            CacheCallerLineNumber = lineNumber;
-            return this;
-        }
-
-        /// <summary>
-        /// Tells the compiler to insert the name of the containing member instead of a parameter’s default value
-        /// </summary>
-        public EFCachePolicy CallerMemberName(string memberName)
-        {
-            CacheCallerMemberName = memberName;
-            return this;
-        }
 
         /// <summary>
         /// Set this option to the `real` related table names of the current query, if you are using an stored procedure,
@@ -151,7 +123,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public override string ToString()
         {
-            return $"{nameof(EFCachePolicy)}[{CacheCallerMemberName}(line {CacheCallerLineNumber})] {PartsSeparator} {CacheExpirationMode}{ItemsSeparator}{CacheTimeout}{ItemsSeparator}{CacheSaltKey}{ItemsSeparator}{string.Join(CacheDependenciesSeparator, CacheItemsDependencies)}{ItemsSeparator}{IsDefaultCacheableMethod}".TrimEnd(ItemsSeparator);
+            return $"{nameof(EFCachePolicy)} {PartsSeparator} {CacheExpirationMode}{ItemsSeparator}{CacheTimeout}{ItemsSeparator}{CacheSaltKey}{ItemsSeparator}{string.Join(CacheDependenciesSeparator, CacheItemsDependencies)}{ItemsSeparator}{IsDefaultCacheableMethod}".TrimEnd(ItemsSeparator);
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Issue12MySQL
             var services = new ServiceCollection();
             services.AddOptions();
 
-            services.AddLogging(cfg => cfg.AddConsole().AddDebug());
+            services.AddLogging(cfg => cfg.AddConsole().AddDebug().SetMinimumLevel(LogLevel.Debug));
 
             var basePath = Directory.GetCurrentDirectory();
             Console.WriteLine($"Using `{basePath}` as the ContentRootPath");

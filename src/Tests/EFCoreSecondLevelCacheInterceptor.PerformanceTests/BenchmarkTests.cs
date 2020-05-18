@@ -11,27 +11,21 @@ namespace EFCoreSecondLevelCacheInterceptor.PerformanceTests
         [Benchmark(Baseline = true)]
         public void RunQueryDirectly()
         {
-            for (var i = 0; i < 100; i++)
+            EFServiceProvider.RunInContext(db =>
             {
-                EFServiceProvider.RunInContext(db =>
-                {
-                    var products = db.Products.Where(x => x.ProductId > 0).ToList();
-                    _count = products.Count;
-                });
-            }
+                var products = db.Products.Where(x => x.ProductId > 0).ToList();
+                _count = products.Count;
+            });
         }
 
         [Benchmark]
         public void RunCacheableQueryWithMicrosoftMemoryCache()
         {
-            for (var i = 0; i < 100; i++)
+            EFServiceProvider.RunInContext(db =>
             {
-                EFServiceProvider.RunInContext(db =>
-                {
-                    var products = db.Products.Where(x => x.ProductId > 0).Cacheable().ToList();
-                    _count = products.Count;
-                });
-            }
+                var products = db.Products.Where(x => x.ProductId > 0).Cacheable().ToList();
+                _count = products.Count;
+            });
         }
 
         [GlobalCleanup]
