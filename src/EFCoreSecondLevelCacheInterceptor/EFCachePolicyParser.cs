@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
 
@@ -12,7 +13,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Converts the `commandText` to an instance of `EFCachePolicy`
         /// </summary>
-        EFCachePolicy GetEFCachePolicy(string commandText);
+        EFCachePolicy GetEFCachePolicy(string commandText, IDictionary<Type, string> allEntityTypes);
 
         /// <summary>
         /// Does `commandText` contain EFCachePolicyTagPrefix?
@@ -36,7 +37,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public static readonly string EFCachePolicyTagPrefix = $"-- {nameof(EFCachePolicy)}";
 
         private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
-        private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
+        private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
         private readonly IEFDebugLogger _logger;
 
         /// <summary>
@@ -44,11 +45,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public EFCachePolicyParser(
             IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
-            IEFCacheDependenciesProcessor cacheDependenciesProcessor,
+            IEFSqlCommandsProcessor sqlCommandsProcessor,
             IEFDebugLogger logger)
         {
             _cacheSettings = cacheSettings?.Value;
-            _cacheDependenciesProcessor = cacheDependenciesProcessor;
+            _sqlCommandsProcessor = sqlCommandsProcessor;
             _logger = logger;
         }
 
@@ -91,9 +92,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Converts the `commandText` to an instance of `EFCachePolicy`
         /// </summary>
-        public EFCachePolicy GetEFCachePolicy(string commandText)
+        public EFCachePolicy GetEFCachePolicy(string commandText, IDictionary<Type, string> allEntityTypes)
         {
-            var efCachePolicy = getParsedPolicy(commandText) ?? getGlobalPolicy(commandText);
+            var efCachePolicy = getParsedPolicy(commandText)
+                                    ?? getRestrictedGlobalPolicy(commandText, allEntityTypes)
+                                    ?? getGlobalPolicy(commandText);
             if (efCachePolicy != null)
             {
                 _logger.LogDebug($"Using EFCachePolicy: {efCachePolicy}.");
@@ -101,11 +104,45 @@ namespace EFCoreSecondLevelCacheInterceptor
             return efCachePolicy;
         }
 
+        private EFCachePolicy getRestrictedGlobalPolicy(string commandText, IDictionary<Type, string> allEntityTypes)
+        {
+            var options = _cacheSettings.CacheSpecificQueriesOptions;
+            if (options?.IsActive != true
+                    || _sqlCommandsProcessor.IsCrudCommand(commandText)
+                    || commandText.Contains(EFCachedQueryExtensions.IsNotCachableMarker))
+            {
+                return null;
+            }
+
+            var shouldBeCached = false;
+            if (options.TableNames != null)
+            {
+                var commandTableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
+                if (options.TableNames?.Any(tableName => commandTableNames.Contains(tableName, StringComparer.OrdinalIgnoreCase)) == true)
+                {
+                    shouldBeCached = true;
+                }
+            }
+
+            if (options.EntityTypes != null)
+            {
+                var queryEntityTypes = _sqlCommandsProcessor.GetSqlCommandEntityTypes(commandText, allEntityTypes);
+                if (queryEntityTypes.Any(entityType => options.EntityTypes.Contains(entityType)))
+                {
+                    shouldBeCached = true;
+                }
+            }
+
+            return shouldBeCached
+                ? new EFCachePolicy().ExpirationMode(options.ExpirationMode).Timeout(options.Timeout)
+                : null;
+        }
+
         private EFCachePolicy getGlobalPolicy(string commandText)
         {
             var cacheAllQueriesOptions = _cacheSettings.CacheAllQueriesOptions;
             return cacheAllQueriesOptions.IsActive
-                && !_cacheDependenciesProcessor.IsCrudCommand(commandText)
+                && !_sqlCommandsProcessor.IsCrudCommand(commandText)
                 && !commandText.Contains(EFCachedQueryExtensions.IsNotCachableMarker)
                 ? new EFCachePolicy().ExpirationMode(cacheAllQueriesOptions.ExpirationMode).Timeout(cacheAllQueriesOptions.Timeout)
                 : null;

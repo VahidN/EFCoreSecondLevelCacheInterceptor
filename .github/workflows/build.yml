@@ -12,6 +12,6 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.202
+        dotnet-version: 3.1.302
     - name: Build DNTCaptcha.Core lib
       run: dotnet build ./src/EFCoreSecondLevelCacheInterceptor/EFCoreSecondLevelCacheInterceptor.csproj --configuration Release

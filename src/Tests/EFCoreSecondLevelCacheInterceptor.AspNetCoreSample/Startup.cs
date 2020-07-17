@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer;
+using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities;
 using System;
 
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
@@ -25,9 +26,17 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider(CacheExpirationMode.Absolute,TimeSpan.FromMinutes(30))
-				    .DisableLogging(false)
-                    .CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
+                options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30))
+                    .DisableLogging(false)
+                    //.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30)
+                    /*.CacheQueriesContainingTypes(
+                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
+                        typeof(Post), typeof(Product), typeof(User)
+                        )*/
+                    .CacheQueriesContainingTableNames(
+                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
+                        "posts", "products", "users"
+                        );
             });
 
             var connectionString = Configuration["ConnectionStrings:ApplicationDbContextConnection"];

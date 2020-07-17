@@ -8,7 +8,7 @@
     <ProjectReference Include="..\EFCoreSecondLevelCacheInterceptor.Tests.DataLayer\EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.csproj" />
   </ItemGroup>  
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.2" />
-	<PackageReference Include="Lamar.Microsoft.DependencyInjection" Version="4.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.6" />
+	<PackageReference Include="Lamar.Microsoft.DependencyInjection" Version="4.3.0" />
   </ItemGroup>
 </Project>

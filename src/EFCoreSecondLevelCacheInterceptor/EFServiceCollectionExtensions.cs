@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -27,6 +28,22 @@ namespace EFCoreSecondLevelCacheInterceptor
     }
 
     /// <summary>
+    /// CacheAllQueries Options
+    /// </summary>
+    public class CacheSpecificQueriesOptions : CacheAllQueriesOptions
+    {
+        /// <summary>
+        /// Given entity types to cache
+        /// </summary>
+        public Type[] EntityTypes { set; get; }
+
+        /// <summary>
+        /// Given table names to cache
+        /// </summary>
+        public IEnumerable<string> TableNames { set; get; }
+    }
+
+    /// <summary>
     /// Global Cache Settings
     /// </summary>
     public class EFCoreSecondLevelCacheSettings
@@ -45,6 +62,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// CacheAllQueries Options
         /// </summary>
         public CacheAllQueriesOptions CacheAllQueriesOptions { get; set; } = new CacheAllQueriesOptions();
+
+        /// <summary>
+        /// Cache Specific Queries Options
+        /// </summary>
+        public CacheSpecificQueriesOptions CacheSpecificQueriesOptions { get; set; } = new CacheSpecificQueriesOptions();
 
         /// <summary>
         /// Should the debug level loggig be disabled?
@@ -73,6 +95,54 @@ namespace EFCoreSecondLevelCacheInterceptor
                 ExpirationMode = expirationMode,
                 Timeout = timeout,
                 IsActive = true
+            };
+            return this;
+        }
+
+        /// <summary>
+        /// Puts the whole system in cache just for the specified `realTableNames`.
+        /// In this case calling the `Cacheable()` methods won't be necessary.
+        /// If you specify the `Cacheable()` method, its setting will override this global setting.
+        /// If you want to exclude some queries from this global cache, apply the `NotCacheable()` method to them.
+        /// </summary>
+        /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
+        /// <param name="timeout">The expiration timeout.</param>
+        /// <param name="realTableNames">
+        /// The real table names.
+        /// Queries containing these names will be cached.
+        /// Table names are not case sensitive.
+        /// </param>
+        public EFCoreSecondLevelCacheOptions CacheQueriesContainingTableNames(
+                CacheExpirationMode expirationMode, TimeSpan timeout, params string[] realTableNames)
+        {
+            Settings.CacheSpecificQueriesOptions = new CacheSpecificQueriesOptions
+            {
+                ExpirationMode = expirationMode,
+                Timeout = timeout,
+                IsActive = true,
+                TableNames = realTableNames
+            };
+            return this;
+        }
+
+        /// <summary>
+        /// Puts the whole system in cache just for the specified `entityTypes`.
+        /// In this case calling the `Cacheable()` methods won't be necessary.
+        /// If you specify the `Cacheable()` method, its setting will override this global setting.
+        /// If you want to exclude some queries from this global cache, apply the `NotCacheable()` method to them.
+        /// </summary>
+        /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
+        /// <param name="timeout">The expiration timeout.</param>
+        /// <param name="entityTypes">The real entity types. Queries containing these types will be cached.</param>
+        public EFCoreSecondLevelCacheOptions CacheQueriesContainingTypes(
+                CacheExpirationMode expirationMode, TimeSpan timeout, params Type[] entityTypes)
+        {
+            Settings.CacheSpecificQueriesOptions = new CacheSpecificQueriesOptions
+            {
+                ExpirationMode = expirationMode,
+                Timeout = timeout,
+                IsActive = true,
+                EntityTypes = entityTypes
             };
             return this;
         }
@@ -218,6 +288,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             services.TryAddSingleton<IReaderWriterLockProvider, ReaderWriterLockProvider>();
             services.TryAddSingleton<IEFCacheKeyProvider, EFCacheKeyProvider>();
             services.TryAddSingleton<IEFCachePolicyParser, EFCachePolicyParser>();
+            services.TryAddSingleton<IEFSqlCommandsProcessor, EFSqlCommandsProcessor>();
             services.TryAddSingleton<IEFCacheDependenciesProcessor, EFCacheDependenciesProcessor>();
             services.TryAddSingleton<IMemoryCacheChangeTokenProvider, EFMemoryCacheChangeTokenProvider>();
             services.TryAddSingleton<IDbCommandInterceptorProcessor, DbCommandInterceptorProcessor>();

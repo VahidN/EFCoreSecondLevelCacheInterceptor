@@ -17,7 +17,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> ExplicitIndex()
         {
             var param1 = 0;
             var post1 = await _context.Set<Post>()
@@ -25,6 +25,18 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample.Controllers
                 .Where(post => post.Id > param1)
                 .OrderBy(post => post.Id)
                 .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                .FirstOrDefaultAsync();
+            return Json(new { post1.Title, post1.User.Name });
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var param1 = 0;
+            var post1 = await _context.Set<Post>()
+                .Include(post => post.User)
+                .Where(post => post.Id > param1)
+                .OrderBy(post => post.Id)
+                //.Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45)) --> using `CacheQueriesContainingTypes`
                 .FirstOrDefaultAsync();
             return Json(new { post1.Title, post1.User.Name });
         }

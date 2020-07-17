@@ -19,7 +19,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
       ORDER BY [p].[Id]";
 
             var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
-            var cachePolicy = cachePolicyParser.GetEFCachePolicy(commandText);
+            var cachePolicy = cachePolicyParser.GetEFCachePolicy(commandText, null);
 
             Assert.AreEqual(expected: CacheExpirationMode.Absolute, actual: cachePolicy.CacheExpirationMode);
             Assert.AreEqual(expected: TimeSpan.FromMinutes(45), actual: cachePolicy.CacheTimeout);
@@ -42,7 +42,7 @@ WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_
 ORDER BY [p].[Id]";
 
             var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
-            var cachePolicy = cachePolicyParser.GetEFCachePolicy(commandText);
+            var cachePolicy = cachePolicyParser.GetEFCachePolicy(commandText, null);
 
             Assert.AreEqual(expected: CacheExpirationMode.Absolute, actual: cachePolicy.CacheExpirationMode);
             Assert.AreEqual(expected: TimeSpan.FromMinutes(45), actual: cachePolicy.CacheTimeout);
@@ -58,7 +58,7 @@ ORDER BY [p].[Id]";
                     .CacheDependencies("item 1", "item 2"));
 
             var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
-            var cachePolicy = cachePolicyParser.GetEFCachePolicy(commandText);
+            var cachePolicy = cachePolicyParser.GetEFCachePolicy(commandText, null);
 
             Assert.IsNotNull(cachePolicy);
             Assert.AreEqual(expected: CacheExpirationMode.Absolute, actual: cachePolicy.CacheExpirationMode);

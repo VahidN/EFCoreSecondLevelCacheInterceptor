@@ -334,6 +334,35 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 
 This will put the whole system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some of the queries from this global cache, apply the `NotCacheable()` method to them.
 
+## Caching some of the queries
+
+To cache some of the system's queries based on their entity-types or table-names, use `CacheQueriesContainingTypes` or `CacheQueriesContainingTableNames` methods:
+
+```csharp
+namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddEFSecondLevelCache(options =>
+            {
+                options.UseMemoryCacheProvider().DisableLogging(true)
+                    /*.CacheQueriesContainingTypes(
+                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
+                        typeof(Post), typeof(Product), typeof(User)
+                        )*/
+                    .CacheQueriesContainingTableNames(
+                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
+                        "posts", "products", "users"
+                        );
+            });
+
+            // ...
+```
+
+This will put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some of the queries from this global cache, apply the `NotCacheable()` method to them.
+
 ## Samples
 
 - [Console App Sample](/src/Tests/EFCoreSecondLevelCacheInterceptor.ConsoleSample/)

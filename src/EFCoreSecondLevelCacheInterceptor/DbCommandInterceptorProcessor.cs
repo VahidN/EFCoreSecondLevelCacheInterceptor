@@ -31,6 +31,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         private readonly IEFCacheKeyProvider _cacheKeyProvider;
         private readonly IEFCachePolicyParser _cachePolicyParser;
         private readonly IEFDebugLogger _logger;
+        private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
 
         /// <summary>
         /// Helps processing SecondLevelCacheInterceptor
@@ -40,13 +41,15 @@ namespace EFCoreSecondLevelCacheInterceptor
             IEFCacheServiceProvider cacheService,
             IEFCacheDependenciesProcessor cacheDependenciesProcessor,
             IEFCacheKeyProvider cacheKeyProvider,
-            IEFCachePolicyParser cachePolicyParser)
+            IEFCachePolicyParser cachePolicyParser,
+            IEFSqlCommandsProcessor sqlCommandsProcessor)
         {
             _cacheService = cacheService;
             _cacheDependenciesProcessor = cacheDependenciesProcessor;
             _cacheKeyProvider = cacheKeyProvider;
             _cachePolicyParser = cachePolicyParser;
             _logger = logger;
+            _sqlCommandsProcessor = sqlCommandsProcessor;
         }
 
         /// <summary>
@@ -65,7 +68,8 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return result;
             }
 
-            var cachePolicy = _cachePolicyParser.GetEFCachePolicy(command.CommandText);
+            var allEntityTypes = _sqlCommandsProcessor.GetAllTableNames(context);
+            var cachePolicy = _cachePolicyParser.GetEFCachePolicy(command.CommandText, allEntityTypes);
             if (cachePolicy == null)
             {
                 return result;
@@ -108,7 +112,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public T ProcessExecutingCommands<T>(DbCommand command, DbContext context, T result)
         {
-            var cachePolicy = _cachePolicyParser.GetEFCachePolicy(command.CommandText);
+            var allEntityTypes = _sqlCommandsProcessor.GetAllTableNames(context);
+            var cachePolicy = _cachePolicyParser.GetEFCachePolicy(command.CommandText, allEntityTypes);
             if (cachePolicy == null)
             {
                 return result;

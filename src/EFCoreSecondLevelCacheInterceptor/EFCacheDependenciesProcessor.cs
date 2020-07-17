@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using System.Threading;
 using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreSecondLevelCacheInterceptor
@@ -27,11 +24,6 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// Invalidates all of the cache entries which are dependent on any of the specified root keys.
         /// </summary>
         bool InvalidateCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy);
-
-        /// <summary>
-        /// Is `insert`, `update` or `delete`?
-        /// </summary>
-        bool IsCrudCommand(string text);
     }
 
     /// <summary>
@@ -39,21 +31,21 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
     {
-        private readonly ConcurrentDictionary<Type, Lazy<SortedSet<string>>> _tableNames =
-                    new ConcurrentDictionary<Type, Lazy<SortedSet<string>>>();
-
         private readonly IEFDebugLogger _logger;
         private readonly IEFCacheServiceProvider _cacheServiceProvider;
+        private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
 
         /// <summary>
         /// Cache Dependencies Calculator
         /// </summary>
         public EFCacheDependenciesProcessor(
             IEFDebugLogger logger,
-            IEFCacheServiceProvider cacheServiceProvider)
+            IEFCacheServiceProvider cacheServiceProvider,
+            IEFSqlCommandsProcessor sqlCommandsProcessor)
         {
             _logger = logger;
             _cacheServiceProvider = cacheServiceProvider;
+            _sqlCommandsProcessor = sqlCommandsProcessor;
         }
 
         /// <summary>
@@ -61,7 +53,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public SortedSet<string> GetCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
         {
-            var tableNames = getAllTableNames(context);
+            var tableNames = new SortedSet<string>(_sqlCommandsProcessor.GetAllTableNames(context).Values.ToList());
             return GetCacheDependencies(cachePolicy, tableNames, command.CommandText);
         }
 
@@ -70,7 +62,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public SortedSet<string> GetCacheDependencies(EFCachePolicy cachePolicy, SortedSet<string> tableNames, string commandText)
         {
-            var textsInsideSquareBrackets = getSqlCommandTableNames(commandText);
+            var textsInsideSquareBrackets = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
             var cacheDependencies = new SortedSet<string>(tableNames.Intersect(textsInsideSquareBrackets));
             if (cacheDependencies.Any())
             {
@@ -99,7 +91,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public bool InvalidateCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
         {
             var commandText = command.CommandText;
-            if (!IsCrudCommand(commandText))
+            if (!_sqlCommandsProcessor.IsCrudCommand(commandText))
             {
                 return false;
             }
@@ -110,99 +102,6 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             _logger.LogDebug(CacheableEventId.QueryResultInvalidated, $"Invalidated [{string.Join(", ", cacheDependencies)}] dependencies.");
             return true;
-        }
-
-        /// <summary>
-        /// Is `insert`, `update` or `delete`?
-        /// </summary>
-        public bool IsCrudCommand(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return false;
-            }
-
-            string[] crudMarkers = { "insert ", "update ", "delete ", "create " };
-
-            var lines = text.Split('\n');
-            foreach (var line in lines)
-            {
-                foreach (var marker in crudMarkers)
-                {
-                    if (line.Trim().StartsWith(marker, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        private SortedSet<string> getAllTableNames(DbContext context)
-        {
-            return _tableNames.GetOrAdd(context.GetType(),
-                            _ => new Lazy<SortedSet<string>>(() =>
-                            {
-                                var tableNames = new SortedSet<string>();
-                                foreach (var entityType in context.Model.GetEntityTypes())
-                                {
-                                    tableNames.Add(entityType.GetTableName());
-                                }
-                                return tableNames;
-                            },
-                            LazyThreadSafetyMode.ExecutionAndPublication)).Value;
-        }
-
-        private static SortedSet<string> getSqlCommandTableNames(string commandText)
-        {
-            string[] tableMarkers = { "FROM", "JOIN", "INTO", "UPDATE" };
-
-            var tables = new SortedSet<string>();
-
-            var sqlItems = commandText.Split(new[] { " ", "\r\n", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            var sqlItemsLength = sqlItems.Length;
-            for (var i = 0; i < sqlItemsLength; i++)
-            {
-                foreach (var marker in tableMarkers)
-                {
-                    if (!sqlItems[i].Equals(marker, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    ++i;
-                    if (i >= sqlItemsLength)
-                    {
-                        continue;
-                    }
-
-                    var tableName = string.Empty;
-
-                    var tableNameParts = sqlItems[i].Split(new[] { "." }, StringSplitOptions.RemoveEmptyEntries);
-                    if (tableNameParts.Length == 1)
-                    {
-                        tableName = tableNameParts[0].Trim();
-                    }
-                    else if (tableNameParts.Length >= 2)
-                    {
-                        tableName = tableNameParts[1].Trim();
-                    }
-
-                    if (string.IsNullOrWhiteSpace(tableName))
-                    {
-                        continue;
-                    }
-
-                    tableName = tableName.Replace("[", "")
-                                        .Replace("]", "")
-                                        .Replace("'", "")
-                                        .Replace("`", "")
-                                        .Replace("\"", "");
-                    tables.Add(tableName);
-                }
-            }
-            return tables;
         }
     }
 }
