@@ -8,6 +8,28 @@ using Microsoft.EntityFrameworkCore;
 namespace EFCoreSecondLevelCacheInterceptor
 {
     /// <summary>
+    /// A Table's EntityInfo
+    /// </summary>
+    public class TableEntityInfo
+    {
+        /// <summary>
+        /// Gets the CLR class that is used to represent instances of this type.
+        /// Returns null if the type does not have a corresponding CLR class (known as a shadow type).
+        /// </summary>
+        public Type ClrType { set; get; }
+
+        /// <summary>
+        /// The Corresponding tabe's name.
+        /// </summary>
+        public string TableName { set; get; }
+
+        /// <summary>
+        /// Debug info.
+        /// </summary>
+        public override string ToString() => $"{ClrType}::{TableName}";
+    }
+
+    /// <summary>
     /// SqlCommands Utils
     /// </summary>
     public interface IEFSqlCommandsProcessor
@@ -20,12 +42,12 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Extracts the entity types of an SQL command.
         /// </summary>
-        IList<Type> GetSqlCommandEntityTypes(string commandText, IDictionary<Type, string> allEntityTypes);
+        IList<Type> GetSqlCommandEntityTypes(string commandText, IList<TableEntityInfo> allEntityTypes);
 
         /// <summary>
         /// Returns all of the given context's table names.
         /// </summary>
-        Dictionary<Type, string> GetAllTableNames(DbContext context);
+        IList<TableEntityInfo> GetAllTableNames(DbContext context);
 
         /// <summary>
         /// Is `insert`, `update` or `delete`?
@@ -38,8 +60,8 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
     {
-        private readonly ConcurrentDictionary<Type, Lazy<Dictionary<Type, string>>> _contextTableNames =
-                    new ConcurrentDictionary<Type, Lazy<Dictionary<Type, string>>>();
+        private readonly ConcurrentDictionary<Type, Lazy<List<TableEntityInfo>>> _contextTableNames =
+                    new ConcurrentDictionary<Type, Lazy<List<TableEntityInfo>>>();
 
         private readonly ConcurrentDictionary<string, Lazy<SortedSet<string>>> _commandTableNames =
                     new ConcurrentDictionary<string, Lazy<SortedSet<string>>>();
@@ -74,15 +96,20 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Returns all of the given context's table names.
         /// </summary>
-        public Dictionary<Type, string> GetAllTableNames(DbContext context)
+        public IList<TableEntityInfo> GetAllTableNames(DbContext context)
         {
             return _contextTableNames.GetOrAdd(context.GetType(),
-                            _ => new Lazy<Dictionary<Type, string>>(() =>
+                            _ => new Lazy<List<TableEntityInfo>>(() =>
                             {
-                                var tableNames = new Dictionary<Type, string>();
+                                var tableNames = new List<TableEntityInfo>();
                                 foreach (var entityType in context.Model.GetEntityTypes())
                                 {
-                                    tableNames.Add(entityType.ClrType, entityType.GetTableName());
+                                    tableNames.Add(
+                                        new TableEntityInfo
+                                        {
+                                            ClrType = entityType.ClrType,
+                                            TableName = entityType.GetTableName()
+                                        });
                                 }
                                 return tableNames;
                             },
@@ -94,7 +121,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public SortedSet<string> GetSqlCommandTableNames(string commandText)
         {
-            return _commandTableNames.GetOrAdd(commandText,
+            var commandTextKey = $"{XxHashUnsafe.ComputeHash(commandText):X}";
+            return _commandTableNames.GetOrAdd(commandTextKey,
                     _ => new Lazy<SortedSet<string>>(() => getRawSqlCommandTableNames(commandText),
                             LazyThreadSafetyMode.ExecutionAndPublication)).Value;
         }
@@ -102,11 +130,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Extracts the entity types of an SQL command.
         /// </summary>
-        public IList<Type> GetSqlCommandEntityTypes(string commandText, IDictionary<Type, string> allEntityTypes)
+        public IList<Type> GetSqlCommandEntityTypes(string commandText, IList<TableEntityInfo> allEntityTypes)
         {
             var commandTableNames = GetSqlCommandTableNames(commandText);
-            return allEntityTypes.Where(entityType => commandTableNames.Contains(entityType.Value))
-                                .Select(entityType => entityType.Key)
+            return allEntityTypes.Where(entityType => commandTableNames.Contains(entityType.TableName))
+                                .Select(entityType => entityType.ClrType)
                                 .ToList();
         }
 

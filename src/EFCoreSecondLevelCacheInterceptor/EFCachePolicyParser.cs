@@ -13,7 +13,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Converts the `commandText` to an instance of `EFCachePolicy`
         /// </summary>
-        EFCachePolicy GetEFCachePolicy(string commandText, IDictionary<Type, string> allEntityTypes);
+        EFCachePolicy GetEFCachePolicy(string commandText, IList<TableEntityInfo> allEntityTypes);
 
         /// <summary>
         /// Does `commandText` contain EFCachePolicyTagPrefix?
@@ -92,7 +92,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Converts the `commandText` to an instance of `EFCachePolicy`
         /// </summary>
-        public EFCachePolicy GetEFCachePolicy(string commandText, IDictionary<Type, string> allEntityTypes)
+        public EFCachePolicy GetEFCachePolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
         {
             var efCachePolicy = getParsedPolicy(commandText)
                                     ?? getRestrictedGlobalPolicy(commandText, allEntityTypes)
@@ -104,7 +104,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             return efCachePolicy;
         }
 
-        private EFCachePolicy getRestrictedGlobalPolicy(string commandText, IDictionary<Type, string> allEntityTypes)
+        private EFCachePolicy getRestrictedGlobalPolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
         {
             var options = _cacheSettings.CacheSpecificQueriesOptions;
             if (options?.IsActive != true

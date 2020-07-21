@@ -53,7 +53,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public SortedSet<string> GetCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
         {
-            var tableNames = new SortedSet<string>(_sqlCommandsProcessor.GetAllTableNames(context).Values.ToList());
+            var tableNames = new SortedSet<string>(
+                    _sqlCommandsProcessor.GetAllTableNames(context).Select(x => x.TableName));
             return GetCacheDependencies(cachePolicy, tableNames, command.CommandText);
         }
 

@@ -13,6 +13,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Blog> Blogs { get; set; }
         public virtual DbSet<DateType> DateTypes { get; set; }
+        public virtual DbSet<EngineVersion> EngineVersions { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         { }
@@ -190,6 +191,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer
             });
 
             modelBuilder.Entity<BlogData>().HasNoKey();
+
+            modelBuilder.Entity<EngineVersion>().OwnsOne(p => p.Commercial);
+            modelBuilder.Entity<EngineVersion>().OwnsOne(p => p.Retail);
         }
     }
 }
