@@ -43,18 +43,30 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called immediately after EF calls System.Data.Common.DbCommand.ExecuteNonQueryAsync.
         /// </summary>
+#if NET5_0
+        public override ValueTask<int> NonQueryExecutedAsync(
+            DbCommand command,
+            CommandExecutedEventData eventData,
+            int result,
+            CancellationToken cancellationToken = default)
+#else
         public override Task<int> NonQueryExecutedAsync(
             DbCommand command,
             CommandExecutedEventData eventData,
             int result,
             CancellationToken cancellationToken = default)
+#endif
         {
             if (eventData.Context == null)
             {
                 return base.NonQueryExecutedAsync(command, eventData, result, cancellationToken);
             }
 
+#if NET5_0
+            return ValueTask.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
+#else
             return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
+#endif
         }
 
         /// <summary>
@@ -76,18 +88,30 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called just before EF intends to call System.Data.Common.DbCommand.ExecuteNonQueryAsync.
         /// </summary>
+#if NET5_0
+        public override ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(
+            DbCommand command,
+            CommandEventData eventData,
+            InterceptionResult<int> result,
+            CancellationToken cancellationToken = default)
+#else
         public override Task<InterceptionResult<int>> NonQueryExecutingAsync(
             DbCommand command,
             CommandEventData eventData,
             InterceptionResult<int> result,
             CancellationToken cancellationToken = default)
+#endif
         {
             if (eventData.Context == null)
             {
                 return base.NonQueryExecutingAsync(command, eventData, result, cancellationToken);
             }
 
+#if NET5_0
+            return ValueTask.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
+#else
             return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
+#endif
         }
 
         /// <summary>
@@ -109,18 +133,30 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called immediately after EF calls System.Data.Common.DbCommand.ExecuteReaderAsync.
         /// </summary>
+#if NET5_0
+        public override ValueTask<DbDataReader> ReaderExecutedAsync(
+            DbCommand command,
+            CommandExecutedEventData eventData,
+            DbDataReader result,
+            CancellationToken cancellationToken = default)
+#else
         public override Task<DbDataReader> ReaderExecutedAsync(
             DbCommand command,
             CommandExecutedEventData eventData,
             DbDataReader result,
             CancellationToken cancellationToken = default)
+#endif
         {
             if (eventData.Context == null)
             {
                 return base.ReaderExecutedAsync(command, eventData, result, cancellationToken);
             }
 
+#if NET5_0
+            return ValueTask.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
+#else
             return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
+#endif
         }
 
         /// <summary>
@@ -142,18 +178,30 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called just before EF intends to call System.Data.Common.DbCommand.ExecuteReaderAsync.
         /// </summary>
+#if NET5_0
+        public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
+            DbCommand command,
+            CommandEventData eventData,
+            InterceptionResult<DbDataReader> result,
+            CancellationToken cancellationToken = default)
+#else
         public override Task<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
             DbCommand command,
             CommandEventData eventData,
             InterceptionResult<DbDataReader> result,
             CancellationToken cancellationToken = default)
+#endif
         {
             if (eventData.Context == null)
             {
                 return base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
             }
 
+#if NET5_0
+            return ValueTask.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
+#else
             return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
+#endif
         }
 
         /// <summary>
@@ -175,18 +223,30 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called immediately after EF calls System.Data.Common.DbCommand.ExecuteScalarAsync.
         /// </summary>
+#if NET5_0
+        public override ValueTask<object> ScalarExecutedAsync(
+            DbCommand command,
+            CommandExecutedEventData eventData,
+            object result,
+            CancellationToken cancellationToken = default)
+#else
         public override Task<object> ScalarExecutedAsync(
             DbCommand command,
             CommandExecutedEventData eventData,
             object result,
             CancellationToken cancellationToken = default)
+#endif
         {
             if (eventData.Context == null)
             {
                 return base.ScalarExecutedAsync(command, eventData, result, cancellationToken);
             }
 
+#if NET5_0
+            return ValueTask.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
+#else
             return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
+#endif
         }
 
         /// <summary>
@@ -208,18 +268,30 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called just before EF intends to call System.Data.Common.DbCommand.ExecuteScalarAsync.
         /// </summary>
+#if NET5_0
+        public override ValueTask<InterceptionResult<object>> ScalarExecutingAsync(
+            DbCommand command,
+            CommandEventData eventData,
+            InterceptionResult<object> result,
+            CancellationToken cancellationToken = default)
+#else
         public override Task<InterceptionResult<object>> ScalarExecutingAsync(
             DbCommand command,
             CommandEventData eventData,
             InterceptionResult<object> result,
             CancellationToken cancellationToken = default)
+#endif
         {
             if (eventData.Context == null)
             {
                 return base.ScalarExecutingAsync(command, eventData, result, cancellationToken);
             }
 
+#if NET5_0
+            return ValueTask.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
+#else
             return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
+#endif
         }
     }
 }
