@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
 {
-    public partial class V2020_04_03_2333 : Migration
+    public partial class V2020_10_15_1029 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,8 +11,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 name: "BlogData",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false),
-                    SiteUrl = table.Column<string>(nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    SiteUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -22,9 +22,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 name: "Blogs",
                 columns: table => new
                 {
-                    BlogId = table.Column<int>(nullable: false)
+                    BlogId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Url = table.Column<string>(nullable: true)
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -32,12 +32,50 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DateTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AddDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AddDateValue = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdateDateValue = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    RelativeAddTimeValue = table.Column<TimeSpan>(type: "time", nullable: true),
+                    RelativeUpdateTimeValue = table.Column<TimeSpan>(type: "time", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DateTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EngineVersions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Commercial_Major = table.Column<int>(type: "int", nullable: true),
+                    Commercial_Minor = table.Column<int>(type: "int", nullable: true),
+                    Commercial_Revision = table.Column<int>(type: "int", nullable: true),
+                    Commercial_Patch = table.Column<int>(type: "int", nullable: true),
+                    Retail_Major = table.Column<int>(type: "int", nullable: true),
+                    Retail_Minor = table.Column<int>(type: "int", nullable: true),
+                    Retail_Revision = table.Column<int>(type: "int", nullable: true),
+                    Retail_Patch = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EngineVersions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tags",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -48,28 +86,28 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(nullable: false),
-                    UserStatus = table.Column<int>(nullable: false),
-                    ImageData = table.Column<byte[]>(nullable: true),
-                    AddDate = table.Column<DateTime>(nullable: true),
-                    UpdateDate = table.Column<DateTime>(nullable: true),
-                    Points = table.Column<long>(nullable: false),
-                    IsActive = table.Column<bool>(nullable: false),
-                    ByteValue = table.Column<byte>(nullable: false),
-                    CharValue = table.Column<string>(nullable: false),
-                    DateTimeOffsetValue = table.Column<DateTimeOffset>(nullable: true),
-                    DecimalValue = table.Column<decimal>(nullable: false),
-                    DoubleValue = table.Column<double>(nullable: false),
-                    FloatValue = table.Column<float>(nullable: false),
-                    GuidValue = table.Column<Guid>(nullable: false),
-                    TimeSpanValue = table.Column<TimeSpan>(nullable: true),
-                    ShortValue = table.Column<short>(nullable: false),
-                    ByteArrayValue = table.Column<byte[]>(nullable: true),
-                    UintValue = table.Column<long>(nullable: false),
-                    UlongValue = table.Column<decimal>(nullable: false),
-                    UshortValue = table.Column<decimal>(nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserStatus = table.Column<int>(type: "int", nullable: false),
+                    ImageData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    AddDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Points = table.Column<long>(type: "bigint", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    ByteValue = table.Column<byte>(type: "tinyint", nullable: false),
+                    CharValue = table.Column<string>(type: "nvarchar(1)", nullable: false),
+                    DateTimeOffsetValue = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DecimalValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DoubleValue = table.Column<double>(type: "float", nullable: false),
+                    FloatValue = table.Column<float>(type: "real", nullable: false),
+                    GuidValue = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TimeSpanValue = table.Column<TimeSpan>(type: "time", nullable: true),
+                    ShortValue = table.Column<short>(type: "smallint", nullable: false),
+                    ByteArrayValue = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    UintValue = table.Column<long>(type: "bigint", nullable: false),
+                    UlongValue = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    UshortValue = table.Column<decimal>(type: "decimal(20,0)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -80,12 +118,12 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 name: "Posts",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(nullable: true),
-                    UserId = table.Column<int>(nullable: false),
-                    BlogId = table.Column<int>(nullable: false),
-                    post_type = table.Column<string>(nullable: false)
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    BlogId = table.Column<int>(type: "int", nullable: false),
+                    post_type = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -108,13 +146,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 name: "Products",
                 columns: table => new
                 {
-                    ProductId = table.Column<int>(nullable: false)
+                    ProductId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductNumber = table.Column<string>(maxLength: 30, nullable: false),
-                    ProductName = table.Column<string>(maxLength: 50, nullable: false),
-                    Notes = table.Column<string>(nullable: true),
-                    IsActive = table.Column<bool>(nullable: false),
-                    UserId = table.Column<int>(nullable: false)
+                    ProductNumber = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    ProductName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -131,8 +169,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                 name: "TagProducts",
                 columns: table => new
                 {
-                    TagId = table.Column<int>(nullable: false),
-                    ProductProductId = table.Column<int>(nullable: false)
+                    TagId = table.Column<int>(type: "int", nullable: false),
+                    ProductProductId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -198,7 +236,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
 
             migrationBuilder.InsertData(
                 table: "TagProducts",
-                columns: new[] { "TagId", "ProductProductId" },
+                columns: new[] { "ProductProductId", "TagId" },
                 values: new object[,]
                 {
                     { 1, 1 },
@@ -243,6 +281,12 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
         {
             migrationBuilder.DropTable(
                 name: "BlogData");
+
+            migrationBuilder.DropTable(
+                name: "DateTypes");
+
+            migrationBuilder.DropTable(
+                name: "EngineVersions");
 
             migrationBuilder.DropTable(
                 name: "Posts");

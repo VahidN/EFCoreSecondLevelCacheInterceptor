@@ -15,16 +15,16 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.6")
+                .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "5.0.0-rc.2.20475.6");
 
             modelBuilder.Entity("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.Blog", b =>
                 {
                     b.Property<int>("BlogId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
@@ -62,7 +62,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<DateTime?>("AddDate")
                         .HasColumnType("datetime2");
@@ -92,7 +92,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.HasKey("Id");
 
@@ -104,7 +104,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<int>("BlogId")
                         .HasColumnType("int");
@@ -151,7 +151,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     b.Property<int>("ProductId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -161,13 +161,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ProductNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(30)")
-                        .HasMaxLength(30);
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -225,7 +225,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -301,7 +301,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<DateTime?>("AddDate")
                         .HasColumnType("datetime2");
@@ -405,7 +405,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                             b1.Property<int>("EngineVersionId")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("int")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                                .UseIdentityColumn();
 
                             b1.Property<int>("Major")
                                 .HasColumnType("int");
@@ -432,7 +432,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                             b1.Property<int>("EngineVersionId")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("int")
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                                .UseIdentityColumn();
 
                             b1.Property<int>("Major")
                                 .HasColumnType("int");
@@ -453,6 +453,10 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("EngineVersionId");
                         });
+
+                    b.Navigation("Commercial");
+
+                    b.Navigation("Retail");
                 });
 
             modelBuilder.Entity("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.Post", b =>
@@ -468,6 +472,10 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Blog");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.Product", b =>
@@ -477,6 +485,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.TagProduct", b =>
@@ -492,6 +502,32 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Migrations
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Tag");
+                });
+
+            modelBuilder.Entity("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.Blog", b =>
+                {
+                    b.Navigation("Posts");
+                });
+
+            modelBuilder.Entity("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.Product", b =>
+                {
+                    b.Navigation("TagProducts");
+                });
+
+            modelBuilder.Entity("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.Tag", b =>
+                {
+                    b.Navigation("TagProducts");
+                });
+
+            modelBuilder.Entity("EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities.User", b =>
+                {
+                    b.Navigation("Posts");
+
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

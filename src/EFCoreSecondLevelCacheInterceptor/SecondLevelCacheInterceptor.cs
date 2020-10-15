@@ -63,7 +63,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
 #if NET5_0
-            return ValueTask.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
+            return new ValueTask<int>(_processor.ProcessExecutedCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
 #endif
@@ -108,7 +108,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
 #if NET5_0
-            return ValueTask.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
+            return new ValueTask<InterceptionResult<int>>(_processor.ProcessExecutingCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
 #endif
@@ -153,7 +153,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
 #if NET5_0
-            return ValueTask.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
+            return new ValueTask<DbDataReader>(_processor.ProcessExecutedCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
 #endif
@@ -198,7 +198,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
 #if NET5_0
-            return ValueTask.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
+            return new ValueTask<InterceptionResult<DbDataReader>>(_processor.ProcessExecutingCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
 #endif
@@ -243,7 +243,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
 #if NET5_0
-            return ValueTask.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
+            return new ValueTask<object>(_processor.ProcessExecutedCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
 #endif
@@ -288,7 +288,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
 #if NET5_0
-            return ValueTask.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
+            return new ValueTask<InterceptionResult<object>>(_processor.ProcessExecutingCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
 #endif

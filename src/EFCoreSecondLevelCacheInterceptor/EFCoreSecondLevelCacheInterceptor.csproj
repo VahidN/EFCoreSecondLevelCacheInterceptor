@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Entity Framework Core Second Level Caching Library.</Description>
-    <VersionPrefix>1.9.0</VersionPrefix>
+    <VersionPrefix>1.9.1</VersionPrefix>
     <Authors>Vahid Nasiri</Authors>
-    <TargetFrameworks>net5.0;netstandard2.0;net461;</TargetFrameworks>
+    <TargetFrameworks>net5.0;netstandard2.1;netstandard2.0;net461;</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>EFCoreSecondLevelCacheInterceptor</AssemblyName>
@@ -45,13 +45,13 @@
     <DefineConstants>NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
   
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+  <ItemGroup Condition="('$(TargetFramework)' == 'net5.0') or  ('$(TargetFramework)' == 'netstandard2.1')">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0-rc.2.20475.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.0-rc.2.20475.6" />
     <PackageReference Include="CacheManager.Core" Version="1.2.0" />
     <PackageReference Include="EasyCaching.Core" Version="0.9.0" />
   </ItemGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net5.0'">
+  <PropertyGroup Condition="('$(TargetFramework)' == 'net5.0') or  ('$(TargetFramework)' == 'netstandard2.1')">
     <DefineConstants>NET5_0</DefineConstants>
   </PropertyGroup>
   
