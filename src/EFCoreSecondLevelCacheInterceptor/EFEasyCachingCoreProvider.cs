@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using EasyCaching.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor
@@ -11,8 +12,8 @@ namespace EFCoreSecondLevelCacheInterceptor
     public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     {
         private readonly IReaderWriterLockProvider _readerWriterLockProvider;
-        private readonly IEasyCachingProviderFactory _easyCachingProviderFactory;
-        private readonly IEasyCachingProvider _easyCachingProvider;
+
+        private readonly IEasyCachingProviderBase _easyCachingProvider;
         private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
 
         /// <summary>
@@ -20,13 +21,22 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public EFEasyCachingCoreProvider(
             IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
-            IEasyCachingProviderFactory easyCachingProviderFactory,
+            IServiceProvider serviceProvider,
             IReaderWriterLockProvider readerWriterLockProvider)
         {
             _cacheSettings = cacheSettings?.Value;
             _readerWriterLockProvider = readerWriterLockProvider;
-            _easyCachingProviderFactory = easyCachingProviderFactory ?? throw new ArgumentNullException("Please register the `EasyCaching.Core`.");
-            _easyCachingProvider = _easyCachingProviderFactory.GetCachingProvider(_cacheSettings.ProviderName);
+
+            if (_cacheSettings.IsHybridCache)
+            {
+                var hybridFactory = serviceProvider.GetRequiredService<IHybridProviderFactory>();
+                _easyCachingProvider = hybridFactory.GetHybridCachingProvider(_cacheSettings.ProviderName);
+            }
+            else
+            {
+                var providerFactory = serviceProvider.GetRequiredService<IEasyCachingProviderFactory>();
+                _easyCachingProvider = providerFactory.GetCachingProvider(_cacheSettings.ProviderName);
+            }
         }
 
         /// <summary>
@@ -70,7 +80,10 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public void ClearAllCachedEntries()
         {
-            _readerWriterLockProvider.TryWriteLocked(() => _easyCachingProvider.Flush());
+            if (!_cacheSettings.IsHybridCache)
+            {
+                _readerWriterLockProvider.TryWriteLocked(() => ((IEasyCachingProvider)_easyCachingProvider).Flush());
+            }
         }
 
         /// <summary>

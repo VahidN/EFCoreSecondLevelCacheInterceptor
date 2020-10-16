@@ -59,6 +59,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public string ProviderName { get; set; }
 
         /// <summary>
+        /// Is an instance of EasyCaching.HybridCache
+        /// </summary>
+        public bool IsHybridCache { get; set; }
+
+        /// <summary>
         /// CacheAllQueries Options
         /// </summary>
         public CacheAllQueriesOptions CacheAllQueriesOptions { get; set; } = new CacheAllQueriesOptions();
@@ -233,10 +238,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Introduces the built-in `EasyCachingCoreProvider` to be used as the CacheProvider.
         /// </summary>
-        public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(string providerName)
+        /// <param name="providerName">Selected caching provider name.</param>
+        /// <param name="isHybridCache">Is an instance of EasyCaching.HybridCache</param>
+        public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(string providerName, bool isHybridCache = false)
         {
             Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
             Settings.ProviderName = providerName;
+            Settings.IsHybridCache = isHybridCache;
             return this;
         }
 
@@ -247,10 +255,16 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="providerName">Selected caching provider name.</param>
         /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
         /// <param name="timeout">The expiration timeout.</param>
-        public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(string providerName, CacheExpirationMode expirationMode, TimeSpan timeout)
+        /// <param name="isHybridCache">Is an instance of EasyCaching.HybridCache</param>
+        public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(
+            string providerName,
+            CacheExpirationMode expirationMode,
+            TimeSpan timeout,
+            bool isHybridCache = false)
         {
             Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
             Settings.ProviderName = providerName;
+            Settings.IsHybridCache = isHybridCache;
             Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
             {
                 ExpirationMode = expirationMode,

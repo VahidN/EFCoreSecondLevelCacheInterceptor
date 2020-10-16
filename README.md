@@ -73,7 +73,7 @@ To use its in-memory caching mechanism, add this entry to the `.csproj` file:
 
 ```xml
   <ItemGroup>
-    <PackageReference Include="EasyCaching.InMemory" Version="0.8.8" />
+    <PackageReference Include="EasyCaching.InMemory" Version="0.9.0" />
   </ItemGroup>
 ```
 
@@ -88,7 +88,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
         {
             const string providerName1 = "InMemory1";
             services.AddEFSecondLevelCache(options =>
-                    options.UseEasyCachingCoreProvider(providerName1).DisableLogging(true)
+                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).DisableLogging(true)
             );
 
             // Add an in-memory cache service provider
@@ -129,7 +129,7 @@ If you want to use the Redis as the preferred cache provider with `EasyCaching.C
 
 ```xml
   <ItemGroup>
-    <PackageReference Include="EasyCaching.Redis" Version="0.8.8" />
+    <PackageReference Include="EasyCaching.Redis" Version="0.9.0" />
   </ItemGroup>
 ```
 
@@ -144,7 +144,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
         {
             const string providerName1 = "Redis1";
             services.AddEFSecondLevelCache(options =>
-                    options.UseEasyCachingCoreProvider(providerName1).DisableLogging(true)
+                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).DisableLogging(true)
             );
 
             // More info: https://easycaching.readthedocs.io/en/latest/Redis/

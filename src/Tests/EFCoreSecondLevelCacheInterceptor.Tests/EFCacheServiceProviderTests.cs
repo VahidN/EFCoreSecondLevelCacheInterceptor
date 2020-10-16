@@ -15,6 +15,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
         [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreHybrid)]
         public virtual void TestCacheInvalidationWithTwoRoots(TestCacheProvider cacheProvider)
         {
             var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
@@ -60,6 +61,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
         [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreHybrid)]
         public virtual void TestCacheInvalidationWithOneRoot(TestCacheProvider cacheProvider)
         {
             var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
@@ -104,6 +106,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
         [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreHybrid)]
         public virtual void TestObjectCacheInvalidationWithOneRoot(TestCacheProvider cacheProvider)
         {
             var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
@@ -151,6 +154,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
         [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreHybrid)]
         public virtual void TestCacheInvalidationWithSimilarRoots(TestCacheProvider cacheProvider)
         {
             var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
@@ -196,6 +200,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
         [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreHybrid)]
         public virtual void TestInsertingNullValues(TestCacheProvider cacheProvider)
         {
             var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
@@ -219,6 +224,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
         [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
         [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreHybrid)]
         public virtual void TestParallelInsertsAndRemoves(TestCacheProvider cacheProvider)
         {
             var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
