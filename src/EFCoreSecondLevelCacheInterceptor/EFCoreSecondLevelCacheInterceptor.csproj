@@ -26,8 +26,8 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.10" />
     <PackageReference Include="CacheManager.Core" Version="1.2.0" />
     <PackageReference Include="EasyCaching.Core" Version="0.9.0" />
   </ItemGroup>
@@ -36,8 +36,8 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" ('$(TargetFramework)' == 'netstandard2.0') or ('$(TargetFramework)' == 'netcoreapp3.1')">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.10" />
     <PackageReference Include="CacheManager.Core" Version="1.2.0" />
     <PackageReference Include="EasyCaching.Core" Version="0.9.0" />
   </ItemGroup>
@@ -46,8 +46,8 @@
   </PropertyGroup>
 
   <ItemGroup Condition="('$(TargetFramework)' == 'net5.0') or  ('$(TargetFramework)' == 'netstandard2.1')">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0-rc.2.20475.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.0-rc.2.20475.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.0" />
     <PackageReference Include="CacheManager.Core" Version="1.2.0" />
     <PackageReference Include="EasyCaching.Core" Version="0.9.0" />
   </ItemGroup>
