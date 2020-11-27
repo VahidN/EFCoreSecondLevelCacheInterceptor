@@ -395,6 +395,12 @@ Suppressed result with a TableRows[ee20d2d7-ffc7-4ff9-9484-e8d4eecde53e] from th
 Using the TableRows[ee20d2d7-ffc7-4ff9-9484-e8d4eecde53e] from the cache.
 ```
 
+Notes:
+ - Having the `Suppressed the result with the TableRows` message means the caching interceptor is working fine.
+ - The next `Executed DbCommand` means nothing and it always will be logged by EF.
+ - At the beginning there will be a lot of internal commands executed by the EF to run migrations, etc. Ignore these commands, because you will see the `Suppressed the result with the TableRows` messages for the frequently running queries.
+ - Also you should verify it with a real DB profiler. It will log the 1st executed query and then on the 2nd run, you won't see it anymore.
+
 ## Samples
 
 - [Console App Sample](/src/Tests/EFCoreSecondLevelCacheInterceptor.ConsoleSample/)
