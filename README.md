@@ -363,6 +363,38 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 
 This will put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some of the queries from this global cache, apply the `NotCacheable()` method to them.
 
+## Does it work?!
+
+You should enable the logging system to see the caching mechanism.
+First set the `DisableLogging(false)`:
+
+```c#
+ services.AddEFSecondLevelCache(options =>
+                options.UseMemoryCacheProvider().DisableLogging(false)
+```
+
+And then change the log level to `Debug` in your `appsettings.json` file:
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Debug",
+      "Microsoft": "Debug",
+      "Microsoft.Hosting.Lifetime": "Debug"
+    }
+  }
+}
+```
+
+Now after running a query multiple times, you should have these logged lines:
+
+```
+Suppressed result with a TableRows[ee20d2d7-ffc7-4ff9-9484-e8d4eecde53e] from the cache[KeyHash: EB153BD4, CacheDependencies: Page.].
+Using the TableRows[ee20d2d7-ffc7-4ff9-9484-e8d4eecde53e] from the cache.
+```
+
 ## Samples
 
 - [Console App Sample](/src/Tests/EFCoreSecondLevelCacheInterceptor.ConsoleSample/)
