@@ -365,7 +365,7 @@ This will put the the specified system's queries in cache. In this case calling 
 
 ## Does it work?!
 
-You should enable the logging system to see the caching mechanism.
+You should enable the logging system to see the behind the scene of the caching interceptor.
 First set the `DisableLogging(false)`:
 
 ```c#
