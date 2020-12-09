@@ -40,6 +40,20 @@ namespace EFCoreSecondLevelCacheInterceptor
         private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
         private readonly IEFDebugLogger _logger;
 
+        private static readonly HashSet<string> _nonDeterministicFunctions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "NEWID()",
+            "GETDATE()",
+            "GETUTCDATE()",
+            "SYSDATETIME()",
+            "SYSUTCDATETIME()",
+            "SYSDATETIMEOFFSET()",
+            "CURRENT_USER()",
+            "CURRENT_TIMESTAMP()",
+            "HOST_NAME()",
+            "USER_NAME()"
+        };
+
         /// <summary>
         /// EFCachePolicy Parser Utils
         /// </summary>
@@ -94,6 +108,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public EFCachePolicy GetEFCachePolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
         {
+            if (containsNonDeterministicFunction(commandText))
+            {
+                return null;
+            }
+
             var efCachePolicy = getParsedPolicy(commandText)
                                     ?? getRestrictedGlobalPolicy(commandText, allEntityTypes)
                                     ?? getGlobalPolicy(commandText);
@@ -193,6 +212,19 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             return new EFCachePolicy().ExpirationMode(expirationMode).SaltKey(saltKey).Timeout(timeout).CacheDependencies(cacheDependencies);
+        }
+
+        private bool containsNonDeterministicFunction(string commandText)
+        {
+            return _nonDeterministicFunctions.Any(item =>
+            {
+                var hasFn = commandText.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0;
+                if (hasFn)
+                {
+                    _logger.LogDebug($"Skipped caching because of the non-deterministic function -> `{item}`.");
+                }
+                return hasFn;
+            });
         }
     }
 }

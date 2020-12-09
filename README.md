@@ -73,7 +73,7 @@ To use its in-memory caching mechanism, add this entry to the `.csproj` file:
 
 ```xml
   <ItemGroup>
-    <PackageReference Include="EasyCaching.InMemory" Version="0.9.0" />
+    <PackageReference Include="EasyCaching.InMemory" Version="1.1.0" />
   </ItemGroup>
 ```
 
@@ -129,7 +129,7 @@ If you want to use the Redis as the preferred cache provider with `EasyCaching.C
 
 ```xml
   <ItemGroup>
-    <PackageReference Include="EasyCaching.Redis" Version="0.9.0" />
+    <PackageReference Include="EasyCaching.Redis" Version="1.1.0" />
   </ItemGroup>
 ```
 
@@ -396,10 +396,11 @@ Using the TableRows[ee20d2d7-ffc7-4ff9-9484-e8d4eecde53e] from the cache.
 ```
 
 Notes:
- - Having the `Suppressed the result with the TableRows` message means the caching interceptor is working fine.
- - The next `Executed DbCommand` means nothing and it always will be logged by EF.
- - At the beginning there will be a lot of internal commands executed by the EF to run migrations, etc. Ignore these commands, because you will see the `Suppressed the result with the TableRows` messages for the frequently running queries.
- - Also you should verify it with a real DB profiler. It will log the 1st executed query and then on the 2nd run, you won't see it anymore.
+
+- Having the `Suppressed the result with the TableRows` message means the caching interceptor is working fine.
+- The next `Executed DbCommand` means nothing and it always will be logged by EF.
+- At the beginning there will be a lot of internal commands executed by the EF to run migrations, etc. Ignore these commands, because you will see the `Suppressed the result with the TableRows` messages for the frequently running queries.
+- Also you should verify it with a real DB profiler. It will log the 1st executed query and then on the 2nd run, you won't see it anymore.
 
 ## Samples
 
