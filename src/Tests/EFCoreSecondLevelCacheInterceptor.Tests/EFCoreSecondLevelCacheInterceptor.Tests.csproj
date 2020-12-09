@@ -18,10 +18,10 @@
     <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="EasyCaching.InMemory" Version="0.9.0" />
-    <PackageReference Include="EasyCaching.Redis" Version="0.9.0" />
-    <PackageReference Include="EasyCaching.HybridCache" Version="0.9.0" />
-    <PackageReference Include="EasyCaching.Bus.Redis" Version="0.9.0" />
+    <PackageReference Include="EasyCaching.InMemory" Version="1.1.0" />
+    <PackageReference Include="EasyCaching.Redis" Version="1.1.0" />
+    <PackageReference Include="EasyCaching.HybridCache" Version="1.1.0" />
+    <PackageReference Include="EasyCaching.Bus.Redis" Version="1.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
