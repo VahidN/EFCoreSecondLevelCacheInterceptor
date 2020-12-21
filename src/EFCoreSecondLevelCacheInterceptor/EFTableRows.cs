@@ -14,12 +14,12 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Rows of the table
         /// </summary>
-        public List<EFTableRow> Rows { set; get; } = new List<EFTableRow>();
+        public IList<EFTableRow> Rows { get; } = new List<EFTableRow>();
 
         /// <summary>
         /// TableColumn's Info
         /// </summary>
-        public Dictionary<int, EFTableColumnInfo> ColumnsInfo { set; get; }
+        public IDictionary<int, EFTableColumnInfo> ColumnsInfo { get; }
 
         /// <summary>
         /// Gets the number of columns in the current row.
@@ -39,7 +39,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the number of rows changed, inserted, or deleted by execution of the Transact-SQL statement.
         /// </summary>
-        public int RecordsAffected => -1;
+        public int RecordsAffected { get; } = -1;
 
         /// <summary>
         /// Gets the number of fields in the SqlDataReader that are not hidden.
@@ -71,6 +71,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public EFTableRows(DbDataReader reader)
         {
+            if (reader == null)
+            {
+                throw new ArgumentNullException(nameof(reader));
+            }
+
             ColumnsInfo = new Dictionary<int, EFTableColumnInfo>(reader.FieldCount);
             for (int i = 0; i < reader.FieldCount; i++)
             {
@@ -118,7 +123,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             {
                 return keyValuePair.Value.Ordinal;
             }
-            throw new IndexOutOfRangeException(name);
+            throw new ArgumentOutOfRangeException(nameof(name), name);
         }
 
         /// <summary>
@@ -134,7 +139,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the Type that is the data type of the object.
         /// </summary>
-        public Type GetFieldType(int ordinal) => Type.GetType(getColumnInfo(ordinal).TypeName);
+        public Type? GetFieldType(int ordinal) => Type.GetType(getColumnInfo(ordinal).TypeName);
 
         /// <summary>
         /// Gets the Type that is the data type of the object.
@@ -148,7 +153,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             {
                 return dbColumnInfo;
             }
-            throw new IndexOutOfRangeException($"Index[{ordinal}] was outside of array's bounds.");
+            throw new ArgumentOutOfRangeException(nameof(ordinal), $"Index[{ordinal}] was outside of array's bounds.");
         }
     }
 }

@@ -36,8 +36,13 @@ namespace EFCoreSecondLevelCacheInterceptor
             IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
             ILogger<EFDebugLogger> logger)
         {
+            if (cacheSettings == null)
+            {
+                throw new ArgumentNullException(nameof(cacheSettings));
+            }
+
             _disableLogging = cacheSettings.Value.DisableLogging;
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using System;
 using System.Data.Common;
+using System.Globalization;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,15 +52,24 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <returns>Information of the computed key of the input LINQ query.</returns>
         public EFCacheKey GetEFCacheKey(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
         {
+            if (command == null)
+            {
+                throw new ArgumentNullException(nameof(command));
+            }
+
+            if (cachePolicy == null)
+            {
+                throw new ArgumentNullException(nameof(cachePolicy));
+            }
+
             var cacheKey = getCacheKey(command, cachePolicy.CacheSaltKey);
             var cacheKeyHash = $"{XxHashUnsafe.ComputeHash(cacheKey):X}";
             var cacheDependencies = _cacheDependenciesProcessor.GetCacheDependencies(command, context, cachePolicy);
             _logger.LogDebug($"KeyHash: {cacheKeyHash}, CacheDependencies: {string.Join(", ", cacheDependencies)}.");
-            return new EFCacheKey
+            return new EFCacheKey(cacheDependencies)
             {
                 Key = cacheKey,
-                KeyHash = cacheKeyHash,
-                CacheDependencies = cacheDependencies
+                KeyHash = cacheKeyHash
             };
         }
 
@@ -68,21 +78,26 @@ namespace EFCoreSecondLevelCacheInterceptor
             var cacheKey = new StringBuilder();
             cacheKey.AppendLine(_cachePolicyParser.RemoveEFCachePolicyTag(command.CommandText));
 
-            foreach (DbParameter parameter in command.Parameters)
+            foreach (DbParameter? parameter in command.Parameters)
             {
+                if (parameter == null)
+                {
+                    continue;
+                }
+
                 cacheKey.Append(parameter.ParameterName)
-                        .Append("=").Append(getParameterValue(parameter)).Append(",")
-                        .Append("Size").Append("=").Append(parameter.Size).Append(",")
-                        .Append("Precision").Append("=").Append(parameter.Precision).Append(",")
-                        .Append("Scale").Append("=").Append(parameter.Scale).Append(",")
-                        .Append("Direction").Append("=").Append(parameter.Direction).Append(",");
+                        .Append('=').Append(getParameterValue(parameter)).Append(',')
+                        .Append("Size").Append('=').Append(parameter.Size).Append(',')
+                        .Append("Precision").Append('=').Append(parameter.Precision).Append(',')
+                        .Append("Scale").Append('=').Append(parameter.Scale).Append(',')
+                        .Append("Direction").Append('=').Append(parameter.Direction).Append(',');
             }
 
-            cacheKey.AppendLine("SaltKey").Append("=").Append(saltKey);
+            cacheKey.AppendLine("SaltKey").Append('=').Append(saltKey);
             return cacheKey.ToString().Trim();
         }
 
-        private static string getParameterValue(DbParameter parameter)
+        private static string? getParameterValue(DbParameter parameter)
         {
             if (parameter.Value is DBNull || parameter.Value is null)
             {
@@ -94,7 +109,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return bytesToHex(buffer);
             }
 
-            return parameter.Value.ToString();
+            return parameter.Value?.ToString();
         }
 
         private static string bytesToHex(byte[] buffer)
@@ -102,7 +117,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             var sb = new StringBuilder(buffer.Length * 2);
             foreach (var @byte in buffer)
             {
-                sb.Append(@byte.ToString("X2"));
+                sb.Append(@byte.ToString("X2", CultureInfo.InvariantCulture));
             }
             return sb.ToString();
         }

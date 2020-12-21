@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace EFCoreSecondLevelCacheInterceptor
@@ -10,32 +11,32 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// The computed key of the input LINQ query.
         /// </summary>
-        public string Key { set; get; }
+        public string Key { set; get; } = default!;
 
         /// <summary>
         /// Hash of the input LINQ query's computed key.
         /// </summary>
-        public string KeyHash { set; get; }
+        public string KeyHash { set; get; } = default!;
 
         /// <summary>
         /// Determines which entities are used in this LINQ query.
         /// This array will be used to invalidate the related cache of all related queries automatically.
         /// </summary>
-        public ISet<string> CacheDependencies { set; get; }
+        public ISet<string> CacheDependencies { get; } = new HashSet<string>();
 
         /// <summary>
         /// Stores information of the computed key of the input LINQ query.
         /// </summary>
-        public EFCacheKey()
+        public EFCacheKey(ISet<string> cacheDependencies)
         {
-            CacheDependencies = new HashSet<string>();
+            CacheDependencies = cacheDependencies;
         }
 
         /// <summary>
         /// Equals
         /// </summary>
         /// <param name="obj"></param>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!(obj is EFCacheKey efCacheKey))
                 return false;
@@ -51,7 +52,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             unchecked
             {
                 var hash = 17;
-                return (hash * 23) + KeyHash.GetHashCode();
+                return (hash * 23) + KeyHash.GetHashCode(StringComparison.Ordinal);
             }
         }
 

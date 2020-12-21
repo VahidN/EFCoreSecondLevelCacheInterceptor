@@ -35,12 +35,20 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Given entity types to cache
         /// </summary>
-        public Type[] EntityTypes { set; get; }
+        public IList<Type>? EntityTypes { get; }
 
         /// <summary>
         /// Given table names to cache
         /// </summary>
-        public IEnumerable<string> TableNames { set; get; }
+        public IEnumerable<string>? TableNames { set; get; }
+
+        /// <summary>
+        /// CacheAllQueries Options
+        /// </summary>
+        public CacheSpecificQueriesOptions(IList<Type>? entityTypes)
+        {
+            EntityTypes = entityTypes;
+        }
     }
 
     /// <summary>
@@ -51,12 +59,12 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// The selected cache provider
         /// </summary>
-        public Type CacheProvider { get; set; }
+        public Type CacheProvider { get; set; } = default!;
 
         /// <summary>
         /// Selected caching provider name
         /// </summary>
-        public string ProviderName { get; set; }
+        public string ProviderName { get; set; } = default!;
 
         /// <summary>
         /// Is an instance of EasyCaching.HybridCache
@@ -71,7 +79,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Cache Specific Queries Options
         /// </summary>
-        public CacheSpecificQueriesOptions CacheSpecificQueriesOptions { get; set; } = new CacheSpecificQueriesOptions();
+        public CacheSpecificQueriesOptions CacheSpecificQueriesOptions { get; set; } = new CacheSpecificQueriesOptions(entityTypes: null);
 
         /// <summary>
         /// Should the debug level loggig be disabled?
@@ -120,7 +128,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFCoreSecondLevelCacheOptions CacheQueriesContainingTableNames(
                 CacheExpirationMode expirationMode, TimeSpan timeout, params string[] realTableNames)
         {
-            Settings.CacheSpecificQueriesOptions = new CacheSpecificQueriesOptions
+            Settings.CacheSpecificQueriesOptions = new CacheSpecificQueriesOptions(entityTypes: null)
             {
                 ExpirationMode = expirationMode,
                 Timeout = timeout,
@@ -142,12 +150,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFCoreSecondLevelCacheOptions CacheQueriesContainingTypes(
                 CacheExpirationMode expirationMode, TimeSpan timeout, params Type[] entityTypes)
         {
-            Settings.CacheSpecificQueriesOptions = new CacheSpecificQueriesOptions
+            Settings.CacheSpecificQueriesOptions = new CacheSpecificQueriesOptions(entityTypes)
             {
                 ExpirationMode = expirationMode,
                 Timeout = timeout,
-                IsActive = true,
-                EntityTypes = entityTypes
+                IsActive = true
             };
             return this;
         }
@@ -297,6 +304,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             this IServiceCollection services,
             Action<EFCoreSecondLevelCacheOptions> options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             services.AddMemoryCache();
             services.TryAddSingleton<IEFDebugLogger, EFDebugLogger>();
             services.TryAddSingleton<IReaderWriterLockProvider, ReaderWriterLockProvider>();

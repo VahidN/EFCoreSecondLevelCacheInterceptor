@@ -32,7 +32,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandExecutedEventData eventData,
             int result)
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.NonQueryExecuted(command, eventData, result);
             }
@@ -57,7 +57,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.NonQueryExecutedAsync(command, eventData, result, cancellationToken);
             }
@@ -77,7 +77,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandEventData eventData,
             InterceptionResult<int> result)
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.NonQueryExecuting(command, eventData, result);
             }
@@ -102,7 +102,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.NonQueryExecutingAsync(command, eventData, result, cancellationToken);
             }
@@ -122,7 +122,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandExecutedEventData eventData,
             DbDataReader result)
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.ReaderExecuted(command, eventData, result);
             }
@@ -147,7 +147,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.ReaderExecutedAsync(command, eventData, result, cancellationToken);
             }
@@ -167,7 +167,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandEventData eventData,
             InterceptionResult<DbDataReader> result)
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.ReaderExecuting(command, eventData, result);
             }
@@ -192,7 +192,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
             }
@@ -212,7 +212,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandExecutedEventData eventData,
             object result)
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.ScalarExecuted(command, eventData, result);
             }
@@ -237,7 +237,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.ScalarExecutedAsync(command, eventData, result, cancellationToken);
             }
@@ -257,7 +257,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandEventData eventData,
             InterceptionResult<object> result)
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.ScalarExecuting(command, eventData, result);
             }
@@ -282,7 +282,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData.Context == null)
+            if (eventData?.Context == null)
             {
                 return base.ScalarExecutingAsync(command, eventData, result, cancellationToken);
             }

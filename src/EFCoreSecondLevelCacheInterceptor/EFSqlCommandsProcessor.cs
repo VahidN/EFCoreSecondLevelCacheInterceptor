@@ -16,12 +16,12 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// Gets the CLR class that is used to represent instances of this type.
         /// Returns null if the type does not have a corresponding CLR class (known as a shadow type).
         /// </summary>
-        public Type ClrType { set; get; }
+        public Type ClrType { set; get; } = default!;
 
         /// <summary>
         /// The Corresponding tabe's name.
         /// </summary>
-        public string TableName { set; get; }
+        public string TableName { set; get; } = default!;
 
         /// <summary>
         /// Debug info.
@@ -98,6 +98,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public IList<TableEntityInfo> GetAllTableNames(DbContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             return _contextTableNames.GetOrAdd(context.GetType(),
                             _ => new Lazy<List<TableEntityInfo>>(() =>
                             {
@@ -178,11 +183,11 @@ namespace EFCoreSecondLevelCacheInterceptor
                         continue;
                     }
 
-                    tableName = tableName.Replace("[", "")
-                                        .Replace("]", "")
-                                        .Replace("'", "")
-                                        .Replace("`", "")
-                                        .Replace("\"", "");
+                    tableName = tableName.Replace("[", "", StringComparison.Ordinal)
+                                        .Replace("]", "", StringComparison.Ordinal)
+                                        .Replace("'", "", StringComparison.Ordinal)
+                                        .Replace("`", "", StringComparison.Ordinal)
+                                        .Replace("\"", "", StringComparison.Ordinal);
                     tables.Add(tableName);
                 }
             }

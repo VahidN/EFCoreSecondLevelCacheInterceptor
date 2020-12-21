@@ -22,8 +22,8 @@ namespace EFCoreSecondLevelCacheInterceptor
             IReaderWriterLockProvider readerWriterLockProvider)
         {
             _readerWriterLockProvider = readerWriterLockProvider;
-            _dependenciesCacheManager = dependenciesCacheManager ?? throw new ArgumentNullException("Please register the `ICacheManager`.");
-            _valuesCacheManager = valuesCacheManager ?? throw new ArgumentNullException("Please register the `ICacheManager`.");
+            _dependenciesCacheManager = dependenciesCacheManager ?? throw new ArgumentNullException(nameof(dependenciesCacheManager), "Please register the `ICacheManager`.");
+            _valuesCacheManager = valuesCacheManager ?? throw new ArgumentNullException(nameof(valuesCacheManager), "Please register the `ICacheManager`.");
 
             // Occurs when an item was removed by the cache handle due to expiration or e.g. memory pressure eviction.
             // Without _dependenciesCacheManager items, we can't invalidate cached items on Insert/Update/Delete.

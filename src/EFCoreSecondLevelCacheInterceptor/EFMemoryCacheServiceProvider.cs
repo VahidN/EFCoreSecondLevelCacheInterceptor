@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace EFCoreSecondLevelCacheInterceptor
@@ -84,6 +85,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="cacheKey">Stores information of the computed key of the input LINQ query.</param>
         public void InvalidateCacheDependencies(EFCacheKey cacheKey)
         {
+            if (cacheKey == null)
+            {
+                throw new ArgumentNullException(nameof(cacheKey));
+            }
+
             foreach (var rootCacheKey in cacheKey.CacheDependencies)
             {
                 _readerWriterLockProvider.TryWriteLocked(() => _signal.RemoveChangeToken(rootCacheKey));

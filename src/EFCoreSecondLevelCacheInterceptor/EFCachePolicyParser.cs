@@ -13,7 +13,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Converts the `commandText` to an instance of `EFCachePolicy`
         /// </summary>
-        EFCachePolicy GetEFCachePolicy(string commandText, IList<TableEntityInfo> allEntityTypes);
+        EFCachePolicy? GetEFCachePolicy(string commandText, IList<TableEntityInfo> allEntityTypes);
 
         /// <summary>
         /// Does `commandText` contain EFCachePolicyTagPrefix?
@@ -51,7 +51,13 @@ namespace EFCoreSecondLevelCacheInterceptor
             "CURRENT_USER()",
             "CURRENT_TIMESTAMP()",
             "HOST_NAME()",
-            "USER_NAME()"
+            "USER_NAME()",
+            "NOW()",
+            "getguid()",
+            "uuid_generate_v4()",
+            "current_timestamp",
+            "current_date",
+            "current_time"
         };
 
         /// <summary>
@@ -62,9 +68,14 @@ namespace EFCoreSecondLevelCacheInterceptor
             IEFSqlCommandsProcessor sqlCommandsProcessor,
             IEFDebugLogger logger)
         {
-            _cacheSettings = cacheSettings?.Value;
-            _sqlCommandsProcessor = sqlCommandsProcessor;
-            _logger = logger;
+            if (cacheSettings == null)
+            {
+                throw new ArgumentNullException(nameof(cacheSettings));
+            }
+
+            _cacheSettings = cacheSettings.Value;
+            _sqlCommandsProcessor = sqlCommandsProcessor ?? throw new ArgumentNullException(nameof(sqlCommandsProcessor));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -72,7 +83,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public bool HasEFCachePolicy(string commandText)
         {
-            return !string.IsNullOrWhiteSpace(commandText) && commandText.Contains(EFCachePolicyTagPrefix);
+            return !string.IsNullOrWhiteSpace(commandText)
+                    && commandText.Contains(EFCachePolicyTagPrefix, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -80,6 +92,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public string RemoveEFCachePolicyTag(string commandText)
         {
+            if (commandText == null)
+            {
+                throw new ArgumentNullException(nameof(commandText));
+            }
+
             var startIndex = commandText.IndexOf(EFCachePolicyTagPrefix, StringComparison.Ordinal);
             if (startIndex == -1)
             {
@@ -106,8 +123,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Converts the `commandText` to an instance of `EFCachePolicy`
         /// </summary>
-        public EFCachePolicy GetEFCachePolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
+        public EFCachePolicy? GetEFCachePolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
         {
+            if (commandText == null)
+            {
+                throw new ArgumentNullException(nameof(commandText));
+            }
+
             if (containsNonDeterministicFunction(commandText))
             {
                 return null;
@@ -123,12 +145,12 @@ namespace EFCoreSecondLevelCacheInterceptor
             return efCachePolicy;
         }
 
-        private EFCachePolicy getRestrictedGlobalPolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
+        private EFCachePolicy? getRestrictedGlobalPolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
         {
             var options = _cacheSettings.CacheSpecificQueriesOptions;
             if (options?.IsActive != true
                     || _sqlCommandsProcessor.IsCrudCommand(commandText)
-                    || commandText.Contains(EFCachedQueryExtensions.IsNotCachableMarker))
+                    || commandText.Contains(EFCachedQueryExtensions.IsNotCachableMarker, StringComparison.Ordinal))
             {
                 return null;
             }
@@ -137,7 +159,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             if (options.TableNames != null)
             {
                 var commandTableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
-                if (options.TableNames?.Any(tableName => commandTableNames.Contains(tableName, StringComparer.OrdinalIgnoreCase)) == true)
+                if (options.TableNames.Any(tableName => commandTableNames.Contains(tableName, StringComparer.OrdinalIgnoreCase)))
                 {
                     shouldBeCached = true;
                 }
@@ -157,17 +179,17 @@ namespace EFCoreSecondLevelCacheInterceptor
                 : null;
         }
 
-        private EFCachePolicy getGlobalPolicy(string commandText)
+        private EFCachePolicy? getGlobalPolicy(string commandText)
         {
             var cacheAllQueriesOptions = _cacheSettings.CacheAllQueriesOptions;
             return cacheAllQueriesOptions.IsActive
                 && !_sqlCommandsProcessor.IsCrudCommand(commandText)
-                && !commandText.Contains(EFCachedQueryExtensions.IsNotCachableMarker)
+                && !commandText.Contains(EFCachedQueryExtensions.IsNotCachableMarker, StringComparison.Ordinal)
                 ? new EFCachePolicy().ExpirationMode(cacheAllQueriesOptions.ExpirationMode).Timeout(cacheAllQueriesOptions.Timeout)
                 : null;
         }
 
-        private EFCachePolicy getParsedPolicy(string commandText)
+        private EFCachePolicy? getParsedPolicy(string commandText)
         {
             if (!HasEFCachePolicy(commandText))
             {
@@ -175,7 +197,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             var commandTextLines = commandText.Split('\n');
-            var efCachePolicyCommentLine = commandTextLines.First(textLine => textLine.StartsWith(EFCachePolicyTagPrefix)).Trim();
+            var efCachePolicyCommentLine = commandTextLines.First(textLine => textLine.StartsWith(EFCachePolicyTagPrefix, StringComparison.Ordinal)).Trim();
 
             var parts = efCachePolicyCommentLine.Split(new[] { EFCachePolicy.PartsSeparator }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 2)
@@ -218,7 +240,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             return _nonDeterministicFunctions.Any(item =>
             {
-                var hasFn = commandText.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0;
+                var hasFn = commandText.Contains(item, StringComparison.OrdinalIgnoreCase);
                 if (hasFn)
                 {
                     _logger.LogDebug($"Skipped caching because of the non-deterministic function -> `{item}`.");

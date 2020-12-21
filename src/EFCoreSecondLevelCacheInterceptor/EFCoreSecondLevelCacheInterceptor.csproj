@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Entity Framework Core Second Level Caching Library.</Description>
-    <VersionPrefix>2.1.0</VersionPrefix>
+    <VersionPrefix>2.2.0</VersionPrefix>
     <Authors>Vahid Nasiri</Authors>
     <TargetFrameworks>net5.0;netstandard2.1;netstandard2.0;net461;netcoreapp3.1;</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFrameworks>
@@ -10,6 +10,8 @@
     <PackageId>EFCoreSecondLevelCacheInterceptor</PackageId>
     <PackageTags>EntityFramework;Cache;Caching;SecondLevelCache;EFCore;ORM;.NET Core;aspnetcore</PackageTags>
     <PackageProjectUrl>https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -18,11 +20,28 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <DebugType>embedded</DebugType>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>9</LangVersion>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+    <Deterministic>true</Deterministic>
+    <Features>strict</Features>
+    <ReportAnalyzer>true</ReportAnalyzer>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
@@ -35,14 +54,24 @@
     <DefineConstants>NET4_6_1</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition=" ('$(TargetFramework)' == 'netstandard2.0') or ('$(TargetFramework)' == 'netcoreapp3.1')">
+  <ItemGroup Condition=" ('$(TargetFramework)' == 'netstandard2.0')">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.10" />
     <PackageReference Include="CacheManager.Core" Version="1.2.0" />
     <PackageReference Include="EasyCaching.Core" Version="1.1.0" />
   </ItemGroup>
-  <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.0') or ('$(TargetFramework)' == 'netcoreapp3.1')">
+  <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.0')">
     <DefineConstants>NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.10" />
+    <PackageReference Include="CacheManager.Core" Version="1.2.0" />
+    <PackageReference Include="EasyCaching.Core" Version="1.1.0" />
+  </ItemGroup>
+  <PropertyGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
+    <DefineConstants>NETCORE3_1</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup Condition="('$(TargetFramework)' == 'net5.0') or  ('$(TargetFramework)' == 'netstandard2.1')">

@@ -1,5 +1,6 @@
 using System;
 using System.Data.Common;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -57,6 +58,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public T ProcessExecutedCommands<T>(DbCommand command, DbContext context, T result)
         {
+            if (command == null)
+            {
+                throw new ArgumentNullException(nameof(command));
+            }
+
             if (result is EFTableRowsDataReader rowsReader)
             {
                 _logger.LogDebug(CacheableEventId.CacheHit, $"Returning the cached TableRows[{rowsReader.TableName}].");
@@ -112,6 +118,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public T ProcessExecutingCommands<T>(DbCommand command, DbContext context, T result)
         {
+            if (command == null)
+            {
+                throw new ArgumentNullException(nameof(command));
+            }
+
             var allEntityTypes = _sqlCommandsProcessor.GetAllTableNames(context);
             var cachePolicy = _cachePolicyParser.GetEFCachePolicy(command.CommandText, allEntityTypes);
             if (cachePolicy == null)
@@ -128,28 +139,42 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             if (result is InterceptionResult<DbDataReader>)
             {
-                if (cacheResult.IsNull)
+                if (cacheResult.IsNull || cacheResult.TableRows == null)
                 {
                     _logger.LogDebug("Suppressed the result with an empty TableRows.");
-                    return (T)Convert.ChangeType(InterceptionResult<DbDataReader>.SuppressWithResult(new EFTableRowsDataReader(new EFTableRows())), typeof(T));
+                    using var rows = new EFTableRowsDataReader(new EFTableRows());
+                    return (T)Convert.ChangeType(
+                            InterceptionResult<DbDataReader>.SuppressWithResult(rows),
+                            typeof(T),
+                            CultureInfo.InvariantCulture);
                 }
 
                 _logger.LogDebug($"Suppressed the result with the TableRows[{cacheResult.TableRows.TableName}] from the cache[{efCacheKey}].");
-                return (T)Convert.ChangeType(InterceptionResult<DbDataReader>.SuppressWithResult(new EFTableRowsDataReader(cacheResult.TableRows)), typeof(T));
+                using var dataRows = new EFTableRowsDataReader(cacheResult.TableRows);
+                return (T)Convert.ChangeType(
+                            InterceptionResult<DbDataReader>.SuppressWithResult(dataRows),
+                            typeof(T),
+                            CultureInfo.InvariantCulture);
             }
 
             if (result is InterceptionResult<int>)
             {
                 int cachedResult = cacheResult.IsNull ? default : cacheResult.NonQuery;
                 _logger.LogDebug($"Suppressed the result with {cachedResult} from the cache[{efCacheKey}].");
-                return (T)Convert.ChangeType(InterceptionResult<int>.SuppressWithResult(cachedResult), typeof(T));
+                return (T)Convert.ChangeType(
+                            InterceptionResult<int>.SuppressWithResult(cachedResult),
+                            typeof(T),
+                            CultureInfo.InvariantCulture);
             }
 
             if (result is InterceptionResult<object>)
             {
-                object cachedResult = cacheResult.IsNull ? default : cacheResult.Scalar;
+                var cachedResult = cacheResult.IsNull ? default : cacheResult.Scalar;
                 _logger.LogDebug($"Suppressed the result with {cachedResult} from the cache[{efCacheKey}].");
-                return (T)Convert.ChangeType(InterceptionResult<object>.SuppressWithResult(cachedResult), typeof(T));
+                return (T)Convert.ChangeType(
+                            InterceptionResult<object>.SuppressWithResult(cachedResult ?? new object()),
+                            typeof(T),
+                            CultureInfo.InvariantCulture);
             }
 
             _logger.LogDebug($"Skipped the result with {result?.GetType()} type.");

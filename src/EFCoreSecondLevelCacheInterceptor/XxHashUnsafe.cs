@@ -22,6 +22,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <returns>xxHash</returns>
         public static unsafe UInt32 ComputeHash(string data)
         {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
             fixed (char* input = data)
             {
                 return hash((byte*)input, (uint)data.Length * sizeof(char), Seed);
@@ -35,6 +40,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <returns>xxHash</returns>
         public static unsafe uint ComputeHash(byte[] data)
         {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
             fixed (byte* input = &data[0])
             {
                 return hash(input, (uint)data.Length, Seed);
@@ -51,6 +61,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <returns>xxHash</returns>
         public static unsafe uint ComputeHash(byte[] data, int offset, uint len, uint seed)
         {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
             fixed (byte* input = &data[offset])
             {
                 return hash(input, len, seed);

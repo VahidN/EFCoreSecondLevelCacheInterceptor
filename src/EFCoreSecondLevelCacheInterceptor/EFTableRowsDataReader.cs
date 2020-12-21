@@ -17,7 +17,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
         private int _currentRow;
 
-        private object[] _rowValues;
+        private IList<object> _rowValues = new List<object>();
 
         private bool _isClosed;
 
@@ -75,7 +75,9 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the Type that is the data type of the object.
         /// </summary>
-        public override Type GetFieldType(int ordinal) => _tableRows.GetFieldType(ordinal);
+        public override Type GetFieldType(int ordinal) =>
+            _tableRows.GetFieldType(ordinal)
+            ?? throw new InvalidOperationException($"Couldn't find the type of `{ordinal}` field.");
 
         /// <summary>
         /// Gets the name of the specified column.
@@ -150,7 +152,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             if (valueType != typeof(bool))
             {
-                return (ulong)Convert.ChangeType(value, typeof(ulong)) != 0;
+                return (ulong)Convert.ChangeType(value, typeof(ulong), CultureInfo.InvariantCulture) != 0;
             }
 
             return (bool)value;
@@ -187,7 +189,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             if (valueType != typeof(byte))
             {
-                return (byte)Convert.ChangeType(value, typeof(byte));
+                return (byte)Convert.ChangeType(value, typeof(byte), CultureInfo.InvariantCulture);
             }
 
             return (byte)value;
@@ -196,7 +198,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Reads a stream of bytes from the specified column offset into the buffer an array starting at the given buffer offset.
         /// </summary>
-        public override long GetBytes(int ordinal, long dataOffset, byte[] buffer, int bufferOffset, int length) => 0L;
+        public override long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length) => 0L;
 
         /// <summary>
         /// Gets the value of the specified column as a single character.
@@ -213,6 +215,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             if (valueType == typeof(string))
             {
                 var val = value.ToString();
+                if (string.IsNullOrWhiteSpace(val))
+                {
+                    return default;
+                }
+
                 if (val.Length == 1)
                 {
                     return val[0];
@@ -226,7 +233,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Reads a stream of characters from the specified column offset into the buffer as an array starting at the given buffer offset.
         /// </summary>
-        public override long GetChars(int ordinal, long dataOffset, char[] buffer, int bufferOffset, int length) => 0L;
+        public override long GetChars(int ordinal, long dataOffset, char[]? buffer, int bufferOffset, int length) => 0L;
 
         /// <summary>
         /// Gets the value of the specified column as a DateTime object.
@@ -242,7 +249,10 @@ namespace EFCoreSecondLevelCacheInterceptor
             var valueType = getOrdinalValueType(ordinal, value);
             if (valueType != typeof(DateTime))
             {
-                return DateTime.Parse(value.ToString());
+                var s = value.ToString();
+                return string.IsNullOrWhiteSpace(s)
+                    ? default
+                    : DateTime.Parse(s, CultureInfo.CurrentCulture);
             }
 
             return (DateTime)value;
@@ -262,12 +272,15 @@ namespace EFCoreSecondLevelCacheInterceptor
             var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(string))
             {
-                return decimal.Parse(value.ToString(), NumberStyles.Number | NumberStyles.AllowExponent, CultureInfo.InvariantCulture);
+                var s = value.ToString();
+                return string.IsNullOrWhiteSpace(s)
+                    ? default
+                    : decimal.Parse(s, NumberStyles.Number | NumberStyles.AllowExponent, CultureInfo.InvariantCulture);
             }
 
             if (valueType != typeof(decimal))
             {
-                return (decimal)Convert.ChangeType(value, typeof(decimal));
+                return (decimal)Convert.ChangeType(value, typeof(decimal), CultureInfo.InvariantCulture);
             }
 
             return (decimal)value;
@@ -311,7 +324,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             if (valueType != typeof(float))
             {
-                return (float)Convert.ChangeType(value, typeof(float));
+                return (float)Convert.ChangeType(value, typeof(float), CultureInfo.InvariantCulture);
             }
 
             return (float)value;
@@ -331,7 +344,8 @@ namespace EFCoreSecondLevelCacheInterceptor
             var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(string))
             {
-                return new Guid(value.ToString());
+                var g = value.ToString();
+                return string.IsNullOrWhiteSpace(g) ? default : new Guid(g);
             }
 
             return (Guid)value;
@@ -356,7 +370,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             if (valueType != typeof(short))
             {
-                return (short)Convert.ChangeType(value, typeof(short));
+                return (short)Convert.ChangeType(value, typeof(short), CultureInfo.InvariantCulture);
             }
 
             return (short)value;
@@ -381,7 +395,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             if (valueType != typeof(int))
             {
-                return (int)Convert.ChangeType(value, typeof(int));
+                return (int)Convert.ChangeType(value, typeof(int), CultureInfo.InvariantCulture);
             }
 
             return (int)value;
@@ -409,7 +423,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             var value = GetValue(ordinal);
             if (value == null)
             {
-                return default;
+                return string.Empty;
             }
 
             return (string)value;
@@ -423,10 +437,10 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Populates an array of objects with the column values of the current row.
         /// </summary>
-        public override int GetValues(object[] result)
+        public override int GetValues(object[] values)
         {
-            Array.Copy(_rowValues, result, _rowValues.Length);
-            return _rowValues.Length;
+            Array.Copy(_rowValues.ToArray(), values, _rowValues.Count);
+            return _rowValues.Count;
         }
 
         /// <summary>

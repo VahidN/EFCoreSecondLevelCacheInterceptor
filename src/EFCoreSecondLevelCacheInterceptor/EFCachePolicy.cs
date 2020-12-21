@@ -113,6 +113,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public static string Configure(Action<EFCachePolicy> options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             var cachePolicy = new EFCachePolicy();
             options.Invoke(cachePolicy);
             return cachePolicy.ToString();

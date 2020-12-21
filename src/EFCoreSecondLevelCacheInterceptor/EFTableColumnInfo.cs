@@ -16,16 +16,16 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// The column's name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         /// <summary>
         /// The column's DbType Name.
         /// </summary>
-        public string DbTypeName { get; set; }
+        public string DbTypeName { get; set; } = default!;
 
         /// <summary>
         /// The column's Type.
         /// </summary>
-        public string TypeName { get; set; }
+        public string TypeName { get; set; } = default!;
     }
 }

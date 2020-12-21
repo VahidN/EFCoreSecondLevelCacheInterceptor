@@ -20,19 +20,17 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         {
             var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
-            var key1 = new EFCacheKey
+            var key1 = new EFCacheKey(new HashSet<string> { "entity1.model", "entity2.model" })
             {
-                KeyHash = "EF_key1",
-                CacheDependencies = new HashSet<string> { "entity1.model", "entity2.model" }
+                KeyHash = "EF_key1"
             };
             cacheService.InsertValue(
                 key1,
                 new EFCachedData { Scalar = "value1" }, efCachePolicy);
 
-            var key2 = new EFCacheKey
+            var key2 = new EFCacheKey(new HashSet<string> { "entity1.model", "entity2.model" })
             {
-                KeyHash = "EF_key2",
-                CacheDependencies = new HashSet<string> { "entity1.model", "entity2.model" }
+                KeyHash = "EF_key2"
             };
             cacheService.InsertValue(
                 key2,
@@ -46,7 +44,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var value2 = cacheService.GetValue(key2, efCachePolicy);
             Assert.IsNotNull(value2);
 
-            cacheService.InvalidateCacheDependencies(new EFCacheKey { CacheDependencies = new HashSet<string> { "entity2.model" } });
+            cacheService.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string> { "entity2.model" }));
 
             value1 = cacheService.GetValue(key1, efCachePolicy);
             Assert.IsNull(value1);
@@ -66,19 +64,17 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         {
             var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
-            var key1 = new EFCacheKey
+            var key1 = new EFCacheKey(new HashSet<string> { "entity1" })
             {
-                KeyHash = "EF_key1",
-                CacheDependencies = new HashSet<string> { "entity1" }
+                KeyHash = "EF_key1"
             };
             cacheService.InsertValue(
                 key1,
                 new EFCachedData { Scalar = "value1" }, efCachePolicy);
 
-            var key2 = new EFCacheKey
+            var key2 = new EFCacheKey(new HashSet<string> { "entity1" })
             {
-                KeyHash = "EF_key2",
-                CacheDependencies = new HashSet<string> { "entity1" }
+                KeyHash = "EF_key2"
             };
             cacheService.InsertValue(
                 key2,
@@ -91,7 +87,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var value2 = cacheService.GetValue(key2, efCachePolicy);
             Assert.IsNotNull(value2);
 
-            cacheService.InvalidateCacheDependencies(new EFCacheKey { CacheDependencies = new HashSet<string> { "entity1" } });
+            cacheService.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string> { "entity1" }));
 
             value1 = cacheService.GetValue(key1, efCachePolicy);
             Assert.IsNull(value1);
@@ -113,12 +109,11 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
             const string rootCacheKey = "EFSecondLevelCache.Core.AspNetCoreSample.DataLayer.Entities.Product";
 
-            cacheService.InvalidateCacheDependencies(new EFCacheKey { CacheDependencies = new HashSet<string> { rootCacheKey } });
+            cacheService.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string> { rootCacheKey }));
 
-            var key11888622 = new EFCacheKey
+            var key11888622 = new EFCacheKey(new HashSet<string> { rootCacheKey })
             {
-                KeyHash = "11888622",
-                CacheDependencies = new HashSet<string> { rootCacheKey }
+                KeyHash = "11888622"
             };
             var val11888622 = cacheService.GetValue(key11888622, efCachePolicy);
             Assert.IsNull(val11888622);
@@ -127,10 +122,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 key11888622,
                 new EFCachedData { Scalar = "Test1" }, efCachePolicy);
 
-            var key44513A63 = new EFCacheKey
+            var key44513A63 = new EFCacheKey(new HashSet<string> { rootCacheKey })
             {
-                KeyHash = "44513A63",
-                CacheDependencies = new HashSet<string> { rootCacheKey }
+                KeyHash = "44513A63"
             };
             var val44513A63 = cacheService.GetValue(key44513A63, efCachePolicy);
             Assert.IsNull(val44513A63);
@@ -139,7 +133,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 key44513A63,
                 new EFCachedData { Scalar = "Test1" }, efCachePolicy);
 
-            cacheService.InvalidateCacheDependencies(new EFCacheKey { CacheDependencies = new HashSet<string> { rootCacheKey } });
+            cacheService.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string> { rootCacheKey }));
 
             val11888622 = cacheService.GetValue(key11888622, efCachePolicy);
             Assert.IsNull(val11888622);
@@ -159,19 +153,17 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         {
             var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
-            var key1 = new EFCacheKey
+            var key1 = new EFCacheKey(new HashSet<string> { "entity1", "entity2" })
             {
-                KeyHash = "EF_key1",
-                CacheDependencies = new HashSet<string> { "entity1", "entity2" }
+                KeyHash = "EF_key1"
             };
             cacheService.InsertValue(
                 key1,
                 new EFCachedData { Scalar = "value1" }, efCachePolicy);
 
-            var key2 = new EFCacheKey
+            var key2 = new EFCacheKey(new HashSet<string> { "entity2" })
             {
-                KeyHash = "EF_key2",
-                CacheDependencies = new HashSet<string> { "entity2" }
+                KeyHash = "EF_key2"
             };
             cacheService.InsertValue(
                 key2,
@@ -185,7 +177,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var value2 = cacheService.GetValue(key2, efCachePolicy);
             Assert.IsNotNull(value2);
 
-            cacheService.InvalidateCacheDependencies(new EFCacheKey { CacheDependencies = new HashSet<string> { "entity2" } });
+            cacheService.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string> { "entity2" }));
 
             value1 = cacheService.GetValue(key1, efCachePolicy);
             Assert.IsNull(value1);
@@ -205,10 +197,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         {
             var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
             var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10)).ExpirationMode(CacheExpirationMode.Absolute);
-            var key1 = new EFCacheKey
+            var key1 = new EFCacheKey(new HashSet<string> { "entity1", "entity2" })
             {
-                KeyHash = "EF_key1",
-                CacheDependencies = new HashSet<string> { "entity1", "entity2" }
+                KeyHash = "EF_key1"
             };
             cacheService.InsertValue(
                 key1,
@@ -237,10 +228,9 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 var i1 = i;
                 tests.Add(() =>
             cacheService.InsertValue(
-                new EFCacheKey
+                new EFCacheKey(new HashSet<string> { "entity1", "entity2" })
                 {
-                    KeyHash = $"EF_key{i1}",
-                    CacheDependencies = new HashSet<string> { "entity1", "entity2" }
+                    KeyHash = $"EF_key{i1}"
                 }, new EFCachedData { NonQuery = i1 }, efCachePolicy));
             }
 
@@ -248,17 +238,17 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             {
                 if (i % 2 == 0)
                 {
-                    tests.Add(() => cacheService.InvalidateCacheDependencies(new EFCacheKey { CacheDependencies = new HashSet<string> { "entity1" } }));
+                    tests.Add(() => cacheService.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string> { "entity1" })));
                 }
                 else
                 {
-                    tests.Add(() => cacheService.InvalidateCacheDependencies(new EFCacheKey { CacheDependencies = new HashSet<string> { "entity2" } }));
+                    tests.Add(() => cacheService.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string> { "entity2" })));
                 }
             }
 
             Parallel.Invoke(tests.OrderBy(a => RandomNumberProvider.Next()).ToArray());
 
-            var value1 = cacheService.GetValue(new EFCacheKey { KeyHash = "EF_key1", CacheDependencies = new HashSet<string> { "entity1", "entity2" } }, efCachePolicy);
+            var value1 = cacheService.GetValue(new EFCacheKey(new HashSet<string> { "entity1", "entity2" }) { KeyHash = "EF_key1" }, efCachePolicy);
             Assert.IsNull(value1);
         }
     }

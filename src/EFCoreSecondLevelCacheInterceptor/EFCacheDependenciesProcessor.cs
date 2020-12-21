@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
@@ -53,6 +54,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public SortedSet<string> GetCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
         {
+            if (command == null)
+            {
+                throw new ArgumentNullException(nameof(command));
+            }
+
             var tableNames = new SortedSet<string>(
                     _sqlCommandsProcessor.GetAllTableNames(context).Select(x => x.TableName));
             return GetCacheDependencies(cachePolicy, tableNames, command.CommandText);
@@ -63,6 +69,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public SortedSet<string> GetCacheDependencies(EFCachePolicy cachePolicy, SortedSet<string> tableNames, string commandText)
         {
+            if (cachePolicy == null)
+            {
+                throw new ArgumentNullException(nameof(cachePolicy));
+            }
+
             var textsInsideSquareBrackets = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
             var cacheDependencies = new SortedSet<string>(tableNames.Intersect(textsInsideSquareBrackets));
             if (cacheDependencies.Any())
@@ -91,6 +102,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public bool InvalidateCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
         {
+            if (command == null)
+            {
+                throw new ArgumentNullException(nameof(command));
+            }
+
             var commandText = command.CommandText;
             if (!_sqlCommandsProcessor.IsCrudCommand(commandText))
             {
@@ -99,7 +115,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             var cacheDependencies = GetCacheDependencies(command, context, cachePolicy);
             cacheDependencies.Add(EFCachePolicy.EFUnknownsCacheDependency);
-            _cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey { CacheDependencies = cacheDependencies });
+            _cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(cacheDependencies));
 
             _logger.LogDebug(CacheableEventId.QueryResultInvalidated, $"Invalidated [{string.Join(", ", cacheDependencies)}] dependencies.");
             return true;

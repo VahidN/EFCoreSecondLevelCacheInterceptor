@@ -6,7 +6,7 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// <summary>
     /// Reader writer locking service
     /// </summary>
-    public interface IReaderWriterLockProvider
+    public interface IReaderWriterLockProvider : IDisposable
     {
         /// <summary>
         /// Tries to enter the lock in read mode, with an optional integer time-out.
@@ -29,6 +29,7 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class ReaderWriterLockProvider : IReaderWriterLockProvider
     {
+        private bool _isDisposed;
         private readonly ReaderWriterLockSlim _readerWriterLock = new ReaderWriterLockSlim();
 
         /// <summary>
@@ -36,6 +37,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public void TryReadLocked(Action action, int timeout = Timeout.Infinite)
         {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
             if (!_readerWriterLock.TryEnterReadLock(timeout))
             {
                 throw new TimeoutException();
@@ -56,6 +62,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public T TryReadLocked<T>(Func<T> action, int timeout = Timeout.Infinite)
         {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
             if (!_readerWriterLock.TryEnterReadLock(timeout))
             {
                 throw new TimeoutException();
@@ -76,6 +87,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public void TryWriteLocked(Action action, int timeout = Timeout.Infinite)
         {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
             if (!_readerWriterLock.TryEnterWriteLock(timeout))
             {
                 throw new TimeoutException();
@@ -88,6 +104,37 @@ namespace EFCoreSecondLevelCacheInterceptor
             finally
             {
                 _readerWriterLock.ExitWriteLock();
+            }
+        }
+
+        /// <summary>
+        /// Dispose resources
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose resources
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                try
+                {
+                    if (disposing)
+                    {
+                        _readerWriterLock?.Dispose();
+                    }
+                }
+                finally
+                {
+                    _isDisposed = true;
+                }
             }
         }
     }

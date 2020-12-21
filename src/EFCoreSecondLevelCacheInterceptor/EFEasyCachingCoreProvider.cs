@@ -24,8 +24,18 @@ namespace EFCoreSecondLevelCacheInterceptor
             IServiceProvider serviceProvider,
             IReaderWriterLockProvider readerWriterLockProvider)
         {
-            _cacheSettings = cacheSettings?.Value;
-            _readerWriterLockProvider = readerWriterLockProvider;
+            if (cacheSettings == null)
+            {
+                throw new ArgumentNullException(nameof(cacheSettings));
+            }
+
+            if (serviceProvider == null)
+            {
+                throw new ArgumentNullException(nameof(serviceProvider));
+            }
+
+            _cacheSettings = cacheSettings.Value;
+            _readerWriterLockProvider = readerWriterLockProvider ?? throw new ArgumentNullException(nameof(readerWriterLockProvider));
 
             if (_cacheSettings.IsHybridCache)
             {

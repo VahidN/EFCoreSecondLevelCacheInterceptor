@@ -14,8 +14,10 @@ namespace EFCoreSecondLevelCacheInterceptor
     {
         private static readonly TimeSpan _thirtyMinutes = TimeSpan.FromMinutes(30);
 
-        private static readonly MethodInfo _asNoTrackingMethodInfo =
-            typeof(EntityFrameworkQueryableExtensions).GetTypeInfo().GetDeclaredMethod(nameof(EntityFrameworkQueryableExtensions.AsNoTracking));
+        private static readonly MethodInfo? _asNoTrackingMethodInfo =
+            typeof(EntityFrameworkQueryableExtensions)
+            .GetTypeInfo()
+            .GetDeclaredMethod(nameof(EntityFrameworkQueryableExtensions.AsNoTracking));
 
         /// <summary>
         /// IsNotCachable Marker
@@ -234,6 +236,11 @@ namespace EFCoreSecondLevelCacheInterceptor
 
         private static void sanityCheck<TType>(IQueryable<TType> query)
         {
+            if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+
             if (!(query.Provider is EntityQueryProvider))
             {
                 throw new NotSupportedException("`Cacheable` method is designed only for relational EF Core queries.");
@@ -242,12 +249,15 @@ namespace EFCoreSecondLevelCacheInterceptor
 
         private static IQueryable<TType> markAsNoTracking<TType>(this IQueryable<TType> query)
         {
-            if (typeof(TType).GetTypeInfo().IsClass)
+            if (_asNoTrackingMethodInfo == null)
             {
-                return query.Provider.CreateQuery<TType>(
-                    Expression.Call(null, _asNoTrackingMethodInfo.MakeGenericMethod(typeof(TType)), query.Expression));
+                return query;
             }
-            return query;
+
+            return typeof(TType).GetTypeInfo().IsClass
+                ? query.Provider.CreateQuery<TType>(
+                    Expression.Call(null, _asNoTrackingMethodInfo.MakeGenericMethod(typeof(TType)), query.Expression))
+                : query;
         }
     }
 }

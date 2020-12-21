@@ -1,0 +1,29 @@
+[*.cs]
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.RCS1090.severity = none
+
+# CA1829 Use the "Count" property instead of Enumerable.Count()
+dotnet_diagnostic.CA1829.severity = suggestion
+
+# Use 'Count' property here instead.
+dotnet_diagnostic.S2971.severity = suggestion
+
+# CA1056: Change the type of property 'Url' from 'string' to 'System.Uri'
+dotnet_diagnostic.CA1056.severity = suggestion
+
+# CA1054: Change the type of parameter of the method to allow a Uri to be passed as a 'System.Uri' object
+dotnet_diagnostic.CA1054.severity = suggestion
+
+# CA1055: Change the return type of method from 'string' to 'System.Uri'
+dotnet_diagnostic.CA1055.severity = suggestion
+
+# CA1040: Avoid empty interfaces
+dotnet_diagnostic.CA1040.severity = suggestion
+
+# CA1308: In method 'urlToLower', replace the call to 'ToLowerInvariant' with 'ToUpperInvariant' (CA1308)
+dotnet_diagnostic.CA1308.severity = suggestion
+
+# CA1010 Type directly or indirectly inherits 'IEnumerable' without implementing 'IEnumerable<T>'. Publicly-visible types should implement the generic version to broaden usability. 
+dotnet_diagnostic.CA1010.severity = suggestion

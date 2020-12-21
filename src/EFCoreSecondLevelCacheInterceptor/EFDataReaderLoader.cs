@@ -11,11 +11,11 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class EFDataReaderLoader : DbDataReader
     {
-        private EFTableRows _tableRows;
+        private readonly EFTableRows _tableRows;
 
         private readonly DbDataReader _dbReader;
 
-        private object[] _rowValues = new object[0];
+        private object[] _rowValues = Array.Empty<object>();
 
         /// <summary>
         /// Gets a value that indicates whether the SqlDataReader contains one or more rows.
@@ -83,7 +83,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Returns a DataTable that describes the column metadata of the SqlDataReader.
         /// </summary>
-        public override DataTable GetSchemaTable() => _dbReader.GetSchemaTable();
+        public override DataTable? GetSchemaTable() => _dbReader.GetSchemaTable();
 
         /// <summary>
         /// Returns GetValue(GetOrdinal(name))
@@ -108,7 +108,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Reads a stream of bytes from the specified column offset into the buffer an array starting at the given buffer offset.
         /// </summary>
-        public override long GetBytes(int ordinal, long dataOffset, byte[] buffer, int bufferOffset, int length) => 0L;
+        public override long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length) => 0L;
 
         /// <summary>
         /// Gets the value of the specified column as a single character.
@@ -118,7 +118,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Reads a stream of characters from the specified column offset into the buffer as an array starting at the given buffer offset.
         /// </summary>
-        public override long GetChars(int ordinal, long dataOffset, char[] buffer, int bufferOffset, int length) => 0L;
+        public override long GetChars(int ordinal, long dataOffset, char[]? buffer, int bufferOffset, int length) => 0L;
 
         /// <summary>
         /// Gets the value of the specified column as a DateTime object.
@@ -178,9 +178,9 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Populates an array of objects with the column values of the current row.
         /// </summary>
-        public override int GetValues(object[] result)
+        public override int GetValues(object[] values)
         {
-            Array.Copy(_rowValues, result, _rowValues.Length);
+            Array.Copy(_rowValues, values, _rowValues.Length);
             return _rowValues.Length;
         }
 
@@ -194,12 +194,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public override bool NextResult()
         {
-            if (_dbReader.NextResult())
-            {
-                _tableRows = null;
-                return true;
-            }
-            return false;
+            return _dbReader.NextResult();
         }
 
         /// <summary>
@@ -237,10 +232,9 @@ namespace EFCoreSecondLevelCacheInterceptor
                 }
             }
 
-            _tableRows?.Add(new EFTableRow
+            _tableRows?.Add(new EFTableRow(_rowValues)
             {
-                Depth = _dbReader.Depth,
-                Values = _rowValues
+                Depth = _dbReader.Depth
             });
             return true;
         }
