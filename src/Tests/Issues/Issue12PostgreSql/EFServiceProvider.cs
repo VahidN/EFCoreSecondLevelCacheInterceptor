@@ -55,8 +55,19 @@ namespace Issue12PostgreSql
                                 .Build();
             services.AddSingleton(_ => configuration);
 
+            const string providerName = "Redis1";
+            services.AddEasyCaching(option =>
+            {
+                option.UseRedis(config =>
+                {
+                    config.DBConfig.AllowAdmin = true;
+                    config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("127.0.0.1", 6379));
+                }, providerName);
+            });
+
             services.AddEFSecondLevelCache(options =>
-                options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5))
+                //options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5))
+                options.UseEasyCachingCoreProvider(providerName)
             );
 
             services.AddDbContext<ApplicationDbContext>((serviceProvider, optionsBuilder) =>

@@ -14,24 +14,24 @@ namespace Issue12PostgreSql
 
             EFServiceProvider.RunInContext(context =>
             {
-                var people = context.People.ToList();
+                var people = context.People.Include(x => x.Addresses).Include(x => x.Books).ToList();
                 foreach (var person in people)
                 {
-                    Console.WriteLine($"{person.Id}, {person.Name}");
+                    Console.WriteLine($"{person.Id}, {person.Name}, {person.Addresses.First().Name}");
                 }
 
-                var cachedPeople = context.People.Cacheable().ToList();
-                cachedPeople = context.People.Cacheable().ToList();
+                var cachedPeople = context.People.Include(x => x.Addresses).Include(x => x.Books).Cacheable().ToList();
+                cachedPeople = context.People.Include(x => x.Addresses).Include(x => x.Books).Cacheable().ToList();
                 foreach (var person in cachedPeople)
                 {
                     Console.WriteLine($"{person.Id}, {person.Name}");
                 }
 
-                cachedPeople = context.People.Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(51)).ToList();
-                cachedPeople = context.People.Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(51)).ToList();
+                cachedPeople = context.People.Include(x => x.Addresses).Include(x => x.Books).Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(51)).ToList();
+                cachedPeople = context.People.Include(x => x.Addresses).Include(x => x.Books).Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(51)).ToList();
                 foreach (var person in cachedPeople)
                 {
-                    Console.WriteLine($"{person.Id}, {person.Name}");
+                    Console.WriteLine($"{person.Id}, {person.Name}, {person.Addresses.First().Name}");
                 }
             });
         }
@@ -44,7 +44,7 @@ namespace Issue12PostgreSql
 
                 if (!context.People.Any())
                 {
-                    context.People.Add(new Person
+                    var person1 = context.People.Add(new Person
                     {
                         Name = "Bill",
                         AddDate = DateTime.UtcNow,
@@ -66,7 +66,10 @@ namespace Issue12PostgreSql
                         UshortValue = 1
                     });
 
-                    context.People.Add(new Person
+                    context.Addresses.Add(new Address { Name = "Addr 1", Person = person1.Entity });
+                    context.Books.Add(new Book { Name = "Book 1", Person = person1.Entity });
+
+                    var person2 = context.People.Add(new Person
                     {
                         Name = "Vahid",
                         AddDate = DateTime.UtcNow,
@@ -87,6 +90,9 @@ namespace Issue12PostgreSql
                         UlongValue = 1,
                         UshortValue = 1
                     });
+
+                    context.Addresses.Add(new Address { Name = "Addr 2", Person = person2.Entity });
+                    context.Books.Add(new Book { Name = "Book 2", Person = person2.Entity });
 
                     context.SaveChanges();
                 }

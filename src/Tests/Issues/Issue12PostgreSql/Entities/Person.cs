@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Issue12PostgreSql.Entities
@@ -42,5 +43,29 @@ namespace Issue12PostgreSql.Entities
         public ulong UlongValue { set; get; }
 
         public ulong UshortValue { set; get; }
+
+        public ICollection<Address> Addresses { set; get; }
+
+        public List<Book> Books { get; set; }
+    }
+
+    public class Address
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public Person Person { get; set; }
+        public int PersonId { get; set; }
+    }
+
+    public class Book
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public Person Person { get; set; }
+        public int PersonId { get; set; }
     }
 }

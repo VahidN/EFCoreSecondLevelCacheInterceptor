@@ -10,23 +10,63 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Issue12PostgreSql.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200330065710_V2020_03_30_1126")]
-    partial class V2020_03_30_1126
+    [Migration("20201223072625_V2020_12_23_1056")]
+    partial class V2020_12_23_1056
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.2")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .UseIdentityByDefaultColumns()
+                .HasAnnotation("Relational:MaxIdentifierLength", 63)
+                .HasAnnotation("ProductVersion", "5.0.1");
+
+            modelBuilder.Entity("Issue12PostgreSql.Entities.Address", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Addresses");
+                });
+
+            modelBuilder.Entity("Issue12PostgreSql.Entities.Book", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Books");
+                });
 
             modelBuilder.Entity("Issue12PostgreSql.Entities.Person", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .UseIdentityByDefaultColumn();
 
                     b.Property<DateTime>("AddDate")
                         .HasColumnType("timestamp without time zone");
@@ -40,8 +80,8 @@ namespace Issue12PostgreSql.Migrations
                     b.Property<char>("CharValue")
                         .HasColumnType("character(1)");
 
-                    b.Property<DateTimeOffset>("DateTimeOffsetValue")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime>("DateTimeOffsetValue")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<decimal>("DecimalValue")
                         .HasColumnType("numeric");
@@ -85,6 +125,35 @@ namespace Issue12PostgreSql.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("People");
+                });
+
+            modelBuilder.Entity("Issue12PostgreSql.Entities.Address", b =>
+                {
+                    b.HasOne("Issue12PostgreSql.Entities.Person", "Person")
+                        .WithMany("Addresses")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("Issue12PostgreSql.Entities.Book", b =>
+                {
+                    b.HasOne("Issue12PostgreSql.Entities.Person", "Person")
+                        .WithMany("Books")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("Issue12PostgreSql.Entities.Person", b =>
+                {
+                    b.Navigation("Addresses");
+
+                    b.Navigation("Books");
                 });
 #pragma warning restore 612, 618
         }

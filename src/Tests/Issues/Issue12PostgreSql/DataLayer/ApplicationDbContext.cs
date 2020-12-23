@@ -15,6 +15,8 @@ namespace Issue12PostgreSql.DataLayer
         }
 
         public DbSet<Person> People { get; set; }
+        public DbSet<Address> Addresses { get; set; }
+        public DbSet<Book> Books { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
