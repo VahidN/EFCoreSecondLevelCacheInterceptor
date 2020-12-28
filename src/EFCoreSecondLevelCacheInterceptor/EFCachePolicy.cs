@@ -50,7 +50,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// Determines which entities are used in this LINQ query.
         /// This array will be used to invalidate the related cache of all related queries automatically.
         /// </summary>
-        public ISet<string> CacheItemsDependencies { get; private set; } = new SortedSet<string>();
+        public ISet<string> CacheItemsDependencies { get; private set; } = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Determines the default Cacheable method
@@ -65,7 +65,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public EFCachePolicy CacheDependencies(params string[] cacheDependencies)
         {
-            CacheItemsDependencies = new SortedSet<string>(cacheDependencies);
+            CacheItemsDependencies = new SortedSet<string>(cacheDependencies, StringComparer.OrdinalIgnoreCase);
             return this;
         }
 

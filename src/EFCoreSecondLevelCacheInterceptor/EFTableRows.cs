@@ -139,7 +139,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the Type that is the data type of the object.
         /// </summary>
-        public Type? GetFieldType(int ordinal) => Type.GetType(getColumnInfo(ordinal).TypeName);
+        public Type GetFieldType(int ordinal) => Type.GetType(getColumnInfo(ordinal).TypeName) ?? typeof(string);
 
         /// <summary>
         /// Gets the Type that is the data type of the object.

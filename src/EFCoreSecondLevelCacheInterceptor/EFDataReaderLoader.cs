@@ -255,7 +255,11 @@ namespace EFCoreSecondLevelCacheInterceptor
                     stream.Seek(0, SeekOrigin.Begin);
                 }
 
-                stream.Read(buffer, 0, checked((int)stream.Length));
+                var count = stream.Read(buffer, 0, checked((int)stream.Length));
+                if (count <= 0)
+                {
+                    return buffer;
+                }
             }
             return buffer;
         }
@@ -263,8 +267,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         private bool isBinary(int ordinal)
         {
             string typeName = _tableRows.GetFieldTypeName(ordinal);
-            return typeName == "Microsoft.SqlServer.Types.SqlGeography"
-                    || typeName == "Microsoft.SqlServer.Types.SqlGeometry";
+            return string.Equals(typeName, "Microsoft.SqlServer.Types.SqlGeography", StringComparison.Ordinal)
+                || string.Equals(typeName, "Microsoft.SqlServer.Types.SqlGeometry", StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -274,6 +278,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             while (Read())
             {
+                // Read all data
             }
             Close();
             return _tableRows;

@@ -4,6 +4,15 @@
 dotnet_diagnostic.CA2007.severity = none
 dotnet_diagnostic.RCS1090.severity = none
 
+# CA1010 Type directly or indirectly inherits 'IEnumerable' without implementing 'IEnumerable<T>'. Publicly-visible types should implement the generic version to broaden usability. 
+dotnet_diagnostic.CA1010.severity = suggestion
+
+# MA0051 : Method is too long. maximum allowed: 60.
+dotnet_diagnostic.MA0051.severity = suggestion
+
+# S1854: Remove this useless assignment to local variable
+dotnet_diagnostic.S1854.severity = suggestion
+
 # CA1829 Use the "Count" property instead of Enumerable.Count()
 dotnet_diagnostic.CA1829.severity = suggestion
 
@@ -25,5 +34,118 @@ dotnet_diagnostic.CA1040.severity = suggestion
 # CA1308: In method 'urlToLower', replace the call to 'ToLowerInvariant' with 'ToUpperInvariant' (CA1308)
 dotnet_diagnostic.CA1308.severity = suggestion
 
-# CA1010 Type directly or indirectly inherits 'IEnumerable' without implementing 'IEnumerable<T>'. Publicly-visible types should implement the generic version to broaden usability. 
-dotnet_diagnostic.CA1010.severity = suggestion
+# MA0026 : Complete the task
+dotnet_diagnostic.MA0026.severity = suggestion
+
+# S1135 : Complete the task
+dotnet_diagnostic.S1135.severity = suggestion
+
+# S2479: Replace the control character at position 7 by its escape sequence
+dotnet_diagnostic.S2479.severity = suggestion
+
+# MA0004: Use Task.ConfigureAwait(false) as the current SynchronizationContext is not needed
+dotnet_diagnostic.MA0004.severity = none
+
+# S4457: Split this method into two, one handling parameters check and the other handling the asynchronous code.
+dotnet_diagnostic.S4457.severity = none
+
+# AsyncFixer01: Unnecessary async/await usage
+dotnet_diagnostic.AsyncFixer01.severity = suggestion
+
+# AsyncFixer02: Long-running or blocking operations inside an async method
+dotnet_diagnostic.AsyncFixer02.severity = error
+
+# VSTHRD103: Call async methods when in an async method
+dotnet_diagnostic.VSTHRD103.severity = error
+
+# AsyncFixer03: Fire & forget async void methods
+dotnet_diagnostic.AsyncFixer03.severity = error
+
+# VSTHRD100: Avoid async void methods
+dotnet_diagnostic.VSTHRD100.severity = error
+
+# VSTHRD101: Avoid unsupported async delegates
+dotnet_diagnostic.VSTHRD101.severity = error
+
+# VSTHRD107: Await Task within using expression
+dotnet_diagnostic.VSTHRD107.severity = error
+
+# AsyncFixer04: Fire & forget async call inside a using block
+dotnet_diagnostic.AsyncFixer04.severity = error
+
+# VSTHRD110: Observe result of async calls
+dotnet_diagnostic.VSTHRD110.severity = error
+
+# VSTHRD002: Avoid problematic synchronous waits
+dotnet_diagnostic.VSTHRD002.severity = suggestion
+
+# MA0045: Do not use blocking call (make method async)
+dotnet_diagnostic.MA0045.severity = suggestion
+
+# AsyncifyInvocation: Use Task Async
+dotnet_diagnostic.AsyncifyInvocation.severity = error
+
+# AsyncifyVariable: Use Task Async
+dotnet_diagnostic.AsyncifyVariable.severity = error
+
+# VSTHRD111: Use ConfigureAwait(bool)
+dotnet_diagnostic.VSTHRD111.severity = none
+
+# MA0022: Return Task.FromResult instead of returning null
+dotnet_diagnostic.MA0022.severity = error
+
+# VSTHRD114: Avoid returning a null Task
+dotnet_diagnostic.VSTHRD114.severity = error
+
+# VSTHRD200: Use "Async" suffix for async methods
+dotnet_diagnostic.VSTHRD200.severity = suggestion
+
+# MA0040: Specify a cancellation token
+dotnet_diagnostic.MA0032.severity = suggestion
+
+# MA0040: Flow the cancellation token when available
+dotnet_diagnostic.MA0040.severity = suggestion
+
+# MA0079: Use a cancellation token using .WithCancellation()
+dotnet_diagnostic.MA0079.severity = suggestion
+
+# MA0080: Use a cancellation token using .WithCancellation()
+dotnet_diagnostic.MA0080.severity = error
+
+#AsyncFixer05: Downcasting from a nested task to an outer task.
+dotnet_diagnostic.AsyncFixer05.severity = error
+
+# ClrHeapAllocationAnalyzer ----------------------------------------------------
+# HAA0301: Closure Allocation Source
+dotnet_diagnostic.HAA0301.severity = suggestion
+
+# HAA0601: Value type to reference type conversion causing boxing allocation
+dotnet_diagnostic.HAA0601.severity = suggestion
+
+# HAA0302: Display class allocation to capture closure
+dotnet_diagnostic.HAA0302.severity = suggestion
+
+# HAA0101: Array allocation for params parameter
+dotnet_diagnostic.HAA0101.severity = suggestion
+
+# HAA0603: Delegate allocation from a method group
+dotnet_diagnostic.HAA0603.severity = suggestion
+
+# HAA0602: Delegate on struct instance caused a boxing allocation
+dotnet_diagnostic.HAA0602.severity = suggestion
+
+# HAA0401: Possible allocation of reference type enumerator
+dotnet_diagnostic.HAA0401.severity = silent
+
+# HAA0303: Lambda or anonymous method in a generic method allocates a delegate instance
+dotnet_diagnostic.HAA0303.severity = silent
+
+# HAA0102: Non-overridden virtual method call on value type
+dotnet_diagnostic.HAA0102.severity = silent
+
+# HAA0502: Explicit new reference type allocation
+dotnet_diagnostic.HAA0502.severity = none
+
+# HAA0505: Initializer reference type allocation
+dotnet_diagnostic.HAA0505.severity = silent
+

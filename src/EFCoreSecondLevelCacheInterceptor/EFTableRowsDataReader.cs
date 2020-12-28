@@ -28,7 +28,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the number of columns in the current row.
         /// </summary>
-        public override int FieldCount { get; }
+        public override int FieldCount => _tableRows.FieldCount;
 
         /// <summary>
         /// Gets a value that indicates whether the SqlDataReader contains one or more rows.
@@ -63,8 +63,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             _tableRows = tableRows;
             _rowsCount = _tableRows.RowsCount;
-            FieldCount = _tableRows.FieldCount;
-            _valueTypes = new Dictionary<int, Type>(FieldCount);
+            _valueTypes = new Dictionary<int, Type>(_tableRows.FieldCount);
         }
 
         /// <summary>
@@ -75,9 +74,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Gets the Type that is the data type of the object.
         /// </summary>
-        public override Type GetFieldType(int ordinal) =>
-            _tableRows.GetFieldType(ordinal)
-            ?? throw new InvalidOperationException($"Couldn't find the type of `{ordinal}` field.");
+        public override Type GetFieldType(int ordinal) => _tableRows.GetFieldType(ordinal);
 
         /// <summary>
         /// Gets the name of the specified column.
@@ -92,7 +89,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Returns a DataTable that describes the column metadata of the SqlDataReader.
         /// </summary>
-        public override DataTable GetSchemaTable() => throw new NotImplementedException();
+        public override DataTable GetSchemaTable() => throw new InvalidOperationException();
 
         /// <summary>
         /// Advances the data reader to the next result, when reading the results of batch Transact-SQL statements.

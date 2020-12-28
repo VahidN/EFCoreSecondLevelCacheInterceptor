@@ -460,11 +460,15 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                     Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
                     Assert.IsNotNull(items1);
 
+                    Assert.IsTrue(items1.First().UpdateDate.Millisecond > 0);
+
                     var items2 = context.DateTypes
                         .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
                         .ToList();
                     Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
                     Assert.IsNotNull(items2);
+
+                    Assert.IsTrue(items2.First().UpdateDate.Millisecond > 0);
                 });
         }
 

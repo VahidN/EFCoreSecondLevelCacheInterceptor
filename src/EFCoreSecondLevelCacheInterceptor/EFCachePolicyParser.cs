@@ -1,31 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
-    /// <summary>
-    /// EFCachePolicy Parser Utils
-    /// </summary>
-    public interface IEFCachePolicyParser
-    {
-        /// <summary>
-        /// Converts the `commandText` to an instance of `EFCachePolicy`
-        /// </summary>
-        EFCachePolicy? GetEFCachePolicy(string commandText, IList<TableEntityInfo> allEntityTypes);
-
-        /// <summary>
-        /// Does `commandText` contain EFCachePolicyTagPrefix?
-        /// </summary>
-        bool HasEFCachePolicy(string commandText);
-
-        /// <summary>
-        /// Removes the EFCachePolicy line from the commandText
-        /// </summary>
-        string RemoveEFCachePolicyTag(string commandText);
-    }
-
     /// <summary>
     /// EFCachePolicy Parser Utils
     /// </summary>
@@ -216,7 +196,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return null;
             }
 
-            if (!TimeSpan.TryParse(options[1], out var timeout))
+            if (!TimeSpan.TryParse(options[1], CultureInfo.InvariantCulture, out var timeout))
             {
                 return null;
             }

@@ -71,7 +71,10 @@ namespace EFCoreSecondLevelCacheInterceptor
                     var items = _easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
                     if (items.IsNull)
                     {
-                        _easyCachingProvider.Set(rootCacheKey, new HashSet<string> { keyHash }, cachePolicy.CacheTimeout);
+                        _easyCachingProvider.Set(
+                            rootCacheKey,
+                            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { keyHash },
+                            cachePolicy.CacheTimeout);
                     }
                     else
                     {

@@ -12,7 +12,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// An array of objects with the column values of the current row.
         /// </summary>
-        public IList<object> Values { get; } = new List<object>();
+        public IList<object> Values { get; }
 
         /// <summary>
         /// Gets or sets a value that indicates the depth of nesting for the current row.

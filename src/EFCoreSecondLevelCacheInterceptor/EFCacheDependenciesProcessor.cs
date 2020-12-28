@@ -9,27 +9,6 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// <summary>
     /// Cache Dependencies Calculator
     /// </summary>
-    public interface IEFCacheDependenciesProcessor
-    {
-        /// <summary>
-        /// Finds the related table names of the current query.
-        /// </summary>
-        SortedSet<string> GetCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy);
-
-        /// <summary>
-        /// Finds the related table names of the current query.
-        /// </summary>
-        SortedSet<string> GetCacheDependencies(EFCachePolicy cachePolicy, SortedSet<string> tableNames, string commandText);
-
-        /// <summary>
-        /// Invalidates all of the cache entries which are dependent on any of the specified root keys.
-        /// </summary>
-        bool InvalidateCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy);
-    }
-
-    /// <summary>
-    /// Cache Dependencies Calculator
-    /// </summary>
     public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
     {
         private readonly IEFDebugLogger _logger;
@@ -60,7 +39,8 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             var tableNames = new SortedSet<string>(
-                    _sqlCommandsProcessor.GetAllTableNames(context).Select(x => x.TableName));
+                    _sqlCommandsProcessor.GetAllTableNames(context).Select(x => x.TableName),
+                    StringComparer.OrdinalIgnoreCase);
             return GetCacheDependencies(cachePolicy, tableNames, command.CommandText);
         }
 
@@ -75,7 +55,9 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             var textsInsideSquareBrackets = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
-            var cacheDependencies = new SortedSet<string>(tableNames.Intersect(textsInsideSquareBrackets));
+            var cacheDependencies = new SortedSet<string>(
+                tableNames.Intersect(textsInsideSquareBrackets, StringComparer.OrdinalIgnoreCase),
+                StringComparer.OrdinalIgnoreCase);
             if (cacheDependencies.Any())
             {
                 logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies);
@@ -86,7 +68,10 @@ namespace EFCoreSecondLevelCacheInterceptor
             if (cacheDependencies?.Any() != true)
             {
                 _logger.LogDebug($"It's not possible to calculate the related table names of the current query[{commandText}]. Please use EFCachePolicy.Configure(options => options.CacheDependencies(\"real_table_name_1\", \"real_table_name_2\")) to specify them explicitly.");
-                cacheDependencies = new SortedSet<string> { EFCachePolicy.EFUnknownsCacheDependency };
+                cacheDependencies = new SortedSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    EFCachePolicy.EFUnknownsCacheDependency
+                };
             }
             logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies);
             return cacheDependencies;

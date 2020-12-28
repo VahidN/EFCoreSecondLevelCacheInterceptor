@@ -22,7 +22,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// Determines which entities are used in this LINQ query.
         /// This array will be used to invalidate the related cache of all related queries automatically.
         /// </summary>
-        public ISet<string> CacheDependencies { get; } = new HashSet<string>();
+        public ISet<string> CacheDependencies { get; }
 
         /// <summary>
         /// Stores information of the computed key of the input LINQ query.
@@ -41,7 +41,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             if (!(obj is EFCacheKey efCacheKey))
                 return false;
 
-            return this.KeyHash == efCacheKey.KeyHash;
+            return string.Equals(this.KeyHash, efCacheKey.KeyHash, StringComparison.Ordinal);
         }
 
         /// <summary>

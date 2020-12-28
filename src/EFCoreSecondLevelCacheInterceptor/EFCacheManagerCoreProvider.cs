@@ -50,7 +50,9 @@ namespace EFCoreSecondLevelCacheInterceptor
 
                 foreach (var rootCacheKey in cacheKey.CacheDependencies)
                 {
-                    _dependenciesCacheManager.AddOrUpdate(rootCacheKey, new HashSet<string> { keyHash },
+                    _dependenciesCacheManager.AddOrUpdate(
+                        rootCacheKey,
+                        new HashSet<string>(StringComparer.OrdinalIgnoreCase) { keyHash },
                         updateValue: set =>
                         {
                             set.Add(keyHash);

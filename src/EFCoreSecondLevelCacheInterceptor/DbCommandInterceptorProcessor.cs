@@ -9,22 +9,6 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// <summary>
     /// Helps processing SecondLevelCacheInterceptor
     /// </summary>
-    public interface IDbCommandInterceptorProcessor
-    {
-        /// <summary>
-        /// Reads data from cache or cache it and then returns the result
-        /// </summary>
-        T ProcessExecutedCommands<T>(DbCommand command, DbContext context, T result);
-
-        /// <summary>
-        /// Adds command's data to the cache
-        /// </summary>
-        T ProcessExecutingCommands<T>(DbCommand command, DbContext context, T result);
-    }
-
-    /// <summary>
-    /// Helps processing SecondLevelCacheInterceptor
-    /// </summary>
     public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
     {
         private readonly IEFCacheServiceProvider _cacheService;
