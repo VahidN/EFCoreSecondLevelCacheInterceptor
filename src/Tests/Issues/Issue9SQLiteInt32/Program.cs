@@ -27,6 +27,10 @@ namespace Issue9SQLiteInt32
                 {
                     Console.WriteLine($"{person.Id}, {person.Name}");
                 }
+
+                var cachedPerson = context.People.Cacheable().FirstOrDefault(x => x.UlongValue == 1);
+                cachedPerson = context.People.Cacheable().FirstOrDefault(x => x.UlongValue == 1);
+                Console.WriteLine($"{cachedPerson.Id}, {cachedPerson.Name}");
             });
         }
 

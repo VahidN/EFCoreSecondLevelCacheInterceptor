@@ -58,8 +58,8 @@ namespace Issue9SQLiteInt32
             services.AddSingleton(_ => configuration);
 
             services.AddEFSecondLevelCache(options =>
-                //options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5))
-                options.UseCacheManagerCoreProvider()
+                options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(false)
+                //options.UseCacheManagerCoreProvider()
             );
             addCacheManagerCoreRedis(services);
 
