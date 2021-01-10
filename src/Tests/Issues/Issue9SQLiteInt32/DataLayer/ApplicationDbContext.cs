@@ -112,7 +112,7 @@ namespace Issue9SQLiteInt32.DataLayer
                 property.SetValueConverter(
                     new ValueConverter<ulong, long>(
                         convertToProviderExpression: ulongValue => (long)ulongValue,
-                        convertFromProviderExpression: longValue => (uint)longValue
+                        convertFromProviderExpression: longValue => (ulong)longValue
                     ));
             }
 
@@ -123,10 +123,9 @@ namespace Issue9SQLiteInt32.DataLayer
                 property.SetValueConverter(
                     new ValueConverter<ulong?, long>(
                         convertToProviderExpression: ulongValue => (long)ulongValue.Value,
-                        convertFromProviderExpression: longValue => (uint)longValue
+                        convertFromProviderExpression: longValue => (ulong)longValue
                     ));
             }
-
         }
     }
 }
