@@ -115,6 +115,11 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return null;
             }
 
+            if (shouldSkipCachingCommands(commandText))
+            {
+                return null;
+            }
+
             var efCachePolicy = getParsedPolicy(commandText)
                                     ?? getRestrictedGlobalPolicy(commandText, allEntityTypes)
                                     ?? getGlobalPolicy(commandText);
@@ -123,6 +128,16 @@ namespace EFCoreSecondLevelCacheInterceptor
                 _logger.LogDebug($"Using EFCachePolicy: {efCachePolicy}.");
             }
             return efCachePolicy;
+        }
+
+        private bool shouldSkipCachingCommands(string commandText)
+        {
+            var result = _cacheSettings.SkipCachingCommands != null && _cacheSettings.SkipCachingCommands(commandText);
+            if (result)
+            {
+                _logger.LogDebug($"Skipped caching of this command[{commandText}] based on the provided predicate.");
+            }
+            return result;
         }
 
         private EFCachePolicy? getRestrictedGlobalPolicy(string commandText, IList<TableEntityInfo> allEntityTypes)

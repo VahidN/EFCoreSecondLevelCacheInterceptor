@@ -205,5 +205,15 @@ namespace EFCoreSecondLevelCacheInterceptor
             Settings.DisableLogging = value;
             return this;
         }
+
+        /// <summary>
+        /// Here you can decide based on the currect executing SQL command, should we cache its result or not?
+        /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <c>null</c>.</exception>
+        public EFCoreSecondLevelCacheOptions SkipCachingCommands(Predicate<string> predicate)
+        {
+            Settings.SkipCachingCommands = predicate ?? throw new ArgumentNullException(nameof(predicate));
+            return this;
+        }
     }
 }

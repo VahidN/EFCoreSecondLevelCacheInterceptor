@@ -36,5 +36,10 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// Should the debug level loggig be disabled?
         /// </summary>
         public bool DisableLogging { set; get; }
+
+        /// <summary>
+        /// Here you can decide based on the currect executing SQL command, should we cache its result or not?
+        /// </summary>
+        public Predicate<string>? SkipCachingCommands { set; get; }
     }
 }
