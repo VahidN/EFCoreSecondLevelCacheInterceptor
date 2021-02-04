@@ -363,6 +363,27 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 
 This will put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some of the queries from this global cache, apply the `NotCacheable()` method to them.
 
+## Skip caching some of the queries
+
+To skip caching some of the system's queries based on their SQL commands set the `SkipCachingCommands` predicate:
+
+```csharp
+namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddEFSecondLevelCache(options =>
+            {
+                options.UseMemoryCacheProvider().DisableLogging(true)
+                        // How to skip caching specific commands
+                       .SkipCachingCommands(commandText =>
+                                commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase));
+            });
+            // ...
+```
+
 ## Does it work?!
 
 You should enable the logging system to see the behind the scene of the caching interceptor.

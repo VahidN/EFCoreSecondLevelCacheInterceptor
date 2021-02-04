@@ -36,7 +36,10 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
                     .CacheQueriesContainingTableNames(
                         CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
                         "posts", "products", "users"
-                        );
+                        )
+                    .SkipCachingCommands(commandText =>
+                                // How to skip caching specific commands
+                                commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase));
             });
 
             var connectionString = Configuration["ConnectionStrings:ApplicationDbContextConnection"];
