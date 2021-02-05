@@ -215,5 +215,15 @@ namespace EFCoreSecondLevelCacheInterceptor
             Settings.SkipCachingCommands = predicate ?? throw new ArgumentNullException(nameof(predicate));
             return this;
         }
+
+        /// <summary>
+        /// Here you can decide based on the currect executing result, should we cache this result or not?
+        /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <c>null</c>.</exception>
+        public EFCoreSecondLevelCacheOptions SkipCachingResults(Predicate<(string CommandText, object Value)> predicate)
+        {
+            Settings.SkipCachingResults = predicate ?? throw new ArgumentNullException(nameof(predicate));
+            return this;
+        }
     }
 }

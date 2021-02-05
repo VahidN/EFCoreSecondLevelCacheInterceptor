@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -17,6 +18,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         private readonly IEFCachePolicyParser _cachePolicyParser;
         private readonly IEFDebugLogger _logger;
         private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
+        private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
 
         /// <summary>
         /// Helps processing SecondLevelCacheInterceptor
@@ -27,7 +29,8 @@ namespace EFCoreSecondLevelCacheInterceptor
             IEFCacheDependenciesProcessor cacheDependenciesProcessor,
             IEFCacheKeyProvider cacheKeyProvider,
             IEFCachePolicyParser cachePolicyParser,
-            IEFSqlCommandsProcessor sqlCommandsProcessor)
+            IEFSqlCommandsProcessor sqlCommandsProcessor,
+            IOptions<EFCoreSecondLevelCacheSettings> cacheSettings)
         {
             _cacheService = cacheService;
             _cacheDependenciesProcessor = cacheDependenciesProcessor;
@@ -35,6 +38,13 @@ namespace EFCoreSecondLevelCacheInterceptor
             _cachePolicyParser = cachePolicyParser;
             _logger = logger;
             _sqlCommandsProcessor = sqlCommandsProcessor;
+
+            if (cacheSettings == null)
+            {
+                throw new ArgumentNullException(nameof(cacheSettings));
+            }
+
+            _cacheSettings = cacheSettings.Value;
         }
 
         /// <summary>
@@ -59,7 +69,8 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             var allEntityTypes = _sqlCommandsProcessor.GetAllTableNames(context);
-            var cachePolicy = _cachePolicyParser.GetEFCachePolicy(command.CommandText, allEntityTypes);
+            var commandText = command.CommandText;
+            var cachePolicy = _cachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes);
             if (cachePolicy == null)
             {
                 return result;
@@ -69,8 +80,11 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             if (result is int data)
             {
-                _cacheService.InsertValue(efCacheKey, new EFCachedData { NonQuery = data }, cachePolicy);
-                _logger.LogDebug(CacheableEventId.QueryResultCached, $"[{data}] added to the cache[{efCacheKey}].");
+                if (!shouldSkipCachingResults(commandText, data))
+                {
+                    _cacheService.InsertValue(efCacheKey, new EFCachedData { NonQuery = data }, cachePolicy);
+                    _logger.LogDebug(CacheableEventId.QueryResultCached, $"[{data}] added to the cache[{efCacheKey}].");
+                }
                 return result;
             }
 
@@ -82,18 +96,34 @@ namespace EFCoreSecondLevelCacheInterceptor
                     tableRows = dbReaderLoader.LoadAndClose();
                 }
 
-                _cacheService.InsertValue(efCacheKey, new EFCachedData { TableRows = tableRows }, cachePolicy);
-                _logger.LogDebug(CacheableEventId.QueryResultCached, $"TableRows[{tableRows.TableName}] added to the cache[{efCacheKey}].");
+                if (!shouldSkipCachingResults(commandText, tableRows))
+                {
+                    _cacheService.InsertValue(efCacheKey, new EFCachedData { TableRows = tableRows }, cachePolicy);
+                    _logger.LogDebug(CacheableEventId.QueryResultCached, $"TableRows[{tableRows.TableName}] added to the cache[{efCacheKey}].");
+                }
                 return (T)(object)new EFTableRowsDataReader(tableRows);
             }
 
             if (result is object)
             {
-                _cacheService.InsertValue(efCacheKey, new EFCachedData { Scalar = result }, cachePolicy);
-                _logger.LogDebug(CacheableEventId.QueryResultCached, $"[{result}] added to the cache[{efCacheKey}].");
+                if (!shouldSkipCachingResults(commandText, result))
+                {
+                    _cacheService.InsertValue(efCacheKey, new EFCachedData { Scalar = result }, cachePolicy);
+                    _logger.LogDebug(CacheableEventId.QueryResultCached, $"[{result}] added to the cache[{efCacheKey}].");
+                }
                 return result;
             }
 
+            return result;
+        }
+
+        private bool shouldSkipCachingResults(string commandText, object value)
+        {
+            var result = _cacheSettings.SkipCachingResults != null && _cacheSettings.SkipCachingResults((commandText, value));
+            if (result)
+            {
+                _logger.LogDebug("Skipped caching of this result based on the provided predicate.");
+            }
             return result;
         }
 

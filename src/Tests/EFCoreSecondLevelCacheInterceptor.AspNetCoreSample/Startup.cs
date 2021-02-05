@@ -39,7 +39,10 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
                         )
                     .SkipCachingCommands(commandText =>
                                 // How to skip caching specific commands
-                                commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase));
+                                commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase))
+                    // Don't cache null values. Remove this optional setting if it's not necessary.
+                    .SkipCachingResults(result =>
+                                result.Value == null || (result.Value is EFTableRows rows && rows.RowsCount == 0));
             });
 
             var connectionString = Configuration["ConnectionStrings:ApplicationDbContextConnection"];

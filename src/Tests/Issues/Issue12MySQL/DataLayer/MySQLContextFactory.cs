@@ -22,7 +22,8 @@ namespace Issue12MySQL.DataLayer
             services.AddSingleton(_ => configuration);
 
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseMySql(configuration["ConnectionStrings:ApplicationDbContextConnection"]);
+            optionsBuilder.UseMySql(
+                ServerVersion.AutoDetect(configuration["ConnectionStrings:ApplicationDbContextConnection"]));
             return new ApplicationDbContext(optionsBuilder.Options);
         }
     }

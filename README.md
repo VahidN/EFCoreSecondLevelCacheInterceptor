@@ -363,9 +363,9 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 
 This will put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some of the queries from this global cache, apply the `NotCacheable()` method to them.
 
-## Skip caching some of the queries
+## Skip caching of some of the queries
 
-To skip caching some of the system's queries based on their SQL commands set the `SkipCachingCommands` predicate:
+To skip caching some of the system's queries based on their SQL commands when you are putting the whole system in cache, set the `SkipCachingCommands` predicate:
 
 ```csharp
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
@@ -380,6 +380,27 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
                         // How to skip caching specific commands
                        .SkipCachingCommands(commandText =>
                                 commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase));
+            });
+            // ...
+```
+
+## Skip caching of some of the queries based on their results
+
+To skip caching some of the system's queries based on their results when you are putting the whole system in cache, set the `SkipCachingResults` predicate:
+
+```csharp
+namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddEFSecondLevelCache(options =>
+            {
+                options.UseMemoryCacheProvider().DisableLogging(true)
+                        // Don't cache null values. Remove this optional setting if it's not necessary.
+                        .SkipCachingResults(result =>
+                                result.Value == null || (result.Value is EFTableRows rows && rows.RowsCount == 0));
             });
             // ...
 ```

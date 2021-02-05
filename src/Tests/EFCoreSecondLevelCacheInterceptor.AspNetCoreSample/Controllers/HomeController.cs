@@ -143,6 +143,13 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample.Controllers
             return Json(new { user1 });
         }
 
+        public async Task<IActionResult> TestNulls()
+        {
+            var user1 = await _context.Set<User>().Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                .FirstOrDefaultAsync(x => x.Name == "Test");
+            return Json(new { user1 });
+        }
+
         /*public async Task<IActionResult> TestFind()
         {
             var product1 = await _context.Products.Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45)).FindAsync(1);
