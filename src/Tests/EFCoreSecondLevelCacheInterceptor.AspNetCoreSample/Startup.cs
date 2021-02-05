@@ -42,7 +42,10 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
                                 commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase))
                     // Don't cache null values. Remove this optional setting if it's not necessary.
                     .SkipCachingResults(result =>
-                                result.Value == null || (result.Value is EFTableRows rows && rows.RowsCount == 0));
+                                result.Value == null || (result.Value is EFTableRows rows && rows.RowsCount == 0))
+                    .SkipCacheInvalidationCommands(commandText =>
+                                // How to skip invalidating the related cache entries of this query
+                                commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase));
             });
 
             var connectionString = Configuration["ConnectionStrings:ApplicationDbContextConnection"];

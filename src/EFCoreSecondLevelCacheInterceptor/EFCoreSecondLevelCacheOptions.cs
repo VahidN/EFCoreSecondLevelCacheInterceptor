@@ -225,5 +225,15 @@ namespace EFCoreSecondLevelCacheInterceptor
             Settings.SkipCachingResults = predicate ?? throw new ArgumentNullException(nameof(predicate));
             return this;
         }
+
+        /// <summary>
+        /// Here you can decide based on the currect executing SQL command, should we invalidate the cache or not?
+        /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <c>null</c>.</exception>
+        public EFCoreSecondLevelCacheOptions SkipCacheInvalidationCommands(Predicate<string> predicate)
+        {
+            Settings.SkipCacheInvalidationCommands = predicate ?? throw new ArgumentNullException(nameof(predicate));
+            return this;
+        }
     }
 }

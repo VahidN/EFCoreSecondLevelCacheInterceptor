@@ -365,7 +365,7 @@ This will put the the specified system's queries in cache. In this case calling 
 
 ## Skip caching of some of the queries
 
-To skip caching some of the system's queries based on their SQL commands when you are putting the whole system in cache, set the `SkipCachingCommands` predicate:
+To skip caching some of the system's queries based on their SQL commands, set the `SkipCachingCommands` predicate:
 
 ```csharp
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
@@ -386,7 +386,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 
 ## Skip caching of some of the queries based on their results
 
-To skip caching some of the system's queries based on their results when you are putting the whole system in cache, set the `SkipCachingResults` predicate:
+To skip caching some of the system's queries based on their results, set the `SkipCachingResults` predicate:
 
 ```csharp
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
@@ -401,6 +401,27 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
                         // Don't cache null values. Remove this optional setting if it's not necessary.
                         .SkipCachingResults(result =>
                                 result.Value == null || (result.Value is EFTableRows rows && rows.RowsCount == 0));
+            });
+            // ...
+```
+
+## Skip invalidating the related cache entries of a given query
+
+Sometimes you don't want to invalidate the cache immediately, such when you are updating a post's likes or views count. In this case to skip invalidating the related cache entries of a given CRUD command, set the `SkipCacheInvalidationCommands` predicate:
+
+```csharp
+namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddEFSecondLevelCache(options =>
+            {
+                options.UseMemoryCacheProvider().DisableLogging(true)
+                    .SkipCacheInvalidationCommands(commandText =>
+                                // How to skip invalidating the related cache entries of this query
+                                commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase));
             });
             // ...
 ```

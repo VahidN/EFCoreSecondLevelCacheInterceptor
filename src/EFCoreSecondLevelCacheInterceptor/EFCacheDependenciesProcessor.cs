@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -14,6 +15,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         private readonly IEFDebugLogger _logger;
         private readonly IEFCacheServiceProvider _cacheServiceProvider;
         private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
+        private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
 
         /// <summary>
         /// Cache Dependencies Calculator
@@ -21,11 +23,19 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFCacheDependenciesProcessor(
             IEFDebugLogger logger,
             IEFCacheServiceProvider cacheServiceProvider,
-            IEFSqlCommandsProcessor sqlCommandsProcessor)
+            IEFSqlCommandsProcessor sqlCommandsProcessor,
+            IOptions<EFCoreSecondLevelCacheSettings> cacheSettings)
         {
             _logger = logger;
             _cacheServiceProvider = cacheServiceProvider;
             _sqlCommandsProcessor = sqlCommandsProcessor;
+
+            if (cacheSettings == null)
+            {
+                throw new ArgumentNullException(nameof(cacheSettings));
+            }
+
+            _cacheSettings = cacheSettings.Value;
         }
 
         /// <summary>
@@ -98,12 +108,27 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return false;
             }
 
+            if (shouldSkipCacheInvalidationCommands(commandText))
+            {
+                return false;
+            }
+
             var cacheDependencies = GetCacheDependencies(command, context, cachePolicy);
             cacheDependencies.Add(EFCachePolicy.EFUnknownsCacheDependency);
             _cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(cacheDependencies));
 
             _logger.LogDebug(CacheableEventId.QueryResultInvalidated, $"Invalidated [{string.Join(", ", cacheDependencies)}] dependencies.");
             return true;
+        }
+
+        private bool shouldSkipCacheInvalidationCommands(string commandText)
+        {
+            var result = _cacheSettings.SkipCacheInvalidationCommands != null && _cacheSettings.SkipCacheInvalidationCommands(commandText);
+            if (result)
+            {
+                _logger.LogDebug($"Skipped invalidating the related cache entries of this query[{commandText}] based on the provided predicate.");
+            }
+            return result;
         }
     }
 }
