@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Entity Framework Core Second Level Caching Library.</Description>
-    <VersionPrefix>2.4.0</VersionPrefix>
+    <VersionPrefix>2.4.1</VersionPrefix>
     <Authors>Vahid Nasiri</Authors>
     <TargetFrameworks>net5.0;netstandard2.1;netstandard2.0;net461;netcoreapp3.1;</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFrameworks>
@@ -87,8 +87,8 @@
   </PropertyGroup>
 
   <ItemGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,)" />
     <PackageReference Include="CacheManager.Core" Version="[1.2,2)" />
     <PackageReference Include="EasyCaching.Core" Version="[1.1,2)" />
   </ItemGroup>
