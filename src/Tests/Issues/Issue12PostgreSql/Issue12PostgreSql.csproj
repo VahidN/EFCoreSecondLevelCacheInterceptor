@@ -23,7 +23,7 @@
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
     <PackageReference Include="EasyCaching.InMemory" Version="1.2.0" />
-    <PackageReference Include="EasyCaching.Redis" Version="1.2.0" />
+    <PackageReference Include="EasyCaching.Redis" Version="1.2.1" />
     <PackageReference Include="EasyCaching.HybridCache" Version="1.2.0" />
     <PackageReference Include="EasyCaching.Bus.Redis" Version="1.2.0" />
   </ItemGroup>
