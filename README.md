@@ -153,6 +153,8 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
                 option.UseRedis(config =>
                 {
                     config.DBConfig.AllowAdmin = true;
+                    config.DBConfig.SyncTimeout = 10000;
+                    config.DBConfig.AsyncTimeout = 10000;
                     config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("127.0.0.1", 6379));
                 }, providerName1);
             });
