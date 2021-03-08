@@ -40,7 +40,7 @@
     <ReportAnalyzer>true</ReportAnalyzer>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.646">
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.647">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
