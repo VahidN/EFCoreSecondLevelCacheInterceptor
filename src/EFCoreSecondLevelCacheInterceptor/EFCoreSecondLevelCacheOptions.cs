@@ -196,6 +196,20 @@ namespace EFCoreSecondLevelCacheInterceptor
             return this;
         }
 
+
+        /// <summary>
+        /// Uses the cache key prefix.
+        /// Set the prefix to any cachedKey
+        /// </summary>
+        /// <param name="prefix">The prefix.</param>
+        /// <returns>EFCoreSecondLevelCacheOptions.</returns>
+        public EFCoreSecondLevelCacheOptions UseCacheKeyPrefix(string prefix)
+        {
+            Settings.CacheKeyPrefix = prefix;
+            return this;
+        }
+
+
         /// <summary>
         /// Should the debug level loggig be disabled?
         /// Set it to true for maximum performance.

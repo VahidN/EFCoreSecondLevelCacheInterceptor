@@ -70,6 +70,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 StringComparer.OrdinalIgnoreCase);
             if (cacheDependencies.Any())
             {
+                cacheDependencies = UpdateListWithPrefix(cacheDependencies);
                 logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies);
                 return cacheDependencies;
             }
@@ -83,8 +84,14 @@ namespace EFCoreSecondLevelCacheInterceptor
                     EFCachePolicy.EFUnknownsCacheDependency
                 };
             }
+            cacheDependencies = UpdateListWithPrefix(cacheDependencies);
             logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies);
             return cacheDependencies;
+        }
+
+        private SortedSet<string> UpdateListWithPrefix(SortedSet<string> incomingSet)
+        {
+            return new SortedSet<string>(incomingSet.Select(x=> _cacheSettings.CacheKeyPrefix+x),StringComparer.OrdinalIgnoreCase);
         }
 
         private void logProcess(SortedSet<string> tableNames, SortedSet<string> textsInsideSquareBrackets, SortedSet<string> cacheDependencies)

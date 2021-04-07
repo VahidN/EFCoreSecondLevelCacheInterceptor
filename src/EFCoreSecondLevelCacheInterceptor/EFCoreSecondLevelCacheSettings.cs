@@ -51,5 +51,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// Here you can decide based on the currect executing result, should we cache this result or not?
         /// </summary>
         public Predicate<(string CommandText, object Value)>? SkipCachingResults { set; get; }
+
+        /// <summary>
+        /// Gets or sets the cache key prefix.
+        /// </summary>
+        /// <value>The cache key prefix.</value>
+        public string CacheKeyPrefix { get; set; } = default!;
     }
 }

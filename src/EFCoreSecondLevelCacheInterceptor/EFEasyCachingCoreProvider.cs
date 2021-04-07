@@ -63,7 +63,6 @@ namespace EFCoreSecondLevelCacheInterceptor
                 {
                     value = new EFCachedData { IsNull = true };
                 }
-
                 var keyHash = cacheKey.KeyHash;
 
                 foreach (var rootCacheKey in cacheKey.CacheDependencies)
@@ -107,7 +106,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
         public EFCachedData GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
         {
-            return _readerWriterLockProvider.TryReadLocked(() => _easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash).Value);
+            return _readerWriterLockProvider.TryReadLocked(() =>
+            {
+                var returnValue = _easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash).Value;
+                return returnValue;
+            });
         }
 
         /// <summary>

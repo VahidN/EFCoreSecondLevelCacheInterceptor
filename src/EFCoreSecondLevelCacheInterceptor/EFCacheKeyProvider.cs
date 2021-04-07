@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Globalization;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -14,6 +16,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
         private readonly IEFDebugLogger _logger;
         private readonly IEFCachePolicyParser _cachePolicyParser;
+        private readonly string _keyPrefix;
 
         /// <summary>
         /// A custom cache key provider for EF queries.
@@ -21,11 +24,14 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFCacheKeyProvider(
             IEFCacheDependenciesProcessor cacheDependenciesProcessor,
             IEFCachePolicyParser cachePolicyParser,
-            IEFDebugLogger logger)
+            IEFDebugLogger logger,IOptions<EFCoreSecondLevelCacheSettings> cacheSettings)
         {
             _cacheDependenciesProcessor = cacheDependenciesProcessor;
             _logger = logger;
             _cachePolicyParser = cachePolicyParser;
+#pragma warning disable CA1062 // Validate arguments of public methods
+            _keyPrefix = cacheSettings.Value.CacheKeyPrefix;
+#pragma warning restore CA1062 // Validate arguments of public methods
         }
 
         /// <summary>
@@ -47,9 +53,21 @@ namespace EFCoreSecondLevelCacheInterceptor
                 throw new ArgumentNullException(nameof(cachePolicy));
             }
 
-            var cacheKey = getCacheKey(command, cachePolicy.CacheSaltKey);
-            var cacheKeyHash = $"{XxHashUnsafe.ComputeHash(cacheKey):X}";
+            //put the prefix in both places so the namespace will apply regardless of which key is used for access into the cache
+            
+            
+#pragma warning disable S125 // Sections of code should not be commented out
+            string cacheKey=string.Empty;
+            var cacheKeyHash = string.Empty;
+            if (!string.IsNullOrEmpty(_keyPrefix))
+            {
+                cacheKey += _keyPrefix;
+                cacheKeyHash += _keyPrefix;
+            }
+            cacheKey += getCacheKey(command, cachePolicy.CacheSaltKey);
+            cacheKeyHash += $"{XxHashUnsafe.ComputeHash(cacheKey):X}";
             var cacheDependencies = _cacheDependenciesProcessor.GetCacheDependencies(command, context, cachePolicy);
+
             _logger.LogDebug($"KeyHash: {cacheKeyHash}, CacheDependencies: {string.Join(", ", cacheDependencies)}.");
             return new EFCacheKey(cacheDependencies)
             {
