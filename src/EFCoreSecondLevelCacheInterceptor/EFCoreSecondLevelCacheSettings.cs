@@ -23,6 +23,12 @@ namespace EFCoreSecondLevelCacheInterceptor
         public bool IsHybridCache { get; set; }
 
         /// <summary>
+        /// Gets or sets the cache key prefix.
+        /// </summary>
+        /// <value>The cache key prefix.</value>
+        public string CacheKeyPrefix { get; set; } = default!;
+
+        /// <summary>
         /// CacheAllQueries Options
         /// </summary>
         public CacheAllQueriesOptions CacheAllQueriesOptions { get; set; } = new CacheAllQueriesOptions();

@@ -9,11 +9,6 @@ namespace EFCoreSecondLevelCacheInterceptor
     public class EFCacheKey
     {
         /// <summary>
-        /// The computed key of the input LINQ query.
-        /// </summary>
-        public string Key { set; get; } = default!;
-
-        /// <summary>
         /// Hash of the input LINQ query's computed key.
         /// </summary>
         public string KeyHash { set; get; } = default!;

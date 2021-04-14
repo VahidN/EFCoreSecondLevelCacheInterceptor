@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Globalization;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -14,6 +15,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
         private readonly IEFDebugLogger _logger;
         private readonly IEFCachePolicyParser _cachePolicyParser;
+        private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
 
         /// <summary>
         /// A custom cache key provider for EF queries.
@@ -21,11 +23,19 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFCacheKeyProvider(
             IEFCacheDependenciesProcessor cacheDependenciesProcessor,
             IEFCachePolicyParser cachePolicyParser,
-            IEFDebugLogger logger)
+            IEFDebugLogger logger,
+            IOptions<EFCoreSecondLevelCacheSettings> cacheSettings)
         {
             _cacheDependenciesProcessor = cacheDependenciesProcessor;
             _logger = logger;
             _cachePolicyParser = cachePolicyParser;
+
+            if (cacheSettings == null)
+            {
+                throw new ArgumentNullException(nameof(cacheSettings));
+            }
+
+            _cacheSettings = cacheSettings.Value;
         }
 
         /// <summary>
@@ -48,12 +58,14 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             var cacheKey = getCacheKey(command, cachePolicy.CacheSaltKey);
-            var cacheKeyHash = $"{XxHashUnsafe.ComputeHash(cacheKey):X}";
+            var cacheKeyHash =
+                !string.IsNullOrEmpty(_cacheSettings.CacheKeyPrefix) ?
+                        $"{_cacheSettings.CacheKeyPrefix}{XxHashUnsafe.ComputeHash(cacheKey):X}" :
+                        $"{XxHashUnsafe.ComputeHash(cacheKey):X}";
             var cacheDependencies = _cacheDependenciesProcessor.GetCacheDependencies(command, context, cachePolicy);
             _logger.LogDebug($"KeyHash: {cacheKeyHash}, CacheDependencies: {string.Join(", ", cacheDependencies)}.");
             return new EFCacheKey(cacheDependencies)
             {
-                Key = cacheKey,
                 KeyHash = cacheKeyHash
             };
         }
