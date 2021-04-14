@@ -121,7 +121,8 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             var efCachePolicy = getParsedPolicy(commandText)
-                                    ?? getRestrictedGlobalPolicy(commandText, allEntityTypes)
+                                    ?? getSpecificGlobalPolicy(commandText, allEntityTypes)
+                                    ?? getSkippedGlobalPolicy(commandText, allEntityTypes)
                                     ?? getGlobalPolicy(commandText);
             if (efCachePolicy != null)
             {
@@ -140,7 +141,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             return result;
         }
 
-        private EFCachePolicy? getRestrictedGlobalPolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
+        private EFCachePolicy? getSpecificGlobalPolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
         {
             var options = _cacheSettings.CacheSpecificQueriesOptions;
             if (options?.IsActive != true
@@ -166,6 +167,40 @@ namespace EFCoreSecondLevelCacheInterceptor
                 if (queryEntityTypes.Any(entityType => options.EntityTypes.Contains(entityType)))
                 {
                     shouldBeCached = true;
+                }
+            }
+
+            return shouldBeCached
+                ? new EFCachePolicy().ExpirationMode(options.ExpirationMode).Timeout(options.Timeout)
+                : null;
+        }
+
+        private EFCachePolicy? getSkippedGlobalPolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
+        {
+            var options = _cacheSettings.SkipCacheSpecificQueriesOptions;
+            if (options?.IsActive != true
+                    || _sqlCommandsProcessor.IsCrudCommand(commandText)
+                    || commandText.Contains(EFCachedQueryExtensions.IsNotCachableMarker, StringComparison.Ordinal))
+            {
+                return null;
+            }
+
+            var shouldBeCached = true;
+            if (options.TableNames != null)
+            {
+                var commandTableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
+                if (options.TableNames.Any(tableName => commandTableNames.Contains(tableName, StringComparer.OrdinalIgnoreCase)))
+                {
+                    shouldBeCached = false;
+                }
+            }
+
+            if (options.EntityTypes != null)
+            {
+                var queryEntityTypes = _sqlCommandsProcessor.GetSqlCommandEntityTypes(commandText, allEntityTypes);
+                if (queryEntityTypes.Any(entityType => options.EntityTypes.Contains(entityType)))
+                {
+                    shouldBeCached = false;
                 }
             }
 

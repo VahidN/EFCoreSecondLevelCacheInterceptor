@@ -407,6 +407,35 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             // ...
 ```
 
+## Skip caching some of the queries based on their table names
+
+To do not cache some of the system's queries based on their entity-types or table-names, use `CacheAllQueriesExceptContainingTypes` or `CacheAllQueriesExceptContainingTableNames` methods:
+
+```csharp
+namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddEFSecondLevelCache(options =>
+            {
+                options.UseMemoryCacheProvider().DisableLogging(true)
+                    /*.CacheAllQueriesExceptContainingTypes(
+                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
+                        typeof(Post), typeof(Product), typeof(User)
+                        )*/
+                    .CacheAllQueriesExceptContainingTableNames(
+                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
+                        "posts", "products", "users"
+                        );
+            });
+
+            // ...
+```
+
+This will not put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting.
+
 ## Skip invalidating the related cache entries of a given query
 
 Sometimes you don't want to invalidate the cache immediately, such when you are updating a post's likes or views count. In this case to skip invalidating the related cache entries of a given CRUD command, set the `SkipCacheInvalidationCommands` predicate:
