@@ -12,6 +12,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         private readonly IReaderWriterLockProvider _readerWriterLockProvider;
         private readonly ICacheManager<ISet<string>> _dependenciesCacheManager;
         private readonly ICacheManager<EFCachedData> _valuesCacheManager;
+        private readonly IEFDebugLogger _logger;
 
         /// <summary>
         /// Using IMemoryCache as a cache service.
@@ -19,11 +20,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFCacheManagerCoreProvider(
             ICacheManager<ISet<string>> dependenciesCacheManager,
             ICacheManager<EFCachedData> valuesCacheManager,
-            IReaderWriterLockProvider readerWriterLockProvider)
+            IReaderWriterLockProvider readerWriterLockProvider,
+            IEFDebugLogger logger)
         {
             _readerWriterLockProvider = readerWriterLockProvider;
             _dependenciesCacheManager = dependenciesCacheManager ?? throw new ArgumentNullException(nameof(dependenciesCacheManager), "Please register the `ICacheManager`.");
             _valuesCacheManager = valuesCacheManager ?? throw new ArgumentNullException(nameof(valuesCacheManager), "Please register the `ICacheManager`.");
+            _logger = logger;
 
             // Occurs when an item was removed by the cache handle due to expiration or e.g. memory pressure eviction.
             // Without _dependenciesCacheManager items, we can't invalidate cached items on Insert/Update/Delete.
@@ -113,16 +116,24 @@ namespace EFCoreSecondLevelCacheInterceptor
                         continue;
                     }
 
-                    clearDependencyValues(rootCacheKey);
+                    var cachedValue = _valuesCacheManager.Get<EFCachedData>(cacheKey.KeyHash);
+                    var dependencyKeys = _dependenciesCacheManager.Get<HashSet<string>>(rootCacheKey);
+                    if (areRootCacheKeysExpired(cachedValue, dependencyKeys))
+                    {
+                        _logger.LogDebug(CacheableEventId.QueryResultInvalidated, "Invalidated all of the cache entries due to early expiration of the root cache keys.");
+                        ClearAllCachedEntries();
+                        return;
+                    }
+
+                    clearDependencyValues(dependencyKeys);
                     _dependenciesCacheManager.Remove(rootCacheKey);
                 }
             });
         }
 
-        private void clearDependencyValues(string rootCacheKey)
+        private void clearDependencyValues(HashSet<string>? dependencyKeys)
         {
-            var dependencyKeys = _dependenciesCacheManager.Get(rootCacheKey);
-            if (dependencyKeys == null)
+            if (dependencyKeys is null)
             {
                 return;
             }
@@ -132,5 +143,10 @@ namespace EFCoreSecondLevelCacheInterceptor
                 _valuesCacheManager.Remove(dependencyKey);
             }
         }
+
+        private static bool areRootCacheKeysExpired(
+                EFCachedData? cachedValue,
+                HashSet<string>? dependencyKeys)
+            => cachedValue is not null && dependencyKeys is null;
     }
 }

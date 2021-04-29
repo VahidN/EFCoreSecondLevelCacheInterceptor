@@ -95,40 +95,34 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Invalidates all of the cache entries which are dependent on any of the specified root keys.
         /// </summary>
-        public bool InvalidateCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
+        public bool InvalidateCacheDependencies(string commandText, EFCacheKey cacheKey)
         {
-            if (command == null)
+            if (cacheKey is null)
             {
-                throw new ArgumentNullException(nameof(command));
+                throw new ArgumentNullException(nameof(cacheKey));
             }
 
-            var commandText = command.CommandText;
             if (!_sqlCommandsProcessor.IsCrudCommand(commandText))
             {
+                _logger.LogDebug($"Skipped invalidating a none-CRUD command[{commandText}].");
                 return false;
             }
 
             if (shouldSkipCacheInvalidationCommands(commandText))
             {
+                _logger.LogDebug($"Skipped invalidating the related cache entries of this query[{commandText}] based on the provided predicate.");
                 return false;
             }
 
-            var cacheDependencies = GetCacheDependencies(command, context, cachePolicy);
-            cacheDependencies.Add(EFCachePolicy.EFUnknownsCacheDependency);
-            _cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(cacheDependencies));
-
-            _logger.LogDebug(CacheableEventId.QueryResultInvalidated, $"Invalidated [{string.Join(", ", cacheDependencies)}] dependencies.");
+            cacheKey.CacheDependencies.Add(EFCachePolicy.EFUnknownsCacheDependency);
+            _cacheServiceProvider.InvalidateCacheDependencies(cacheKey);
+            _logger.LogDebug(CacheableEventId.QueryResultInvalidated, $"Invalidated [{string.Join(", ", cacheKey.CacheDependencies)}] dependencies.");
             return true;
         }
 
         private bool shouldSkipCacheInvalidationCommands(string commandText)
         {
-            var result = _cacheSettings.SkipCacheInvalidationCommands != null && _cacheSettings.SkipCacheInvalidationCommands(commandText);
-            if (result)
-            {
-                _logger.LogDebug($"Skipped invalidating the related cache entries of this query[{commandText}] based on the provided predicate.");
-            }
-            return result;
+            return _cacheSettings.SkipCacheInvalidationCommands != null && _cacheSettings.SkipCacheInvalidationCommands(commandText);
         }
     }
 }

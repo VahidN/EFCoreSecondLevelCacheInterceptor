@@ -241,10 +241,14 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
         public void TestIncludeMethodAndProjectionAffectsKeyCache(TestCacheProvider cacheProvider)
         {
+            var isActive = true;
+            var name = "Product1";
+
             EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false,
                 (context, loggerProvider) =>
                 {
                     var product1IncludeTags = context.Products
+                        .Where(product => product.IsActive == isActive && product.ProductName == name)
                         .Include(x => x.TagProducts).ThenInclude(x => x.Tag)
                         .Select(x => new { Name = x.ProductName, Tag = x.TagProducts.Select(y => y.Tag) })
                         .OrderBy(x => x.Name)
@@ -254,6 +258,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 (context, loggerProvider) =>
                 {
                     var firstProductIncludeTags = context.Products
+                        .Where(product => product.IsActive == isActive && product.ProductName == name)
                         .Include(x => x.TagProducts).ThenInclude(x => x.Tag)
                         .Select(x => new { Name = x.ProductName, Tag = x.TagProducts.Select(y => y.Tag) })
                         .OrderBy(x => x.Name)
@@ -265,6 +270,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 (context, loggerProvider) =>
                 {
                     var firstProductIncludeTags2 = context.Products
+                        .Where(product => product.IsActive == isActive && product.ProductName == name)
                         .Include(x => x.TagProducts).ThenInclude(x => x.Tag)
                         .Select(x => new { Name = x.ProductName, Tag = x.TagProducts.Select(y => y.Tag) })
                         .OrderBy(x => x.Name)
@@ -276,6 +282,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 (context, loggerProvider) =>
                 {
                     var firstProduct = context.Products
+                        .Where(product => product.IsActive == isActive && product.ProductName == name)
                         .Select(x => new { Name = x.ProductName, Tag = x.TagProducts.Select(y => y.Tag) })
                         .OrderBy(x => x.Name)
                         .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))

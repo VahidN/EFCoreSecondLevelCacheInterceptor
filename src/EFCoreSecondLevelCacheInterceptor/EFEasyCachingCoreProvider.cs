@@ -15,6 +15,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
         private readonly IEasyCachingProviderBase _easyCachingProvider;
         private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+        private readonly IEFDebugLogger _logger;
 
         /// <summary>
         /// Using IMemoryCache as a cache service.
@@ -22,7 +23,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFEasyCachingCoreProvider(
             IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
             IServiceProvider serviceProvider,
-            IReaderWriterLockProvider readerWriterLockProvider)
+            IReaderWriterLockProvider readerWriterLockProvider,
+            IEFDebugLogger logger)
         {
             if (cacheSettings == null)
             {
@@ -36,6 +38,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             _cacheSettings = cacheSettings.Value;
             _readerWriterLockProvider = readerWriterLockProvider ?? throw new ArgumentNullException(nameof(readerWriterLockProvider));
+            _logger = logger;
 
             if (_cacheSettings.IsHybridCache)
             {
@@ -125,15 +128,23 @@ namespace EFCoreSecondLevelCacheInterceptor
                         continue;
                     }
 
-                    clearDependencyValues(rootCacheKey);
+                    var cachedValue = _easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash);
+                    var dependencyKeys = _easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
+                    if (areRootCacheKeysExpired(cachedValue, dependencyKeys))
+                    {
+                        _logger.LogDebug(CacheableEventId.QueryResultInvalidated, "Invalidated all of the cache entries due to early expiration of the root cache keys.");
+                        ClearAllCachedEntries();
+                        return;
+                    }
+
+                    clearDependencyValues(dependencyKeys);
                     _easyCachingProvider.Remove(rootCacheKey);
                 }
             });
         }
 
-        private void clearDependencyValues(string rootCacheKey)
+        private void clearDependencyValues(CacheValue<HashSet<string>> dependencyKeys)
         {
-            var dependencyKeys = _easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
             if (dependencyKeys.IsNull)
             {
                 return;
@@ -144,5 +155,10 @@ namespace EFCoreSecondLevelCacheInterceptor
                 _easyCachingProvider.Remove(dependencyKey);
             }
         }
+
+        private static bool areRootCacheKeysExpired(
+                CacheValue<EFCachedData> cachedValue,
+                CacheValue<HashSet<string>> dependencyKeys)
+            => !cachedValue.IsNull && dependencyKeys.IsNull;
     }
 }

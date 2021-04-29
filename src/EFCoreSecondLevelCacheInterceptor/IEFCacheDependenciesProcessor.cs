@@ -22,6 +22,6 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Invalidates all of the cache entries which are dependent on any of the specified root keys.
         /// </summary>
-        bool InvalidateCacheDependencies(DbCommand command, DbContext context, EFCachePolicy cachePolicy);
+        bool InvalidateCacheDependencies(string commandText, EFCacheKey cacheKey);
     }
 }

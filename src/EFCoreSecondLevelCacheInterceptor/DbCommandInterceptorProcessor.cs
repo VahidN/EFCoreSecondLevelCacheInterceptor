@@ -63,20 +63,19 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return result;
             }
 
-            if (_cacheDependenciesProcessor.InvalidateCacheDependencies(command, context, new EFCachePolicy()))
+            var commandText = command.CommandText;
+            var cachePolicy = getCachePolicy(context, commandText);
+            var efCacheKey = _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy ?? new EFCachePolicy());
+            if (_cacheDependenciesProcessor.InvalidateCacheDependencies(commandText, efCacheKey))
             {
                 return result;
             }
 
-            var allEntityTypes = _sqlCommandsProcessor.GetAllTableNames(context);
-            var commandText = command.CommandText;
-            var cachePolicy = _cachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes);
             if (cachePolicy == null)
             {
+                _logger.LogDebug($"Skipping a none-cachable command[{commandText}].");
                 return result;
             }
-
-            var efCacheKey = _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
 
             if (result is int data)
             {
@@ -117,6 +116,12 @@ namespace EFCoreSecondLevelCacheInterceptor
             return result;
         }
 
+        private EFCachePolicy? getCachePolicy(DbContext context, string commandText)
+        {
+            var allEntityTypes = _sqlCommandsProcessor.GetAllTableNames(context);
+            return _cachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes);
+        }
+
         private bool shouldSkipCachingResults(string commandText, object value)
         {
             var result = _cacheSettings.SkipCachingResults != null && _cacheSettings.SkipCachingResults((commandText, value));
@@ -137,10 +142,11 @@ namespace EFCoreSecondLevelCacheInterceptor
                 throw new ArgumentNullException(nameof(command));
             }
 
-            var allEntityTypes = _sqlCommandsProcessor.GetAllTableNames(context);
-            var cachePolicy = _cachePolicyParser.GetEFCachePolicy(command.CommandText, allEntityTypes);
+            var commandText = command.CommandText;
+            var cachePolicy = getCachePolicy(context, commandText);
             if (cachePolicy == null)
             {
+                _logger.LogDebug($"Skipping a none-cachable command[{commandText}].");
                 return result;
             }
 
