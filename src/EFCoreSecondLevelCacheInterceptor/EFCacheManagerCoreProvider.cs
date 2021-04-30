@@ -120,7 +120,8 @@ namespace EFCoreSecondLevelCacheInterceptor
                     var dependencyKeys = _dependenciesCacheManager.Get<HashSet<string>>(rootCacheKey);
                     if (areRootCacheKeysExpired(cachedValue, dependencyKeys))
                     {
-                        _logger.LogDebug(CacheableEventId.QueryResultInvalidated, "Invalidated all of the cache entries due to early expiration of the root cache keys.");
+                        _logger.LogDebug(CacheableEventId.QueryResultInvalidated,
+                            $"Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].");
                         ClearAllCachedEntries();
                         return;
                     }

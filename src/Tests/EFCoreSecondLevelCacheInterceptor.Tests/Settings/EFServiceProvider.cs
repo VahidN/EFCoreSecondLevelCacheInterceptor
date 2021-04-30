@@ -212,7 +212,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                 .WithRedisBus(busConf =>
                 {
                     busConf.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("127.0.0.1", 6379));
-                    busConf.Database = 2;
+                    // busConf.Database = 2;
                     busConf.AllowAdmin = true;
                 });
             });
