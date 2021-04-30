@@ -66,8 +66,8 @@ namespace Issue12PostgreSql
             });
 
             services.AddEFSecondLevelCache(options =>
-                //options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5))
-                options.UseEasyCachingCoreProvider(providerName)
+                options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5))
+            //options.UseEasyCachingCoreProvider(providerName)
             );
 
             services.AddDbContext<ApplicationDbContext>((serviceProvider, optionsBuilder) =>

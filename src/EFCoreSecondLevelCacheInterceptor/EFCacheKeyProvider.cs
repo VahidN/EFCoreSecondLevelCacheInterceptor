@@ -106,7 +106,22 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return bytesToHex(buffer);
             }
 
+            if (parameter.Value is Array array)
+            {
+                return arrayToString(array);
+            }
+
             return parameter.Value?.ToString();
+        }
+
+        private static string arrayToString(Array array)
+        {
+            var sb = new StringBuilder();
+            foreach (var item in array)
+            {
+                sb.Append(item).Append(' ');
+            }
+            return sb.ToString();
         }
 
         private static string bytesToHex(byte[] buffer)

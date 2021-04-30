@@ -68,4 +68,10 @@ namespace Issue12PostgreSql.Entities
         public Person Person { get; set; }
         public int PersonId { get; set; }
     }
+
+    public class Entity
+    {
+        public long Id { get; set; }
+        public int[] Array { get; set; }
+    }
 }

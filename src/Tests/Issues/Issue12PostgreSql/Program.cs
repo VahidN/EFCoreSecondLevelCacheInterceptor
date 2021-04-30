@@ -3,6 +3,9 @@ using EFCoreSecondLevelCacheInterceptor;
 using Microsoft.EntityFrameworkCore;
 using System;
 using Issue12PostgreSql.Entities;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Issue12PostgreSql.DataLayer;
 
 namespace Issue12PostgreSql
 {
@@ -14,6 +17,8 @@ namespace Issue12PostgreSql
 
             EFServiceProvider.RunInContext(context =>
             {
+                testArrays(context);
+
                 var people = context.People.Include(x => x.Addresses).Include(x => x.Books).ToList();
                 foreach (var person in people)
                 {
@@ -34,6 +39,27 @@ namespace Issue12PostgreSql
                     Console.WriteLine($"{person.Id}, {person.Name}, {person.Addresses.First().Name}");
                 }
             });
+        }
+
+        private static void testArrays(ApplicationDbContext context)
+        {
+            var firstQueryResult = queryEntities(context, new int[] { 1, 3 });
+            foreach (var entity in firstQueryResult)
+            {
+                Console.WriteLine($"firstQueryResult -> Id: {entity.Id}");
+            }
+
+            var secondQueryResult = queryEntities(context, new int[] { 4, 8, 9 });
+            foreach (var entity in secondQueryResult)
+            {
+                Console.WriteLine($"secondQueryResult -> Id: {entity.Id}");
+            }
+        }
+
+        private static List<Entity> queryEntities(ApplicationDbContext dbContext, int[] array)
+        {
+            return dbContext.Entities.AsNoTracking()
+                            .Where(entity => entity.Array.Any(x => array.Contains(x))).Cacheable().ToList();
         }
 
         private static void initDb()
@@ -93,6 +119,19 @@ namespace Issue12PostgreSql
 
                     context.Addresses.Add(new Address { Name = "Addr 2", Person = person2.Entity });
                     context.Books.Add(new Book { Name = "Book 2", Person = person2.Entity });
+
+                    context.SaveChanges();
+                }
+
+                if (!context.Entities.Any())
+                {
+                    var initialData = new[]
+                    {
+                        new Entity { Array = new[] { 1, 2, 3 } },
+                        new Entity { Array = new[] { 4, 5, 6 } },
+                        new Entity { Array = new[] { 7, 8, 9 } }
+                    };
+                    context.AddRange(initialData);
 
                     context.SaveChanges();
                 }
