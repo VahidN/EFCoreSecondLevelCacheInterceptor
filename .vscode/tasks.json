@@ -22,7 +22,7 @@
                 "${workspaceFolder}/src/Tests/Issues/Issue12PostgreSql/Issue12PostgreSql.csproj",
             ],
             "problemMatcher": "$tsc"
-        },				
+        },
         {
             "label": "buildIssue12MySQL",
             "command": "dotnet",
@@ -32,7 +32,7 @@
                 "${workspaceFolder}/src/Tests/Issues/Issue12MySQL/Issue12MySQL.csproj",
             ],
             "problemMatcher": "$tsc"
-        },		
+        },
         {
             "label": "buildIssue9SQLiteInt32",
             "command": "dotnet",
@@ -40,6 +40,16 @@
             "args": [
                 "build",
                 "${workspaceFolder}/src/Tests/Issues/Issue9SQLiteInt32/Issue9SQLiteInt32.csproj",
+            ],
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "buildIssue123WithMessagePack",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/Tests/Issues/Issue123WithMessagePack/Issue123WithMessagePack.csproj",
             ],
             "problemMatcher": "$tsc"
         },

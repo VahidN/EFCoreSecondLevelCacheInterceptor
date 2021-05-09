@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -9,46 +10,55 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// TableRows structure
     /// </summary>
     [Serializable]
+    [DataContract]
     public class EFTableRows
     {
         /// <summary>
         /// Rows of the table
         /// </summary>
-        public IList<EFTableRow> Rows { get; } = new List<EFTableRow>();
+        [DataMember]
+        public IList<EFTableRow> Rows { get; set; } = new List<EFTableRow>();
 
         /// <summary>
         /// TableColumn's Info
         /// </summary>
-        public IDictionary<int, EFTableColumnInfo> ColumnsInfo { get; }
+        [DataMember]
+        public IDictionary<int, EFTableColumnInfo> ColumnsInfo { get; set; }
 
         /// <summary>
         /// Gets the number of columns in the current row.
         /// </summary>
+        [DataMember]
         public int FieldCount { get; set; }
 
         /// <summary>
         /// EFTableRows's unique ID
         /// </summary>
-        public string TableName { get; } = Guid.NewGuid().ToString();
+        [DataMember]
+        public string TableName { get; set; } = Guid.NewGuid().ToString();
 
         /// <summary>
         /// Gets a value that indicates whether the SqlDataReader contains one or more rows.
         /// </summary>
+        [DataMember]
         public bool HasRows => Rows?.Count > 0;
 
         /// <summary>
         /// Gets the number of rows changed, inserted, or deleted by execution of the Transact-SQL statement.
         /// </summary>
+        [DataMember]
         public int RecordsAffected { get; } = -1;
 
         /// <summary>
         /// Gets the number of fields in the SqlDataReader that are not hidden.
         /// </summary>
+        [DataMember]
         public int VisibleFieldCount { get; set; }
 
         /// <summary>
         /// Number of Db rows.
         /// </summary>
+        [DataMember]
         public int RowsCount => Rows?.Count ?? 0;
 
         /// <summary>

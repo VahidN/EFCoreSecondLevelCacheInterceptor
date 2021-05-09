@@ -49,6 +49,17 @@
             "console": "internalConsole"
         },
         {
+            "name": "Issue123WithMessagePack",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "buildIssue123WithMessagePack",
+            "program": "${workspaceFolder}/src/Tests/Issues/Issue123WithMessagePack/bin/Debug/net5.0/Issue123WithMessagePack.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Tests/Issues/Issue123WithMessagePack",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
