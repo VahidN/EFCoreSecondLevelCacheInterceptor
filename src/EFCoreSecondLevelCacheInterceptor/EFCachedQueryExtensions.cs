@@ -1,7 +1,5 @@
 using System;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 
@@ -13,11 +11,6 @@ namespace EFCoreSecondLevelCacheInterceptor
     public static class EFCachedQueryExtensions
     {
         private static readonly TimeSpan _thirtyMinutes = TimeSpan.FromMinutes(30);
-
-        private static readonly MethodInfo? _asNoTrackingMethodInfo =
-            typeof(EntityFrameworkQueryableExtensions)
-            .GetTypeInfo()
-            .GetDeclaredMethod(nameof(EntityFrameworkQueryableExtensions.AsNoTracking));
 
         /// <summary>
         /// IsNotCachable Marker
@@ -36,7 +29,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout)
         {
             sanityCheck(query);
-            return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
+            return query.TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(expirationMode).Timeout(timeout)));
         }
 
@@ -59,7 +52,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies, string saltKey)
         {
             sanityCheck(query);
-            return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
+            return query.TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(expirationMode).Timeout(timeout)
                 .CacheDependencies(cacheDependencies).SaltKey(saltKey)));
         }
@@ -82,7 +75,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies)
         {
             sanityCheck(query);
-            return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
+            return query.TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)));
         }
 
@@ -99,7 +92,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string saltKey)
         {
             sanityCheck(query);
-            return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
+            return query.TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(expirationMode).Timeout(timeout).SaltKey(saltKey)));
         }
 
@@ -113,7 +106,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             this IQueryable<TType> query)
         {
             sanityCheck(query);
-            return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
+            return query.TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes).DefaultCacheableMethod(true)));
         }
 
@@ -127,7 +120,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             this DbSet<TType> query) where TType : class
         {
             sanityCheck(query);
-            return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
+            return query.TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes).DefaultCacheableMethod(true)));
         }
 
@@ -143,7 +136,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout) where TType : class
         {
             sanityCheck(query);
-            return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
+            return query.TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(expirationMode).Timeout(timeout)));
         }
 
@@ -166,7 +159,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies, string saltKey) where TType : class
         {
             sanityCheck(query);
-            return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
+            return query.TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(expirationMode).Timeout(timeout)
                 .CacheDependencies(cacheDependencies).SaltKey(saltKey)));
         }
@@ -189,7 +182,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies) where TType : class
         {
             sanityCheck(query);
-            return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
+            return query.TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)));
         }
 
@@ -206,7 +199,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string saltKey) where TType : class
         {
             sanityCheck(query);
-            return query.markAsNoTracking().TagWith(EFCachePolicy.Configure(options =>
+            return query.TagWith(EFCachePolicy.Configure(options =>
                 options.ExpirationMode(expirationMode).Timeout(timeout).SaltKey(saltKey)));
         }
 
@@ -245,19 +238,6 @@ namespace EFCoreSecondLevelCacheInterceptor
             {
                 throw new NotSupportedException("`Cacheable` method is designed only for relational EF Core queries.");
             }
-        }
-
-        private static IQueryable<TType> markAsNoTracking<TType>(this IQueryable<TType> query)
-        {
-            if (_asNoTrackingMethodInfo == null)
-            {
-                return query;
-            }
-
-            return typeof(TType).GetTypeInfo().IsClass
-                ? query.Provider.CreateQuery<TType>(
-                    Expression.Call(null, _asNoTrackingMethodInfo.MakeGenericMethod(typeof(TType)), query.Expression))
-                : query;
         }
     }
 }

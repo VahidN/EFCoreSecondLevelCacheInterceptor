@@ -515,6 +515,3 @@ This cache is scoped to the application, not the current user. It does not use s
 ### Invalidation
 
 This cache is updated when an entity is changed (insert, update, or delete) via a DbContext that uses this library. If the database is updated through some other means, such as a stored procedure or trigger, the cache becomes stale.
-
-### Notes
-Cachable queries have an implicitly applied AsNoTracking(). When we are reading an entity from the cache for the second time, it's disconnected form the context. So using AsNoTracking() for the first time, reduces the change tracking proxies creation when it's not going to be used at all. Use this library mainly for reporting purposes (having read-only lists or entites).
