@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace EFCoreSecondLevelCacheInterceptor
 {
@@ -12,6 +13,21 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
     {
+        private static readonly Type IEntityType =
+            Type.GetType("Microsoft.EntityFrameworkCore.Metadata.IEntityType, Microsoft.EntityFrameworkCore") ?? throw new TypeLoadException("Couldn't load Microsoft.EntityFrameworkCore.Metadata.IEntityType");
+        private static readonly PropertyInfo ClrTypePropertyInfo =
+            IEntityType.GetInterfaces()
+                        .Union(new Type[] { IEntityType })
+                        .Select(i => i.GetProperty("ClrType", BindingFlags.Public | BindingFlags.Instance))
+                        .Distinct()
+                        .FirstOrDefault(propertyInfo => propertyInfo != null) ?? throw new KeyNotFoundException("Couldn't find `ClrType` on IEntityType.");
+
+        private static readonly Type RelationalEntityTypeExtensionsType =
+            Type.GetType("Microsoft.EntityFrameworkCore.RelationalEntityTypeExtensions, Microsoft.EntityFrameworkCore.Relational") ?? throw new TypeLoadException("Couldn't load Microsoft.EntityFrameworkCore.RelationalEntityTypeExtensions");
+        private static readonly MethodInfo GetTableNameMethodInfo =
+            RelationalEntityTypeExtensionsType.GetMethod("GetTableName", BindingFlags.Static | BindingFlags.Public)
+            ?? throw new KeyNotFoundException("Couldn't find `GetTableName()` on RelationalEntityTypeExtensions.");
+
         private readonly ConcurrentDictionary<Type, Lazy<List<TableEntityInfo>>> _contextTableNames = new();
         private readonly ConcurrentDictionary<string, Lazy<SortedSet<string>>> _commandTableNames = new(StringComparer.OrdinalIgnoreCase);
         private readonly IEFHashProvider _hashProvider;
@@ -62,21 +78,35 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             return _contextTableNames.GetOrAdd(context.GetType(),
-                            _ => new Lazy<List<TableEntityInfo>>(() =>
-                            {
-                                var tableNames = new List<TableEntityInfo>();
-                                foreach (var entityType in context.Model.GetEntityTypes())
-                                {
-                                    tableNames.Add(
-                                        new TableEntityInfo
-                                        {
-                                            ClrType = entityType.ClrType,
-                                            TableName = entityType.GetTableName() ?? entityType.ClrType.ToString()
-                                        });
-                                }
-                                return tableNames;
-                            },
+                            _ => new Lazy<List<TableEntityInfo>>(() => getTableNames(context),
                             LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+        }
+
+        private static List<TableEntityInfo> getTableNames(DbContext context)
+        {
+            var tableNames = new List<TableEntityInfo>();
+            foreach (var entityType in context.Model.GetEntityTypes())
+            {
+                var clrType = getClrType(entityType);
+                tableNames.Add(
+                    new TableEntityInfo
+                    {
+                        ClrType = clrType,
+                        TableName = getTableName(entityType) ?? clrType.ToString()
+                    });
+            }
+            return tableNames;
+        }
+
+        private static string? getTableName(object entityType)
+        {
+            return GetTableNameMethodInfo.Invoke(null, new[] { entityType }) as string;
+        }
+
+        private static Type getClrType(object entityType)
+        {
+            var value = ClrTypePropertyInfo.GetValue(entityType) ?? throw new InvalidOperationException($"Couldn't get the ClrType value of `{entityType}`");
+            return (Type)value;
         }
 
         /// <summary>
