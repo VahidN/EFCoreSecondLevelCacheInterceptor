@@ -24,6 +24,7 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             services.AddMemoryCache();
             services.TryAddSingleton<IEFDebugLogger, EFDebugLogger>();
+            services.TryAddSingleton<IEFHashProvider, XxHashUnsafe>();
             services.TryAddSingleton<IReaderWriterLockProvider, ReaderWriterLockProvider>();
             services.TryAddSingleton<IEFCacheKeyProvider, EFCacheKeyProvider>();
             services.TryAddSingleton<IEFCachePolicyParser, EFCachePolicyParser>();

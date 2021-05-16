@@ -6,7 +6,7 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// xxHash is an extremely fast non-cryptographic Hash algorithm, working at speeds close to RAM limits.
     /// http://code.google.com/p/xxhash/
     /// </summary>
-    public static class XxHashUnsafe
+    public class XxHashUnsafe : IEFHashProvider
     {
         private const uint Prime1 = 2654435761U;
         private const uint Prime2 = 2246822519U;
@@ -20,7 +20,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         /// <param name="data">the input string</param>
         /// <returns>xxHash</returns>
-        public static unsafe UInt32 ComputeHash(string data)
+        public unsafe uint ComputeHash(string data)
         {
             if (data == null)
             {
@@ -38,7 +38,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         /// <param name="data">the input byte array</param>
         /// <returns>xxHash</returns>
-        public static unsafe uint ComputeHash(byte[] data)
+        public unsafe uint ComputeHash(byte[] data)
         {
             if (data == null)
             {
@@ -59,7 +59,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="len">length</param>
         /// <param name="seed">initial seed</param>
         /// <returns>xxHash</returns>
-        public static unsafe uint ComputeHash(byte[] data, int offset, uint len, uint seed)
+        public unsafe uint ComputeHash(byte[] data, int offset, uint len, uint seed)
         {
             if (data == null)
             {
@@ -136,7 +136,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             return crc;
         }
 
-        private static UInt32 rotl32(UInt32 x, int r)
+        private static uint rotl32(uint x, int r)
         {
             return (x << r) | (x >> (32 - r));
         }

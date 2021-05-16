@@ -16,21 +16,21 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
         [TestMethod]
         public void TestEmptyXxHashReturnsCorrectValue()
         {
-            var hash = XxHashUnsafe.ComputeHash(TestConstants.Empty);
+            var hash = new XxHashUnsafe().ComputeHash(TestConstants.Empty);
             Assert.AreEqual((uint)0x02cc5d05, hash);
         }
 
         [TestMethod]
         public void TestFooBarXxHashReturnsCorrectValue()
         {
-            var hash = XxHashUnsafe.ComputeHash(TestConstants.FooBar);
+            var hash = new XxHashUnsafe().ComputeHash(TestConstants.FooBar);
             Assert.AreEqual((uint)2348340516, hash);
         }
 
         [TestMethod]
         public void TestLoremIpsumXxHashReturnsCorrectValue()
         {
-            var hash = XxHashUnsafe.ComputeHash(TestConstants.LoremIpsum);
+            var hash = new XxHashUnsafe().ComputeHash(TestConstants.LoremIpsum);
             Assert.AreEqual((uint)4046722717, hash);
         }
     }

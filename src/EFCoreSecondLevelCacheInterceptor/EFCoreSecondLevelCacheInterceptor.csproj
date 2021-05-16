@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Entity Framework Core Second Level Caching Library.</Description>
-    <VersionPrefix>2.8.0</VersionPrefix>
+    <VersionPrefix>2.9.0</VersionPrefix>
     <Authors>Vahid Nasiri</Authors>
     <TargetFrameworks>net5.0;netstandard2.1;netstandard2.0;net461;netcoreapp3.1;</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFrameworks>
@@ -89,8 +89,8 @@
   </PropertyGroup>
 
   <ItemGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,6)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,6)" />
     <PackageReference Include="CacheManager.Core" Version="[1.2,2)" />
     <PackageReference Include="EasyCaching.Core" Version="[1.1,2)" />
   </ItemGroup>
@@ -98,13 +98,23 @@
     <DefineConstants>NETCORE3_1</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition="('$(TargetFramework)' == 'net5.0') or  ('$(TargetFramework)' == 'netstandard2.1')">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[5,)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)" />
+  <ItemGroup Condition="('$(TargetFramework)' == 'netstandard2.1')">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[5,6)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,6)" />
     <PackageReference Include="CacheManager.Core" Version="[1.2,2)" />
     <PackageReference Include="EasyCaching.Core" Version="[1.1,2)" />
   </ItemGroup>
-  <PropertyGroup Condition="('$(TargetFramework)' == 'net5.0') or  ('$(TargetFramework)' == 'netstandard2.1')">
+  <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.1')">
+    <DefineConstants>NETSTANDARD2_1</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="('$(TargetFramework)' == 'net5.0')">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[6.0.0-preview.3.21201.2,7)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[6.0.0-preview.3.21201.2,7)" />
+    <PackageReference Include="CacheManager.Core" Version="[1.2,2)" />
+    <PackageReference Include="EasyCaching.Core" Version="[1.1,2)" />
+  </ItemGroup>
+  <PropertyGroup Condition="('$(TargetFramework)' == 'net5.0')">
     <DefineConstants>NET5_0</DefineConstants>
   </PropertyGroup>
 

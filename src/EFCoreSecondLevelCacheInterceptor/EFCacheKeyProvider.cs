@@ -16,6 +16,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         private readonly IEFDebugLogger _logger;
         private readonly IEFCachePolicyParser _cachePolicyParser;
         private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+        private readonly IEFHashProvider _hashProvider;
 
         /// <summary>
         /// A custom cache key provider for EF queries.
@@ -24,7 +25,8 @@ namespace EFCoreSecondLevelCacheInterceptor
             IEFCacheDependenciesProcessor cacheDependenciesProcessor,
             IEFCachePolicyParser cachePolicyParser,
             IEFDebugLogger logger,
-            IOptions<EFCoreSecondLevelCacheSettings> cacheSettings)
+            IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
+            IEFHashProvider hashProvider)
         {
             _cacheDependenciesProcessor = cacheDependenciesProcessor;
             _logger = logger;
@@ -36,6 +38,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             _cacheSettings = cacheSettings.Value;
+            _hashProvider = hashProvider ?? throw new ArgumentNullException(nameof(hashProvider));
         }
 
         /// <summary>
@@ -60,8 +63,8 @@ namespace EFCoreSecondLevelCacheInterceptor
             var cacheKey = getCacheKey(command, cachePolicy.CacheSaltKey);
             var cacheKeyHash =
                 !string.IsNullOrEmpty(_cacheSettings.CacheKeyPrefix) ?
-                        $"{_cacheSettings.CacheKeyPrefix}{XxHashUnsafe.ComputeHash(cacheKey):X}" :
-                        $"{XxHashUnsafe.ComputeHash(cacheKey):X}";
+                        $"{_cacheSettings.CacheKeyPrefix}{_hashProvider.ComputeHash(cacheKey):X}" :
+                        $"{_hashProvider.ComputeHash(cacheKey):X}";
             var cacheDependencies = _cacheDependenciesProcessor.GetCacheDependencies(command, context, cachePolicy);
             _logger.LogDebug($"KeyHash: {cacheKeyHash}, CacheDependencies: {string.Join(", ", cacheDependencies)}.");
             return new EFCacheKey(cacheDependencies)

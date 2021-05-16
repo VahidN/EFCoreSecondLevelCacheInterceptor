@@ -12,11 +12,17 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
     {
-        private readonly ConcurrentDictionary<Type, Lazy<List<TableEntityInfo>>> _contextTableNames =
-                    new ConcurrentDictionary<Type, Lazy<List<TableEntityInfo>>>();
+        private readonly ConcurrentDictionary<Type, Lazy<List<TableEntityInfo>>> _contextTableNames = new();
+        private readonly ConcurrentDictionary<string, Lazy<SortedSet<string>>> _commandTableNames = new(StringComparer.OrdinalIgnoreCase);
+        private readonly IEFHashProvider _hashProvider;
 
-        private readonly ConcurrentDictionary<string, Lazy<SortedSet<string>>> _commandTableNames =
-                    new ConcurrentDictionary<string, Lazy<SortedSet<string>>>(StringComparer.OrdinalIgnoreCase);
+        /// <summary>
+        /// SqlCommands Utils
+        /// </summary>
+        public EFSqlCommandsProcessor(IEFHashProvider hashProvider)
+        {
+            _hashProvider = hashProvider ?? throw new ArgumentNullException(nameof(hashProvider));
+        }
 
         /// <summary>
         /// Is `insert`, `update` or `delete`?
@@ -65,7 +71,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                                         new TableEntityInfo
                                         {
                                             ClrType = entityType.ClrType,
-                                            TableName = entityType.GetTableName()
+                                            TableName = entityType.GetTableName() ?? entityType.ClrType.ToString()
                                         });
                                 }
                                 return tableNames;
@@ -78,7 +84,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         public SortedSet<string> GetSqlCommandTableNames(string commandText)
         {
-            var commandTextKey = $"{XxHashUnsafe.ComputeHash(commandText):X}";
+            var commandTextKey = $"{_hashProvider.ComputeHash(commandText):X}";
             return _commandTableNames.GetOrAdd(commandTextKey,
                     _ => new Lazy<SortedSet<string>>(() => getRawSqlCommandTableNames(commandText),
                             LazyThreadSafetyMode.ExecutionAndPublication)).Value;
