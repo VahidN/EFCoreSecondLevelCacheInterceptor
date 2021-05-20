@@ -6,8 +6,6 @@
   </a>
 </p>
 
-## Entity Framework Core 3.1.x, 5.x & 6.x Second Level Caching Library
-
 Second level caching is a query cache. The results of EF commands will be stored in the cache, so that the same EF commands will retrieve their data from the cache rather than executing them against the database again.
 
 ## Install via NuGet
