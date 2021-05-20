@@ -199,6 +199,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Uses the cache key prefix.
         /// Sets the prefix to all of the cachedKey's.
+        /// Its default value is `EF_`.
         /// </summary>
         /// <param name="prefix">The prefix.</param>
         /// <returns>EFCoreSecondLevelCacheOptions.</returns>

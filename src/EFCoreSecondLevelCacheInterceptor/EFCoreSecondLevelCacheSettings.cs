@@ -24,9 +24,10 @@ namespace EFCoreSecondLevelCacheInterceptor
 
         /// <summary>
         /// Gets or sets the cache key prefix.
+        /// Its default value is `EF_`.
         /// </summary>
         /// <value>The cache key prefix.</value>
-        public string CacheKeyPrefix { get; set; } = default!;
+        public string CacheKeyPrefix { get; set; } = "EF_";
 
         /// <summary>
         /// CacheAllQueries Options
