@@ -268,6 +268,8 @@ If you don't want to use the above cache providers, implement your custom `IEFCa
     }
 ```
 
+Note: Some database providers don't support special fields such as `DateTimeOffset`, `TimeSpan`, etc. For these scenarios you will need [the related converters](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/blob/master/src/Tests/Issues/Issue9SQLiteInt32/DataLayer/ApplicationDbContext.cs#L35).
+
 ### 3- Setting up the cache invalidation:
 
 This library doesn't need any settings for the cache invalidation. It watches for all of the CRUD operations using its interceptor and then invalidates the related cache entries automatically.
