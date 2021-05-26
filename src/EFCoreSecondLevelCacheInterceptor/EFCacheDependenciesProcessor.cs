@@ -12,6 +12,7 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// </summary>
     public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
     {
+        private readonly string _cacheKeyPrefix;
         private readonly IEFDebugLogger _logger;
         private readonly IEFCacheServiceProvider _cacheServiceProvider;
         private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
@@ -36,6 +37,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             _cacheSettings = cacheSettings.Value;
+            _cacheKeyPrefix = cacheSettings.Value.CacheKeyPrefix;
         }
 
         /// <summary>
@@ -71,7 +73,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             if (cacheDependencies.Any())
             {
                 logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies);
-                return cacheDependencies;
+                return PrefixCacheDependencies(cacheDependencies);
             }
 
             cacheDependencies = cachePolicy.CacheItemsDependencies as SortedSet<string>;
@@ -80,11 +82,11 @@ namespace EFCoreSecondLevelCacheInterceptor
                 _logger.LogDebug($"It's not possible to calculate the related table names of the current query[{commandText}]. Please use EFCachePolicy.Configure(options => options.CacheDependencies(\"real_table_name_1\", \"real_table_name_2\")) to specify them explicitly.");
                 cacheDependencies = new SortedSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
-                    EFCachePolicy.EFUnknownsCacheDependency
+                    $"{_cacheKeyPrefix}{EFCachePolicy.EFUnknownsCacheDependency}"
                 };
             }
             logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies);
-            return cacheDependencies;
+            return PrefixCacheDependencies(cacheDependencies);
         }
 
         private void logProcess(SortedSet<string> tableNames, SortedSet<string> textsInsideSquareBrackets, SortedSet<string> cacheDependencies)
@@ -114,7 +116,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return false;
             }
 
-            cacheKey.CacheDependencies.Add(EFCachePolicy.EFUnknownsCacheDependency);
+            cacheKey.CacheDependencies.Add($"{_cacheKeyPrefix}{EFCachePolicy.EFUnknownsCacheDependency}");
             _cacheServiceProvider.InvalidateCacheDependencies(cacheKey);
             _logger.LogDebug(CacheableEventId.QueryResultInvalidated, $"Invalidated [{string.Join(", ", cacheKey.CacheDependencies)}] dependencies.");
             return true;
@@ -124,5 +126,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             return _cacheSettings.SkipCacheInvalidationCommands != null && _cacheSettings.SkipCacheInvalidationCommands(commandText);
         }
+
+        private SortedSet<string> PrefixCacheDependencies(SortedSet<string> cacheDependencies)
+            => new(cacheDependencies.Select(x => $"{_cacheKeyPrefix}{x}"), StringComparer.OrdinalIgnoreCase);
     }
 }
