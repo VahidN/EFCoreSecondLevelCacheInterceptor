@@ -6,6 +6,8 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
     [TestClass]
     public class EFCacheDependenciesProcessorTests
     {
+        private const string CacheKeyPrefix = "EF_";
+
         [TestMethod]
         public void TestGetCacheDependenciesWorksWithNormalEFQueries()
         {
@@ -17,7 +19,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
             var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), new SortedSet<string> { "Posts", "Users", "Products" }, commandText);
 
-            var inUseTableNames = new SortedSet<string> { "Users" };
+            var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Users" };
             CollectionAssert.AreEqual(expected: inUseTableNames, actual: cacheDependencies);
         }
 
@@ -34,7 +36,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
             var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), new SortedSet<string> { "Posts", "Users", "Products" }, commandText);
 
-            var inUseTableNames = new SortedSet<string> { "Posts", "Users" };
+            var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Posts", CacheKeyPrefix + "Users" };
             CollectionAssert.AreEqual(expected: inUseTableNames, actual: cacheDependencies);
         }
 
@@ -51,7 +53,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
             var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), new SortedSet<string> { "Posts", "Users", "Products" }, commandText);
 
-            var inUseTableNames = new SortedSet<string> { "Posts", "Users" };
+            var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Posts", CacheKeyPrefix + "Users" };
             CollectionAssert.AreEqual(expected: inUseTableNames, actual: cacheDependencies);
         }
 
@@ -69,7 +71,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
             var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), new SortedSet<string> { "Posts", "Users", "Products" }, commandText);
 
-            var inUseTableNames = new SortedSet<string> { "Posts", "Users" };
+            var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Posts", CacheKeyPrefix + "Users" };
             CollectionAssert.AreEqual(expected: inUseTableNames, actual: cacheDependencies);
         }
 
@@ -86,7 +88,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
             var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), new SortedSet<string> { "Posts", "Users", "Products" }, commandText);
 
-            var inUseTableNames = new SortedSet<string> { "Posts", "Users" };
+            var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Posts", CacheKeyPrefix + "Users" };
             CollectionAssert.AreEqual(expected: inUseTableNames, actual: cacheDependencies);
         }
 
@@ -102,7 +104,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
             var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), new SortedSet<string> { "Posts", "Users", "Products" }, commandText);
 
-            var inUseTableNames = new SortedSet<string> { "Products" };
+            var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Products" };
             CollectionAssert.AreEqual(expected: inUseTableNames, actual: cacheDependencies);
         }
 
@@ -118,7 +120,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
             var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), new SortedSet<string> { "Posts", "Users", "Products" }, commandText);
 
-            var inUseTableNames = new SortedSet<string> { "Products" };
+            var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Products" };
             CollectionAssert.AreEqual(expected: inUseTableNames, actual: cacheDependencies);
         }
 
@@ -132,7 +134,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
             var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), new SortedSet<string> { "Posts", "Users", "Products" }, commandText);
 
-            var inUseTableNames = new SortedSet<string> { "Products" };
+            var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Products" };
             CollectionAssert.AreEqual(expected: inUseTableNames, actual: cacheDependencies);
         }
 
@@ -146,7 +148,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
             var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
             var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(), new SortedSet<string> { "Posts", "Users", "Products" }, commandText);
 
-            var inUseTableNames = new SortedSet<string> { "Users" };
+            var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Users" };
             CollectionAssert.AreEqual(expected: inUseTableNames, actual: cacheDependencies);
         }
     }

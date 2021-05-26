@@ -82,7 +82,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 _logger.LogDebug($"It's not possible to calculate the related table names of the current query[{commandText}]. Please use EFCachePolicy.Configure(options => options.CacheDependencies(\"real_table_name_1\", \"real_table_name_2\")) to specify them explicitly.");
                 cacheDependencies = new SortedSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
-                    $"{_cacheKeyPrefix}{EFCachePolicy.EFUnknownsCacheDependency}"
+                    EFCachePolicy.UnknownsCacheDependency
                 };
             }
             logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies);
@@ -116,7 +116,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return false;
             }
 
-            cacheKey.CacheDependencies.Add($"{_cacheKeyPrefix}{EFCachePolicy.EFUnknownsCacheDependency}");
+            cacheKey.CacheDependencies.Add($"{_cacheKeyPrefix}{EFCachePolicy.UnknownsCacheDependency}");
             _cacheServiceProvider.InvalidateCacheDependencies(cacheKey);
             _logger.LogDebug(CacheableEventId.QueryResultInvalidated, $"Invalidated [{string.Join(", ", cacheKey.CacheDependencies)}] dependencies.");
             return true;

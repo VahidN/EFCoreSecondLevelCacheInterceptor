@@ -26,7 +26,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// It's an special key for unknown cache dependencies
         /// </summary>
-        public const string EFUnknownsCacheDependency = nameof(EFUnknownsCacheDependency);
+        public const string UnknownsCacheDependency = nameof(UnknownsCacheDependency);
 
         /// <summary>
         /// Defines the expiration mode of the cache item.

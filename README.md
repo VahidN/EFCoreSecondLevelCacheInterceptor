@@ -46,7 +46,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEFSecondLevelCache(options =>
-                options.UseMemoryCacheProvider().DisableLogging(true)
+                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
 
             // Please use the `CacheManager.Core` or `EasyCaching.Redis` for the Redis cache provider.
             );
@@ -86,7 +86,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
         {
             const string providerName1 = "InMemory1";
             services.AddEFSecondLevelCache(options =>
-                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).DisableLogging(true)
+                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).DisableLogging(true).UseCacheKeyPrefix("EF_")
             );
 
             // Add an in-memory cache service provider
@@ -142,7 +142,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
         {
             const string providerName1 = "Redis1";
             services.AddEFSecondLevelCache(options =>
-                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).DisableLogging(true)
+                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).DisableLogging(true).UseCacheKeyPrefix("EF_")
             );
 
             // More info: https://easycaching.readthedocs.io/en/latest/Redis/
@@ -184,7 +184,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEFSecondLevelCache(options =>
-                options.UseCacheManagerCoreProvider().DisableLogging(true)
+                options.UseCacheManagerCoreProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
             );
 
             // Add an in-memory cache service provider
@@ -234,7 +234,7 @@ services.AddSingleton(typeof(ICacheManagerConfiguration),
 services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
 
 services.AddEFSecondLevelCache(options =>
-    options.UseCacheManagerCoreProvider().DisableLogging(true)
+    options.UseCacheManagerCoreProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
 );
 ```
 
@@ -299,7 +299,7 @@ NOTE: It doesn't matter where the `Cacheable` method is located in this expressi
 Also it's possible to set the `Cacheable()` method's settings globally:
 
 ```csharp
-services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true));
+services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true).UseCacheKeyPrefix("EF_"));
 ```
 
 In this case the above query will become:
@@ -327,7 +327,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true);
+                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_");
                 options.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
             });
 
@@ -349,7 +349,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true)
+                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
                     /*.CacheQueriesContainingTypes(
                         CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
                         typeof(Post), typeof(Product), typeof(User)
@@ -378,7 +378,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true)
+                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
                         // How to skip caching specific commands
                        .SkipCachingCommands(commandText =>
                                 commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase));
@@ -399,7 +399,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true)
+                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
                         // Don't cache null values. Remove this optional setting if it's not necessary.
                         .SkipCachingResults(result =>
                                 result.Value == null || (result.Value is EFTableRows rows && rows.RowsCount == 0));
@@ -420,7 +420,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true)
+                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
                     /*.CacheAllQueriesExceptContainingTypes(
                         CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
                         typeof(Post), typeof(Product), typeof(User)
@@ -449,7 +449,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true)
+                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
                     .SkipCacheInvalidationCommands(commandText =>
                                 // How to skip invalidating the related cache entries of this query
                                 commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase));
@@ -464,7 +464,7 @@ First set the `DisableLogging(false)`:
 
 ```c#
  services.AddEFSecondLevelCache(options =>
-                options.UseMemoryCacheProvider().DisableLogging(false)
+                options.UseMemoryCacheProvider().DisableLogging(false).UseCacheKeyPrefix("EF_")
 ```
 
 And then change the log level to `Debug` in your `appsettings.json` file:

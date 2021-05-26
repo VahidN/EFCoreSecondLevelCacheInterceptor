@@ -75,6 +75,7 @@ namespace Issue123WithMessagePack
             {
                 o.UseEasyCachingCoreProvider(providerName, isHybridCache: false).DisableLogging(false);
                 o.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(10));
+                o.UseCacheKeyPrefix("EF_");
             });
 
             var basePath = Directory.GetCurrentDirectory();

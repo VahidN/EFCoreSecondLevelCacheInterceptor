@@ -33,7 +33,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="obj"></param>
         public override bool Equals(object? obj)
         {
-            if (!(obj is EFCacheKey efCacheKey)) {
+            if (obj is not EFCacheKey efCacheKey)
+            {
                 return false;
             }
 
