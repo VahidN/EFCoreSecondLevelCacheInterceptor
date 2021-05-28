@@ -9,6 +9,8 @@ using EFCoreSecondLevelCacheInterceptor;
 using Microsoft.EntityFrameworkCore;
 using Issue123WithMessagePack.DataLayer;
 using MessagePack.Resolvers;
+using MessagePack.Formatters;
+using MessagePack;
 
 namespace Issue123WithMessagePack
 {
@@ -59,16 +61,22 @@ namespace Issue123WithMessagePack
                     cfg.DBConfig.AllowAdmin = true;
                     cfg.DBConfig.ConnectionTimeout = 10000;
                 }, providerName);
-                o.WithMessagePack(/*so =>
+                o.WithMessagePack(so =>
                     {
                         so.EnableCustomResolver = true;
-                        so.CustomResolvers = CompositeResolver.Create(new MessagePack.IFormatterResolver[]
+                        so.CustomResolvers = CompositeResolver.Create(
+                        new IMessagePackFormatter[]
+                        {
+                            DBNullFormatter.Instance // This is necessary for the null values
+                        },
+                        new IFormatterResolver[]
                         {
                             NativeDateTimeResolver.Instance,
                             ContractlessStandardResolver.Instance,
-                            StandardResolverAllowPrivate.Instance
+                            StandardResolverAllowPrivate.Instance,
+                            TypelessContractlessStandardResolver.Instance,
                         });
-                    },*/
+                    },
                     "Pack");
             });
             services.AddEFSecondLevelCache(o =>
@@ -107,6 +115,25 @@ namespace Issue123WithMessagePack
             }
             Console.WriteLine($"Using {connectionString}");
             return connectionString;
+        }
+    }
+
+    public class DBNullFormatter : IMessagePackFormatter<DBNull>
+    {
+        public static DBNullFormatter Instance = new();
+
+        private DBNullFormatter()
+        {
+        }
+
+        public void Serialize(ref MessagePackWriter writer, DBNull value, MessagePackSerializerOptions options)
+        {
+            writer.WriteNil();
+        }
+
+        public DBNull Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+        {
+            return DBNull.Value;
         }
     }
 }

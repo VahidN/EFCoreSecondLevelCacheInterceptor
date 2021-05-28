@@ -41,6 +41,10 @@ namespace Issue123WithMessagePack
                     {
                         Name = "Bill",
                     });
+		    context.People.Add(new Person
+                    {
+                        Name = null,
+                    });
                     context.SaveChanges();
                 }
             });
