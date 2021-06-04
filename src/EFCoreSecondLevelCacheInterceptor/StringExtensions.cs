@@ -6,7 +6,7 @@ namespace EFCoreSecondLevelCacheInterceptor
     /// <summary>
     /// Missing NET4_6_1 exts
     /// </summary>
-    public static class StringExtensions
+    internal static class StringExtensions
     {
         /// <summary>
         /// Returns a new string in which all occurrences of a specified string in the current instance are replaced with another specified string, using the provided comparison type.
