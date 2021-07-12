@@ -63,8 +63,7 @@ namespace Issue12MySQL
                 {
                     optionsBuilder
                         .AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())
-                        .UseMySql(
-                            ServerVersion.AutoDetect(configuration["ConnectionStrings:ApplicationDbContextConnection"]));
+                        .UseMySQL(configuration["ConnectionStrings:ApplicationDbContextConnection"]);
                 });
 
             return services.BuildServiceProvider();

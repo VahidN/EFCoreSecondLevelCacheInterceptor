@@ -6,14 +6,6 @@ using Issue12MySQL.Entities;
 
 namespace Issue12MySQL
 {
-    /*
-    From https://github.com/dotnet/efcore/issues/17788#issuecomment-574569529
-
-    There are two MySQL providers for Entity Framework Core:
-    - The official one from MySQL: MySql.Data.EntityFrameworkCore. As of now, the latest version is 8.0.19, and works with Entity Framework Core 2.1 (and probably also 2.2). Since EF Core 3.0 is a major version with breaking changes, you cannot use it with this provider.
-    - The Pomelo provider: Pomelo.EntityFrameworkCore.MySql. There is a 3.1 version of this provider.
-    In other words, if you want to use EF Core 3.0/3.1 with MySQL, at this point you need to use the Pomelo provider (or wait for the official MySQL one to get released).
-    */
     class Program
     {
         static void Main(string[] args)

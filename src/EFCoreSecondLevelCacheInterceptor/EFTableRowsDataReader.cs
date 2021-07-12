@@ -294,6 +294,12 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return default;
             }
 
+            var valueType = getOrdinalValueType(ordinal, value);
+            if (valueType != typeof(double))
+            {
+                return (double)Convert.ChangeType(value, typeof(double), CultureInfo.InvariantCulture);
+            }
+
             return (double)value;
         }
 
@@ -409,6 +415,12 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return default;
             }
 
+            var valueType = getOrdinalValueType(ordinal, value);
+            if (valueType != typeof(long))
+            {
+                return (long)Convert.ChangeType(value, typeof(long), CultureInfo.InvariantCulture);
+            }
+
             return (long)value;
         }
 
@@ -418,12 +430,12 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override string GetString(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (value is null)
             {
                 return string.Empty;
             }
 
-            return (string)value;
+            return value.ToString() ?? string.Empty;
         }
 
         /// <summary>

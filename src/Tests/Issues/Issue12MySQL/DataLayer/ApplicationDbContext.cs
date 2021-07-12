@@ -54,6 +54,43 @@ namespace Issue12MySQL.DataLayer
                         convertFromProviderExpression: dateTime => new DateTimeOffset(dateTime)
                     ));
             }
+
+            // To solve: Unable to cast object of type 'System.Char' to type 'System.Int32'.
+            foreach (var property in builder.Model.GetEntityTypes()
+                                                .SelectMany(t => t.GetProperties())
+                                                .Where(p => p.ClrType == typeof(char)))
+            {
+                property.SetValueConverter(
+                    new ValueConverter<char, int>(
+                        convertToProviderExpression: charValue => charValue,
+                        convertFromProviderExpression: intValue => (char)intValue
+                    ));
+            }
+
+            //To solve: Unable to cast object of type 'System.UInt32' to type 'System.Int32'
+            foreach (var property in builder.Model.GetEntityTypes()
+                                                .SelectMany(t => t.GetProperties())
+                                                .Where(p => p.ClrType == typeof(uint)))
+            {
+                property.SetValueConverter(
+                    new ValueConverter<uint, int>(
+                        convertToProviderExpression: uintValue => (int)uintValue,
+                        convertFromProviderExpression: intValue => (uint)intValue
+                    ));
+            }
+
+            //To solve: Unable to cast object of type 'System.UInt64' to type 'System.Int64'
+            foreach (var property in builder.Model.GetEntityTypes()
+                                                .SelectMany(t => t.GetProperties())
+                                                .Where(p => p.ClrType == typeof(ulong)))
+            {
+                property.SetValueConverter(
+                    new ValueConverter<ulong, long>(
+                        convertToProviderExpression: ulongValue => (long)ulongValue,
+                        convertFromProviderExpression: longValue => (ulong)longValue
+                    ));
+            }
+
         }
     }
 }

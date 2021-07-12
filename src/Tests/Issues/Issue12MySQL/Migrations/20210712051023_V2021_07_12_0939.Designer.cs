@@ -9,15 +9,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Issue12MySQL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200330061245_V2020_03_30_1042")]
-    partial class V2020_03_30_1042
+    [Migration("20210712051023_V2021_07_12_0939")]
+    partial class V2021_07_12_0939
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.2")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64)
+                .HasAnnotation("ProductVersion", "5.0.3");
 
             modelBuilder.Entity("Issue12MySQL.Entities.Person", b =>
                 {
@@ -26,23 +26,22 @@ namespace Issue12MySQL.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("AddDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime");
 
                     b.Property<byte[]>("ByteArrayValue")
-                        .HasColumnType("longblob");
+                        .HasColumnType("varbinary(4000)");
 
                     b.Property<byte>("ByteValue")
                         .HasColumnType("tinyint unsigned");
 
-                    b.Property<string>("CharValue")
-                        .IsRequired()
-                        .HasColumnType("varchar(1) CHARACTER SET utf8mb4");
+                    b.Property<char>("CharValue")
+                        .HasColumnType("int");
 
-                    b.Property<DateTimeOffset>("DateTimeOffsetValue")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTime>("DateTimeOffsetValue")
+                        .HasColumnType("datetime");
 
                     b.Property<decimal>("DecimalValue")
-                        .HasColumnType("decimal(65,30)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<double>("DoubleValue")
                         .HasColumnType("double");
@@ -50,14 +49,15 @@ namespace Issue12MySQL.Migrations
                     b.Property<float>("FloatValue")
                         .HasColumnType("float");
 
-                    b.Property<Guid>("GuidValue")
-                        .HasColumnType("char(36)");
+                    b.Property<byte[]>("GuidValue")
+                        .IsRequired()
+                        .HasColumnType("varbinary(16)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("text");
 
                     b.Property<long>("Points")
                         .HasColumnType("bigint");
@@ -66,7 +66,7 @@ namespace Issue12MySQL.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<TimeSpan>("TimeSpanValue")
-                        .HasColumnType("time(6)");
+                        .HasColumnType("time");
 
                     b.Property<uint>("UintValue")
                         .HasColumnType("int unsigned");
@@ -75,7 +75,7 @@ namespace Issue12MySQL.Migrations
                         .HasColumnType("bigint unsigned");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime");
 
                     b.Property<ulong>("UshortValue")
                         .HasColumnType("bigint unsigned");
