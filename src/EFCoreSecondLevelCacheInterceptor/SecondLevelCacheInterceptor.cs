@@ -11,6 +11,7 @@ namespace EFCoreSecondLevelCacheInterceptor
     public class SecondLevelCacheInterceptor : DbCommandInterceptor
     {
         private readonly IDbCommandInterceptorProcessor _processor;
+        private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
 
         /// <summary>
         /// Entity Framework Core Second Level Caching Library
@@ -19,9 +20,12 @@ namespace EFCoreSecondLevelCacheInterceptor
         ///                   optionsBuilder.UseSqlServer(...).AddInterceptors(serviceProvider.GetRequiredService&lt;SecondLevelCacheInterceptor&gt;()));
         /// to register it.
         /// </summary>
-        public SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processor)
+        public SecondLevelCacheInterceptor(
+            IDbCommandInterceptorProcessor processor,
+            IEFSqlCommandsProcessor sqlCommandsProcessor)
         {
             _processor = processor;
+            _sqlCommandsProcessor = sqlCommandsProcessor;
         }
 
         /// <summary>
@@ -32,12 +36,27 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandExecutedEventData eventData,
             int result)
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
                 return result;
             }
 
             return _processor.ProcessExecutedCommands(command, eventData.Context, result);
+        }
+
+        private bool ShouldSkipProcessing(DbCommand? command, DbContextEventData? eventData)
+        {
+            if (eventData?.Context is null)
+            {
+                return true;
+            }
+
+            if (command?.Transaction is not null)
+            {
+                return !_sqlCommandsProcessor.IsCrudCommand(command.CommandText);
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -57,7 +76,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
 #if NET5_0 || NETSTANDARD2_1
                 return new(result);
@@ -81,7 +100,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandEventData eventData,
             InterceptionResult<int> result)
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
                 return result;
             }
@@ -106,7 +125,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
 #if NET5_0 || NETSTANDARD2_1
                 return new(result);
@@ -130,7 +149,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandExecutedEventData eventData,
             DbDataReader result)
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
                 return result;
             }
@@ -155,7 +174,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
 #if NET5_0 || NETSTANDARD2_1
                 return new(result);
@@ -179,7 +198,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandEventData eventData,
             InterceptionResult<DbDataReader> result)
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
                 return result;
             }
@@ -204,7 +223,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
 #if NET5_0 || NETSTANDARD2_1
                 return new(result);
@@ -228,7 +247,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandExecutedEventData eventData,
             object? result)
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
                 return result;
             }
@@ -253,7 +272,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
 #if NET5_0 || NETSTANDARD2_1
                 return new(result);
@@ -277,7 +296,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CommandEventData eventData,
             InterceptionResult<object> result)
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
                 return result;
             }
@@ -302,7 +321,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             CancellationToken cancellationToken = default)
 #endif
         {
-            if (eventData?.Context == null)
+            if (ShouldSkipProcessing(command, eventData))
             {
 #if NET5_0 || NETSTANDARD2_1
                 return new(result);

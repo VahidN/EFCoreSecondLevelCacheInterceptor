@@ -515,3 +515,7 @@ This cache is scoped to the application, not the current user. It does not use s
 ### Invalidation
 
 This cache is updated when an entity is changed (insert, update, or delete) via a DbContext that uses this library. If the database is updated through some other means, such as a stored procedure or trigger, the cache becomes stale.
+
+### Transactions
+
+To avoid complications, all of the queries inside an `explicit` transaction (context.Database.BeginTransaction()) will not be cached. But the cache invalidations due to its CRUD operations will occur.

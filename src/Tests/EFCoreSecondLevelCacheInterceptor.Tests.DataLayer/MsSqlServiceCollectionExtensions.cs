@@ -16,7 +16,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer
                             {
                                 sqlServerOptionsBuilder
                                     .CommandTimeout((int)TimeSpan.FromMinutes(3).TotalSeconds)
-                                    .EnableRetryOnFailure()
                                     .MigrationsAssembly(typeof(MsSqlServiceCollectionExtensions).Assembly.FullName);
                             })
                         .AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>()));

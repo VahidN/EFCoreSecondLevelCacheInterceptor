@@ -543,7 +543,6 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                         sqlServerOptionsBuilder =>
                         {
                             sqlServerOptionsBuilder.CommandTimeout((int)TimeSpan.FromMinutes(3).TotalSeconds);
-                            sqlServerOptionsBuilder.EnableRetryOnFailure();
                             sqlServerOptionsBuilder.MigrationsAssembly(typeof(MsSqlServiceCollectionExtensions).Assembly.FullName);
                         })
                     .AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>());
