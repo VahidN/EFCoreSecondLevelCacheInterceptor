@@ -131,7 +131,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override bool GetBoolean(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (IsNull(value))
             {
                 return default;
             }
@@ -173,7 +173,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override byte GetByte(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (IsNull(value))
             {
                 return default;
             }
@@ -203,7 +203,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override char GetChar(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (IsNull(value))
             {
                 return default;
             }
@@ -238,7 +238,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override DateTime GetDateTime(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (IsNull(value))
             {
                 return default;
             }
@@ -261,7 +261,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override decimal GetDecimal(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (IsNull(value))
             {
                 return default;
             }
@@ -289,7 +289,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override double GetDouble(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (IsNull(value))
             {
                 return default;
             }
@@ -314,7 +314,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override float GetFloat(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (IsNull(value))
             {
                 return default;
             }
@@ -339,7 +339,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override Guid GetGuid(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (IsNull(value))
             {
                 return default;
             }
@@ -360,7 +360,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override short GetInt16(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (IsNull(value))
             {
                 return default;
             }
@@ -385,7 +385,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override int GetInt32(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (IsNull(value))
             {
                 return default;
             }
@@ -410,7 +410,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override long GetInt64(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value == null)
+            if (IsNull(value))
             {
                 return default;
             }
@@ -430,7 +430,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override string GetString(int ordinal)
         {
             var value = GetValue(ordinal);
-            if (value is null)
+            if (IsNull(value))
             {
                 return string.Empty;
             }
@@ -458,7 +458,9 @@ namespace EFCoreSecondLevelCacheInterceptor
         public override bool IsDBNull(int ordinal)
         {
             var value = _rowValues[ordinal];
-            return value is null || value is DBNull;
+            return IsNull(value);
         }
+		
+	private static bool IsNull(object? value) => value is null || value is DBNull;
     }
 }
