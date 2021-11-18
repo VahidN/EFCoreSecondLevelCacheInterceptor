@@ -77,6 +77,8 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             var cacheKey = new StringBuilder();
             cacheKey.AppendLine(_cachePolicyParser.RemoveEFCachePolicyTag(command.CommandText));
+			
+            cacheKey.AppendLine("ConnectionString").Append('=').Append(command.Connection?.ConnectionString);
 
             foreach (DbParameter? parameter in command.Parameters)
             {
