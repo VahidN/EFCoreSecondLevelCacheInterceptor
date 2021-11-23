@@ -93,8 +93,8 @@ namespace EFCoreSecondLevelCacheInterceptor
                 {
                     Ordinal = i,
                     Name = reader.GetName(i),
-                    DbTypeName = reader.GetDataTypeName(i),
-                    TypeName = reader.GetFieldType(i).ToString()
+                    DbTypeName = reader.GetDataTypeName(i) ?? typeof(string).ToString(),
+                    TypeName = reader.GetFieldType(i)?.ToString() ?? typeof(string).ToString()
                 });
             }
         }
