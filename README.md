@@ -273,7 +273,17 @@ Note: Some database providers don't support special fields such as `DateTimeOffs
 ### 3- Setting up the cache invalidation:
 
 This library doesn't need any settings for the cache invalidation. It watches for all of the CRUD operations using its interceptor and then invalidates the related cache entries automatically.
-But if you want to invalidate the whole cache manually, inject the `IEFCacheServiceProvider` service and then call its `ClearAllCachedEntries()` method.
+But if you want to invalidate the whole cache `manually`, inject the `IEFCacheServiceProvider` service and then call its `_cacheServiceProvider.ClearAllCachedEntries()` method or use it this way to specify the root cache keys which are a collection of a Prefix+TableName:
+```C#
+// Partial cache invalidation using the specified table names
+// This is useful when you are monitoring your DB's changes using the SqlTableDependency 
+_cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>() 
+{
+   "EF_TableName1", // "EF_" is the cache key's prefix
+   "EF_TableName2" 
+} {  KeyHash = "empty" }));
+```
+
 
 ### 4- To cache the results of the normal queries like:
 
