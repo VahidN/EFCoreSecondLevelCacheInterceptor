@@ -179,6 +179,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             var valueType = getOrdinalValueType(ordinal, value);
+            if (valueType == typeof(bool))
+            {
+                return ((bool)value) ? (byte)1 : (byte)0;
+            }
+			
             if (valueType == typeof(long))
             {
                 return (byte)(long)value;
@@ -366,6 +371,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             var valueType = getOrdinalValueType(ordinal, value);
+            if (valueType == typeof(bool))
+            {
+                return ((bool)value) ? (short)1 : (short)0;
+            }
+			
             if (valueType == typeof(long))
             {
                 return (short)(long)value;
@@ -391,6 +401,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             var valueType = getOrdinalValueType(ordinal, value);
+            if (valueType == typeof(bool))
+            {
+                return ((bool)value) ? 1 : 0;
+            }
+			
             if (valueType == typeof(long))
             {
                 return (int)(long)value;
@@ -416,6 +431,11 @@ namespace EFCoreSecondLevelCacheInterceptor
             }
 
             var valueType = getOrdinalValueType(ordinal, value);
+            if (valueType == typeof(bool))
+            {
+                return ((bool)value) ? 1 : 0;
+            }
+			
             if (valueType != typeof(long))
             {
                 return (long)Convert.ChangeType(value, typeof(long), CultureInfo.InvariantCulture);
