@@ -47,6 +47,20 @@ namespace Issue12PostgreSql.Entities
         public ICollection<Address> Addresses { set; get; }
 
         public List<Book> Books { get; set; }
+
+        [Column(TypeName = "jsonb")]
+        public List<BlogOption> OptionDefinitions { get; set; } = new();
+    }
+
+    public class BlogOption
+    {
+        public bool IsActive { get; set; }
+
+        public int NumberOfTimesUsed { get; set; }
+
+        public int SortOrder { get; set; }
+
+        public string Name { get; set; }
     }
 
     public class Address

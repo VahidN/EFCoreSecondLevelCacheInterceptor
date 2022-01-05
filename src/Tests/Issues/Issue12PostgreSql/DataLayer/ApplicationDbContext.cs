@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Text.Json;
 using Issue12PostgreSql.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -35,6 +37,15 @@ namespace Issue12PostgreSql.DataLayer
         {
             base.OnModelCreating(builder);
 
+            foreach (var property in builder.Model.GetEntityTypes()
+                         .SelectMany(t => t.GetProperties())
+                         .Where(p => p.GetColumnType() == "jsonb"))
+            {
+                var converterType = typeof(JsonbConvertor<>).MakeGenericType(property.ClrType);
+                var converter = (ValueConverter)Activator.CreateInstance(converterType, (object)null);
+                property.SetValueConverter(converter);
+            }
+
             // It does not support DateTimeOffset
             foreach (var property in builder.Model.GetEntityTypes()
                                                 .SelectMany(t => t.GetProperties())
@@ -58,6 +69,26 @@ namespace Issue12PostgreSql.DataLayer
                     ));
             }
 
+        }
+    }
+
+    public class JsonbConvertor<T> : ValueConverter<T, string>
+    {
+        private static readonly Expression<Func<T, string>> _convertToProviderExpression = x => Serialize(x);
+        private static readonly Expression<Func<string, T>> _convertFromProviderExpression = x => Deserialize(x);
+
+        public JsonbConvertor(ConverterMappingHints mappingHints = null)
+            : base(_convertToProviderExpression, _convertFromProviderExpression, mappingHints)
+        { }
+
+        private static string Serialize(T x)
+        {
+            return JsonSerializer.Serialize(x);
+        }
+
+        private static T Deserialize(string x)
+        {
+            return JsonSerializer.Deserialize<T>(x);
         }
     }
 }

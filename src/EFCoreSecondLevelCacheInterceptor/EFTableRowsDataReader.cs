@@ -183,7 +183,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             {
                 return ((bool)value) ? (byte)1 : (byte)0;
             }
-			
+
             if (valueType == typeof(long))
             {
                 return (byte)(long)value;
@@ -346,14 +346,14 @@ namespace EFCoreSecondLevelCacheInterceptor
             var value = GetValue(ordinal);
             if (IsNull(value))
             {
-                return default;
+                return Guid.NewGuid();
             }
 
             var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(string))
             {
                 var g = value.ToString();
-                return string.IsNullOrWhiteSpace(g) ? default : new Guid(g);
+                return string.IsNullOrWhiteSpace(g) ? Guid.NewGuid() : new Guid(g);
             }
 
             return (Guid)value;
@@ -375,7 +375,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             {
                 return ((bool)value) ? (short)1 : (short)0;
             }
-			
+
             if (valueType == typeof(long))
             {
                 return (short)(long)value;
@@ -405,7 +405,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             {
                 return ((bool)value) ? 1 : 0;
             }
-			
+
             if (valueType == typeof(long))
             {
                 return (int)(long)value;
@@ -433,9 +433,9 @@ namespace EFCoreSecondLevelCacheInterceptor
             var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(bool))
             {
-                return ((bool)value) ? 1 : 0;
+                return (bool)value ? 1 : 0;
             }
-			
+
             if (valueType != typeof(long))
             {
                 return (long)Convert.ChangeType(value, typeof(long), CultureInfo.InvariantCulture);
@@ -480,7 +480,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             var value = _rowValues[ordinal];
             return IsNull(value);
         }
-		
-	private static bool IsNull(object? value) => value is null || value is DBNull;
+
+	    private static bool IsNull(object? value) => value is null || value is DBNull;
     }
 }

@@ -114,7 +114,17 @@ namespace Issue12PostgreSql
                         ByteArrayValue = new byte[] { 1, 2 },
                         UintValue = 1,
                         UlongValue = 1,
-                        UshortValue = 1
+                        UshortValue = 1,
+                        OptionDefinitions = new List<BlogOption>
+                        {
+                            new()
+                            {
+                                IsActive = true,
+                                Name = "Test",
+                                NumberOfTimesUsed = 1,
+                                SortOrder = 1
+                            }
+                        }
                     });
 
                     context.Addresses.Add(new Address { Name = "Addr 2", Person = person2.Entity });

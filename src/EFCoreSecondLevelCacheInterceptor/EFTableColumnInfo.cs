@@ -33,5 +33,13 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// </summary>
         [DataMember]
         public string TypeName { get; set; } = default!;
+
+        /// <summary>
+        /// ToString
+        /// </summary>
+        public override string ToString()
+        {
+            return $"Ordinal: {Ordinal}, Name: {Name}, DbTypeName: {DbTypeName}, TypeName= {TypeName}.";
+        }
     }
 }
