@@ -50,6 +50,12 @@ namespace Issue12PostgreSql.Entities
 
         [Column(TypeName = "jsonb")]
         public List<BlogOption> OptionDefinitions { get; set; } = new();
+
+
+        public DateOnly Date1 { get; set; }
+        public TimeOnly Time1 { get; set; }
+        public DateOnly? Date2 { get; set; }
+        public TimeOnly? Time2 { get; set; }
     }
 
     public class BlogOption

@@ -89,7 +89,13 @@ namespace Issue12PostgreSql
                         ByteArrayValue = new byte[] { 1, 2 },
                         UintValue = 1,
                         UlongValue = 1,
-                        UshortValue = 1
+                        UshortValue = 1,
+                        Date1 = new DateOnly(2021, 09, 23),
+                        Date2 = null,
+                        Time1 = TimeOnly.FromTimeSpan(
+                            new DateTime(2021, 09, 23, 19, 2, 0) -
+                            new DateTime(2021, 09, 23, 6, 54, 0)),
+                        Time2 = null
                     });
 
                     context.Addresses.Add(new Address { Name = "Addr 1", Person = person1.Entity });

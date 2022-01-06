@@ -77,7 +77,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             var cacheKey = new StringBuilder();
             cacheKey.AppendLine(_cachePolicyParser.RemoveEFCachePolicyTag(command.CommandText));
-			
+
             cacheKey.AppendLine("ConnectionString").Append('=').Append(command.Connection?.ConnectionString);
 
             foreach (DbParameter? parameter in command.Parameters)
@@ -116,7 +116,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return arrayToString(array);
             }
 
-            return parameter.Value?.ToString();
+            return Convert.ToString(parameter.Value, CultureInfo.InvariantCulture);
         }
 
         private static string arrayToString(Array array)

@@ -69,6 +69,51 @@ namespace Issue12PostgreSql.DataLayer
                     ));
             }
 
+            // Supporting DateOnly
+            foreach (var property in builder.Model.GetEntityTypes()
+                         .SelectMany(t => t.GetProperties())
+                         .Where(p => p.ClrType == typeof(DateOnly)))
+            {
+                property.SetValueConverter(
+                    new ValueConverter<DateOnly, DateTime>(
+                        convertToProviderExpression: dateOnly => dateOnly.ToDateTime(new TimeOnly(0, 0)),
+                        convertFromProviderExpression: dateTime => DateOnly.FromDateTime(dateTime)
+                    ));
+            }
+
+            foreach (var property in builder.Model.GetEntityTypes()
+                         .SelectMany(t => t.GetProperties())
+                         .Where(p => p.ClrType == typeof(DateOnly?)))
+            {
+                property.SetValueConverter(
+                    new ValueConverter<DateOnly?, DateTime>(
+                        convertToProviderExpression: dateOnly => dateOnly.Value.ToDateTime(new TimeOnly(0, 0)),
+                        convertFromProviderExpression: dateTime => DateOnly.FromDateTime(dateTime)
+                    ));
+            }
+
+            // Supporting TimeOnly
+            foreach (var property in builder.Model.GetEntityTypes()
+                         .SelectMany(t => t.GetProperties())
+                         .Where(p => p.ClrType == typeof(TimeOnly)))
+            {
+                property.SetValueConverter(
+                    new ValueConverter<TimeOnly, TimeSpan>(
+                        convertToProviderExpression: timeOnly => timeOnly.ToTimeSpan(),
+                        convertFromProviderExpression: timeSpan => TimeOnly.FromTimeSpan(timeSpan)
+                    ));
+            }
+
+            foreach (var property in builder.Model.GetEntityTypes()
+                         .SelectMany(t => t.GetProperties())
+                         .Where(p => p.ClrType == typeof(TimeOnly?)))
+            {
+                property.SetValueConverter(
+                    new ValueConverter<TimeOnly?, TimeSpan>(
+                        convertToProviderExpression: timeOnly => timeOnly.Value.ToTimeSpan(),
+                        convertFromProviderExpression: timeSpan => TimeOnly.FromTimeSpan(timeSpan)
+                    ));
+            }
         }
     }
 
