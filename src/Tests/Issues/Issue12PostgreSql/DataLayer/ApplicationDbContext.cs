@@ -37,17 +37,17 @@ namespace Issue12PostgreSql.DataLayer
         {
             base.OnModelCreating(builder);
 
-            foreach (var property in builder.Model.GetEntityTypes()
+            /*foreach (var property in builder.Model.GetEntityTypes()
                          .SelectMany(t => t.GetProperties())
                          .Where(p => p.GetColumnType() == "jsonb"))
             {
                 var converterType = typeof(JsonbConvertor<>).MakeGenericType(property.ClrType);
                 var converter = (ValueConverter)Activator.CreateInstance(converterType, (object)null);
                 property.SetValueConverter(converter);
-            }
+            }*/
 
             // It does not support DateTimeOffset
-            foreach (var property in builder.Model.GetEntityTypes()
+            /*foreach (var property in builder.Model.GetEntityTypes()
                                                 .SelectMany(t => t.GetProperties())
                                                 .Where(p => p.ClrType == typeof(DateTimeOffset)))
             {
@@ -67,10 +67,10 @@ namespace Issue12PostgreSql.DataLayer
                         convertToProviderExpression: dateTimeOffset => dateTimeOffset.Value.UtcDateTime,
                         convertFromProviderExpression: dateTime => new DateTimeOffset(dateTime)
                     ));
-            }
+            }*/
 
             // Supporting DateOnly
-            foreach (var property in builder.Model.GetEntityTypes()
+            /*foreach (var property in builder.Model.GetEntityTypes()
                          .SelectMany(t => t.GetProperties())
                          .Where(p => p.ClrType == typeof(DateOnly)))
             {
@@ -90,10 +90,10 @@ namespace Issue12PostgreSql.DataLayer
                         convertToProviderExpression: dateOnly => dateOnly.Value.ToDateTime(new TimeOnly(0, 0)),
                         convertFromProviderExpression: dateTime => DateOnly.FromDateTime(dateTime)
                     ));
-            }
+            }*/
 
             // Supporting TimeOnly
-            foreach (var property in builder.Model.GetEntityTypes()
+            /*foreach (var property in builder.Model.GetEntityTypes()
                          .SelectMany(t => t.GetProperties())
                          .Where(p => p.ClrType == typeof(TimeOnly)))
             {
@@ -113,7 +113,7 @@ namespace Issue12PostgreSql.DataLayer
                         convertToProviderExpression: timeOnly => timeOnly.Value.ToTimeSpan(),
                         convertFromProviderExpression: timeSpan => TimeOnly.FromTimeSpan(timeSpan)
                     ));
-            }
+            }*/
         }
     }
 

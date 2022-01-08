@@ -373,7 +373,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(bool))
             {
-                return ((bool)value) ? (short)1 : (short)0;
+                return (bool)value ? (short)1 : (short)0;
             }
 
             if (valueType == typeof(long))
@@ -403,7 +403,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             var valueType = getOrdinalValueType(ordinal, value);
             if (valueType == typeof(bool))
             {
-                return ((bool)value) ? 1 : 0;
+                return (bool)value ? 1 : 0;
             }
 
             if (valueType == typeof(long))
@@ -462,6 +462,80 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// Gets the value of the specified column in its native format.
         /// </summary>
         public override object GetValue(int ordinal) => _rowValues[ordinal];
+
+
+        /// <inheritdoc />
+        public override T GetFieldValue<T>(int ordinal)
+        {
+            var value = GetValue(ordinal);
+            var actualValueType = getOrdinalValueType(ordinal, value);
+            var expectedValueType = typeof(T);
+
+            if (expectedValueType == actualValueType)
+            {
+                return (T)value;
+            }
+
+            if (expectedValueType == typeof(DateTimeOffset) && actualValueType == typeof(DateTime))
+            {
+                return (T)(object)new DateTimeOffset((DateTime)value);
+            }
+
+            if (expectedValueType == typeof(DateTimeOffset) && actualValueType == typeof(string))
+            {
+                return (T)(object)DateTimeOffset.Parse((string)value, CultureInfo.CurrentCulture);
+            }
+
+            if (expectedValueType == typeof(TimeSpan) && actualValueType == typeof(string))
+            {
+                return (T)(object)TimeSpan.Parse((string)value, CultureInfo.CurrentCulture);
+            }
+
+            if (IsNumber(expectedValueType) && IsNumber(actualValueType))
+            {
+                return (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
+            }
+
+            if (actualValueType == typeof(bool) && IsNumber(expectedValueType))
+            {
+                return (bool)value ? (T)(object)1 : (T)(object)0;
+            }
+
+            if (expectedValueType == typeof(bool) && IsNumber(actualValueType))
+            {
+                return (T)(object)((ulong)value != 0);
+            }
+
+#if NET6_0 || NET5_0 || NETCORE3_1
+            var dbTypeName = GetDataTypeName(ordinal);
+
+            if(actualValueType == typeof(string) && string.Equals(dbTypeName, "jsonb", StringComparison.OrdinalIgnoreCase))
+            {
+                return System.Text.Json.JsonSerializer.Deserialize<T>((string)value)!;
+            }
+#endif
+
+#if NET6_0
+            if(expectedValueType == typeof(DateOnly) && actualValueType == typeof(DateTime))
+            {
+                return (T)(object)DateOnly.FromDateTime((DateTime)value);
+            }
+
+            if(expectedValueType == typeof(TimeOnly) && actualValueType == typeof(TimeSpan))
+            {
+                return (T)(object)TimeOnly.FromTimeSpan((TimeSpan)value);
+            }
+#endif
+
+            return (T)value;
+        }
+
+        private static bool IsNumber(Type type)
+        {
+            return type == typeof(uint) || type == typeof(int) ||
+                   type == typeof(ulong) || type == typeof(long) ||
+                   type == typeof(short) || type == typeof(byte) ||  type == typeof(char);
+        }
 
         /// <summary>
         /// Populates an array of objects with the column values of the current row.

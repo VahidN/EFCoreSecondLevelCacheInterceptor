@@ -62,7 +62,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called immediately after EF calls System.Data.Common.DbCommand.ExecuteNonQueryAsync.
         /// </summary>
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
         public override ValueTask<int> NonQueryExecutedAsync(
             DbCommand command,
             CommandExecutedEventData eventData,
@@ -78,14 +78,14 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             if (ShouldSkipProcessing(command, eventData))
             {
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
                 return new(result);
 #else
                 return Task.FromResult(result);
 #endif
             }
 
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
             return new ValueTask<int>(_processor.ProcessExecutedCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
@@ -111,7 +111,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called just before EF intends to call System.Data.Common.DbCommand.ExecuteNonQueryAsync.
         /// </summary>
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
         public override ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(
             DbCommand command,
             CommandEventData eventData,
@@ -127,14 +127,14 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             if (ShouldSkipProcessing(command, eventData))
             {
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
                 return new(result);
 #else
                 return Task.FromResult(result);
 #endif
             }
 
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
             return new ValueTask<InterceptionResult<int>>(_processor.ProcessExecutingCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
@@ -160,7 +160,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called immediately after EF calls System.Data.Common.DbCommand.ExecuteReaderAsync.
         /// </summary>
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
         public override ValueTask<DbDataReader> ReaderExecutedAsync(
             DbCommand command,
             CommandExecutedEventData eventData,
@@ -176,14 +176,14 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             if (ShouldSkipProcessing(command, eventData))
             {
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
                 return new(result);
 #else
                 return Task.FromResult(result);
 #endif
             }
 
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
             return new ValueTask<DbDataReader>(_processor.ProcessExecutedCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
@@ -209,7 +209,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called just before EF intends to call System.Data.Common.DbCommand.ExecuteReaderAsync.
         /// </summary>
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
         public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
             DbCommand command,
             CommandEventData eventData,
@@ -225,14 +225,14 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             if (ShouldSkipProcessing(command, eventData))
             {
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
                 return new(result);
 #else
                 return Task.FromResult(result);
 #endif
             }
 
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
             return new ValueTask<InterceptionResult<DbDataReader>>(_processor.ProcessExecutingCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));
@@ -258,7 +258,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called immediately after EF calls System.Data.Common.DbCommand.ExecuteScalarAsync.
         /// </summary>
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
         public override ValueTask<object?> ScalarExecutedAsync(
             DbCommand command,
             CommandExecutedEventData eventData,
@@ -274,14 +274,14 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             if (ShouldSkipProcessing(command, eventData))
             {
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
                 return new(result);
 #else
                 return Task.FromResult(result);
 #endif
             }
 
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
             return new ValueTask<object?>(_processor.ProcessExecutedCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutedCommands(command, eventData.Context, result));
@@ -307,7 +307,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Called just before EF intends to call System.Data.Common.DbCommand.ExecuteScalarAsync.
         /// </summary>
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
         public override ValueTask<InterceptionResult<object>> ScalarExecutingAsync(
             DbCommand command,
             CommandEventData eventData,
@@ -323,14 +323,14 @@ namespace EFCoreSecondLevelCacheInterceptor
         {
             if (ShouldSkipProcessing(command, eventData))
             {
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
                 return new(result);
 #else
                 return Task.FromResult(result);
 #endif
             }
 
-#if NET5_0 || NETSTANDARD2_1
+#if NET6_0 || NET5_0 || NETSTANDARD2_1
             return new ValueTask<InterceptionResult<object>>(_processor.ProcessExecutingCommands(command, eventData.Context, result));
 #else
             return Task.FromResult(_processor.ProcessExecutingCommands(command, eventData.Context, result));

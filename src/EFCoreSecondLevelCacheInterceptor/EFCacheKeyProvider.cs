@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Data.Common;
 using System.Globalization;
 using System.Text;
@@ -113,13 +114,18 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             if (parameter.Value is Array array)
             {
-                return arrayToString(array);
+                return enumerableToString(array);
+            }
+
+            if (parameter.Value is IEnumerable enumerable)
+            {
+                return enumerableToString(enumerable);
             }
 
             return Convert.ToString(parameter.Value, CultureInfo.InvariantCulture);
         }
 
-        private static string arrayToString(Array array)
+        private static string enumerableToString(IEnumerable array)
         {
             var sb = new StringBuilder();
             foreach (var item in array)

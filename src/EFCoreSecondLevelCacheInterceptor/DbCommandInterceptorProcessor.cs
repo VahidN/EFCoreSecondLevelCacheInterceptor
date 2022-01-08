@@ -50,11 +50,16 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Reads data from cache or cache it and then returns the result
         /// </summary>
-        public T ProcessExecutedCommands<T>(DbCommand command, DbContext context, T result)
+        public T ProcessExecutedCommands<T>(DbCommand command, DbContext? context, T result)
         {
             if (command == null)
             {
                 throw new ArgumentNullException(nameof(command));
+            }
+
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
             }
 
             if (result is EFTableRowsDataReader rowsReader)
@@ -135,11 +140,16 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <summary>
         /// Reads command's data from the cache, if any.
         /// </summary>
-        public T ProcessExecutingCommands<T>(DbCommand command, DbContext context, T result)
+        public T ProcessExecutingCommands<T>(DbCommand command, DbContext? context, T result)
         {
             if (command == null)
             {
                 throw new ArgumentNullException(nameof(command));
+            }
+
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
             }
 
             var commandText = command.CommandText;

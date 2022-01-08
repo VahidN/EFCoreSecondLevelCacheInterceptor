@@ -33,7 +33,7 @@ namespace Issue9SQLiteInt32.DataLayer
             base.OnModelCreating(builder);
 
             // SQLite does not support DateTimeOffset
-            foreach (var property in builder.Model.GetEntityTypes()
+            /*foreach (var property in builder.Model.GetEntityTypes()
                                                 .SelectMany(t => t.GetProperties())
                                                 .Where(p => p.ClrType == typeof(DateTimeOffset)))
             {
@@ -53,11 +53,11 @@ namespace Issue9SQLiteInt32.DataLayer
                         convertToProviderExpression: dateTimeOffset => dateTimeOffset.Value.UtcDateTime,
                         convertFromProviderExpression: dateTime => new DateTimeOffset(dateTime)
                     ));
-            }
+            }*/
 
 
             // SQLite does not support TimeSpan
-            foreach (var property in builder.Model.GetEntityTypes()
+            /*foreach (var property in builder.Model.GetEntityTypes()
                                                 .SelectMany(t => t.GetProperties())
                                                 .Where(p => p.ClrType == typeof(TimeSpan)))
             {
@@ -77,11 +77,11 @@ namespace Issue9SQLiteInt32.DataLayer
                         convertToProviderExpression: timeSpan => timeSpan.Value.ToString(),
                         convertFromProviderExpression: timeSpanString => TimeSpan.Parse(timeSpanString)
                     ));
-            }
+            }*/
 
 
             // SQLite does not support uint32
-            foreach (var property in builder.Model.GetEntityTypes()
+            /*foreach (var property in builder.Model.GetEntityTypes()
                                                 .SelectMany(t => t.GetProperties())
                                                 .Where(p => p.ClrType == typeof(uint)))
             {
@@ -101,11 +101,11 @@ namespace Issue9SQLiteInt32.DataLayer
                         convertToProviderExpression: uintValue => (long)uintValue.Value,
                         convertFromProviderExpression: longValue => (uint)longValue
                     ));
-            }
+            }*/
 
 
             // SQLite does not support ulong
-            foreach (var property in builder.Model.GetEntityTypes()
+            /*foreach (var property in builder.Model.GetEntityTypes()
                                                 .SelectMany(t => t.GetProperties())
                                                 .Where(p => p.ClrType == typeof(ulong)))
             {
@@ -125,7 +125,7 @@ namespace Issue9SQLiteInt32.DataLayer
                         convertToProviderExpression: ulongValue => (long)ulongValue.Value,
                         convertFromProviderExpression: longValue => (ulong)longValue
                     ));
-            }
+            }*/
         }
     }
 }
