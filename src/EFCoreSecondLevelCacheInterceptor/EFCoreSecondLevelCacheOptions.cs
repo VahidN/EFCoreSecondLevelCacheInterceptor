@@ -94,7 +94,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFCoreSecondLevelCacheOptions UseCustomCacheProvider<T>(CacheExpirationMode expirationMode, TimeSpan timeout) where T : IEFCacheServiceProvider
         {
             Settings.CacheProvider = typeof(T);
-            Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
+            Settings.CachableQueriesOptions = new CachableQueriesOptions
             {
                 ExpirationMode = expirationMode,
                 Timeout = timeout,
@@ -121,7 +121,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFCoreSecondLevelCacheOptions UseMemoryCacheProvider(CacheExpirationMode expirationMode, TimeSpan timeout)
         {
             Settings.CacheProvider = typeof(EFMemoryCacheServiceProvider);
-            Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
+            Settings.CachableQueriesOptions = new CachableQueriesOptions
             {
                 ExpirationMode = expirationMode,
                 Timeout = timeout,
@@ -148,7 +148,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public EFCoreSecondLevelCacheOptions UseCacheManagerCoreProvider(CacheExpirationMode expirationMode, TimeSpan timeout)
         {
             Settings.CacheProvider = typeof(EFCacheManagerCoreProvider);
-            Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
+            Settings.CachableQueriesOptions = new CachableQueriesOptions
             {
                 ExpirationMode = expirationMode,
                 Timeout = timeout,
@@ -187,7 +187,7 @@ namespace EFCoreSecondLevelCacheInterceptor
             Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
             Settings.ProviderName = providerName;
             Settings.IsHybridCache = isHybridCache;
-            Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
+            Settings.CachableQueriesOptions = new CachableQueriesOptions
             {
                 ExpirationMode = expirationMode,
                 Timeout = timeout,

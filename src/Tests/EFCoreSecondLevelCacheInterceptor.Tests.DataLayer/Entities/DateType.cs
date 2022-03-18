@@ -17,5 +17,13 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities
         public TimeSpan? RelativeAddTimeValue { set; get; }
 
         public TimeSpan RelativeUpdateTimeValue { set; get; }
+
+        public DateOnly? AddDateOnlyValue { get; set; }
+
+        public DateOnly UpdateDateOnlyValue { get; set; }
+
+        public TimeOnly? RelativeAddTimeOnlyValue { set; get; }
+
+        public TimeOnly RelativeUpdateTimeOnlyValue { set; get; }
     }
 }

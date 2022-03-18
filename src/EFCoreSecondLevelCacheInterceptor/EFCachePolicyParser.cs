@@ -256,11 +256,15 @@ namespace EFCoreSecondLevelCacheInterceptor
             var cacheDependencies = options.Length >= 4 ? options[3].Split(new[] { EFCachePolicy.CacheDependenciesSeparator }, StringSplitOptions.RemoveEmptyEntries) : Array.Empty<string>();
 
             var isDefaultCacheableMethod = options.Length >= 5 && bool.Parse(options[4]);
-            var cacheAllQueriesOptions = _cacheSettings.CacheAllQueriesOptions;
-            if (isDefaultCacheableMethod && cacheAllQueriesOptions.IsActive)
+            if (isDefaultCacheableMethod && _cacheSettings.CacheAllQueriesOptions.IsActive)
             {
-                expirationMode = cacheAllQueriesOptions.ExpirationMode;
-                timeout = cacheAllQueriesOptions.Timeout;
+                expirationMode = _cacheSettings.CacheAllQueriesOptions.ExpirationMode;
+                timeout = _cacheSettings.CacheAllQueriesOptions.Timeout;
+            }
+            else if (isDefaultCacheableMethod && _cacheSettings.CachableQueriesOptions.IsActive)
+            {
+                expirationMode = _cacheSettings.CachableQueriesOptions.ExpirationMode;
+                timeout = _cacheSettings.CachableQueriesOptions.Timeout;
             }
 
             return new EFCachePolicy().ExpirationMode(expirationMode).SaltKey(saltKey).Timeout(timeout).CacheDependencies(cacheDependencies);

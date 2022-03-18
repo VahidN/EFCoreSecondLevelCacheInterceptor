@@ -24,14 +24,19 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Utils
         {
             var rnd = new Random();
             var isEven = rnd.Next(1, 100000) % 2 == 0;
+            var now = DateTime.UtcNow;
             var dateType1 = new DateType
             {
-                AddDate = isEven ? (DateTime?)null : DateTime.UtcNow,
-                UpdateDate = DateTime.UtcNow,
+                AddDate = isEven ? (DateTime?)null : now,
+                UpdateDate = now,
                 AddDateValue = isEven ? (DateTimeOffset?)null : DateTimeOffset.UtcNow,
                 UpdateDateValue = DateTimeOffset.UtcNow,
                 RelativeAddTimeValue = isEven ? (TimeSpan?)null : TimeSpan.FromMinutes(6),
-                RelativeUpdateTimeValue = TimeSpan.FromMinutes(6)
+                RelativeUpdateTimeValue = TimeSpan.FromMinutes(6),
+                AddDateOnlyValue = isEven ? (DateOnly?)null : DateOnly.FromDateTime(now),
+                UpdateDateOnlyValue = DateOnly.FromDateTime(now),
+                RelativeAddTimeOnlyValue = isEven ? (TimeOnly?)null : TimeOnly.FromTimeSpan(TimeSpan.FromMinutes(6)),
+                RelativeUpdateTimeOnlyValue = TimeOnly.FromTimeSpan(TimeSpan.FromMinutes(6))
             };
             context.DateTypes.Add(dateType1);
             context.SaveChanges();

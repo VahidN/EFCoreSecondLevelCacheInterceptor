@@ -40,6 +40,11 @@ namespace EFCoreSecondLevelCacheInterceptor
         public CacheSpecificQueriesOptions CacheSpecificQueriesOptions { get; set; } = new CacheSpecificQueriesOptions(entityTypes: null);
 
         /// <summary>
+        /// Cachable Queries Options
+        /// </summary>
+        public CachableQueriesOptions CachableQueriesOptions { get; set; } = new CachableQueriesOptions();
+
+        /// <summary>
         /// Skip Cache Specific Queries Options
         /// </summary>
         public SkipCacheSpecificQueriesOptions SkipCacheSpecificQueriesOptions { get; set; } = new SkipCacheSpecificQueriesOptions(entityTypes: null);
