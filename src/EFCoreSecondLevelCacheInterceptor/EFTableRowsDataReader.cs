@@ -506,6 +506,15 @@ namespace EFCoreSecondLevelCacheInterceptor
                 return (T)(object)((ulong)value != 0);
             }
 
+            if (actualValueType.IsArray && expectedValueType.GetInterface(nameof(IEnumerable)) != null)
+            {
+                var enumerable = Activator.CreateInstance(typeof(T), value);
+                if (enumerable is not null)
+                {
+                    return (T)enumerable;
+                }
+            }
+
 #if NET6_0 || NET5_0 || NETCORE3_1
             var dbTypeName = GetDataTypeName(ordinal);
 

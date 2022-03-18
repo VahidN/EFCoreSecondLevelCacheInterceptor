@@ -102,24 +102,17 @@ namespace EFCoreSecondLevelCacheInterceptor
 
         private static string? getParameterValue(DbParameter parameter)
         {
-            if (parameter.Value is DBNull || parameter.Value is null)
+            switch (parameter.Value)
             {
-                return "null";
-            }
-
-            if (parameter.Value is byte[] buffer)
-            {
-                return bytesToHex(buffer);
-            }
-
-            if (parameter.Value is Array array)
-            {
-                return enumerableToString(array);
-            }
-
-            if (parameter.Value is IEnumerable enumerable)
-            {
-                return enumerableToString(enumerable);
+                case DBNull:
+                case null:
+                    return "null";
+                case byte[] buffer:
+                    return bytesToHex(buffer);
+                case Array array:
+                    return enumerableToString(array);
+                case IEnumerable enumerable:
+                    return enumerableToString(enumerable);
             }
 
             return Convert.ToString(parameter.Value, CultureInfo.InvariantCulture);
