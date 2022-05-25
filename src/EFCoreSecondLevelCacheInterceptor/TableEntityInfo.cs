@@ -14,7 +14,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         public Type ClrType { set; get; } = default!;
 
         /// <summary>
-        /// The Corresponding tabe's name.
+        /// The Corresponding table's name.
         /// </summary>
         public string TableName { set; get; } = default!;
 

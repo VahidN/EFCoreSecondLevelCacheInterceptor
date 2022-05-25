@@ -210,7 +210,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         }
 
         /// <summary>
-        /// Should the debug level loggig be disabled?
+        /// Should the debug level logging be disabled?
         /// Set it to true for maximum performance.
         /// </summary>
         public EFCoreSecondLevelCacheOptions DisableLogging(bool value = false)
@@ -220,7 +220,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         }
 
         /// <summary>
-        /// Here you can decide based on the currect executing SQL command, should we cache its result or not?
+        /// Here you can decide based on the correct executing SQL command, should we cache its result or not?
         /// </summary>
         /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <c>null</c>.</exception>
         public EFCoreSecondLevelCacheOptions SkipCachingCommands(Predicate<string> predicate)
@@ -230,7 +230,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         }
 
         /// <summary>
-        /// Here you can decide based on the currect executing result, should we cache this result or not?
+        /// Here you can decide based on the correct executing result, should we cache this result or not?
         /// </summary>
         /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <c>null</c>.</exception>
         public EFCoreSecondLevelCacheOptions SkipCachingResults(Predicate<(string CommandText, object Value)> predicate)
@@ -240,7 +240,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         }
 
         /// <summary>
-        /// Here you can decide based on the currect executing SQL command, should we invalidate the cache or not?
+        /// Here you can decide based on the correct executing SQL command, should we invalidate the cache or not?
         /// </summary>
         /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is <c>null</c>.</exception>
         public EFCoreSecondLevelCacheOptions SkipCacheInvalidationCommands(Predicate<string> predicate)

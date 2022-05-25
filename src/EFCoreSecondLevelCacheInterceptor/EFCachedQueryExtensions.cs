@@ -42,7 +42,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="timeout">The expiration timeout.</param>
         /// <param name="cacheDependencies">
         /// Set this option to the `real` related table names of the current query, if you are using an stored procedure,
-        /// otherswise cache dependencies of normal queries will be calculated automatically.
+        /// otherwise cache dependencies of normal queries will be calculated automatically.
         /// `cacheDependencies` determines which tables are used in this final query.
         /// This array will be used to invalidate the related cache of all related queries automatically.
         /// </param>
@@ -66,7 +66,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="timeout">The expiration timeout.</param>
         /// <param name="cacheDependencies">
         /// Set this option to the `real` related table names of the current query, if you are using an stored procedure,
-        /// otherswise cache dependencies of normal queries will be calculated automatically.
+        /// otherwise cache dependencies of normal queries will be calculated automatically.
         /// `cacheDependencies` determines which tables are used in this final query.
         /// This array will be used to invalidate the related cache of all related queries automatically.
         /// </param>
@@ -149,7 +149,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="timeout">The expiration timeout.</param>
         /// <param name="cacheDependencies">
         /// Set this option to the `real` related table names of the current query, if you are using an stored procedure,
-        /// otherswise cache dependencies of normal queries will be calculated automatically.
+        /// otherwise cache dependencies of normal queries will be calculated automatically.
         /// `cacheDependencies` determines which tables are used in this final query.
         /// This array will be used to invalidate the related cache of all related queries automatically.
         /// </param>
@@ -173,7 +173,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         /// <param name="timeout">The expiration timeout.</param>
         /// <param name="cacheDependencies">
         /// Set this option to the `real` related table names of the current query, if you are using an stored procedure,
-        /// otherswise cache dependencies of normal queries will be calculated automatically.
+        /// otherwise cache dependencies of normal queries will be calculated automatically.
         /// `cacheDependencies` determines which tables are used in this final query.
         /// This array will be used to invalidate the related cache of all related queries automatically.
         /// </param>

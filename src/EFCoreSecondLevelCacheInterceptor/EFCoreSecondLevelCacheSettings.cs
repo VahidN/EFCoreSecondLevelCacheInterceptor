@@ -50,22 +50,22 @@ namespace EFCoreSecondLevelCacheInterceptor
         public SkipCacheSpecificQueriesOptions SkipCacheSpecificQueriesOptions { get; set; } = new SkipCacheSpecificQueriesOptions(entityTypes: null);
 
         /// <summary>
-        /// Should the debug level loggig be disabled?
+        /// Should the debug level logging be disabled?
         /// </summary>
         public bool DisableLogging { set; get; }
 
         /// <summary>
-        /// Here you can decide based on the currect executing SQL command, should we cache its result or not?
+        /// Here you can decide based on the correct executing SQL command, should we cache its result or not?
         /// </summary>
         public Predicate<string>? SkipCachingCommands { set; get; }
 
         /// <summary>
-        /// Here you can decide based on the currect executing SQL command, should we invalidate the cache or not?
+        /// Here you can decide based on the correct executing SQL command, should we invalidate the cache or not?
         /// </summary>
         public Predicate<string>? SkipCacheInvalidationCommands { set; get; }
 
         /// <summary>
-        /// Here you can decide based on the currect executing result, should we cache this result or not?
+        /// Here you can decide based on the correct executing result, should we cache this result or not?
         /// </summary>
         public Predicate<(string CommandText, object Value)>? SkipCachingResults { set; get; }
     }
