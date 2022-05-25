@@ -361,11 +361,11 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             {
                 options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
                     /*.CacheQueriesContainingTypes(
-                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
+                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30), TableTypeComparison.Contains,
                         typeof(Post), typeof(Product), typeof(User)
                         )*/
                     .CacheQueriesContainingTableNames(
-                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
+                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30), TableNameComparison.ContainsOnly,
                         "posts", "products", "users"
                         );
             });
