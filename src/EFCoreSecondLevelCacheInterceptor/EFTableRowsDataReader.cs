@@ -355,7 +355,11 @@ namespace EFCoreSecondLevelCacheInterceptor
                 var g = value.ToString();
                 return string.IsNullOrWhiteSpace(g) ? Guid.NewGuid() : new Guid(g);
             }
-
+            else if(valueType == typeof(byte[]))
+            {
+                return  new Guid((byte[])value);
+            }
+			
             return (Guid)value;
         }
 
