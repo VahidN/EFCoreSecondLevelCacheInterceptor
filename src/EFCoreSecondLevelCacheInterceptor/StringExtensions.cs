@@ -38,9 +38,9 @@ namespace EFCoreSecondLevelCacheInterceptor
         }
 
         /// <summary>
-        ///     Determines if a collection contains an item which starts with the given value
+        ///     Determines if a collection exclusively contains every item in the given collection
         /// </summary>
-        public static bool ContainsOnly(this IEnumerable<string>? source, IEnumerable<string>? collection,
+        public static bool ContainsEvery(this IEnumerable<string>? source, IEnumerable<string>? collection,
             StringComparer stringComparison)
         {
             if (source is null || collection is null)
@@ -50,6 +50,20 @@ namespace EFCoreSecondLevelCacheInterceptor
 
             return source.OrderBy(fElement => fElement).SequenceEqual(
                 collection.OrderBy(sElement => sElement), stringComparison);
+        }
+
+        /// <summary>
+        ///     Determines if a collection contains items only in the given collection
+        /// </summary>
+        public static bool ContainsOnly(this IEnumerable<string>? source, IEnumerable<string>? collection,
+            StringComparer stringComparison)
+        {
+            if (source is null || collection is null)
+            {
+                return false;
+            }
+
+            return source.All(sElement => collection.Contains(sElement, stringComparison));
         }
 
 

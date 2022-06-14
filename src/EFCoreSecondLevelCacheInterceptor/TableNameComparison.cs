@@ -41,8 +41,13 @@
         ContainsOnly,
 
         /// <summary>
-        ///     Caches queries containing table names not equal to the specified names exclusively.
+        ///     Caches queries containing table names equal to every one of the specified names exclusively.
         /// </summary>
-        DoesNotContainOnly
+        ContainsEvery,
+
+        /// <summary>
+        ///     Caches queries containing table names not equal to every one of the specified names exclusively.
+        /// </summary>
+        DoesNotContainEvery
     }
 }
