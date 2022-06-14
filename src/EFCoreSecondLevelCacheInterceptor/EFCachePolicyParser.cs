@@ -198,7 +198,7 @@ namespace EFCoreSecondLevelCacheInterceptor
                     }
 
                     break;
-                case TableTypeComparison.ContainsOnly:
+                case TableTypeComparison.ContainsEvery:
                     if (queryEntityTypes.OrderBy(x => x.FullName)
                         .SequenceEqual(options.EntityTypes.OrderBy(x => x.FullName)))
                     {
@@ -206,7 +206,14 @@ namespace EFCoreSecondLevelCacheInterceptor
                     }
 
                     break;
-                case TableTypeComparison.DoesNotContainOnly:
+                case TableTypeComparison.ContainsOnly:
+                    if(queryEntityTypes.All(x => options.EntityTypes.Contains(x)))
+                    {
+                        return true;
+                    }
+
+                    break;
+                case TableTypeComparison.DoesNotContainEvery:
                     if (!queryEntityTypes.OrderBy(x => x.FullName)
                             .SequenceEqual(options.EntityTypes.OrderBy(x => x.FullName)))
                     {
@@ -279,15 +286,22 @@ namespace EFCoreSecondLevelCacheInterceptor
                     }
 
                     break;
-                case TableNameComparison.ContainsOnly:
-                    if (commandTableNames.ContainsOnly(options.TableNames, StringComparer.OrdinalIgnoreCase))
+                case TableNameComparison.ContainsEvery:
+                    if (commandTableNames.ContainsEvery(options.TableNames, StringComparer.OrdinalIgnoreCase))
                     {
                         return true;
                     }
 
                     break;
-                case TableNameComparison.DoesNotContainOnly:
-                    if (!commandTableNames.ContainsOnly(options.TableNames, StringComparer.OrdinalIgnoreCase))
+                case TableNameComparison.ContainsOnly:
+                    if(commandTableNames.ContainsOnly(options.TableNames, StringComparer.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+
+                    break;
+                case TableNameComparison.DoesNotContainEvery:
+                    if (!commandTableNames.ContainsEvery(options.TableNames, StringComparer.OrdinalIgnoreCase))
                     {
                         return true;
                     }

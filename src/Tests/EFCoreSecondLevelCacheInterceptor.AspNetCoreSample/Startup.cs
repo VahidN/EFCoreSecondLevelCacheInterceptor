@@ -35,6 +35,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
                         )*/
                     .CacheQueriesContainingTableNames(
                         CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
+                        TableNameComparison.ContainsOnly,
                         "posts", "products", "users"
                         )
                     .SkipCachingCommands(commandText =>

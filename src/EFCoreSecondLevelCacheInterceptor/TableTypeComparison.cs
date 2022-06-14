@@ -21,8 +21,13 @@
         ContainsOnly,
 
         /// <summary>
-        ///     Caches queries containing table types not equal to the specified types exclusively.
+        ///     Caches queries containing table types equal to every one of the specified types exclusively.
         /// </summary>
-        DoesNotContainOnly
+        ContainsEvery,
+
+        /// <summary>
+        ///     Caches queries containing table types not equal to every one of the specified types exclusively.
+        /// </summary>
+        DoesNotContainEvery
     }
 }
