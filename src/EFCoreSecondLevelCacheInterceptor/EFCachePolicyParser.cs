@@ -175,12 +175,16 @@ namespace EFCoreSecondLevelCacheInterceptor
             CacheSpecificQueriesOptions options,
             IList<TableEntityInfo> allEntityTypes)
         {
-            if (options.EntityTypes is null)
+            if (options.EntityTypes is null || options.EntityTypes.Count == 0)
             {
                 return false;
             }
 
             var queryEntityTypes = _sqlCommandsProcessor.GetSqlCommandEntityTypes(commandText, allEntityTypes);
+            if (queryEntityTypes.Count == 0)
+            {
+                return false;
+            }
 
             switch (options.TableTypeComparison)
             {
@@ -230,12 +234,17 @@ namespace EFCoreSecondLevelCacheInterceptor
             string commandText,
             CacheSpecificQueriesOptions options)
         {
-            if (options.TableNames is null)
+            if (options.TableNames is null || !options.TableNames.Any())
             {
                 return false;
             }
 
             var commandTableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
+            if (commandTableNames.Count == 0)
+            {
+                return false;
+            }
+			
             switch (options.TableNameComparison)
             {
                 case TableNameComparison.Contains:
