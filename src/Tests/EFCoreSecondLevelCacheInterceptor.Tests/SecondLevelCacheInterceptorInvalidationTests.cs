@@ -417,6 +417,60 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
                     Assert.IsNotNull(userData);
                     CollectionAssert.AreEqual(binaryData, userData.ImageData);
                 });
-        }
+        }		
+		
+        [DataTestMethod]
+        [DataRow(TestCacheProvider.BuiltInInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+        [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
+        [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+        [DataRow(TestCacheProvider.EasyCachingCoreRedis)]
+        public void TestInsertingMultipleDataIntoTheSameTableShouldInvalidateTheCacheAutomatically(TestCacheProvider cacheProvider)
+        {
+            EFServiceProvider.RunInContext(cacheProvider, LogLevel.Debug, false,
+                (context, loggerProvider) =>
+                {
+                    var isActive = true;
+                    var name = "Product2";
+
+                    var list1 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
+                        .OrderBy(product => product.ProductNumber)
+                        .Where(product => product.IsActive == isActive && product.ProductName == name)
+                        .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                        .ToList();
+                    Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
+                    Assert.IsTrue(list1.Any());
+
+                    var list2 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
+                        .OrderBy(product => product.ProductNumber)
+                        .Where(product => product.IsActive == isActive && product.ProductName == name)
+                        .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                        .ToList();
+                    Assert.AreEqual(1, loggerProvider.GetCacheHitCount());
+                    Assert.IsTrue(list2.Any());
+					
+					for(var i = 0; i < 100; i++)
+					{
+						var newProduct = new Product
+						{
+							IsActive = false,
+							ProductName = $"Product{RandomNumberProvider.Next()}",
+							ProductNumber = RandomNumberProvider.Next().ToString(),
+							Notes = "Notes ...",
+							UserId = 1
+						};
+						context.Products.Add(newProduct);
+					}
+                    context.SaveChanges();
+
+                    var list3 = context.Products.Include(x => x.TagProducts).ThenInclude(x => x.Tag)
+                        .OrderBy(product => product.ProductNumber)
+                        .Where(product => product.IsActive == isActive && product.ProductName == name)
+                        .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(45))
+                        .ToList();
+                    Assert.AreEqual(0, loggerProvider.GetCacheHitCount());
+                    Assert.IsTrue(list3.Any());
+                });
+        }		
     }
 }
