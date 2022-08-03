@@ -1,3 +1,5 @@
+using System;
+
 namespace Issue123WithMessagePack.Entities
 {
     public class Person
@@ -5,5 +7,9 @@ namespace Issue123WithMessagePack.Entities
         public int Id { get; set; }
 
         public string Name { get; set; }
+		
+		public DateTime Date { get; set; }
+		
+		public DateTimeOffset DateOffset { get; set; }
     }
 }

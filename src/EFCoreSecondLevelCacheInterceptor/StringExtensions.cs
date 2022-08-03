@@ -5,7 +5,7 @@ using System.Linq;
 namespace EFCoreSecondLevelCacheInterceptor
 {
     /// <summary>
-    ///     Missing NET4_6_1 exts
+    ///     Missing NET4_6_2 exts
     /// </summary>
     internal static class StringExtensions
     {
@@ -67,7 +67,7 @@ namespace EFCoreSecondLevelCacheInterceptor
         }
 
 
-#if NET4_6_1 || NETSTANDARD2_0
+#if NET4_6_2 || NETSTANDARD2_0
         /// <summary>
         /// Returns a new string in which all occurrences of a specified string in the current instance are replaced with another specified string, using the provided comparison type.
         /// </summary>

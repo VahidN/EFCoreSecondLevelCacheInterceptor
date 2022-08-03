@@ -20,7 +20,7 @@ namespace Issue123WithMessagePack
                 cachedPeople = context.People.ToList();
                 foreach (var person in cachedPeople)
                 {
-                    Console.WriteLine($"{person.Id}, {person.Name}");
+                    Console.WriteLine($"{person.Id}, {person.Name}, {person.Date}, {person.DateOffset}");
                 }
 
                 var person1 = context.People.Single(x => x.Id == 1);
@@ -40,10 +40,14 @@ namespace Issue123WithMessagePack
                     context.People.Add(new Person
                     {
                         Name = "Bill",
+			Date = DateTime.Now,
+			DateOffset = DateTimeOffset.Now
                     });
 		    context.People.Add(new Person
                     {
                         Name = null,
+			Date = DateTime.Now,
+			DateOffset = DateTimeOffset.Now						
                     });
                     context.SaveChanges();
                 }
