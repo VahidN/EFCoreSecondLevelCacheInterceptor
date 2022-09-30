@@ -1,9 +1,8 @@
-﻿namespace EFCoreSecondLevelCacheInterceptor
+﻿namespace EFCoreSecondLevelCacheInterceptor;
+
+/// <summary>
+///     Cachable queries Options
+/// </summary>
+public class CachableQueriesOptions : CacheAllQueriesOptions
 {
-    /// <summary>
-    /// Cachable queries Options
-    /// </summary>
-    public class CachableQueriesOptions : CacheAllQueriesOptions
-    {
-    }
 }

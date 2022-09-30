@@ -1,29 +1,25 @@
 using System;
 using System.Collections.Generic;
 
-namespace EFCoreSecondLevelCacheInterceptor
+namespace EFCoreSecondLevelCacheInterceptor;
+
+/// <summary>
+///     CacheAllQueries Options
+/// </summary>
+public class SkipCacheSpecificQueriesOptions : CacheAllQueriesOptions
 {
     /// <summary>
-    /// CacheAllQueries Options
+    ///     CacheAllQueries Options
     /// </summary>
-    public class SkipCacheSpecificQueriesOptions : CacheAllQueriesOptions
-    {
-        /// <summary>
-        /// Given entity types to cache
-        /// </summary>
-        public IList<Type>? EntityTypes { get; }
+    public SkipCacheSpecificQueriesOptions(IList<Type>? entityTypes) => EntityTypes = entityTypes;
 
-        /// <summary>
-        /// Given table names to cache
-        /// </summary>
-        public IEnumerable<string>? TableNames { set; get; }
+    /// <summary>
+    ///     Given entity types to cache
+    /// </summary>
+    public IList<Type>? EntityTypes { get; }
 
-        /// <summary>
-        /// CacheAllQueries Options
-        /// </summary>
-        public SkipCacheSpecificQueriesOptions(IList<Type>? entityTypes)
-        {
-            EntityTypes = entityTypes;
-        }
-    }
+    /// <summary>
+    ///     Given table names to cache
+    /// </summary>
+    public IEnumerable<string>? TableNames { set; get; }
 }

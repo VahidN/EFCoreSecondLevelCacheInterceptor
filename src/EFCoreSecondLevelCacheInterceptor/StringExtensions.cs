@@ -2,69 +2,70 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EFCoreSecondLevelCacheInterceptor
+namespace EFCoreSecondLevelCacheInterceptor;
+
+/// <summary>
+///     Missing NET4_6_2 exts
+/// </summary>
+internal static class StringExtensions
 {
     /// <summary>
-    ///     Missing NET4_6_2 exts
+    ///     Determines if a collection contains an item which ends with the given value
     /// </summary>
-    internal static class StringExtensions
+    public static bool EndsWith(this IEnumerable<string>? collection, string? value,
+                                StringComparison stringComparison)
     {
-        /// <summary>
-        ///     Determines if a collection contains an item which ends with the given value
-        /// </summary>
-        public static bool EndsWith(this IEnumerable<string>? collection, string? value,
-            StringComparison stringComparison)
+        if (string.IsNullOrEmpty(value))
         {
-            if (string.IsNullOrEmpty(value))
-            {
-                return false;
-            }
-
-            return collection?.Any(item => item.EndsWith(value, stringComparison)) == true;
+            return false;
         }
 
-        /// <summary>
-        ///     Determines if a collection contains an item which starts with the given value
-        /// </summary>
-        public static bool StartsWith(this IEnumerable<string>? collection, string? value,
-            StringComparison stringComparison)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return false;
-            }
+        return collection?.Any(item => item.EndsWith(value, stringComparison)) == true;
+    }
 
-            return collection?.Any(item => item.StartsWith(value, stringComparison)) == true;
+    /// <summary>
+    ///     Determines if a collection contains an item which starts with the given value
+    /// </summary>
+    public static bool StartsWith(this IEnumerable<string>? collection, string? value,
+                                  StringComparison stringComparison)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return false;
         }
 
-        /// <summary>
-        ///     Determines if a collection exclusively contains every item in the given collection
-        /// </summary>
-        public static bool ContainsEvery(this IEnumerable<string>? source, IEnumerable<string>? collection,
-            StringComparer stringComparison)
-        {
-            if (source is null || collection is null)
-            {
-                return false;
-            }
+        return collection?.Any(item => item.StartsWith(value, stringComparison)) == true;
+    }
 
-            return source.OrderBy(fElement => fElement).SequenceEqual(
-                collection.OrderBy(sElement => sElement), stringComparison);
+    /// <summary>
+    ///     Determines if a collection exclusively contains every item in the given collection
+    /// </summary>
+    public static bool ContainsEvery(this IEnumerable<string>? source, IEnumerable<string>? collection,
+                                     StringComparer stringComparison)
+    {
+        if (source is null || collection is null)
+        {
+            return false;
         }
 
-        /// <summary>
-        ///     Determines if a collection contains items only in the given collection
-        /// </summary>
-        public static bool ContainsOnly(this IEnumerable<string>? source, IEnumerable<string>? collection,
-            StringComparer stringComparison)
-        {
-            if (source is null || collection is null)
-            {
-                return false;
-            }
+        return source.OrderBy(fElement => fElement).SequenceEqual(
+                                                                  collection.OrderBy(sElement => sElement),
+                                                                  stringComparison);
+    }
 
-            return source.All(sElement => collection.Contains(sElement, stringComparison));
+    /// <summary>
+    ///     Determines if a collection contains items only in the given collection
+    /// </summary>
+    public static bool ContainsOnly(this IEnumerable<string>? source, IEnumerable<string>? collection,
+                                    StringComparer stringComparison)
+    {
+        if (source is null || collection is null)
+        {
+            return false;
         }
+
+        return source.All(sElement => collection.Contains(sElement, stringComparison));
+    }
 
 
 #if NET4_6_2 || NETSTANDARD2_0
@@ -109,5 +110,4 @@ namespace EFCoreSecondLevelCacheInterceptor
             };
         }
 #endif
-    }
 }

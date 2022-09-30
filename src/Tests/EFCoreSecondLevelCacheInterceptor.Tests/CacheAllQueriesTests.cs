@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EFCoreSecondLevelCacheInterceptor.Tests
 {
     [TestClass]
-    public class CacheAllQueriesTests
+    public class CacheAllQueriesTests  
     {
         [DataTestMethod]
         [DataRow(TestCacheProvider.BuiltInInMemory)]

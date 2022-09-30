@@ -1,25 +1,24 @@
 using System;
 
-namespace EFCoreSecondLevelCacheInterceptor
+namespace EFCoreSecondLevelCacheInterceptor;
+
+/// <summary>
+///     CacheAllQueries Options
+/// </summary>
+public class CacheAllQueriesOptions
 {
     /// <summary>
-    /// CacheAllQueries Options
+    ///     Defines the expiration mode of the cache item.
     /// </summary>
-    public class CacheAllQueriesOptions
-    {
-        /// <summary>
-        /// Defines the expiration mode of the cache item.
-        /// </summary>
-        public CacheExpirationMode ExpirationMode { set; get; }
+    public CacheExpirationMode ExpirationMode { set; get; }
 
-        /// <summary>
-        /// The expiration timeout.
-        /// </summary>
-        public TimeSpan Timeout { set; get; }
+    /// <summary>
+    ///     The expiration timeout.
+    /// </summary>
+    public TimeSpan Timeout { set; get; }
 
-        /// <summary>
-        /// Enables or disables the `CacheAllQueries` feature.
-        /// </summary>
-        public bool IsActive { set; get; }
-    }
+    /// <summary>
+    ///     Enables or disables the `CacheAllQueries` feature.
+    /// </summary>
+    public bool IsActive { set; get; }
 }

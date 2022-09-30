@@ -4,162 +4,182 @@ using EasyCaching.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace EFCoreSecondLevelCacheInterceptor
+namespace EFCoreSecondLevelCacheInterceptor;
+
+/// <summary>
+///     Using ICacheManager as a cache service.
+/// </summary>
+public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
 {
+    private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+
+    private readonly IEasyCachingProviderBase _easyCachingProvider;
+    private readonly ILockProvider _lockProvider;
+    private readonly IEFDebugLogger _logger;
+
     /// <summary>
-    /// Using ICacheManager as a cache service.
+    ///     Using IMemoryCache as a cache service.
     /// </summary>
-    public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
+    public EFEasyCachingCoreProvider(
+        IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
+        IServiceProvider serviceProvider,
+        ILockProvider lockProvider,
+        IEFDebugLogger logger)
     {
-        private readonly IReaderWriterLockProvider _readerWriterLockProvider;
-
-        private readonly IEasyCachingProviderBase _easyCachingProvider;
-        private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
-        private readonly IEFDebugLogger _logger;
-
-        /// <summary>
-        /// Using IMemoryCache as a cache service.
-        /// </summary>
-        public EFEasyCachingCoreProvider(
-            IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
-            IServiceProvider serviceProvider,
-            IReaderWriterLockProvider readerWriterLockProvider,
-            IEFDebugLogger logger)
+        if (cacheSettings == null)
         {
-            if (cacheSettings == null)
+            throw new ArgumentNullException(nameof(cacheSettings));
+        }
+
+        if (serviceProvider == null)
+        {
+            throw new ArgumentNullException(nameof(serviceProvider));
+        }
+
+        _cacheSettings = cacheSettings.Value;
+        _lockProvider = lockProvider ?? throw new ArgumentNullException(nameof(lockProvider));
+        _logger = logger;
+
+        if (_cacheSettings.IsHybridCache)
+        {
+            var hybridFactory = serviceProvider.GetRequiredService<IHybridProviderFactory>();
+            _easyCachingProvider = hybridFactory.GetHybridCachingProvider(_cacheSettings.ProviderName);
+        }
+        else
+        {
+            var providerFactory = serviceProvider.GetRequiredService<IEasyCachingProviderFactory>();
+            _easyCachingProvider = providerFactory.GetCachingProvider(_cacheSettings.ProviderName);
+        }
+    }
+
+    /// <summary>
+    ///     Adds a new item to the cache.
+    /// </summary>
+    /// <param name="cacheKey">key</param>
+    /// <param name="value">value</param>
+    /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
+    public void InsertValue(EFCacheKey cacheKey, EFCachedData value, EFCachePolicy cachePolicy)
+    {
+        if (cacheKey is null)
+        {
+            throw new ArgumentNullException(nameof(cacheKey));
+        }
+
+        if (cachePolicy is null)
+        {
+            throw new ArgumentNullException(nameof(cachePolicy));
+        }
+
+        using var @lock = _lockProvider.Lock();
+        if (value == null)
+        {
+            value = new EFCachedData { IsNull = true };
+        }
+
+        var keyHash = cacheKey.KeyHash;
+
+        foreach (var rootCacheKey in cacheKey.CacheDependencies)
+        {
+            if (string.IsNullOrWhiteSpace(rootCacheKey))
             {
-                throw new ArgumentNullException(nameof(cacheSettings));
+                continue;
             }
 
-            if (serviceProvider == null)
+            var items = _easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
+            if (items.IsNull)
             {
-                throw new ArgumentNullException(nameof(serviceProvider));
-            }
-
-            _cacheSettings = cacheSettings.Value;
-            _readerWriterLockProvider = readerWriterLockProvider ?? throw new ArgumentNullException(nameof(readerWriterLockProvider));
-            _logger = logger;
-
-            if (_cacheSettings.IsHybridCache)
-            {
-                var hybridFactory = serviceProvider.GetRequiredService<IHybridProviderFactory>();
-                _easyCachingProvider = hybridFactory.GetHybridCachingProvider(_cacheSettings.ProviderName);
+                _easyCachingProvider.Set(rootCacheKey,
+                                         new HashSet<string>(StringComparer.OrdinalIgnoreCase) { keyHash },
+                                         cachePolicy.CacheTimeout);
             }
             else
             {
-                var providerFactory = serviceProvider.GetRequiredService<IEasyCachingProviderFactory>();
-                _easyCachingProvider = providerFactory.GetCachingProvider(_cacheSettings.ProviderName);
+                items.Value.Add(keyHash);
+                _easyCachingProvider.Set(rootCacheKey, items.Value, cachePolicy.CacheTimeout);
             }
         }
 
-        /// <summary>
-        /// Adds a new item to the cache.
-        /// </summary>
-        /// <param name="cacheKey">key</param>
-        /// <param name="value">value</param>
-        /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-        public void InsertValue(EFCacheKey cacheKey, EFCachedData value, EFCachePolicy cachePolicy)
+        // We don't support Sliding Expiration at this time. -> https://github.com/dotnetcore/EasyCaching/issues/113
+        _easyCachingProvider.Set(keyHash, value, cachePolicy.CacheTimeout);
+    }
+
+    /// <summary>
+    ///     Removes the cached entries added by this library.
+    /// </summary>
+    public void ClearAllCachedEntries()
+    {
+        using var @lock = _lockProvider.Lock();
+        if (!_cacheSettings.IsHybridCache)
         {
-            _readerWriterLockProvider.TryWriteLocked(() =>
-            {
-                if (value == null)
-                {
-                    value = new EFCachedData { IsNull = true };
-                }
+            ((IEasyCachingProvider)_easyCachingProvider).Flush();
+        }
+    }
 
-                var keyHash = cacheKey.KeyHash;
-
-                foreach (var rootCacheKey in cacheKey.CacheDependencies)
-                {
-                    var items = _easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
-                    if (items.IsNull)
-                    {
-                        _easyCachingProvider.Set(
-                            rootCacheKey,
-                            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { keyHash },
-                            cachePolicy.CacheTimeout);
-                    }
-                    else
-                    {
-                        items.Value.Add(keyHash);
-                        _easyCachingProvider.Set(rootCacheKey, items.Value, cachePolicy.CacheTimeout);
-                    }
-                }
-
-                // We don't support Sliding Expiration at this time. -> https://github.com/dotnetcore/EasyCaching/issues/113
-                _easyCachingProvider.Set(keyHash, value, cachePolicy.CacheTimeout);
-            });
+    /// <summary>
+    ///     Gets a cached entry by key.
+    /// </summary>
+    /// <param name="cacheKey">key to find</param>
+    /// <returns>cached value</returns>
+    /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
+    public EFCachedData GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
+    {
+        if (cacheKey is null)
+        {
+            throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        /// <summary>
-        /// Removes the cached entries added by this library.
-        /// </summary>
-        public void ClearAllCachedEntries()
+        using var @lock = _lockProvider.Lock();
+        return _easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash).Value;
+    }
+
+    /// <summary>
+    ///     Invalidates all of the cache entries which are dependent on any of the specified root keys.
+    /// </summary>
+    /// <param name="cacheKey">Stores information of the computed key of the input LINQ query.</param>
+    public void InvalidateCacheDependencies(EFCacheKey cacheKey)
+    {
+        if (cacheKey is null)
         {
-            if (!_cacheSettings.IsHybridCache)
+            throw new ArgumentNullException(nameof(cacheKey));
+        }
+
+        using var @lock = _lockProvider.Lock();
+        foreach (var rootCacheKey in cacheKey.CacheDependencies)
+        {
+            if (string.IsNullOrWhiteSpace(rootCacheKey))
             {
-                _readerWriterLockProvider.TryWriteLocked(() => ((IEasyCachingProvider)_easyCachingProvider).Flush());
+                continue;
             }
-        }
 
-        /// <summary>
-        /// Gets a cached entry by key.
-        /// </summary>
-        /// <param name="cacheKey">key to find</param>
-        /// <returns>cached value</returns>
-        /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-        public EFCachedData GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
-        {
-            return _readerWriterLockProvider.TryReadLocked(() => _easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash).Value);
-        }
-
-        /// <summary>
-        /// Invalidates all of the cache entries which are dependent on any of the specified root keys.
-        /// </summary>
-        /// <param name="cacheKey">Stores information of the computed key of the input LINQ query.</param>
-        public void InvalidateCacheDependencies(EFCacheKey cacheKey)
-        {
-            _readerWriterLockProvider.TryWriteLocked(() =>
+            var cachedValue = _easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash);
+            var dependencyKeys = _easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
+            if (AreRootCacheKeysExpired(cachedValue, dependencyKeys))
             {
-                foreach (var rootCacheKey in cacheKey.CacheDependencies)
-                {
-                    if (string.IsNullOrWhiteSpace(rootCacheKey))
-                    {
-                        continue;
-                    }
-
-                    var cachedValue = _easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash);
-                    var dependencyKeys = _easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
-                    if (areRootCacheKeysExpired(cachedValue, dependencyKeys))
-                    {
-                        _logger.LogDebug(CacheableEventId.QueryResultInvalidated,
-                            $"Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].");
-                        ClearAllCachedEntries();
-                        return;
-                    }
-
-                    clearDependencyValues(dependencyKeys);
-                    _easyCachingProvider.Remove(rootCacheKey);
-                }
-            });
-        }
-
-        private void clearDependencyValues(CacheValue<HashSet<string>> dependencyKeys)
-        {
-            if (dependencyKeys.IsNull)
-            {
+                _logger.LogDebug(CacheableEventId.QueryResultInvalidated,
+                                 $"Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].");
+                ClearAllCachedEntries();
                 return;
             }
 
-            foreach (var dependencyKey in dependencyKeys.Value)
-            {
-                _easyCachingProvider.Remove(dependencyKey);
-            }
+            ClearDependencyValues(dependencyKeys);
+            _easyCachingProvider.Remove(rootCacheKey);
+        }
+    }
+
+    private void ClearDependencyValues(CacheValue<HashSet<string>> dependencyKeys)
+    {
+        if (dependencyKeys.IsNull)
+        {
+            return;
         }
 
-        private static bool areRootCacheKeysExpired(
-                CacheValue<EFCachedData> cachedValue,
-                CacheValue<HashSet<string>> dependencyKeys)
-            => !cachedValue.IsNull && dependencyKeys.IsNull;
+        foreach (var dependencyKey in dependencyKeys.Value)
+        {
+            _easyCachingProvider.Remove(dependencyKey);
+        }
     }
+
+    private static bool AreRootCacheKeysExpired(
+        CacheValue<EFCachedData> cachedValue, CacheValue<HashSet<string>> dependencyKeys)
+        => !cachedValue.IsNull && dependencyKeys.IsNull;
 }

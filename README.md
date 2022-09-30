@@ -71,7 +71,7 @@ To use its in-memory caching mechanism, add this entry to the `.csproj` file:
 
 ```xml
   <ItemGroup>
-    <PackageReference Include="EasyCaching.InMemory" Version="1.1.0" />
+    <PackageReference Include="EasyCaching.InMemory" Version="1.6.1" />
   </ItemGroup>
 ```
 
@@ -127,7 +127,8 @@ If you want to use the Redis as the preferred cache provider with `EasyCaching.C
 
 ```xml
   <ItemGroup>
-    <PackageReference Include="EasyCaching.Redis" Version="1.1.0" />
+    <PackageReference Include="EasyCaching.Redis" Version="1.6.1" />
+    <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.6.1" />	
   </ItemGroup>
 ```
 
@@ -154,7 +155,26 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
                     config.DBConfig.SyncTimeout = 10000;
                     config.DBConfig.AsyncTimeout = 10000;
                     config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("127.0.0.1", 6379));
-                }, providerName1);
+                    config.EnableLogging = true;
+                    config.SerializerName = "Pack";
+                    config.DBConfig.ConnectionTimeout = 10000;
+                }, providerName1)
+                .WithMessagePack(so =>
+                                      {
+                                         so.EnableCustomResolver = true;
+                                         so.CustomResolvers = CompositeResolver.Create(
+                                         new IMessagePackFormatter[]
+                                         {
+                                               DBNullFormatter.Instance, // This is necessary for the null values
+                                         },
+                                         new IFormatterResolver[]
+                                         {
+                                              NativeDateTimeResolver.Instance,
+                                              ContractlessStandardResolver.Instance,
+                                              StandardResolverAllowPrivate.Instance,
+                                         });
+                                       },
+                                       "Pack");
             });
         }
     }

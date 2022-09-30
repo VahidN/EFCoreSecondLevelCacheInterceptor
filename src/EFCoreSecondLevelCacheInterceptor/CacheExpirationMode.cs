@@ -1,18 +1,17 @@
-namespace EFCoreSecondLevelCacheInterceptor
+namespace EFCoreSecondLevelCacheInterceptor;
+
+/// <summary>
+///     Defines the supported expiration modes for cache items.
+/// </summary>
+public enum CacheExpirationMode
 {
     /// <summary>
-    /// Defines the supported expiration modes for cache items.
+    ///     Defines absolute expiration. The item will expire after the expiration timeout.
     /// </summary>
-    public enum CacheExpirationMode
-    {
-        /// <summary>
-        /// Defines absolute expiration. The item will expire after the expiration timeout.
-        /// </summary>
-        Absolute,
+    Absolute,
 
-        /// <summary>
-        /// Defines sliding expiration. The expiration timeout will be refreshed on every access.
-        /// </summary>
-        Sliding
-    }
+    /// <summary>
+    ///     Defines sliding expiration. The expiration timeout will be refreshed on every access.
+    /// </summary>
+    Sliding,
 }

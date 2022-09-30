@@ -1,3 +1,7 @@
+# Code files
+[*.{cs,csx,vb,vbx,razor,html,htm,js,md,cshtml,xaml,vbhtml,aspx,txt,asax,ashx,asmx,master,config}]
+charset = utf-8-bom
+
 [*.cs]
 
 dotnet_diagnostic.CA1848.severity = suggestion
