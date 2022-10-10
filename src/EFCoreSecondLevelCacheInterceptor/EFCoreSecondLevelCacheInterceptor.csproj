@@ -1,139 +1,139 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <Description>Entity Framework Core Second Level Caching Library.</Description>
-    <VersionPrefix>3.7.0</VersionPrefix>
-    <Authors>Vahid Nasiri</Authors>
-    <TargetFrameworks>net6.0;net5.0;netstandard2.1;netstandard2.0;net462;netcoreapp3.1;</TargetFrameworks>
-    <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFrameworks>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>EFCoreSecondLevelCacheInterceptor</AssemblyName>
-    <PackageId>EFCoreSecondLevelCacheInterceptor</PackageId>
-    <PackageTags>EntityFramework;Cache;Caching;SecondLevelCache;EFCore;ORM;.NET Core;aspnetcore</PackageTags>
-    <PackageProjectUrl>https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <DebugType>embedded</DebugType>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-  </PropertyGroup>
-  <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-    <AnalysisLevel>latest</AnalysisLevel>
-    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
-    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
-    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
-    <Deterministic>true</Deterministic>
-    <Features>strict</Features>
-    <ReportAnalyzer>true</ReportAnalyzer>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.708">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.2.32">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="AsyncFixer" Version="1.6.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Asyncify" Version="0.9.7">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.42.0.51121">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)" />
-    <PackageReference Include="CacheManager.Core" Version="[1.2,)" />
-    <PackageReference Include="EasyCaching.Core" Version="[1.6,)" />
-    <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)" />
-  </ItemGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net462'">
-    <DefineConstants>NET4_6_2</DefineConstants>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Description>Entity Framework Core Second Level Caching Library.</Description>
+        <VersionPrefix>3.7.1</VersionPrefix>
+        <Authors>Vahid Nasiri</Authors>
+        <TargetFrameworks>net6.0;net5.0;netstandard2.1;netstandard2.0;net462;netcoreapp3.1;</TargetFrameworks>
+        <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFrameworks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AssemblyName>EFCoreSecondLevelCacheInterceptor</AssemblyName>
+        <PackageId>EFCoreSecondLevelCacheInterceptor</PackageId>
+        <PackageTags>EntityFramework;Cache;Caching;SecondLevelCache;EFCore;ORM;.NET Core;aspnetcore</PackageTags>
+        <PackageProjectUrl>https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+        <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+        <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <DebugType>embedded</DebugType>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    </PropertyGroup>
+    <PropertyGroup>
+        <LangVersion>latest</LangVersion>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+        <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+        <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+        <Deterministic>true</Deterministic>
+        <Features>strict</Features>
+        <ReportAnalyzer>true</ReportAnalyzer>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Meziantou.Analyzer" Version="1.0.708">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.2.32">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="AsyncFixer" Version="1.6.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Asyncify" Version="0.9.7">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.42.0.51121">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+    </ItemGroup>
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
+        <Reference Include="System"/>
+        <Reference Include="Microsoft.CSharp"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)"/>
+        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.6,)"/>
+        <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
+    </ItemGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net462'">
+        <DefineConstants>NET4_6_2</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup Condition=" ('$(TargetFramework)' == 'netstandard2.0')">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)" />
-    <PackageReference Include="CacheManager.Core" Version="[1.2,)" />
-    <PackageReference Include="EasyCaching.Core" Version="[1.6,)" />
-    <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)" />
-  </ItemGroup>
-  <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.0')">
-    <DefineConstants>NETSTANDARD2_0</DefineConstants>
-  </PropertyGroup>
+    <ItemGroup Condition=" ('$(TargetFramework)' == 'netstandard2.0')">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)"/>
+        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.6,)"/>
+        <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
+    </ItemGroup>
+    <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.0')">
+        <DefineConstants>NETSTANDARD2_0</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,6)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,6)" />
-    <PackageReference Include="CacheManager.Core" Version="[1.2,)" />
-    <PackageReference Include="EasyCaching.Core" Version="[1.6,)" />
-    <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)" />
-  </ItemGroup>
-  <PropertyGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
-    <DefineConstants>NETCORE3_1</DefineConstants>
-  </PropertyGroup>
+    <ItemGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,6)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,6)"/>
+        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.6,)"/>
+        <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
+    </ItemGroup>
+    <PropertyGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
+        <DefineConstants>NETCORE3_1</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup Condition="('$(TargetFramework)' == 'netstandard2.1')">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[5,)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)" />
-    <PackageReference Include="CacheManager.Core" Version="[1.2,)" />
-    <PackageReference Include="EasyCaching.Core" Version="[1.6,)" />
-    <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)" />
-  </ItemGroup>
-  <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.1')">
-    <DefineConstants>NETSTANDARD2_1</DefineConstants>
-  </PropertyGroup>
+    <ItemGroup Condition="('$(TargetFramework)' == 'netstandard2.1')">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[5,)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)"/>
+        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.6,)"/>
+        <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
+    </ItemGroup>
+    <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.1')">
+        <DefineConstants>NETSTANDARD2_1</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup Condition="('$(TargetFramework)' == 'net5.0')">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[5,)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)" />
-    <PackageReference Include="CacheManager.Core" Version="[1.2,)" />
-    <PackageReference Include="EasyCaching.Core" Version="[1.6,)" />
-    <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)" />
-  </ItemGroup>
-  <PropertyGroup Condition="('$(TargetFramework)' == 'net5.0')">
-    <DefineConstants>NET5_0</DefineConstants>
-  </PropertyGroup>
+    <ItemGroup Condition="('$(TargetFramework)' == 'net5.0')">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[5,)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)"/>
+        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.6,)"/>
+        <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
+    </ItemGroup>
+    <PropertyGroup Condition="('$(TargetFramework)' == 'net5.0')">
+        <DefineConstants>NET5_0</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup Condition="('$(TargetFramework)' == 'net6.0')">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[6,)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[6,)" />
-    <PackageReference Include="CacheManager.Core" Version="[1.2,)" />
-    <PackageReference Include="EasyCaching.Core" Version="[1.6,)" />
-    <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)" />
-  </ItemGroup>
-  <PropertyGroup Condition="('$(TargetFramework)' == 'net6.0')">
-    <DefineConstants>NET6_0</DefineConstants>
-  </PropertyGroup>
+    <ItemGroup Condition="('$(TargetFramework)' == 'net6.0')">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[6,)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[6,)"/>
+        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.6,)"/>
+        <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
+    </ItemGroup>
+    <PropertyGroup Condition="('$(TargetFramework)' == 'net6.0')">
+        <DefineConstants>NET6_0</DefineConstants>
+    </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>anycpu</PlatformTarget>
-  </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <PlatformTarget>anycpu</PlatformTarget>
+    </PropertyGroup>
 </Project>

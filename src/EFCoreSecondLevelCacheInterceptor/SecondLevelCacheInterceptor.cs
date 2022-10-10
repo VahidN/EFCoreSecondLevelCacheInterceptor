@@ -12,7 +12,6 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
 {
     private readonly ILockProvider _lockProvider;
     private readonly IDbCommandInterceptorProcessor _processor;
-    private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
 
     /// <summary>
     ///     Entity Framework Core Second Level Caching Library
@@ -22,13 +21,9 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
     ///     &gt;()));
     ///     to register it.
     /// </summary>
-    public SecondLevelCacheInterceptor(
-        IDbCommandInterceptorProcessor processor,
-        IEFSqlCommandsProcessor sqlCommandsProcessor,
-        ILockProvider lockProvider)
+    public SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processor, ILockProvider lockProvider)
     {
         _processor = processor;
-        _sqlCommandsProcessor = sqlCommandsProcessor;
         _lockProvider = lockProvider;
     }
 
@@ -40,26 +35,16 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandExecutedEventData eventData,
         int result)
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var @lock = _lockProvider.Lock();
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutedCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
     }
 
-    private bool ShouldSkipProcessing(DbCommand? command, DbContextEventData? eventData)
-    {
-        if (eventData?.Context is null)
-        {
-            return true;
-        }
-
-        if (command?.Transaction is not null)
-        {
-            return !_sqlCommandsProcessor.IsCrudCommand(command.CommandText);
-        }
-
-        return false;
-    }
 
     /// <summary>
     ///     Called immediately after EF calls System.Data.Common.DbCommand.ExecuteNonQueryAsync.
@@ -78,10 +63,14 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutedCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
     }
 
     /// <summary>
@@ -92,10 +81,14 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandEventData eventData,
         InterceptionResult<int> result)
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var @lock = _lockProvider.Lock();
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutingCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
     }
 
     /// <summary>
@@ -115,10 +108,14 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutingCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
     }
 
     /// <summary>
@@ -129,10 +126,14 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandExecutedEventData eventData,
         DbDataReader result)
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var @lock = _lockProvider.Lock();
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutedCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
     }
 
     /// <summary>
@@ -152,10 +153,14 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutedCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
     }
 
     /// <summary>
@@ -166,10 +171,14 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandEventData eventData,
         InterceptionResult<DbDataReader> result)
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var @lock = _lockProvider.Lock();
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutingCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
     }
 
     /// <summary>
@@ -189,10 +198,14 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutingCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
     }
 
     /// <summary>
@@ -203,10 +216,14 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandExecutedEventData eventData,
         object? result)
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var @lock = _lockProvider.Lock();
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutedCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
     }
 
     /// <summary>
@@ -226,10 +243,14 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutedCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
     }
 
     /// <summary>
@@ -240,10 +261,14 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandEventData eventData,
         InterceptionResult<object> result)
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var @lock = _lockProvider.Lock();
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutingCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
     }
 
     /// <summary>
@@ -263,9 +288,13 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        if (shouldSkipProcessing)
+        {
+            return result;
+        }
+
         using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-        return ShouldSkipProcessing(command, eventData)
-                   ? result
-                   : _processor.ProcessExecutingCommands(command, eventData.Context, result);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
     }
 }

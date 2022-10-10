@@ -50,7 +50,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
     /// <summary>
     ///     Reads data from cache or cache it and then returns the result
     /// </summary>
-    public T ProcessExecutedCommands<T>(DbCommand command, DbContext? context, T result)
+    public T ProcessExecutedCommands<T>(DbCommand command, DbContext? context, T result, EFCachePolicy? cachePolicy)
     {
         if (command == null)
         {
@@ -69,7 +69,6 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         }
 
         var commandText = command.CommandText;
-        var cachePolicy = getCachePolicy(context, commandText);
         var efCacheKey = _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy ?? new EFCachePolicy());
         if (_cacheDependenciesProcessor.InvalidateCacheDependencies(commandText, efCacheKey))
         {
@@ -84,7 +83,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 
         if (result is int data)
         {
-            if (!shouldSkipCachingResults(commandText, data))
+            if (!ShouldSkipCachingResults(commandText, data))
             {
                 _cacheService.InsertValue(efCacheKey, new EFCachedData { NonQuery = data }, cachePolicy);
                 _logger.LogDebug(CacheableEventId.QueryResultCached, $"[{data}] added to the cache[{efCacheKey}].");
@@ -101,7 +100,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                 tableRows = dbReaderLoader.LoadAndClose();
             }
 
-            if (!shouldSkipCachingResults(commandText, tableRows))
+            if (!ShouldSkipCachingResults(commandText, tableRows))
             {
                 _cacheService.InsertValue(efCacheKey, new EFCachedData { TableRows = tableRows }, cachePolicy);
                 _logger.LogDebug(CacheableEventId.QueryResultCached,
@@ -113,7 +112,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 
         if (result is object)
         {
-            if (!shouldSkipCachingResults(commandText, result))
+            if (!ShouldSkipCachingResults(commandText, result))
             {
                 _cacheService.InsertValue(efCacheKey, new EFCachedData { Scalar = result }, cachePolicy);
                 _logger.LogDebug(CacheableEventId.QueryResultCached, $"[{result}] added to the cache[{efCacheKey}].");
@@ -128,7 +127,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
     /// <summary>
     ///     Reads command's data from the cache, if any.
     /// </summary>
-    public T ProcessExecutingCommands<T>(DbCommand command, DbContext? context, T result)
+    public T ProcessExecutingCommands<T>(DbCommand command, DbContext? context, T result, EFCachePolicy? cachePolicy)
     {
         if (command == null)
         {
@@ -141,7 +140,6 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         }
 
         var commandText = command.CommandText;
-        var cachePolicy = getCachePolicy(context, commandText);
         if (cachePolicy == null)
         {
             _logger.LogDebug($"Skipping a none-cachable command[{commandText}].");
@@ -200,13 +198,35 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         return result;
     }
 
-    private EFCachePolicy? getCachePolicy(DbContext context, string commandText)
+    /// <summary>
+    ///     Is this command marked for caching?
+    /// </summary>
+    public (bool ShouldSkipProcessing, EFCachePolicy? CachePolicy) ShouldSkipProcessing(
+        DbCommand? command, DbContext? context)
+    {
+        if (context is null)
+        {
+            return (true, null);
+        }
+
+        var commandCommandText = command?.CommandText ?? "";
+        var cachePolicy = GetCachePolicy(context, commandCommandText);
+
+        if (command?.Transaction is not null)
+        {
+            return (!_sqlCommandsProcessor.IsCrudCommand(commandCommandText), cachePolicy);
+        }
+
+        return cachePolicy is null ? (true, null) : (false, cachePolicy);
+    }
+
+    private EFCachePolicy? GetCachePolicy(DbContext context, string commandText)
     {
         var allEntityTypes = _sqlCommandsProcessor.GetAllTableNames(context);
         return _cachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes);
     }
 
-    private bool shouldSkipCachingResults(string commandText, object value)
+    private bool ShouldSkipCachingResults(string commandText, object value)
     {
         var result = _cacheSettings.SkipCachingResults != null &&
                      _cacheSettings.SkipCachingResults((commandText, value));
