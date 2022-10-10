@@ -1,6 +1,7 @@
 using System;
 using System.Data.Common;
 using System.Globalization;
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
@@ -202,9 +203,14 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
     ///     Is this command marked for caching?
     /// </summary>
     public (bool ShouldSkipProcessing, EFCachePolicy? CachePolicy) ShouldSkipProcessing(
-        DbCommand? command, DbContext? context)
+        DbCommand? command, DbContext? context, CancellationToken cancellationToken = default)
     {
         if (context is null)
+        {
+            return (true, null);
+        }
+
+        if (cancellationToken.IsCancellationRequested)
         {
             return (true, null);
         }

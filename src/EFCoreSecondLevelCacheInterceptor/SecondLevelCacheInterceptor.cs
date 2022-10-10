@@ -63,7 +63,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
+         command, eventData?.Context, cancellationToken);
         if (shouldSkipProcessing)
         {
             return result;
@@ -108,7 +109,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
+         command, eventData?.Context, cancellationToken);
         if (shouldSkipProcessing)
         {
             return result;
@@ -153,7 +155,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
+         command, eventData?.Context, cancellationToken);
         if (shouldSkipProcessing)
         {
             return result;
@@ -198,7 +201,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
+         command, eventData?.Context, cancellationToken);
         if (shouldSkipProcessing)
         {
             return result;
@@ -243,7 +247,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
+         command, eventData?.Context, cancellationToken);
         if (shouldSkipProcessing)
         {
             return result;
@@ -288,7 +293,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
+        var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
+         command, eventData?.Context, cancellationToken);
         if (shouldSkipProcessing)
         {
             return result;

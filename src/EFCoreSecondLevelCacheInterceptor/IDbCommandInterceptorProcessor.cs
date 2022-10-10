@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -22,5 +23,5 @@ public interface IDbCommandInterceptorProcessor
     ///     Is this command marked for caching?
     /// </summary>
     (bool ShouldSkipProcessing, EFCachePolicy? CachePolicy)
-        ShouldSkipProcessing(DbCommand? command, DbContext? context);
+        ShouldSkipProcessing(DbCommand? command, DbContext? context, CancellationToken cancellationToken = default);
 }
