@@ -8,7 +8,6 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFMemoryCacheServiceProvider : IEFCacheServiceProvider
 {
-    private readonly ILockProvider _lockProvider;
     private readonly IMemoryCache _memoryCache;
     private readonly IMemoryCacheChangeTokenProvider _signal;
 
@@ -17,12 +16,10 @@ public class EFMemoryCacheServiceProvider : IEFCacheServiceProvider
     /// </summary>
     public EFMemoryCacheServiceProvider(
         IMemoryCache memoryCache,
-        IMemoryCacheChangeTokenProvider signal,
-        ILockProvider lockProvider)
+        IMemoryCacheChangeTokenProvider signal)
     {
         _memoryCache = memoryCache;
         _signal = signal;
-        _lockProvider = lockProvider;
     }
 
     /// <summary>
@@ -43,7 +40,6 @@ public class EFMemoryCacheServiceProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cachePolicy));
         }
 
-        using var @lock = _lockProvider.Lock();
         if (value == null)
         {
             value = new EFCachedData { IsNull = true };
@@ -73,7 +69,6 @@ public class EFMemoryCacheServiceProvider : IEFCacheServiceProvider
     /// </summary>
     public void ClearAllCachedEntries()
     {
-        using var @lock = _lockProvider.Lock();
         _signal.RemoveAllChangeTokens();
     }
 
@@ -90,7 +85,6 @@ public class EFMemoryCacheServiceProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        using var @lock = _lockProvider.Lock();
         return _memoryCache.Get<EFCachedData>(cacheKey.KeyHash);
     }
 
@@ -104,8 +98,6 @@ public class EFMemoryCacheServiceProvider : IEFCacheServiceProvider
         {
             throw new ArgumentNullException(nameof(cacheKey));
         }
-
-        using var @lock = _lockProvider.Lock();
 
         foreach (var rootCacheKey in cacheKey.CacheDependencies)
         {

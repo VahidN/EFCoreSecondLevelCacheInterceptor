@@ -14,7 +14,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
 
     private readonly IEasyCachingProviderBase _easyCachingProvider;
-    private readonly ILockProvider _lockProvider;
+
     private readonly IEFDebugLogger _logger;
 
     /// <summary>
@@ -23,7 +23,6 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     public EFEasyCachingCoreProvider(
         IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
         IServiceProvider serviceProvider,
-        ILockProvider lockProvider,
         IEFDebugLogger logger)
     {
         if (cacheSettings == null)
@@ -37,7 +36,6 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
         }
 
         _cacheSettings = cacheSettings.Value;
-        _lockProvider = lockProvider ?? throw new ArgumentNullException(nameof(lockProvider));
         _logger = logger;
 
         if (_cacheSettings.IsHybridCache)
@@ -70,7 +68,6 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cachePolicy));
         }
 
-        using var @lock = _lockProvider.Lock();
         if (value == null)
         {
             value = new EFCachedData { IsNull = true };
@@ -108,7 +105,6 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     /// </summary>
     public void ClearAllCachedEntries()
     {
-        using var @lock = _lockProvider.Lock();
         if (!_cacheSettings.IsHybridCache)
         {
             ((IEasyCachingProvider)_easyCachingProvider).Flush();
@@ -128,7 +124,6 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        using var @lock = _lockProvider.Lock();
         return _easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash).Value;
     }
 
@@ -143,7 +138,6 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        using var @lock = _lockProvider.Lock();
         foreach (var rootCacheKey in cacheKey.CacheDependencies)
         {
             if (string.IsNullOrWhiteSpace(rootCacheKey))

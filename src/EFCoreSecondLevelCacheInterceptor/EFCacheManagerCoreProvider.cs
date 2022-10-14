@@ -10,7 +10,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
 {
     private readonly ICacheManager<ISet<string>> _dependenciesCacheManager;
-    private readonly ILockProvider _lockProvider;
+
     private readonly IEFDebugLogger _logger;
     private readonly ICacheManager<EFCachedData> _valuesCacheManager;
 
@@ -20,10 +20,8 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     public EFCacheManagerCoreProvider(
         ICacheManager<ISet<string>> dependenciesCacheManager,
         ICacheManager<EFCachedData> valuesCacheManager,
-        ILockProvider lockProvider,
         IEFDebugLogger logger)
     {
-        _lockProvider = lockProvider;
         _dependenciesCacheManager = dependenciesCacheManager ??
                                     throw new ArgumentNullException(nameof(dependenciesCacheManager),
                                                                     "Please register the `ICacheManager`.");
@@ -51,7 +49,6 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        using var @lock = _lockProvider.Lock();
         if (value == null)
         {
             value = new EFCachedData { IsNull = true };
@@ -93,7 +90,6 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     /// </summary>
     public void ClearAllCachedEntries()
     {
-        using var @lock = _lockProvider.Lock();
         _valuesCacheManager.Clear();
         _dependenciesCacheManager.Clear();
     }
@@ -111,7 +107,6 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        using var @lock = _lockProvider.Lock();
         return _valuesCacheManager.Get<EFCachedData>(cacheKey.KeyHash);
     }
 
@@ -125,8 +120,6 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
         {
             throw new ArgumentNullException(nameof(cacheKey));
         }
-
-        using var @lock = _lockProvider.Lock();
 
         foreach (var rootCacheKey in cacheKey.CacheDependencies)
         {
