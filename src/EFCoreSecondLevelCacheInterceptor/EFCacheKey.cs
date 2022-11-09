@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -19,6 +19,11 @@ public class EFCacheKey
     public string KeyHash { set; get; } = default!;
 
     /// <summary>
+    ///     Type of DbContext.
+    /// </summary>
+    public Type? DbContext { get; set; }
+
+    /// <summary>
     ///     Determines which entities are used in this LINQ query.
     ///     This array will be used to invalidate the related cache of all related queries automatically.
     /// </summary>
@@ -35,7 +40,7 @@ public class EFCacheKey
             return false;
         }
 
-        return string.Equals(KeyHash, efCacheKey.KeyHash, StringComparison.Ordinal);
+        return string.Equals(KeyHash, efCacheKey.KeyHash, StringComparison.Ordinal) && DbContext == efCacheKey.DbContext;
     }
 
     /// <summary>
@@ -46,7 +51,7 @@ public class EFCacheKey
         unchecked
         {
             var hash = 17;
-            return hash * 23 + KeyHash.GetHashCode(StringComparison.Ordinal);
+            return hash * 23 + KeyHash.GetHashCode(StringComparison.Ordinal) + DbContext.Name.GetHashCode(StringComparison.Ordinal);
         }
     }
 
@@ -54,5 +59,5 @@ public class EFCacheKey
     ///     ToString
     /// </summary>
     public override string ToString() =>
-        $"KeyHash: {KeyHash}, CacheDependencies: {string.Join(", ", CacheDependencies)}.";
+        $"KeyHash: {KeyHash}, DbContext: {DbContext?.Name}, CacheDependencies: {string.Join(", ", CacheDependencies)}.";
 }

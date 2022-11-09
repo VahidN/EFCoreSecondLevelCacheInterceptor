@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Data.Common;
 using System.Globalization;
@@ -66,12 +66,14 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
             !string.IsNullOrEmpty(_cacheSettings.CacheKeyPrefix)
                 ? $"{_cacheSettings.CacheKeyPrefix}{_hashProvider.ComputeHash(cacheKey):X}"
                 : $"{_hashProvider.ComputeHash(cacheKey):X}";
+        var cacheDbContextType = context.GetType();
         var cacheDependencies = _cacheDependenciesProcessor.GetCacheDependencies(command, context, cachePolicy);
-        _logger.LogDebug($"KeyHash: {cacheKeyHash}, CacheDependencies: {string.Join(", ", cacheDependencies)}.");
+        _logger.LogDebug($"KeyHash: {cacheKeyHash}, DbContext: {cacheDbContextType?.Name}, CacheDependencies: {string.Join(", ", cacheDependencies)}.");
         return new EFCacheKey(cacheDependencies)
                {
                    KeyHash = cacheKeyHash,
-               };
+                   DbContext = cacheDbContextType
+        };
     }
 
     private string getCacheKey(DbCommand command, string saltKey)
