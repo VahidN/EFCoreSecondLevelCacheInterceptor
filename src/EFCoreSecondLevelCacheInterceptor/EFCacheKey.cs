@@ -51,7 +51,7 @@ public class EFCacheKey
         unchecked
         {
             var hash = 17;
-            return hash * 23 + KeyHash.GetHashCode(StringComparison.Ordinal) + DbContext.Name.GetHashCode(StringComparison.Ordinal);
+            return hash * 23 + KeyHash.GetHashCode(StringComparison.Ordinal) + DbContext?.Name.GetHashCode(StringComparison.Ordinal);
         }
     }
 
