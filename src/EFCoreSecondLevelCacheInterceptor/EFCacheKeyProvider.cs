@@ -51,12 +51,17 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
     /// <returns>Information of the computed key of the input LINQ query.</returns>
     public EFCacheKey GetEFCacheKey(DbCommand command, DbContext context, EFCachePolicy cachePolicy)
     {
-        if (command == null)
+        if (context is null)
+        {
+            throw new ArgumentNullException(nameof(context));
+        }
+
+        if (command is null)
         {
             throw new ArgumentNullException(nameof(command));
         }
 
-        if (cachePolicy == null)
+        if (cachePolicy is null)
         {
             throw new ArgumentNullException(nameof(cachePolicy));
         }
@@ -72,8 +77,8 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         return new EFCacheKey(cacheDependencies)
                {
                    KeyHash = cacheKeyHash,
-                   DbContext = cacheDbContextType
-        };
+                   DbContext = cacheDbContextType,
+               };
     }
 
     private string getCacheKey(DbCommand command, string saltKey)
