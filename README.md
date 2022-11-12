@@ -1,4 +1,4 @@
-# EF Core 3.1.x, 5.x & 6.x Second Level Cache Interceptor
+# EF Core 3.1.x, 5x, 6x & 7x Second Level Cache Interceptor
 
 <p align="left">
   <a href="https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor">

@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>Entity Framework Core Second Level Caching Library.</Description>
-        <VersionPrefix>3.7.4</VersionPrefix>
+        <VersionPrefix>3.7.5</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
-        <TargetFrameworks>net6.0;net5.0;netstandard2.1;netstandard2.0;net462;netcoreapp3.1;</TargetFrameworks>
+        <TargetFrameworks>net7.0;net6.0;net5.0;netstandard2.1;netstandard2.0;net462;netcoreapp3.1;</TargetFrameworks>
         <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>EFCoreSecondLevelCacheInterceptor</AssemblyName>
@@ -40,11 +40,11 @@
         <ReportAnalyzer>true</ReportAnalyzer>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Meziantou.Analyzer" Version="1.0.708">
+        <PackageReference Include="Meziantou.Analyzer" Version="1.0.746">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.2.32">
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.4.27">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -56,7 +56,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.42.0.51121">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.48.0.56517">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -130,6 +130,17 @@
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net6.0')">
         <DefineConstants>NET6_0</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup Condition="('$(TargetFramework)' == 'net7.0')">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[7,)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[7,)"/>
+        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.6,)"/>
+        <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
+    </ItemGroup>
+    <PropertyGroup Condition="('$(TargetFramework)' == 'net7.0')">
+        <DefineConstants>NET7_0</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

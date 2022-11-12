@@ -16,7 +16,7 @@ public interface IEFCacheServiceProvider
     /// <param name="cacheKey">key to find</param>
     /// <returns>cached value</returns>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    EFCachedData GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy);
+    EFCachedData? GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy);
 
     /// <summary>
     ///     Adds a new item to the cache.

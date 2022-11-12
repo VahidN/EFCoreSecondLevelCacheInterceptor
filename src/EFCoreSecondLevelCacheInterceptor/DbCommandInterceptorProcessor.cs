@@ -218,13 +218,21 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         var commandCommandText = command?.CommandText ?? "";
         var cachePolicy = GetCachePolicy(context, commandCommandText);
 
-        if (command?.Transaction is not null)
+        if (ShouldSkipQueriesInsideExplicitTransaction(command))
         {
             return (!_sqlCommandsProcessor.IsCrudCommand(commandCommandText), cachePolicy);
         }
 
+        if (_sqlCommandsProcessor.IsCrudCommand(commandCommandText))
+        {
+            return (false, cachePolicy);
+        }
+
         return cachePolicy is null ? (true, null) : (false, cachePolicy);
     }
+
+    private static bool ShouldSkipQueriesInsideExplicitTransaction(DbCommand? command) =>
+        command?.Transaction is not null;
 
     private EFCachePolicy? GetCachePolicy(DbContext context, string commandText)
     {

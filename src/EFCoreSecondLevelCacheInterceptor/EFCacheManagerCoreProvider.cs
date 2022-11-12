@@ -100,7 +100,7 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     /// <param name="cacheKey">key to find</param>
     /// <returns>cached value</returns>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public EFCachedData GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
+    public EFCachedData? GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
     {
         if (cacheKey is null)
         {
