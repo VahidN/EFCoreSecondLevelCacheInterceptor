@@ -15,7 +15,13 @@ public class EFCoreSecondLevelCacheSettings
     /// <summary>
     ///     Selected caching provider name
     /// </summary>
-    public string ProviderName { get; set; } = default!;
+    public string? ProviderName { get; set; }
+
+    /// <summary>
+    ///     This option will let you to choose a different redis database for your current tenant.
+    ///     <![CDATA[ Such as: (serviceProvider, cacheKey) => "redis-db-" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"]; ]]>
+    /// </summary>
+    public Func<IServiceProvider, EFCacheKey?, string>? CacheProviderName { set; get; }
 
     /// <summary>
     ///     Is an instance of EasyCaching.HybridCache

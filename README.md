@@ -128,7 +128,7 @@ If you want to use the Redis as the preferred cache provider with `EasyCaching.C
 ```xml
   <ItemGroup>
     <PackageReference Include="EasyCaching.Redis" Version="1.6.1" />
-    <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.6.1" />	
+    <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.6.1" />
   </ItemGroup>
 ```
 
@@ -180,6 +180,21 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
     }
 }
 ```
+
+### Using EasyCaching.Core as a dynamic cache provider
+
+If you want to support multitenancy in your application and have a different Redis database per each tenant, first register multiple pre-configured providers with known `providerName`s and then select these `providerName`s based on the current tenant this way dynamically:
+
+```C#
+services.AddEFSecondLevelCache(options =>
+    options.UseEasyCachingCoreProvider(
+	   (serviceProvider, cacheKey) => "redis-db-" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"],
+	   isHybridCache: false)
+	.DisableLogging(true)
+	.UseCacheKeyPrefix("EF_")
+);
+```
+
 
 ### Using CacheManager.Core as the cache provider [It's not actively maintained]
 
@@ -296,11 +311,11 @@ This library doesn't need any settings for the cache invalidation. It watches fo
 But if you want to invalidate the whole cache `manually`, inject the `IEFCacheServiceProvider` service and then call its `_cacheServiceProvider.ClearAllCachedEntries()` method or use it this way to specify the root cache keys which are a collection of a Prefix+TableName:
 ```C#
 // Partial cache invalidation using the specified table names
-// This is useful when you are monitoring your DB's changes using the SqlTableDependency 
-_cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>() 
+// This is useful when you are monitoring your DB's changes using the SqlTableDependency
+_cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>()
 {
    "EF_TableName1", // "EF_" is the cache key's prefix
-   "EF_TableName2" 
+   "EF_TableName2"
 } {  KeyHash = "empty" }));
 ```
 

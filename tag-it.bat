@@ -1,3 +1,3 @@
-git tag -a 3.7.5 -m "Published 3.7.5 to nuget.org"
+git tag -a 3.8.0 -m "Published 3.8.0 to nuget.org"
 git push --follow-tags
 pause
