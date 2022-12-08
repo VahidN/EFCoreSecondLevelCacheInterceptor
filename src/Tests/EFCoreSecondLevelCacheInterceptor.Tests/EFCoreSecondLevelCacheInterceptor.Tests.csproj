@@ -39,6 +39,6 @@
         <PackageReference Include="CacheManager.Core" Version="1.2.0" />
         <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="1.2.0" />
         <PackageReference Include="CacheManager.Serialization.Json" Version="1.2.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     </ItemGroup>
 </Project>
