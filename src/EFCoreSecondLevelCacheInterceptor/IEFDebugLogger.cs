@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Logging;
-
 namespace EFCoreSecondLevelCacheInterceptor;
 
 /// <summary>
@@ -8,12 +6,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 public interface IEFDebugLogger
 {
     /// <summary>
-    ///     Formats and writes a debug log message.
+    ///     Determines whether the debug logger is enabled.
     /// </summary>
-    void LogDebug(string message);
-
-    /// <summary>
-    ///     Formats and writes a debug log message.
-    /// </summary>
-    void LogDebug(EventId eventId, string message);
+    bool IsLoggerEnabled { get; }
 }

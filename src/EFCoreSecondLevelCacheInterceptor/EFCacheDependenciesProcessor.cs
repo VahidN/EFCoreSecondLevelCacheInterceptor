@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -15,6 +16,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
     private readonly string _cacheKeyPrefix;
     private readonly IEFCacheServiceProvider _cacheServiceProvider;
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+    private readonly ILogger<EFCacheDependenciesProcessor> _dependenciesProcessorLogger;
     private readonly IEFDebugLogger _logger;
     private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
 
@@ -23,11 +25,13 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
     /// </summary>
     public EFCacheDependenciesProcessor(
         IEFDebugLogger logger,
+        ILogger<EFCacheDependenciesProcessor> dependenciesProcessorLogger,
         IEFCacheServiceProvider cacheServiceProvider,
         IEFSqlCommandsProcessor sqlCommandsProcessor,
         IOptions<EFCoreSecondLevelCacheSettings> cacheSettings)
     {
         _logger = logger;
+        _dependenciesProcessorLogger = dependenciesProcessorLogger;
         _cacheServiceProvider = cacheServiceProvider;
         _sqlCommandsProcessor = sqlCommandsProcessor;
 
@@ -81,7 +85,13 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
         cacheDependencies = cachePolicy.CacheItemsDependencies as SortedSet<string>;
         if (cacheDependencies?.Any() != true)
         {
-            _logger.LogDebug($"It's not possible to calculate the related table names of the current query[{commandText}]. Please use EFCachePolicy.Configure(options => options.CacheDependencies(\"real_table_name_1\", \"real_table_name_2\")) to specify them explicitly.");
+            if (_logger.IsLoggerEnabled)
+            {
+                _dependenciesProcessorLogger
+                    .LogDebug("It's not possible to calculate the related table names of the current query[{commandText}]. Please use EFCachePolicy.Configure(options => options.CacheDependencies(\"real_table_name_1\", \"real_table_name_2\")) to specify them explicitly.",
+                              commandText);
+            }
+
             cacheDependencies = new SortedSet<string>(StringComparer.OrdinalIgnoreCase)
                                 {
                                     EFCachePolicy.UnknownsCacheDependency,
@@ -104,27 +114,51 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
 
         if (!_sqlCommandsProcessor.IsCrudCommand(commandText))
         {
-            _logger.LogDebug($"Skipped invalidating a none-CRUD command[{commandText}].");
+            if (_logger.IsLoggerEnabled)
+            {
+                _dependenciesProcessorLogger.LogDebug("Skipped invalidating a none-CRUD command[{commandText}].",
+                                                      commandText);
+            }
+
             return false;
         }
 
         if (shouldSkipCacheInvalidationCommands(commandText))
         {
-            _logger.LogDebug($"Skipped invalidating the related cache entries of this query[{commandText}] based on the provided predicate.");
+            if (_logger.IsLoggerEnabled)
+            {
+                _dependenciesProcessorLogger
+                    .LogDebug("Skipped invalidating the related cache entries of this query[{commandText}] based on the provided predicate.",
+                              commandText);
+            }
+
             return false;
         }
 
         cacheKey.CacheDependencies.Add($"{_cacheKeyPrefix}{EFCachePolicy.UnknownsCacheDependency}");
         _cacheServiceProvider.InvalidateCacheDependencies(cacheKey);
-        _logger.LogDebug(CacheableEventId.QueryResultInvalidated,
-                         $"Invalidated [{string.Join(", ", cacheKey.CacheDependencies)}] dependencies.");
+
+        if (_logger.IsLoggerEnabled)
+        {
+            _dependenciesProcessorLogger.LogDebug(CacheableEventId.QueryResultInvalidated,
+                                                  "Invalidated [{items}] dependencies.",
+                                                  string.Join(", ", cacheKey.CacheDependencies));
+        }
+
         return true;
     }
 
     private void logProcess(SortedSet<string> tableNames, SortedSet<string> textsInsideSquareBrackets,
                             SortedSet<string> cacheDependencies)
     {
-        _logger.LogDebug($"ContextTableNames: {string.Join(", ", tableNames)}, PossibleQueryTableNames: {string.Join(", ", textsInsideSquareBrackets)} -> CacheDependencies: {string.Join(", ", cacheDependencies)}.");
+        if (_logger.IsLoggerEnabled)
+        {
+            _dependenciesProcessorLogger
+                .LogDebug("ContextTableNames: {names}, PossibleQueryTableNames: {texts} -> CacheDependencies: {dependencies}.",
+                          string.Join(", ", tableNames),
+                          string.Join(", ", cacheDependencies),
+                          string.Join(", ", textsInsideSquareBrackets));
+        }
     }
 
     private bool shouldSkipCacheInvalidationCommands(string commandText) =>

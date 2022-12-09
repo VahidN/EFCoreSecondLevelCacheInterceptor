@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Globalization;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -17,6 +18,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
     private readonly IEFCachePolicyParser _cachePolicyParser;
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
     private readonly IEFHashProvider _hashProvider;
+    private readonly ILogger<EFCacheKeyProvider> _keyProviderLogger;
     private readonly IEFDebugLogger _logger;
 
     /// <summary>
@@ -26,11 +28,13 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         IEFCacheDependenciesProcessor cacheDependenciesProcessor,
         IEFCachePolicyParser cachePolicyParser,
         IEFDebugLogger logger,
+        ILogger<EFCacheKeyProvider> keyProviderLogger,
         IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
         IEFHashProvider hashProvider)
     {
         _cacheDependenciesProcessor = cacheDependenciesProcessor;
         _logger = logger;
+        _keyProviderLogger = keyProviderLogger;
         _cachePolicyParser = cachePolicyParser;
 
         if (cacheSettings == null)
@@ -73,7 +77,16 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
                 : $"{_hashProvider.ComputeHash(cacheKey):X}";
         var cacheDbContextType = context.GetType();
         var cacheDependencies = _cacheDependenciesProcessor.GetCacheDependencies(command, context, cachePolicy);
-        _logger.LogDebug($"KeyHash: {cacheKeyHash}, DbContext: {cacheDbContextType?.Name}, CacheDependencies: {string.Join(", ", cacheDependencies)}.");
+
+        if (_logger.IsLoggerEnabled)
+        {
+            _keyProviderLogger
+                .LogDebug("KeyHash: {cacheKeyHash}, DbContext: {name}, CacheDependencies: {dependencies}.",
+                          cacheKeyHash,
+                          cacheDbContextType?.Name,
+                          string.Join(", ", cacheDependencies));
+        }
+
         return new EFCacheKey(cacheDependencies)
                {
                    KeyHash = cacheKeyHash,

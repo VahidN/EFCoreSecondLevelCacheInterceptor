@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using EasyCaching.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -13,6 +14,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
 {
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+    private readonly ILogger<EFEasyCachingCoreProvider> _easyCachingCoreProviderLogger;
     private readonly IEFDebugLogger _logger;
 
     private readonly ConcurrentDictionary<string, IEasyCachingProviderBase> _providers =
@@ -26,7 +28,8 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     public EFEasyCachingCoreProvider(
         IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
         IServiceProvider serviceProvider,
-        IEFDebugLogger logger)
+        IEFDebugLogger logger,
+        ILogger<EFEasyCachingCoreProvider> easyCachingCoreProviderLogger)
     {
         if (cacheSettings == null)
         {
@@ -36,6 +39,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
         _cacheSettings = cacheSettings.Value;
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _logger = logger;
+        _easyCachingCoreProviderLogger = easyCachingCoreProviderLogger;
     }
 
     /// <summary>
@@ -143,8 +147,13 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
             var dependencyKeys = easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
             if (AreRootCacheKeysExpired(cachedValue, dependencyKeys))
             {
-                _logger.LogDebug(CacheableEventId.QueryResultInvalidated,
-                                 $"Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].");
+                if (_logger.IsLoggerEnabled)
+                {
+                    _easyCachingCoreProviderLogger.LogDebug(CacheableEventId.QueryResultInvalidated,
+                                                            "Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].",
+                                                            rootCacheKey);
+                }
+
                 ClearAllCachedEntries();
                 return;
             }

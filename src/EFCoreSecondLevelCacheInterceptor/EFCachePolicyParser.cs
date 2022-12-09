@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -38,6 +39,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
 
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
     private readonly IEFDebugLogger _logger;
+    private readonly ILogger<EFCachePolicyParser> _policyParserLogger;
     private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
 
     /// <summary>
@@ -46,7 +48,8 @@ public class EFCachePolicyParser : IEFCachePolicyParser
     public EFCachePolicyParser(
         IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
         IEFSqlCommandsProcessor sqlCommandsProcessor,
-        IEFDebugLogger logger)
+        IEFDebugLogger logger,
+        ILogger<EFCachePolicyParser> policyParserLogger)
     {
         if (cacheSettings == null)
         {
@@ -57,6 +60,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         _sqlCommandsProcessor =
             sqlCommandsProcessor ?? throw new ArgumentNullException(nameof(sqlCommandsProcessor));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _policyParserLogger = policyParserLogger;
     }
 
     /// <summary>
@@ -123,9 +127,9 @@ public class EFCachePolicyParser : IEFCachePolicyParser
                             ?? getSpecificGlobalPolicy(commandText, allEntityTypes)
                             ?? getSkippedGlobalPolicy(commandText, allEntityTypes)
                             ?? getGlobalPolicy(commandText);
-        if (efCachePolicy != null)
+        if (efCachePolicy != null && _logger.IsLoggerEnabled)
         {
-            _logger.LogDebug($"Using EFCachePolicy: {efCachePolicy}.");
+            _policyParserLogger.LogDebug("Using EFCachePolicy: {efCachePolicy}.", efCachePolicy);
         }
 
         return efCachePolicy;
@@ -134,9 +138,11 @@ public class EFCachePolicyParser : IEFCachePolicyParser
     private bool shouldSkipCachingCommands(string commandText)
     {
         var result = _cacheSettings.SkipCachingCommands != null && _cacheSettings.SkipCachingCommands(commandText);
-        if (result)
+        if (result && _logger.IsLoggerEnabled)
         {
-            _logger.LogDebug($"Skipped caching of this command[{commandText}] based on the provided predicate.");
+            _policyParserLogger
+                .LogDebug("Skipped caching of this command[{commandText}] based on the provided predicate.",
+                          commandText);
         }
 
         return result;
@@ -434,10 +440,11 @@ public class EFCachePolicyParser : IEFCachePolicyParser
                                               {
                                                   var hasFn =
                                                       commandText.Contains(item, StringComparison.OrdinalIgnoreCase);
-                                                  if (hasFn)
+                                                  if (hasFn && _logger.IsLoggerEnabled)
                                                   {
-                                                      _logger
-                                                          .LogDebug($"Skipped caching because of the non-deterministic function -> `{item}`.");
+                                                      _policyParserLogger
+                                                          .LogDebug("Skipped caching because of the non-deterministic function -> `{item}`.",
+                                                                    item);
                                                   }
 
                                                   return hasFn;

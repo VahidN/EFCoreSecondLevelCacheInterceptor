@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CacheManager.Core;
+using Microsoft.Extensions.Logging;
 
 namespace EFCoreSecondLevelCacheInterceptor;
 
@@ -9,6 +10,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
 {
+    private readonly ILogger<EFCacheManagerCoreProvider> _cacheManagerCoreProviderLogger;
     private readonly ICacheManager<ISet<string>> _dependenciesCacheManager;
 
     private readonly IEFDebugLogger _logger;
@@ -20,7 +22,8 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     public EFCacheManagerCoreProvider(
         ICacheManager<ISet<string>> dependenciesCacheManager,
         ICacheManager<EFCachedData> valuesCacheManager,
-        IEFDebugLogger logger)
+        IEFDebugLogger logger,
+        ILogger<EFCacheManagerCoreProvider> cacheManagerCoreProviderLogger)
     {
         _dependenciesCacheManager = dependenciesCacheManager ??
                                     throw new ArgumentNullException(nameof(dependenciesCacheManager),
@@ -29,6 +32,7 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
                               throw new ArgumentNullException(nameof(valuesCacheManager),
                                                               "Please register the `ICacheManager`.");
         _logger = logger;
+        _cacheManagerCoreProviderLogger = cacheManagerCoreProviderLogger;
 
         // Occurs when an item was removed by the cache handle due to expiration or e.g. memory pressure eviction.
         // Without _dependenciesCacheManager items, we can't invalidate cached items on Insert/Update/Delete.
@@ -132,8 +136,13 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
             var dependencyKeys = _dependenciesCacheManager.Get<HashSet<string>>(rootCacheKey);
             if (AreRootCacheKeysExpired(cachedValue, dependencyKeys))
             {
-                _logger.LogDebug(CacheableEventId.QueryResultInvalidated,
-                                 $"Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].");
+                if (_logger.IsLoggerEnabled)
+                {
+                    _cacheManagerCoreProviderLogger.LogDebug(CacheableEventId.QueryResultInvalidated,
+                                                             "Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].",
+                                                             rootCacheKey);
+                }
+
                 ClearAllCachedEntries();
                 return;
             }

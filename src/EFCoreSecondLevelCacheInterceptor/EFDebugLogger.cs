@@ -9,10 +9,6 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFDebugLogger : IEFDebugLogger
 {
-    private readonly bool _disableLogging;
-    private readonly ILogger<EFDebugLogger> _logger;
-    private readonly string _signature = $"InstanceId: {Guid.NewGuid()}, Started @{DateTime.UtcNow} UTC.";
-
     /// <summary>
     ///     Formats and writes a debug log message.
     /// </summary>
@@ -25,29 +21,21 @@ public class EFDebugLogger : IEFDebugLogger
             throw new ArgumentNullException(nameof(cacheSettings));
         }
 
-        _disableLogging = cacheSettings.Value.DisableLogging;
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
-    /// <summary>
-    ///     Formats and writes a debug log message.
-    /// </summary>
-    public void LogDebug(string message)
-    {
-        if (!_disableLogging)
+        var disableLogging = cacheSettings.Value.DisableLogging;
+        if (logger is null)
         {
-            _logger.LogDebug($"{_signature} {message}");
+            throw new ArgumentNullException(nameof(logger));
+        }
+
+        IsLoggerEnabled = !disableLogging && logger.IsEnabled(LogLevel.Debug);
+        if (IsLoggerEnabled)
+        {
+            logger.LogDebug("InstanceId: {Id}, Started @{Date} UTC.", Guid.NewGuid(), DateTime.UtcNow);
         }
     }
 
     /// <summary>
-    ///     Formats and writes a debug log message.
+    ///     Determines whether the debug logger is enabled.
     /// </summary>
-    public void LogDebug(EventId eventId, string message)
-    {
-        if (!_disableLogging)
-        {
-            _logger.LogDebug(eventId, $"{_signature} {message}");
-        }
-    }
+    public bool IsLoggerEnabled { get; }
 }
