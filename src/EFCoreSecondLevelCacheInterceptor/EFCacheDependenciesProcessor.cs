@@ -88,7 +88,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
             if (_logger.IsLoggerEnabled)
             {
                 _dependenciesProcessorLogger
-                    .LogDebug("It's not possible to calculate the related table names of the current query[{commandText}]. Please use EFCachePolicy.Configure(options => options.CacheDependencies(\"real_table_name_1\", \"real_table_name_2\")) to specify them explicitly.",
+                    .LogDebug("It's not possible to calculate the related table names of the current query[{CommandText}]. Please use EFCachePolicy.Configure(options => options.CacheDependencies(\"real_table_name_1\", \"real_table_name_2\")) to specify them explicitly.",
                               commandText);
             }
 
@@ -116,7 +116,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
         {
             if (_logger.IsLoggerEnabled)
             {
-                _dependenciesProcessorLogger.LogDebug("Skipped invalidating a none-CRUD command[{commandText}].",
+                _dependenciesProcessorLogger.LogDebug("Skipped invalidating a none-CRUD command[{CommandText}].",
                                                       commandText);
             }
 
@@ -128,7 +128,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
             if (_logger.IsLoggerEnabled)
             {
                 _dependenciesProcessorLogger
-                    .LogDebug("Skipped invalidating the related cache entries of this query[{commandText}] based on the provided predicate.",
+                    .LogDebug("Skipped invalidating the related cache entries of this query[{CommandText}] based on the provided predicate.",
                               commandText);
             }
 
@@ -141,7 +141,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
         if (_logger.IsLoggerEnabled)
         {
             _dependenciesProcessorLogger.LogDebug(CacheableEventId.QueryResultInvalidated,
-                                                  "Invalidated [{items}] dependencies.",
+                                                  "Invalidated [{Items}] dependencies.",
                                                   string.Join(", ", cacheKey.CacheDependencies));
         }
 
@@ -154,7 +154,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
         if (_logger.IsLoggerEnabled)
         {
             _dependenciesProcessorLogger
-                .LogDebug("ContextTableNames: {names}, PossibleQueryTableNames: {texts} -> CacheDependencies: {dependencies}.",
+                .LogDebug("ContextTableNames: {Names}, PossibleQueryTableNames: {Texts} -> CacheDependencies: {Dependencies}.",
                           string.Join(", ", tableNames),
                           string.Join(", ", cacheDependencies),
                           string.Join(", ", textsInsideSquareBrackets));

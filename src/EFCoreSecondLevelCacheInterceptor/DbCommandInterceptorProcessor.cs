@@ -90,7 +90,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         {
             if (_logger.IsLoggerEnabled)
             {
-                _interceptorProcessorLogger.LogDebug("Skipping a none-cachable command[{commandText}].", commandText);
+                _interceptorProcessorLogger.LogDebug("Skipping a none-cachable command[{CommandText}].", commandText);
             }
 
             return result;
@@ -105,7 +105,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                 if (_logger.IsLoggerEnabled)
                 {
                     _interceptorProcessorLogger.LogDebug(CacheableEventId.QueryResultCached,
-                                                         "[{data}] added to the cache[{efCacheKey}].", data,
+                                                         "[{Data}] added to the cache[{EfCacheKey}].", data,
                                                          efCacheKey);
                 }
             }
@@ -128,7 +128,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                 if (_logger.IsLoggerEnabled)
                 {
                     _interceptorProcessorLogger.LogDebug(CacheableEventId.QueryResultCached,
-                                                         "TableRows[{tableName}] added to the cache[{efCacheKey}].",
+                                                         "TableRows[{TableName}] added to the cache[{EfCacheKey}].",
                                                          tableRows.TableName, efCacheKey);
                 }
             }
@@ -145,7 +145,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                 if (_logger.IsLoggerEnabled)
                 {
                     _interceptorProcessorLogger.LogDebug(CacheableEventId.QueryResultCached,
-                                                         "[{result}] added to the cache[{efCacheKey}].",
+                                                         "[{Result}] added to the cache[{EfCacheKey}].",
                                                          result, efCacheKey);
                 }
             }
@@ -176,7 +176,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         {
             if (_logger.IsLoggerEnabled)
             {
-                _interceptorProcessorLogger.LogDebug("Skipping a none-cachable command[{commandText}].",
+                _interceptorProcessorLogger.LogDebug("Skipping a none-cachable command[{CommandText}].",
                                                      commandText);
             }
 
@@ -188,7 +188,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         {
             if (_logger.IsLoggerEnabled)
             {
-                _interceptorProcessorLogger.LogDebug("[{efCacheKey}] was not present in the cache.", efCacheKey);
+                _interceptorProcessorLogger.LogDebug("[{EfCacheKey}] was not present in the cache.", efCacheKey);
             }
 
             return result;
@@ -213,7 +213,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
             if (_logger.IsLoggerEnabled)
             {
                 _interceptorProcessorLogger
-                    .LogDebug("Suppressed the result with the TableRows[{tableName}] from the cache[{efCacheKey}].",
+                    .LogDebug("Suppressed the result with the TableRows[{TableName}] from the cache[{EfCacheKey}].",
                               cacheResult.TableRows.TableName, efCacheKey);
             }
 
@@ -231,7 +231,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
             if (_logger.IsLoggerEnabled)
             {
                 _interceptorProcessorLogger
-                    .LogDebug("Suppressed the result with {cachedResult} from the cache[{efCacheKey}].",
+                    .LogDebug("Suppressed the result with {CachedResult} from the cache[{EfCacheKey}].",
                               cachedResult, efCacheKey);
             }
 
@@ -248,7 +248,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
             if (_logger.IsLoggerEnabled)
             {
                 _interceptorProcessorLogger
-                    .LogDebug("Suppressed the result with {cachedResult} from the cache[{efCacheKey}].",
+                    .LogDebug("Suppressed the result with {CachedResult} from the cache[{EfCacheKey}].",
                               cachedResult, efCacheKey);
             }
 
@@ -260,7 +260,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 
         if (_logger.IsLoggerEnabled)
         {
-            _interceptorProcessorLogger.LogDebug("Skipped the result with {type} type.",
+            _interceptorProcessorLogger.LogDebug("Skipped the result with {Type} type.",
                                                  result?.GetType());
         }
 

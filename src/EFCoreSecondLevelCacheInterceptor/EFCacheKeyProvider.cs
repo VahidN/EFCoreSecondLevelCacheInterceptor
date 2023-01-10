@@ -81,7 +81,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         if (_logger.IsLoggerEnabled)
         {
             _keyProviderLogger
-                .LogDebug("KeyHash: {cacheKeyHash}, DbContext: {name}, CacheDependencies: {dependencies}.",
+                .LogDebug("KeyHash: {CacheKeyHash}, DbContext: {Name}, CacheDependencies: {Dependencies}.",
                           cacheKeyHash,
                           cacheDbContextType?.Name,
                           string.Join(", ", cacheDependencies));

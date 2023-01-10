@@ -129,7 +129,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
                             ?? getGlobalPolicy(commandText);
         if (efCachePolicy != null && _logger.IsLoggerEnabled)
         {
-            _policyParserLogger.LogDebug("Using EFCachePolicy: {efCachePolicy}.", efCachePolicy);
+            _policyParserLogger.LogDebug("Using EFCachePolicy: {EfCachePolicy}.", efCachePolicy);
         }
 
         return efCachePolicy;
@@ -141,7 +141,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         if (result && _logger.IsLoggerEnabled)
         {
             _policyParserLogger
-                .LogDebug("Skipped caching of this command[{commandText}] based on the provided predicate.",
+                .LogDebug("Skipped caching of this command[{CommandText}] based on the provided predicate.",
                           commandText);
         }
 
@@ -443,7 +443,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
                                                   if (hasFn && _logger.IsLoggerEnabled)
                                                   {
                                                       _policyParserLogger
-                                                          .LogDebug("Skipped caching because of the non-deterministic function -> `{item}`.",
+                                                          .LogDebug("Skipped caching because of the non-deterministic function -> `{Item}`.",
                                                                     item);
                                                   }
 

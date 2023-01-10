@@ -150,7 +150,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
                 if (_logger.IsLoggerEnabled)
                 {
                     _easyCachingCoreProviderLogger.LogDebug(CacheableEventId.QueryResultInvalidated,
-                                                            "Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].",
+                                                            "Invalidated all of the cache entries due to early expiration of a root cache key[{RootCacheKey}].",
                                                             rootCacheKey);
                 }
 

@@ -13,6 +13,8 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
 {
+    private static readonly string[] CrudMarkers = { "MERGE ", "insert ", "update ", "delete ", "create " };
+
     private static readonly Type IEntityType =
         Type.GetType("Microsoft.EntityFrameworkCore.Metadata.IEntityType, Microsoft.EntityFrameworkCore") ??
         throw new TypeLoadException("Couldn't load Microsoft.EntityFrameworkCore.Metadata.IEntityType");
@@ -56,12 +58,10 @@ public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
             return false;
         }
 
-        string[] crudMarkers = { "insert ", "update ", "delete ", "create " };
-
         var lines = text.Split('\n');
         foreach (var line in lines)
         {
-            foreach (var marker in crudMarkers)
+            foreach (var marker in CrudMarkers)
             {
                 if (line.Trim().StartsWith(marker, StringComparison.OrdinalIgnoreCase))
                 {
