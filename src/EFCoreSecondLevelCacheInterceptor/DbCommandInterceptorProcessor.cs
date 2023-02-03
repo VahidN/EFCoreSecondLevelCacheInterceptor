@@ -299,8 +299,8 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         return cachePolicy is null ? (true, null) : (false, cachePolicy);
     }
 
-    private static bool ShouldSkipQueriesInsideExplicitTransaction(DbCommand? command) =>
-        command?.Transaction is not null;
+    private bool ShouldSkipQueriesInsideExplicitTransaction(DbCommand? command) =>
+        !_cacheSettings.AllowCachingWithExplicitTransactions && command?.Transaction is not null;
 
     private EFCachePolicy? GetCachePolicy(DbContext context, string commandText)
     {

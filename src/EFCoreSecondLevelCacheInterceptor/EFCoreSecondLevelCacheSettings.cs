@@ -61,6 +61,12 @@ public class EFCoreSecondLevelCacheSettings
     public bool DisableLogging { set; get; }
 
     /// <summary>
+    ///     Possibility to allow caching with explicit transactions.
+    ///     Its default value is false.
+    /// </summary>
+    public bool AllowCachingWithExplicitTransactions { set; get; }
+
+    /// <summary>
     ///     Here you can decide based on the correct executing SQL command, should we cache its result or not?
     /// </summary>
     public Predicate<string>? SkipCachingCommands { set; get; }

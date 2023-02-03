@@ -282,6 +282,16 @@ public class EFCoreSecondLevelCacheOptions
     }
 
     /// <summary>
+    ///     Possibility to allow caching with explicit transactions.
+    ///     Its default value is false.
+    /// </summary>
+    public EFCoreSecondLevelCacheOptions AllowCachingWithExplicitTransactions(bool value = false)
+    {
+        Settings.AllowCachingWithExplicitTransactions = value;
+        return this;
+    }
+
+    /// <summary>
     ///     Here you can decide based on the correct executing SQL command, should we cache its result or not?
     /// </summary>
     /// <exception cref="ArgumentNullException"><paramref name="predicate" /> is <c>null</c>.</exception>

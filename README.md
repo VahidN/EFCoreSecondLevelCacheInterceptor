@@ -563,4 +563,4 @@ This cache is updated when an entity is changed (insert, update, or delete) via 
 
 ### Transactions
 
-To avoid complications, all of the queries inside an `explicit` transaction (context.Database.BeginTransaction()) will not be cached. But the cache invalidations due to its CRUD operations will occur.
+To avoid complications, all of the queries inside an `explicit` transaction (context.Database.BeginTransaction()) will not be cached. But the cache invalidations due to its CRUD operations will occur. You can use `.AllowCachingWithExplicitTransactions(true)` setting to disable it.
