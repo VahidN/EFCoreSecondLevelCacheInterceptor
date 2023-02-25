@@ -5,7 +5,7 @@ using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
-#if NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
+#if NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
 using System.Text.Json;
 #endif
 
@@ -19,7 +19,7 @@ public class EFTableRowsDataReader : DbDataReader
     private readonly int _rowsCount;
     private readonly EFTableRows _tableRows;
 
-    private readonly IDictionary<int, Type> _valueTypes;
+    private readonly Dictionary<int, Type> _valueTypes;
 
     private int _currentRow;
 
@@ -526,7 +526,7 @@ public class EFTableRowsDataReader : DbDataReader
             }
         }
 
-#if NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
+#if NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
         var dbTypeName = GetDataTypeName(ordinal);
 
         if (actualValueType == typeof(string) && string.Equals(dbTypeName, "jsonb", StringComparison.OrdinalIgnoreCase))
@@ -535,7 +535,7 @@ public class EFTableRowsDataReader : DbDataReader
         }
 #endif
 
-#if NET7_0 || NET6_0
+#if NET8_0 || NET7_0 || NET6_0
         if (expectedValueType == typeof(DateOnly) && actualValueType == typeof(DateTime))
         {
             return (T)(object)DateOnly.FromDateTime((DateTime)value);

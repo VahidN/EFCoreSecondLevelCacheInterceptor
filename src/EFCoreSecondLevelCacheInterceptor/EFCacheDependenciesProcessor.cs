@@ -76,14 +76,14 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
                                                       tableNames.Intersect(textsInsideSquareBrackets,
                                                                            StringComparer.OrdinalIgnoreCase),
                                                       StringComparer.OrdinalIgnoreCase);
-        if (cacheDependencies.Any())
+        if (cacheDependencies.Count != 0)
         {
             logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies);
             return PrefixCacheDependencies(cacheDependencies);
         }
 
         cacheDependencies = cachePolicy.CacheItemsDependencies as SortedSet<string>;
-        if (cacheDependencies?.Any() != true)
+        if (cacheDependencies is { Count: 0 })
         {
             if (_logger.IsLoggerEnabled)
             {
@@ -149,14 +149,14 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
     }
 
     private void logProcess(SortedSet<string> tableNames, SortedSet<string> textsInsideSquareBrackets,
-                            SortedSet<string> cacheDependencies)
+                            SortedSet<string>? cacheDependencies)
     {
         if (_logger.IsLoggerEnabled)
         {
             _dependenciesProcessorLogger
                 .LogDebug("ContextTableNames: {Names}, PossibleQueryTableNames: {Texts} -> CacheDependencies: {Dependencies}.",
                           string.Join(", ", tableNames),
-                          string.Join(", ", cacheDependencies),
+                          string.Join(", ", cacheDependencies ?? new SortedSet<string>(StringComparer.Ordinal)),
                           string.Join(", ", textsInsideSquareBrackets));
         }
     }
@@ -165,6 +165,14 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
         _cacheSettings.SkipCacheInvalidationCommands != null &&
         _cacheSettings.SkipCacheInvalidationCommands(commandText);
 
-    private SortedSet<string> PrefixCacheDependencies(SortedSet<string> cacheDependencies)
-        => new(cacheDependencies.Select(x => $"{_cacheKeyPrefix}{x}"), StringComparer.OrdinalIgnoreCase);
+    private SortedSet<string> PrefixCacheDependencies(SortedSet<string>? cacheDependencies)
+    {
+        if (cacheDependencies is null)
+        {
+            return new SortedSet<string>(StringComparer.Ordinal);
+        }
+
+        return new SortedSet<string>(cacheDependencies.Select(x => $"{_cacheKeyPrefix}{x}"),
+                                     StringComparer.OrdinalIgnoreCase);
+    }
 }

@@ -4,6 +4,7 @@ using Issue123WithMessagePack.DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Issue123WithMessagePack.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230222181834_V2023_02_22_2147")]
+    partial class V202302222147
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0-preview.1.23111.4")
+                .HasAnnotation("ProductVersion", "7.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -36,16 +39,10 @@ namespace Issue123WithMessagePack.Migrations
                     b.Property<DateTimeOffset>("DateOffset")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateOnly>("DateOnly")
-                        .HasColumnType("date");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<TimeSpan>("Span")
-                        .HasColumnType("time");
-
-                    b.Property<TimeOnly>("TimeOnly")
                         .HasColumnType("time");
 
                     b.HasKey("Id");

@@ -49,7 +49,7 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
     /// <summary>
     ///     Called immediately after EF calls System.Data.Common.DbCommand.ExecuteNonQueryAsync.
     /// </summary>
-#if NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+#if NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
     public override async ValueTask<int> NonQueryExecutedAsync(
         DbCommand command,
         CommandExecutedEventData eventData,
@@ -95,7 +95,7 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
     /// <summary>
     ///     Called just before EF intends to call System.Data.Common.DbCommand.ExecuteNonQueryAsync.
     /// </summary>
-#if NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+#if NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
     public override async ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(
         DbCommand command,
         CommandEventData eventData,
@@ -141,7 +141,7 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
     /// <summary>
     ///     Called immediately after EF calls System.Data.Common.DbCommand.ExecuteReaderAsync.
     /// </summary>
-#if NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+#if NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
     public override async ValueTask<DbDataReader> ReaderExecutedAsync(
         DbCommand command,
         CommandExecutedEventData eventData,
@@ -187,7 +187,7 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
     /// <summary>
     ///     Called just before EF intends to call System.Data.Common.DbCommand.ExecuteReaderAsync.
     /// </summary>
-#if NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+#if NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
     public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
         DbCommand command,
         CommandEventData eventData,
@@ -233,7 +233,7 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
     /// <summary>
     ///     Called immediately after EF calls System.Data.Common.DbCommand.ExecuteScalarAsync.
     /// </summary>
-#if NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+#if NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
     public override async ValueTask<object?> ScalarExecutedAsync(
         DbCommand command,
         CommandExecutedEventData eventData,
@@ -279,7 +279,7 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
     /// <summary>
     ///     Called just before EF intends to call System.Data.Common.DbCommand.ExecuteScalarAsync.
     /// </summary>
-#if NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+#if NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
     public override async ValueTask<InterceptionResult<object>> ScalarExecutingAsync(
         DbCommand command,
         CommandEventData eventData,
