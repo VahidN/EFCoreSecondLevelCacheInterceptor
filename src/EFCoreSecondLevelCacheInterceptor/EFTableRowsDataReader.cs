@@ -16,6 +16,23 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFTableRowsDataReader : DbDataReader
 {
+    private static readonly Type LongType = typeof(long);
+    private static readonly Type UlongTYpe = typeof(ulong);
+    private static readonly Type BoolType = typeof(bool);
+    private static readonly Type ByteType = typeof(byte);
+    private static readonly Type StringType = typeof(string);
+    private static readonly Type DateTimeType = typeof(DateTime);
+    private static readonly Type DecimalType = typeof(decimal);
+    private static readonly Type DoubleType = typeof(double);
+    private static readonly Type FloatType = typeof(float);
+    private static readonly Type ByteArrayType = typeof(byte[]);
+    private static readonly Type ShortType = typeof(short);
+    private static readonly Type IntType = typeof(int);
+    private static readonly Type DateTimeOffsetType = typeof(DateTimeOffset);
+    private static readonly Type TimeSpanType = typeof(TimeSpan);
+    private static readonly Type UintType = typeof(uint);
+    private static readonly Type CharType = typeof(char);
+
     private readonly int _rowsCount;
     private readonly EFTableRows _tableRows;
 
@@ -139,19 +156,19 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = getOrdinalValueType(ordinal, value);
-        if (valueType == typeof(long))
+        if (valueType == LongType)
         {
             return (long)value != 0;
         }
 
-        if (valueType == typeof(ulong))
+        if (valueType == UlongTYpe)
         {
             return (ulong)value != 0;
         }
 
-        if (valueType != typeof(bool))
+        if (valueType != BoolType)
         {
-            return (ulong)Convert.ChangeType(value, typeof(ulong), CultureInfo.InvariantCulture) != 0;
+            return (ulong)Convert.ChangeType(value, UlongTYpe, CultureInfo.InvariantCulture) != 0;
         }
 
         return (bool)value;
@@ -181,19 +198,19 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = getOrdinalValueType(ordinal, value);
-        if (valueType == typeof(bool))
+        if (valueType == BoolType)
         {
             return (bool)value ? (byte)1 : (byte)0;
         }
 
-        if (valueType == typeof(long))
+        if (valueType == LongType)
         {
             return (byte)(long)value;
         }
 
-        if (valueType != typeof(byte))
+        if (valueType != ByteType)
         {
-            return (byte)Convert.ChangeType(value, typeof(byte), CultureInfo.InvariantCulture);
+            return (byte)Convert.ChangeType(value, ByteType, CultureInfo.InvariantCulture);
         }
 
         return (byte)value;
@@ -217,7 +234,7 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = getOrdinalValueType(ordinal, value);
-        if (valueType == typeof(string))
+        if (valueType == StringType)
         {
             var val = value.ToString();
             if (string.IsNullOrWhiteSpace(val))
@@ -254,7 +271,7 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = getOrdinalValueType(ordinal, value);
-        if (valueType != typeof(DateTime))
+        if (valueType != DateTimeType)
         {
             var s = value.ToString();
             return string.IsNullOrWhiteSpace(s)
@@ -277,7 +294,7 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = getOrdinalValueType(ordinal, value);
-        if (valueType == typeof(string))
+        if (valueType == StringType)
         {
             var s = value.ToString();
             return string.IsNullOrWhiteSpace(s)
@@ -286,9 +303,9 @@ public class EFTableRowsDataReader : DbDataReader
                                        CultureInfo.InvariantCulture);
         }
 
-        if (valueType != typeof(decimal))
+        if (valueType != DecimalType)
         {
-            return (decimal)Convert.ChangeType(value, typeof(decimal), CultureInfo.InvariantCulture);
+            return (decimal)Convert.ChangeType(value, DecimalType, CultureInfo.InvariantCulture);
         }
 
         return (decimal)value;
@@ -306,9 +323,9 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = getOrdinalValueType(ordinal, value);
-        if (valueType != typeof(double))
+        if (valueType != DoubleType)
         {
-            return (double)Convert.ChangeType(value, typeof(double), CultureInfo.InvariantCulture);
+            return (double)Convert.ChangeType(value, DoubleType, CultureInfo.InvariantCulture);
         }
 
         return (double)value;
@@ -331,14 +348,14 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = getOrdinalValueType(ordinal, value);
-        if (valueType == typeof(double))
+        if (valueType == DoubleType)
         {
             return (float)(double)value;
         }
 
-        if (valueType != typeof(float))
+        if (valueType != FloatType)
         {
-            return (float)Convert.ChangeType(value, typeof(float), CultureInfo.InvariantCulture);
+            return (float)Convert.ChangeType(value, FloatType, CultureInfo.InvariantCulture);
         }
 
         return (float)value;
@@ -356,13 +373,13 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = getOrdinalValueType(ordinal, value);
-        if (valueType == typeof(string))
+        if (valueType == StringType)
         {
             var g = value.ToString();
             return string.IsNullOrWhiteSpace(g) ? Guid.NewGuid() : new Guid(g);
         }
 
-        if (valueType == typeof(byte[]))
+        if (valueType == ByteArrayType)
         {
             return new Guid((byte[])value);
         }
@@ -382,19 +399,19 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = getOrdinalValueType(ordinal, value);
-        if (valueType == typeof(bool))
+        if (valueType == BoolType)
         {
             return (bool)value ? (short)1 : (short)0;
         }
 
-        if (valueType == typeof(long))
+        if (valueType == LongType)
         {
             return (short)(long)value;
         }
 
-        if (valueType != typeof(short))
+        if (valueType != ShortType)
         {
-            return (short)Convert.ChangeType(value, typeof(short), CultureInfo.InvariantCulture);
+            return (short)Convert.ChangeType(value, ShortType, CultureInfo.InvariantCulture);
         }
 
         return (short)value;
@@ -412,19 +429,19 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = getOrdinalValueType(ordinal, value);
-        if (valueType == typeof(bool))
+        if (valueType == BoolType)
         {
             return (bool)value ? 1 : 0;
         }
 
-        if (valueType == typeof(long))
+        if (valueType == LongType)
         {
             return (int)(long)value;
         }
 
-        if (valueType != typeof(int))
+        if (valueType != IntType)
         {
-            return (int)Convert.ChangeType(value, typeof(int), CultureInfo.InvariantCulture);
+            return (int)Convert.ChangeType(value, IntType, CultureInfo.InvariantCulture);
         }
 
         return (int)value;
@@ -442,14 +459,14 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = getOrdinalValueType(ordinal, value);
-        if (valueType == typeof(bool))
+        if (valueType == BoolType)
         {
             return (bool)value ? 1 : 0;
         }
 
-        if (valueType != typeof(long))
+        if (valueType != LongType)
         {
-            return (long)Convert.ChangeType(value, typeof(long), CultureInfo.InvariantCulture);
+            return (long)Convert.ChangeType(value, LongType, CultureInfo.InvariantCulture);
         }
 
         return (long)value;
@@ -487,17 +504,17 @@ public class EFTableRowsDataReader : DbDataReader
             return (T)value;
         }
 
-        if (expectedValueType == typeof(DateTimeOffset) && actualValueType == typeof(DateTime))
+        if (expectedValueType == DateTimeOffsetType && actualValueType == DateTimeType)
         {
             return (T)(object)new DateTimeOffset((DateTime)value);
         }
 
-        if (expectedValueType == typeof(DateTimeOffset) && actualValueType == typeof(string))
+        if (expectedValueType == DateTimeOffsetType && actualValueType == StringType)
         {
             return (T)(object)DateTimeOffset.Parse((string)value, CultureInfo.CurrentCulture);
         }
 
-        if (expectedValueType == typeof(TimeSpan) && actualValueType == typeof(string))
+        if (expectedValueType == TimeSpanType && actualValueType == StringType)
         {
             return (T)(object)TimeSpan.Parse((string)value, CultureInfo.CurrentCulture);
         }
@@ -507,12 +524,12 @@ public class EFTableRowsDataReader : DbDataReader
             return (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
         }
 
-        if (actualValueType == typeof(bool) && IsNumber(expectedValueType))
+        if (actualValueType == BoolType && IsNumber(expectedValueType))
         {
             return (bool)value ? (T)(object)1 : (T)(object)0;
         }
 
-        if (expectedValueType == typeof(bool) && IsNumber(actualValueType))
+        if (expectedValueType == BoolType && IsNumber(actualValueType))
         {
             return (T)(object)((ulong)value != 0);
         }
@@ -529,19 +546,19 @@ public class EFTableRowsDataReader : DbDataReader
 #if NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
         var dbTypeName = GetDataTypeName(ordinal);
 
-        if (actualValueType == typeof(string) && string.Equals(dbTypeName, "jsonb", StringComparison.OrdinalIgnoreCase))
+        if (actualValueType == StringType && string.Equals(dbTypeName, "jsonb", StringComparison.OrdinalIgnoreCase))
         {
             return JsonSerializer.Deserialize<T>((string)value)!;
         }
 #endif
 
 #if NET8_0 || NET7_0 || NET6_0
-        if (expectedValueType == typeof(DateOnly) && actualValueType == typeof(DateTime))
+        if (expectedValueType == DateOnlyType && actualValueType == DateTimeType)
         {
             return (T)(object)DateOnly.FromDateTime((DateTime)value);
         }
 
-        if (expectedValueType == typeof(TimeOnly) && actualValueType == typeof(TimeSpan))
+        if (expectedValueType == TimeOnlyType && actualValueType == TimeSpanType)
         {
             return (T)(object)TimeOnly.FromTimeSpan((TimeSpan)value);
         }
@@ -551,9 +568,9 @@ public class EFTableRowsDataReader : DbDataReader
     }
 
     private static bool IsNumber(Type type) =>
-        type == typeof(uint) || type == typeof(int) ||
-        type == typeof(ulong) || type == typeof(long) ||
-        type == typeof(short) || type == typeof(byte) || type == typeof(char);
+        type == UintType || type == IntType ||
+        type == UlongTYpe || type == LongType ||
+        type == ShortType || type == ByteType || type == CharType;
 
     /// <summary>
     ///     Populates an array of objects with the column values of the current row.
@@ -574,4 +591,8 @@ public class EFTableRowsDataReader : DbDataReader
     }
 
     private static bool IsNull(object? value) => value is null || value is DBNull;
+#if NET8_0 || NET7_0 || NET6_0
+    private static readonly Type DateOnlyType = typeof(DateOnly);
+    private static readonly Type TimeOnlyType = typeof(TimeOnly);
+#endif
 }
