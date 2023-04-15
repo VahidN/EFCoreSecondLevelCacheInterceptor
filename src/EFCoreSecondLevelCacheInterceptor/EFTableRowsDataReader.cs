@@ -521,7 +521,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (expectedValueType == TimeSpanType && IsNumber(actualValueType))
         {
-            return (T)(object)new TimeSpan((long)value);
+            return (T)(object)new TimeSpan((ulong)value);
         }
 
         if (IsNumber(expectedValueType) && IsNumber(actualValueType))
