@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -517,6 +517,11 @@ public class EFTableRowsDataReader : DbDataReader
         if (expectedValueType == TimeSpanType && actualValueType == StringType)
         {
             return (T)(object)TimeSpan.Parse((string)value, CultureInfo.CurrentCulture);
+        }
+
+        if (expectedValueType == TimeSpanType && IsNumber(actualValueType))
+        {
+            return (T)(object)new TimeSpan((long)value);
         }
 
         if (IsNumber(expectedValueType) && IsNumber(actualValueType))
