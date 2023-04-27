@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>Entity Framework Core Second Level Caching Library.</Description>
-        <VersionPrefix>3.8.8</VersionPrefix>
+        <VersionPrefix>3.9.0</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
         <TargetFrameworks>net8.0;net7.0;net6.0;net5.0;netstandard2.1;netstandard2.0;net462;netcoreapp3.1;</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -39,11 +39,11 @@
         <ReportAnalyzer>true</ReportAnalyzer>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Meziantou.Analyzer" Version="1.0.746">
+        <PackageReference Include="Meziantou.Analyzer" Version="2.0.43">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.4.27">
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.5.22">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -55,7 +55,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="8.48.0.56517">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.0.0.68202">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -143,8 +143,8 @@
     </PropertyGroup>
 
     <ItemGroup Condition="('$(TargetFramework)' == 'net8.0')">
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[8.0.0-preview.1.23111.4,)"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[8.0.0-preview.1.23111.4,)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[8.0.0-preview.3.23174.2,)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[8.0.0-preview.3.23174.2,)"/>
         <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
         <PackageReference Include="EasyCaching.Core" Version="[1.8,)"/>
         <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>

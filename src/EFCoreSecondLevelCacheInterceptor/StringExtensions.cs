@@ -48,9 +48,9 @@ internal static class StringExtensions
             return false;
         }
 
-        return source.OrderBy(fElement => fElement).SequenceEqual(
-                                                                  collection.OrderBy(sElement => sElement),
-                                                                  stringComparison);
+        return source.OrderBy(fElement => fElement, stringComparison).SequenceEqual(
+         collection.OrderBy(sElement => sElement, stringComparison),
+         stringComparison);
     }
 
     /// <summary>

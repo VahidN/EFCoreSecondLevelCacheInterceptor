@@ -5,6 +5,7 @@ charset = utf-8-bom
 [*.cs]
 
 dotnet_diagnostic.S2857.severity = suggestion
+dotnet_diagnostic.S2094.severity = suggestion
 
 # CA1510: Use 'ArgumentNullException.ThrowIfNull' instead of explicitly throwing a new exception instance
 dotnet_diagnostic.CA1510.severity = suggestion

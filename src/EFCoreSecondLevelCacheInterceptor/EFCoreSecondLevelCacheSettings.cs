@@ -36,6 +36,12 @@ public class EFCoreSecondLevelCacheSettings
     public string CacheKeyPrefix { get; set; } = "EF_";
 
     /// <summary>
+    ///     Gets or sets a dynamic cache key prefix.
+    /// </summary>
+    /// <value>The cache key prefix.</value>
+    public Func<IServiceProvider, string>? CacheKeyPrefixSelector { get; set; }
+
+    /// <summary>
     ///     CacheAllQueries Options
     /// </summary>
     public CacheAllQueriesOptions CacheAllQueriesOptions { get; set; } = new();

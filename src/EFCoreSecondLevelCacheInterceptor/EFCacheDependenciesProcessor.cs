@@ -13,7 +13,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
 {
-    private readonly string _cacheKeyPrefix;
+    private readonly IEFCacheKeyPrefixProvider _cacheKeyPrefixProvider;
     private readonly IEFCacheServiceProvider _cacheServiceProvider;
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
     private readonly ILogger<EFCacheDependenciesProcessor> _dependenciesProcessorLogger;
@@ -28,12 +28,14 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
         ILogger<EFCacheDependenciesProcessor> dependenciesProcessorLogger,
         IEFCacheServiceProvider cacheServiceProvider,
         IEFSqlCommandsProcessor sqlCommandsProcessor,
-        IOptions<EFCoreSecondLevelCacheSettings> cacheSettings)
+        IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
+        IEFCacheKeyPrefixProvider cacheKeyPrefixProvider)
     {
         _logger = logger;
         _dependenciesProcessorLogger = dependenciesProcessorLogger;
         _cacheServiceProvider = cacheServiceProvider;
         _sqlCommandsProcessor = sqlCommandsProcessor;
+        _cacheKeyPrefixProvider = cacheKeyPrefixProvider;
 
         if (cacheSettings == null)
         {
@@ -41,7 +43,6 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
         }
 
         _cacheSettings = cacheSettings.Value;
-        _cacheKeyPrefix = cacheSettings.Value.CacheKeyPrefix;
     }
 
     /// <summary>
@@ -135,7 +136,8 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
             return false;
         }
 
-        cacheKey.CacheDependencies.Add($"{_cacheKeyPrefix}{EFCachePolicy.UnknownsCacheDependency}");
+        var cacheKeyPrefix = _cacheKeyPrefixProvider.GetCacheKeyPrefix();
+        cacheKey.CacheDependencies.Add($"{cacheKeyPrefix}{EFCachePolicy.UnknownsCacheDependency}");
         _cacheServiceProvider.InvalidateCacheDependencies(cacheKey);
 
         if (_logger.IsLoggerEnabled)
@@ -172,7 +174,8 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
             return new SortedSet<string>(StringComparer.Ordinal);
         }
 
-        return new SortedSet<string>(cacheDependencies.Select(x => $"{_cacheKeyPrefix}{x}"),
+        var cacheKeyPrefix = _cacheKeyPrefixProvider.GetCacheKeyPrefix();
+        return new SortedSet<string>(cacheDependencies.Select(x => $"{cacheKeyPrefix}{x}"),
                                      StringComparer.OrdinalIgnoreCase);
     }
 }

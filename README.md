@@ -190,6 +190,8 @@ services.AddEFSecondLevelCache(options =>
     options.UseEasyCachingCoreProvider(
 	   (serviceProvider, cacheKey) => "redis-db-" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"],
 	   isHybridCache: false)
+	// `Or` you can set the cache key prefix per tenant dynamically  
+	.UseCacheKeyPrefix(serviceProvider => "EF_" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"])
 	.DisableLogging(true)
 	.UseCacheKeyPrefix("EF_")
 );

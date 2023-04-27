@@ -207,8 +207,9 @@ public class EFCachePolicyParser : IEFCachePolicyParser
 
                 break;
             case TableTypeComparison.ContainsEvery:
-                if (queryEntityTypes.OrderBy(x => x.FullName)
-                                    .SequenceEqual(options.EntityTypes.OrderBy(x => x.FullName)))
+                if (queryEntityTypes.OrderBy(x => x.FullName, StringComparer.Ordinal)
+                                    .SequenceEqual(options.EntityTypes.OrderBy(x => x.FullName,
+                                                                               StringComparer.Ordinal)))
                 {
                     return true;
                 }
@@ -222,8 +223,9 @@ public class EFCachePolicyParser : IEFCachePolicyParser
 
                 break;
             case TableTypeComparison.DoesNotContainEvery:
-                if (!queryEntityTypes.OrderBy(x => x.FullName)
-                                     .SequenceEqual(options.EntityTypes.OrderBy(x => x.FullName)))
+                if (!queryEntityTypes.OrderBy(x => x.FullName, StringComparer.Ordinal)
+                                     .SequenceEqual(options.EntityTypes.OrderBy(x => x.FullName,
+                                                                                StringComparer.Ordinal)))
                 {
                     return true;
                 }

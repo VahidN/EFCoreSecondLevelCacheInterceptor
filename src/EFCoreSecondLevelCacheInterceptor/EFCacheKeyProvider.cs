@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor;
 
@@ -15,8 +14,9 @@ namespace EFCoreSecondLevelCacheInterceptor;
 public class EFCacheKeyProvider : IEFCacheKeyProvider
 {
     private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
+    private readonly IEFCacheKeyPrefixProvider _cacheKeyPrefixProvider;
     private readonly IEFCachePolicyParser _cachePolicyParser;
-    private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+
     private readonly IEFHashProvider _hashProvider;
     private readonly ILogger<EFCacheKeyProvider> _keyProviderLogger;
     private readonly IEFDebugLogger _logger;
@@ -24,26 +24,19 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
     /// <summary>
     ///     A custom cache key provider for EF queries.
     /// </summary>
-    public EFCacheKeyProvider(
-        IEFCacheDependenciesProcessor cacheDependenciesProcessor,
-        IEFCachePolicyParser cachePolicyParser,
-        IEFDebugLogger logger,
-        ILogger<EFCacheKeyProvider> keyProviderLogger,
-        IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
-        IEFHashProvider hashProvider)
+    public EFCacheKeyProvider(IEFCacheDependenciesProcessor cacheDependenciesProcessor,
+                              IEFCachePolicyParser cachePolicyParser,
+                              IEFDebugLogger logger,
+                              ILogger<EFCacheKeyProvider> keyProviderLogger,
+                              IEFHashProvider hashProvider,
+                              IEFCacheKeyPrefixProvider cacheKeyPrefixProvider)
     {
         _cacheDependenciesProcessor = cacheDependenciesProcessor;
         _logger = logger;
         _keyProviderLogger = keyProviderLogger;
         _cachePolicyParser = cachePolicyParser;
-
-        if (cacheSettings == null)
-        {
-            throw new ArgumentNullException(nameof(cacheSettings));
-        }
-
-        _cacheSettings = cacheSettings.Value;
         _hashProvider = hashProvider ?? throw new ArgumentNullException(nameof(hashProvider));
+        _cacheKeyPrefixProvider = cacheKeyPrefixProvider;
     }
 
     /// <summary>
@@ -71,9 +64,10 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         }
 
         var cacheKey = getCacheKey(command, cachePolicy.CacheSaltKey);
+        var cacheKeyPrefix = _cacheKeyPrefixProvider.GetCacheKeyPrefix();
         var cacheKeyHash =
-            !string.IsNullOrEmpty(_cacheSettings.CacheKeyPrefix)
-                ? $"{_cacheSettings.CacheKeyPrefix}{_hashProvider.ComputeHash(cacheKey):X}"
+            !string.IsNullOrEmpty(cacheKeyPrefix)
+                ? $"{cacheKeyPrefix}{_hashProvider.ComputeHash(cacheKey):X}"
                 : $"{_hashProvider.ComputeHash(cacheKey):X}";
         var cacheDbContextType = context.GetType();
         var cacheDependencies = _cacheDependenciesProcessor.GetCacheDependencies(command, context, cachePolicy);

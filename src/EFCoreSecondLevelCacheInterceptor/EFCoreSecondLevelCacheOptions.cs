@@ -259,6 +259,21 @@ public class EFCoreSecondLevelCacheOptions
     }
 
     /// <summary>
+    ///     Sets a dynamic prefix for the current cachedKey.
+    /// </summary>
+    /// <param name="prefix">
+    ///     Selected cache key prefix.
+    ///     This option will let you to choose a different cache key prefix for your current tenant.
+    ///     <![CDATA[ Such as: serviceProvider => "EF_" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"] ]]>
+    /// </param>
+    /// <returns>EFCoreSecondLevelCacheOptions.</returns>
+    public EFCoreSecondLevelCacheOptions UseCacheKeyPrefix(Func<IServiceProvider, string>? prefix)
+    {
+        Settings.CacheKeyPrefixSelector = prefix;
+        return this;
+    }
+
+    /// <summary>
     ///     Uses the cache key prefix.
     ///     Sets the prefix to all of the cachedKey's.
     ///     Its default value is `EF_`.

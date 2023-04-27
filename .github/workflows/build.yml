@@ -12,9 +12,10 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 8.0.100-preview.1.23115.2
+        dotnet-version: 8.0.100-preview.3.23178.7
     - name: Build EFCoreSecondLevelCacheInterceptor lib
       run: dotnet build ./src/EFCoreSecondLevelCacheInterceptor/EFCoreSecondLevelCacheInterceptor.csproj --configuration Release
 
     - name: Push Package to NuGet.org
+      if: github.event_name == 'push'
       run: dotnet nuget push **\*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
