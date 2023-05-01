@@ -521,7 +521,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (expectedValueType == TimeSpanType && IsNumber(actualValueType))
         {
-            return (T)(object)new TimeSpan(Convert.ToInt64((ulong)value));
+            return (T)(object)new TimeSpan(Convert.ToInt64(value, CultureInfo.InvariantCulture));
         }
 
         if (IsNumber(expectedValueType) && IsNumber(actualValueType))
