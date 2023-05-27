@@ -24,7 +24,6 @@ public static class EFServiceCollectionExtensions
 
         services.AddMemoryCache();
         services.TryAddSingleton<IEFDebugLogger, EFDebugLogger>();
-        services.TryAddSingleton<IEFHashProvider, XxHash64Unsafe>();
         services.TryAddSingleton<IEFCacheKeyPrefixProvider, EFCacheKeyPrefixProvider>();
         services.TryAddSingleton<IEFCacheKeyProvider, EFCacheKeyProvider>();
         services.TryAddSingleton<IEFCachePolicyParser, EFCachePolicyParser>();
@@ -45,6 +44,30 @@ public static class EFServiceCollectionExtensions
         var cacheOptions = new EFCoreSecondLevelCacheOptions();
         options.Invoke(cacheOptions);
 
+        AddHashProvider(services, cacheOptions);
+        AddCacheServiceProvider(services, cacheOptions);
+        AddOptions(services, cacheOptions);
+    }
+
+    private static void AddHashProvider(IServiceCollection services, EFCoreSecondLevelCacheOptions cacheOptions)
+    {
+        if (cacheOptions.Settings.HashProvider == null)
+        {
+            services.TryAddSingleton<IEFHashProvider, XxHash64Unsafe>();
+        }
+        else
+        {
+            services.TryAddSingleton(typeof(IEFHashProvider), cacheOptions.Settings.HashProvider);
+        }
+    }
+
+    private static void AddOptions(IServiceCollection services, EFCoreSecondLevelCacheOptions cacheOptions)
+    {
+        services.TryAddSingleton(Options.Create(cacheOptions.Settings));
+    }
+
+    private static void AddCacheServiceProvider(IServiceCollection services, EFCoreSecondLevelCacheOptions cacheOptions)
+    {
         if (cacheOptions.Settings.CacheProvider == null)
         {
             services.TryAddSingleton<IEFCacheServiceProvider, EFMemoryCacheServiceProvider>();
@@ -53,7 +76,5 @@ public static class EFServiceCollectionExtensions
         {
             services.TryAddSingleton(typeof(IEFCacheServiceProvider), cacheOptions.Settings.CacheProvider);
         }
-
-        services.TryAddSingleton(Options.Create(cacheOptions.Settings));
     }
 }

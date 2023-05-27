@@ -10,7 +10,12 @@ public class EFCoreSecondLevelCacheSettings
     /// <summary>
     ///     The selected cache provider
     /// </summary>
-    public Type CacheProvider { get; set; } = default!;
+    public Type? CacheProvider { get; set; }
+
+    /// <summary>
+    ///     The selected hash provider
+    /// </summary>
+    public Type? HashProvider { get; set; }
 
     /// <summary>
     ///     Selected caching provider name

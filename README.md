@@ -504,6 +504,27 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             // ...
 ```
 
+## Using a different hash provider  
+
+This library uses the [XxHash64Unsafe](/src/EFCoreSecondLevelCacheInterceptor/XxHash64Unsafe.cs) class to calculate the hash of a query and its parameters to produce a corresponding cache-key.
+`xxHash` is an extremely fast `non-cryptographic` Hash algorithm. If you don't like it or you want to change it, just implement the `IEFHashProvider` interface and then introduce it this way:  
+
+```csharp
+namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddEFSecondLevelCache(options =>
+            {
+                options.UseCustomHashProvider<MyCustomHashProvider>();
+                // ...                
+            });
+
+            // ...
+```
+
 ## Does it work?!
 
 You should enable the logging system to see the behind the scene of the caching interceptor.

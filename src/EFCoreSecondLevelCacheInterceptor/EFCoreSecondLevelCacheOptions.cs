@@ -85,6 +85,19 @@ public class EFCoreSecondLevelCacheOptions
     }
 
     /// <summary>
+    ///     You can introduce a custom IEFHashProvider to be used as the HashProvider.
+    ///     If you don't specify a custom hash provider, the default `XxHash64Unsafe` provider will be used.
+    ///     `xxHash` is an extremely fast `non-cryptographic` Hash algorithm, working at speeds close to RAM limits.
+    /// </summary>
+    /// <typeparam name="T">Implements IEFHashProvider</typeparam>
+    public EFCoreSecondLevelCacheOptions UseCustomHashProvider<T>() where T : IEFHashProvider
+    {
+        Settings.HashProvider = typeof(T);
+        return this;
+    }
+
+
+    /// <summary>
     ///     You can introduce a custom IEFCacheServiceProvider to be used as the CacheProvider.
     /// </summary>
     /// <typeparam name="T">Implements IEFCacheServiceProvider</typeparam>
