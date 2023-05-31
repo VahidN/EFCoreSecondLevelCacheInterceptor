@@ -12,7 +12,7 @@ Second level caching is a query cache. The results of EF commands will be stored
 
 To install EFCoreSecondLevelCacheInterceptor, run the following command in the Package Manager Console:
 
-[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor)](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor)
+[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor/)
 
 ```powershell
 PM> Install-Package EFCoreSecondLevelCacheInterceptor
