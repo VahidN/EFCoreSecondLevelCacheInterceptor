@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>Entity Framework Core Second Level Caching Library.</Description>
-        <VersionPrefix>3.9.2</VersionPrefix>
+        <VersionPrefix>3.9.3</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
         <TargetFrameworks>net8.0;net7.0;net6.0;net5.0;netstandard2.1;netstandard2.0;net462;netcoreapp3.1;</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -39,11 +39,11 @@
         <ReportAnalyzer>true</ReportAnalyzer>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Meziantou.Analyzer" Version="2.0.43">
+        <PackageReference Include="Meziantou.Analyzer" Version="2.0.93">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.5.22">
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.7.30">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -55,7 +55,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.0.0.68202">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.12.0.78982">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -69,7 +69,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)"/>
         <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.8,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.9.1,)"/>
         <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
     </ItemGroup>
     <PropertyGroup Condition="'$(TargetFramework)' == 'net462'">
@@ -80,7 +80,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)"/>
         <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.8,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.9.1,)"/>
         <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.0')">
@@ -91,7 +91,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,6)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,6)"/>
         <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.8,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.9.1,)"/>
         <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
@@ -102,7 +102,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[5,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)"/>
         <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.8,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.9.1,)"/>
         <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.1')">
@@ -113,7 +113,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[5,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)"/>
         <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.8,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.9.1,)"/>
         <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net5.0')">
@@ -124,7 +124,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[6,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[6,)"/>
         <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.8,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.9.1,)"/>
         <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net6.0')">
@@ -135,7 +135,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[7,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[7,)"/>
         <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.8,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.9.1,)"/>
         <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net7.0')">
@@ -143,10 +143,10 @@
     </PropertyGroup>
 
     <ItemGroup Condition="('$(TargetFramework)' == 'net8.0')">
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[8.0.0-preview.3.23174.2,)"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[8.0.0-preview.3.23174.2,)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[8.0.0-rc.2.23480.1,)"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[8.0.0-rc.2.23480.1,)"/>
         <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.8,)"/>
+        <PackageReference Include="EasyCaching.Core" Version="[1.9.1,)"/>
         <PackageReference Include="NeoSmart.AsyncLock" Version="[3.2.1,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net8.0')">

@@ -18,8 +18,8 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="7.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0"/>
-        <PackageReference Include="EasyCaching.Core" Version="1.8.0"/>
-        <PackageReference Include="EasyCaching.Redis" Version="1.8.0"/>
-        <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.8.0"/>
+        <PackageReference Include="EasyCaching.Core" Version="1.9.1"/>
+        <PackageReference Include="EasyCaching.Redis" Version="1.9.1"/>
+        <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.9.1"/>
     </ItemGroup>
 </Project>

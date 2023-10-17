@@ -36,6 +36,8 @@ public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
         RelationalEntityTypeExtensionsType.GetMethod("GetTableName", BindingFlags.Static | BindingFlags.Public)
         ?? throw new KeyNotFoundException("Couldn't find `GetTableName()` on RelationalEntityTypeExtensions.");
 
+    private static readonly string[] Separator = { "." };
+
     private readonly ConcurrentDictionary<string, Lazy<SortedSet<string>>> _commandTableNames =
         new(StringComparer.OrdinalIgnoreCase);
 
@@ -169,7 +171,7 @@ public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
 
                 var tableName = string.Empty;
 
-                var tableNameParts = sqlItems[i].Split(new[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+                var tableNameParts = sqlItems[i].Split(Separator, StringSplitOptions.RemoveEmptyEntries);
                 if (tableNameParts.Length == 1)
                 {
                     tableName = tableNameParts[0].Trim();

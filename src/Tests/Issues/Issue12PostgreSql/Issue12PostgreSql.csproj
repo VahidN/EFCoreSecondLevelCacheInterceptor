@@ -22,10 +22,10 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0"/>
-        <PackageReference Include="EasyCaching.InMemory" Version="1.8.0"/>
-        <PackageReference Include="EasyCaching.Redis" Version="1.8.0"/>
-        <PackageReference Include="EasyCaching.HybridCache" Version="1.8.0"/>
-        <PackageReference Include="EasyCaching.Bus.Redis" Version="1.8.0"/>
+        <PackageReference Include="EasyCaching.InMemory" Version="1.9.1"/>
+        <PackageReference Include="EasyCaching.Redis" Version="1.9.1"/>
+        <PackageReference Include="EasyCaching.HybridCache" Version="1.9.1"/>
+        <PackageReference Include="EasyCaching.Bus.Redis" Version="1.9.1"/>
     </ItemGroup>
 
     <ItemGroup>

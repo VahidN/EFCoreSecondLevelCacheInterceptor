@@ -179,7 +179,8 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     }
 
     private static bool AreRootCacheKeysExpired(
-        CacheValue<EFCachedData> cachedValue, CacheValue<HashSet<string>> dependencyKeys)
+        CacheValue<EFCachedData> cachedValue,
+        CacheValue<HashSet<string>> dependencyKeys)
         => !cachedValue.IsNull && dependencyKeys.IsNull;
 
     private IEasyCachingProviderBase GetEasyCachingProvider(EFCacheKey? cacheKey)
@@ -200,18 +201,18 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
         }
 
         return _providers.GetOrAdd(providerName,
-                                   _ =>
+                                   name =>
                                    {
                                        if (_cacheSettings.IsHybridCache)
                                        {
                                            var hybridFactory =
                                                _serviceProvider.GetRequiredService<IHybridProviderFactory>();
-                                           return hybridFactory.GetHybridCachingProvider(providerName);
+                                           return hybridFactory.GetHybridCachingProvider(name);
                                        }
 
                                        var providerFactory =
                                            _serviceProvider.GetRequiredService<IEasyCachingProviderFactory>();
-                                       return providerFactory.GetCachingProvider(providerName);
+                                       return providerFactory.GetCachingProvider(name);
                                    });
     }
 }
