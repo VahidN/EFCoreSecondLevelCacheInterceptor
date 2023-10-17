@@ -541,7 +541,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (actualValueType.IsArray && expectedValueType.GetInterface(nameof(IEnumerable)) != null)
         {
-            var enumerable = Activator.CreateInstance(typeof(T), value);
+            var enumerable = Activator.CreateInstance(typeof(T), new object[] { value });
             if (enumerable is not null)
             {
                 return (T)enumerable;
