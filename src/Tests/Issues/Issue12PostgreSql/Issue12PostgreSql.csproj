@@ -26,6 +26,7 @@
         <PackageReference Include="EasyCaching.Redis" Version="1.9.1"/>
         <PackageReference Include="EasyCaching.HybridCache" Version="1.9.1"/>
         <PackageReference Include="EasyCaching.Bus.Redis" Version="1.9.1"/>
+        <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.9.1" />
     </ItemGroup>
 
     <ItemGroup>
