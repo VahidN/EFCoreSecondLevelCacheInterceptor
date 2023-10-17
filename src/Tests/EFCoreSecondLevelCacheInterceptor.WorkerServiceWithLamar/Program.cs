@@ -2,7 +2,6 @@ using System;
 using Lamar.Microsoft.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Builder;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer;
 using System.IO;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Utils;
