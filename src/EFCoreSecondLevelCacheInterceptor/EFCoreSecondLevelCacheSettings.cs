@@ -72,6 +72,11 @@ public class EFCoreSecondLevelCacheSettings
     public bool DisableLogging { set; get; }
 
     /// <summary>
+    ///     Fallback on db if the caching provider (redis) is down.
+    /// </summary>
+    public bool UseDbCallsIfCachingProviderIsDown { set; get; }
+
+    /// <summary>
     ///     Possibility to allow caching with explicit transactions.
     ///     Its default value is false.
     /// </summary>

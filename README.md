@@ -447,6 +447,8 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             services.AddEFSecondLevelCache(options =>
             {
                 options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
+                        // Fallback on db if the caching provider (redis) is down.
+                        .UseDbCallsIfCachingProviderIsDown(true)
                         // Don't cache null values. Remove this optional setting if it's not necessary.
                         .SkipCachingResults(result =>
                                 result.Value == null || (result.Value is EFTableRows rows && rows.RowsCount == 0));
