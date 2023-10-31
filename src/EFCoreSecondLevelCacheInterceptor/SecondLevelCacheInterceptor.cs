@@ -3,8 +3,6 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace EFCoreSecondLevelCacheInterceptor;
 
@@ -13,11 +11,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class SecondLevelCacheInterceptor : DbCommandInterceptor
 {
-    private readonly IEFCacheServiceCheck _cacheServiceCheck;
-    private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
-    private readonly ILogger<SecondLevelCacheInterceptor> _interceptorLogger;
     private readonly ILockProvider _lockProvider;
-    private readonly IEFDebugLogger _logger;
     private readonly IDbCommandInterceptorProcessor _processor;
 
     /// <summary>
@@ -29,23 +23,10 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
     ///     to register it.
     /// </summary>
     public SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processor,
-                                       ILockProvider lockProvider,
-                                       IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
-                                       IEFDebugLogger logger,
-                                       ILogger<SecondLevelCacheInterceptor> interceptorLogger,
-                                       IEFCacheServiceCheck cacheServiceCheck)
+                                       ILockProvider lockProvider)
     {
-        if (cacheSettings == null)
-        {
-            throw new ArgumentNullException(nameof(cacheSettings));
-        }
-
-        _processor = processor;
-        _lockProvider = lockProvider;
-        _logger = logger;
-        _interceptorLogger = interceptorLogger;
-        _cacheServiceCheck = cacheServiceCheck;
-        _cacheSettings = cacheSettings.Value;
+        _processor = processor ?? throw new ArgumentNullException(nameof(processor));
+        _lockProvider = lockProvider ?? throw new ArgumentNullException(nameof(lockProvider));
     }
 
     /// <summary>
@@ -56,37 +37,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandExecutedEventData eventData,
         int result)
     {
-        try
-        {
-            using var @lock = _lockProvider.Lock();
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var @lock = _lockProvider.Lock();
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
 
 
@@ -107,40 +59,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        try
-        {
-            using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
-                 command,
-                 eventData?.Context,
-                 cancellationToken);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -151,37 +71,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandEventData eventData,
         InterceptionResult<int> result)
     {
-        try
-        {
-            using var @lock = _lockProvider.Lock();
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var @lock = _lockProvider.Lock();
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -201,40 +92,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        try
-        {
-            using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
-                 command,
-                 eventData?.Context,
-                 cancellationToken);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -245,37 +104,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandExecutedEventData eventData,
         DbDataReader result)
     {
-        try
-        {
-            using var @lock = _lockProvider.Lock();
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var @lock = _lockProvider.Lock();
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -295,40 +125,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        try
-        {
-            using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
-                 command,
-                 eventData?.Context,
-                 cancellationToken);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -339,37 +137,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandEventData eventData,
         InterceptionResult<DbDataReader> result)
     {
-        try
-        {
-            using var @lock = _lockProvider.Lock();
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var @lock = _lockProvider.Lock();
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -389,40 +158,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        try
-        {
-            using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
-                 command,
-                 eventData?.Context,
-                 cancellationToken);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -433,37 +170,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandExecutedEventData eventData,
         object? result)
     {
-        try
-        {
-            using var @lock = _lockProvider.Lock();
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var @lock = _lockProvider.Lock();
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -483,40 +191,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        try
-        {
-            using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
-                 command,
-                 eventData?.Context,
-                 cancellationToken);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutedCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -527,37 +203,8 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
         CommandEventData eventData,
         InterceptionResult<object> result)
     {
-        try
-        {
-            using var @lock = _lockProvider.Lock();
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(command, eventData?.Context);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var @lock = _lockProvider.Lock();
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
 
     /// <summary>
@@ -577,39 +224,7 @@ public class SecondLevelCacheInterceptor : DbCommandInterceptor
             CancellationToken cancellationToken = default)
 #endif
     {
-        try
-        {
-            using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-
-            if (!_cacheServiceCheck.IsCacheServiceAvailable())
-            {
-                return result;
-            }
-
-            var (shouldSkipProcessing, cachePolicy) = _processor.ShouldSkipProcessing(
-                 command,
-                 eventData?.Context,
-                 cancellationToken);
-            if (shouldSkipProcessing)
-            {
-                return result;
-            }
-
-            return _processor.ProcessExecutingCommands(command, eventData?.Context, result, cachePolicy);
-        }
-        catch (Exception ex)
-        {
-            if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
-            {
-                throw;
-            }
-
-            if (_logger.IsLoggerEnabled)
-            {
-                _interceptorLogger.LogCritical(ex, "Interceptor Error");
-            }
-
-            return result;
-        }
+        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
     }
 }
