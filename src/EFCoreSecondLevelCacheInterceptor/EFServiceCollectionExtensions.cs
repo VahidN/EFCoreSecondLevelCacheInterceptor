@@ -24,6 +24,7 @@ public static class EFServiceCollectionExtensions
 
         services.AddMemoryCache();
         services.TryAddSingleton<IEFDebugLogger, EFDebugLogger>();
+        services.TryAddSingleton<IEFCacheServiceCheck, EFCacheServiceCheck>();
         services.TryAddSingleton<IEFCacheKeyPrefixProvider, EFCacheKeyPrefixProvider>();
         services.TryAddSingleton<IEFCacheKeyProvider, EFCacheKeyProvider>();
         services.TryAddSingleton<IEFCachePolicyParser, EFCachePolicyParser>();

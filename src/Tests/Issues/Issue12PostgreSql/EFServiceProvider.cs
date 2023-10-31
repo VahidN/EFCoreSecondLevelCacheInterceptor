@@ -93,6 +93,8 @@ public static class EFServiceProvider
                                            o.UseEasyCachingCoreProvider(providerName).DisableLogging();
                                            o.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(10));
                                            o.UseCacheKeyPrefix("EF_");
+                                           // Fallback on db if the caching provider (redis) is down.
+                                           o.UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1));
                                        });
 
         services.AddDbContext<ApplicationDbContext>((serviceProvider, optionsBuilder) =>

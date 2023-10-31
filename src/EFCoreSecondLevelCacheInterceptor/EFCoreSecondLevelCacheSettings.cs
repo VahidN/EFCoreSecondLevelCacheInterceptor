@@ -77,6 +77,11 @@ public class EFCoreSecondLevelCacheSettings
     public bool UseDbCallsIfCachingProviderIsDown { set; get; }
 
     /// <summary>
+    ///     The cache server's availability check interval value.
+    /// </summary>
+    public TimeSpan NextCacheServerAvailabilityCheck { set; get; } = TimeSpan.FromMinutes(1);
+
+    /// <summary>
     ///     Possibility to allow caching with explicit transactions.
     ///     Its default value is false.
     /// </summary>

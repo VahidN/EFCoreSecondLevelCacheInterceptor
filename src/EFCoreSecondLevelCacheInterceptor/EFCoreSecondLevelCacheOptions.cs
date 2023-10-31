@@ -311,11 +311,11 @@ public class EFCoreSecondLevelCacheOptions
 
     /// <summary>
     ///     Fallback on db if the caching provider (redis) is down.
-    ///     Its default value is false.
     /// </summary>
-    public EFCoreSecondLevelCacheOptions UseDbCallsIfCachingProviderIsDown(bool value = false)
+    public EFCoreSecondLevelCacheOptions UseDbCallsIfCachingProviderIsDown(TimeSpan nextAvailabilityCheck)
     {
-        Settings.UseDbCallsIfCachingProviderIsDown = value;
+        Settings.UseDbCallsIfCachingProviderIsDown = true;
+        Settings.NextCacheServerAvailabilityCheck = nextAvailabilityCheck;
         return this;
     }
 
