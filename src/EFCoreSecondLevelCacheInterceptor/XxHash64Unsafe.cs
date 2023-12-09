@@ -1,3 +1,35 @@
+#if NET8_0
+using System;
+using System.IO.Hashing;
+using System.Text;
+
+namespace EFCoreSecondLevelCacheInterceptor;
+
+/// <inheritdoc />
+public class XxHash64Unsafe : IEFHashProvider
+{
+    /// <inheritdoc />
+    public ulong ComputeHash(string data)
+    {
+        ArgumentNullException.ThrowIfNull(data);
+        return XxHash64.HashToUInt64(Encoding.UTF8.GetBytes(data));
+    }
+
+    /// <inheritdoc />
+    public ulong ComputeHash(byte[] data)
+    {
+        ArgumentNullException.ThrowIfNull(data);
+        return XxHash64.HashToUInt64(data);
+    }
+
+    /// <inheritdoc />
+    public ulong ComputeHash(byte[] data, int offset, int len, uint seed)
+    {
+        ArgumentNullException.ThrowIfNull(data);
+        return XxHash64.HashToUInt64(data.AsSpan(offset, len), seed);
+    }
+}
+#else
 using System;
 using System.Runtime.CompilerServices;
 
@@ -203,3 +235,4 @@ public class XxHash64Unsafe : IEFHashProvider
 #endif
     }
 }
+#endif
