@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <AssemblyName>EFCoreSecondLevelCacheInterceptor.Tests</AssemblyName>
         <PackageId>EFCoreSecondLevelCacheInterceptor.Tests</PackageId>
         <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -27,13 +27,13 @@
         <PackageReference Include="MessagePack" Version="2.4.35"/>
         <PackageReference Include="StackExchange.Redis" Version="2.6.70"/>
 
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0"/>
         <PackageReference Include="MSTest.TestFramework" Version="3.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0"/>
         <PackageReference Include="MSTest.TestAdapter" Version="3.0.2"/>
         <PackageReference Include="CacheManager.StackExchange.Redis" Version="1.2.0"/>
         <PackageReference Include="CacheManager.Core" Version="1.2.0"/>
