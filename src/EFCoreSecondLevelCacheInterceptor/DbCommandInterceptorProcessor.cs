@@ -60,14 +60,9 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
     /// </summary>
     public T ProcessExecutedCommands<T>(DbCommand command, DbContext? context, T result)
     {
-        if (command == null)
+        if (context is null || command is null)
         {
-            throw new ArgumentNullException(nameof(command));
-        }
-
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
+            return result;
         }
 
         try
@@ -196,14 +191,9 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
     /// </summary>
     public T ProcessExecutingCommands<T>(DbCommand command, DbContext? context, T result)
     {
-        if (command == null)
+        if (context is null || command is null)
         {
-            throw new ArgumentNullException(nameof(command));
-        }
-
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
+            return result;
         }
 
         try
@@ -342,7 +332,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         DbContext? context,
         CancellationToken cancellationToken = default)
     {
-        if (context is null)
+        if (context is null || command is null)
         {
             return (true, null);
         }
