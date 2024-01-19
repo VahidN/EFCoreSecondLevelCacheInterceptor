@@ -18,12 +18,20 @@ public class EFCacheDependenciesProcessorTests
       WHERE [u].[Id] = @__user1_Id_0]";
         var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
         var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
-                                                                                new SortedSet<string>
-                                                                                { "Posts", "Users", "Products" },
-                                                                                commandText);
+            new SortedSet<string>
+            {
+                "Posts",
+                "Users",
+                "Products"
+            },
+            commandText);
 
-        var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Users" };
-        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "Users"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
     }
 
     [TestMethod]
@@ -38,12 +46,21 @@ public class EFCacheDependenciesProcessorTests
       ORDER BY [p].[Id]";
         var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
         var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
-                                                                                new SortedSet<string>
-                                                                                { "Posts", "Users", "Products" },
-                                                                                commandText);
+            new SortedSet<string>
+            {
+                "Posts",
+                "Users",
+                "Products"
+            },
+            commandText);
 
-        var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Posts", CacheKeyPrefix + "Users" };
-        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "Posts",
+            CacheKeyPrefix + "Users"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
     }
 
     [TestMethod]
@@ -58,12 +75,21 @@ public class EFCacheDependenciesProcessorTests
       ORDER BY [p].[Id]";
         var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
         var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
-                                                                                new SortedSet<string>
-                                                                                { "Posts", "Users", "Products" },
-                                                                                commandText);
+            new SortedSet<string>
+            {
+                "Posts",
+                "Users",
+                "Products"
+            },
+            commandText);
 
-        var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Posts", CacheKeyPrefix + "Users" };
-        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "Posts",
+            CacheKeyPrefix + "Users"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
     }
 
 
@@ -79,12 +105,21 @@ public class EFCacheDependenciesProcessorTests
       ORDER BY [p].[Id]";
         var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
         var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
-                                                                                new SortedSet<string>
-                                                                                { "Posts", "Users", "Products" },
-                                                                                commandText);
+            new SortedSet<string>
+            {
+                "Posts",
+                "Users",
+                "Products"
+            },
+            commandText);
 
-        var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Posts", CacheKeyPrefix + "Users" };
-        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "Posts",
+            CacheKeyPrefix + "Users"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
     }
 
     [TestMethod]
@@ -99,12 +134,21 @@ public class EFCacheDependenciesProcessorTests
       ORDER BY [p].[Id]";
         var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
         var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
-                                                                                new SortedSet<string>
-                                                                                { "Posts", "Users", "Products" },
-                                                                                commandText);
+            new SortedSet<string>
+            {
+                "Posts",
+                "Users",
+                "Products"
+            },
+            commandText);
 
-        var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Posts", CacheKeyPrefix + "Users" };
-        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "Posts",
+            CacheKeyPrefix + "Users"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
     }
 
     [TestMethod]
@@ -118,12 +162,20 @@ public class EFCacheDependenciesProcessorTests
         WHERE @@ROWCOUNT = 1 AND [ProductId] = scope_identity();";
         var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
         var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
-                                                                                new SortedSet<string>
-                                                                                { "Posts", "Users", "Products" },
-                                                                                commandText);
+            new SortedSet<string>
+            {
+                "Posts",
+                "Users",
+                "Products"
+            },
+            commandText);
 
-        var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Products" };
-        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "Products"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
     }
 
     [TestMethod]
@@ -137,12 +189,20 @@ public class EFCacheDependenciesProcessorTests
         WHERE @@ROWCOUNT = 1 AND `ProductId` = scope_identity();";
         var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
         var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
-                                                                                new SortedSet<string>
-                                                                                { "Posts", "Users", "Products" },
-                                                                                commandText);
+            new SortedSet<string>
+            {
+                "Posts",
+                "Users",
+                "Products"
+            },
+            commandText);
 
-        var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Products" };
-        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "Products"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
     }
 
     [TestMethod]
@@ -154,12 +214,20 @@ public class EFCacheDependenciesProcessorTests
         SELECT @@ROWCOUNT;";
         var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
         var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
-                                                                                new SortedSet<string>
-                                                                                { "Posts", "Users", "Products" },
-                                                                                commandText);
+            new SortedSet<string>
+            {
+                "Posts",
+                "Users",
+                "Products"
+            },
+            commandText);
 
-        var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Products" };
-        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "Products"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
     }
 
     [TestMethod]
@@ -171,12 +239,20 @@ public class EFCacheDependenciesProcessorTests
       SELECT @@ROWCOUNT;";
         var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
         var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
-                                                                                new SortedSet<string>
-                                                                                { "Posts", "Users", "Products" },
-                                                                                commandText);
+            new SortedSet<string>
+            {
+                "Posts",
+                "Users",
+                "Products"
+            },
+            commandText);
 
-        var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Users" };
-        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "Users"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
     }
 
 
@@ -199,11 +275,19 @@ OUTPUT INSERTED.[BlogId], i._Position
 INTO @inserted2;";
         var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
         var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
-                                                                                new SortedSet<string>
-                                                                                { "Blogs", "Posts" }, commandText);
+            new SortedSet<string>
+            {
+                "Blogs",
+                "Posts"
+            },
+            commandText);
 
-        var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "Blogs" };
-        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "Blogs"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
     }
 
     [TestMethod]
@@ -213,12 +297,44 @@ INTO @inserted2;";
             @"MERGE [dbo].[People] WITH (HOLDLOCK) AS T USING (SELECT TOP 2 * FROM [dbo].[PeopleTemp94f5cba8] ORDER BY [Id]) AS S ON T.[Id] = S.[Id] WHEN NOT MATCHED BY TARGET THEN INSERT ([Name]) VALUES (S.[Name]) WHEN MATCHED AND EXISTS (SELECT S.[Name] EXCEPT SELECT T.[Name]) THEN UPDATE SET T.[Name] = S.[Name];";
         var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
         var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
-                                                                                new SortedSet<string>
-                                                                                {
-                                                                                    "People",
-                                                                                }, commandText);
+            new SortedSet<string>
+            {
+                "People"
+            },
+            commandText);
 
-        var inUseTableNames = new SortedSet<string> { CacheKeyPrefix + "People" };
-        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "People"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
+    }
+
+    [TestMethod]
+    public void TestGetCacheDependenciesWorksForQueryHints()
+    {
+        const string commandText = @"SET NOCOUNT ON;
+        INSERT INTO [Products] ([IsActive], [Notes], [ProductName], [ProductNumber], [UserId])
+        VALUES (@p0, @p1, @p2, @p3, @p4);
+        SELECT [ProductId]
+        FROM [Products]
+        WHERE @@ROWCOUNT = 1 AND [ProductId] = scope_identity() FOR UPDATE";
+        var cacheDependenciesProcessor = EFServiceProvider.GetRequiredService<IEFCacheDependenciesProcessor>();
+        var cacheDependencies = cacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
+            new SortedSet<string>
+            {
+                "Posts",
+                "Users",
+                "Products"
+            },
+            commandText);
+
+        var inUseTableNames = new SortedSet<string>
+        {
+            CacheKeyPrefix + "Products"
+        };
+        CollectionAssert.AreEqual(inUseTableNames,
+            cacheDependencies);
     }
 }

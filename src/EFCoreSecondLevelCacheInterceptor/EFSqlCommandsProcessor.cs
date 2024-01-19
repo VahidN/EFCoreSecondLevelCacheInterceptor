@@ -13,30 +13,39 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
 {
-    private static readonly string[] CrudMarkers = { "MERGE ", "insert ", "update ", "delete ", "create " };
+    private static readonly string[] CrudMarkers =
+    {
+        "MERGE ", "insert ", "update ", "delete ", "create "
+    };
 
     private static readonly Type IEntityType =
         Type.GetType("Microsoft.EntityFrameworkCore.Metadata.IEntityType, Microsoft.EntityFrameworkCore") ??
         throw new TypeLoadException("Couldn't load Microsoft.EntityFrameworkCore.Metadata.IEntityType");
 
-    private static readonly PropertyInfo ClrTypePropertyInfo =
-        IEntityType.GetInterfaces()
-                   .Union(new[] { IEntityType })
-                   .Select(i => i.GetProperty("ClrType", BindingFlags.Public | BindingFlags.Instance))
-                   .Distinct()
-                   .FirstOrDefault(propertyInfo => propertyInfo != null) ??
-        throw new KeyNotFoundException("Couldn't find `ClrType` on IEntityType.");
+    private static readonly PropertyInfo ClrTypePropertyInfo = IEntityType.GetInterfaces().Union(new[]
+                                                                   {
+                                                                       IEntityType
+                                                                   }).Select(i => i.GetProperty("ClrType",
+                                                                       BindingFlags.Public | BindingFlags.Instance))
+                                                                   .Distinct()
+                                                                   .FirstOrDefault(propertyInfo
+                                                                       => propertyInfo != null) ??
+                                                               throw new KeyNotFoundException(
+                                                                   "Couldn't find `ClrType` on IEntityType.");
 
     private static readonly Type RelationalEntityTypeExtensionsType =
         Type.GetType(
-                     "Microsoft.EntityFrameworkCore.RelationalEntityTypeExtensions, Microsoft.EntityFrameworkCore.Relational") ??
+            "Microsoft.EntityFrameworkCore.RelationalEntityTypeExtensions, Microsoft.EntityFrameworkCore.Relational") ??
         throw new TypeLoadException("Couldn't load Microsoft.EntityFrameworkCore.RelationalEntityTypeExtensions");
 
     private static readonly MethodInfo GetTableNameMethodInfo =
-        RelationalEntityTypeExtensionsType.GetMethod("GetTableName", BindingFlags.Static | BindingFlags.Public)
-        ?? throw new KeyNotFoundException("Couldn't find `GetTableName()` on RelationalEntityTypeExtensions.");
+        RelationalEntityTypeExtensionsType.GetMethod("GetTableName", BindingFlags.Static | BindingFlags.Public) ??
+        throw new KeyNotFoundException("Couldn't find `GetTableName()` on RelationalEntityTypeExtensions.");
 
-    private static readonly string[] Separator = { "." };
+    private static readonly string[] Separator =
+    {
+        "."
+    };
 
     private readonly ConcurrentDictionary<string, Lazy<SortedSet<string>>> _commandTableNames =
         new(StringComparer.OrdinalIgnoreCase);
@@ -47,8 +56,8 @@ public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
     /// <summary>
     ///     SqlCommands Utils
     /// </summary>
-    public EFSqlCommandsProcessor(IEFHashProvider hashProvider) =>
-        _hashProvider = hashProvider ?? throw new ArgumentNullException(nameof(hashProvider));
+    public EFSqlCommandsProcessor(IEFHashProvider hashProvider)
+        => _hashProvider = hashProvider ?? throw new ArgumentNullException(nameof(hashProvider));
 
     /// <summary>
     ///     Is `insert`, `update` or `delete`?
@@ -86,9 +95,8 @@ public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
         }
 
         return _contextTableNames.GetOrAdd(context.GetType(),
-                                           _ => new Lazy<List<TableEntityInfo>>(() => getTableNames(context),
-                                                                                LazyThreadSafetyMode
-                                                                                    .ExecutionAndPublication)).Value;
+            _ => new Lazy<List<TableEntityInfo>>(() => getTableNames(context),
+                LazyThreadSafetyMode.ExecutionAndPublication)).Value;
     }
 
     /// <summary>
@@ -98,11 +106,8 @@ public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
     {
         var commandTextKey = $"{_hashProvider.ComputeHash(commandText):X}";
         return _commandTableNames.GetOrAdd(commandTextKey,
-                                           _ =>
-                                               new
-                                                   Lazy<SortedSet<
-                                                       string>>(() => getRawSqlCommandTableNames(commandText),
-                                                                LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+            _ => new Lazy<SortedSet<string>>(() => getRawSqlCommandTableNames(commandText),
+                LazyThreadSafetyMode.ExecutionAndPublication)).Value;
     }
 
     /// <summary>
@@ -112,8 +117,7 @@ public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
     {
         var commandTableNames = GetSqlCommandTableNames(commandText);
         return allEntityTypes.Where(entityType => commandTableNames.Contains(entityType.TableName))
-                             .Select(entityType => entityType.ClrType)
-                             .ToList();
+            .Select(entityType => entityType.ClrType).ToList();
     }
 
     private static List<TableEntityInfo> getTableNames(DbContext context)
@@ -122,21 +126,21 @@ public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
         foreach (var entityType in context.Model.GetEntityTypes())
         {
             var clrType = getClrType(entityType);
-            tableNames.Add(
-                           new TableEntityInfo
-                           {
-                               ClrType = clrType,
-                               TableName = getTableName(entityType) ?? clrType.ToString(),
-                           });
+            tableNames.Add(new TableEntityInfo
+            {
+                ClrType = clrType,
+                TableName = getTableName(entityType) ?? clrType.ToString()
+            });
         }
 
         return tableNames;
     }
 
     private static string? getTableName(object entityType)
-    {
-        return GetTableNameMethodInfo.Invoke(null, new[] { entityType }) as string;
-    }
+        => GetTableNameMethodInfo.Invoke(null, new[]
+        {
+            entityType
+        }) as string;
 
     private static Type getClrType(object entityType)
     {
@@ -147,12 +151,17 @@ public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
 
     private static SortedSet<string> getRawSqlCommandTableNames(string commandText)
     {
-        string[] tableMarkers = { "FROM", "JOIN", "INTO", "UPDATE", "MERGE" };
+        string[] tableMarkers =
+        {
+            "FROM", "JOIN", "INTO", "UPDATE", "MERGE"
+        };
 
         var tables = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        var sqlItems = commandText.Split(new[] { " ", "\r\n", Environment.NewLine, "\n" },
-                                         StringSplitOptions.RemoveEmptyEntries);
+        var sqlItems = commandText.Split(new[]
+        {
+            " ", "\r\n", Environment.NewLine, "\n"
+        }, StringSplitOptions.RemoveEmptyEntries);
         var sqlItemsLength = sqlItems.Length;
         for (var i = 0; i < sqlItemsLength; i++)
         {
@@ -166,7 +175,7 @@ public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
                 ++i;
                 if (i >= sqlItemsLength)
                 {
-                    continue;
+                    break;
                 }
 
                 var tableName = string.Empty;
@@ -187,10 +196,8 @@ public class EFSqlCommandsProcessor : IEFSqlCommandsProcessor
                 }
 
                 tableName = tableName.Replace("[", "", StringComparison.Ordinal)
-                                     .Replace("]", "", StringComparison.Ordinal)
-                                     .Replace("'", "", StringComparison.Ordinal)
-                                     .Replace("`", "", StringComparison.Ordinal)
-                                     .Replace("\"", "", StringComparison.Ordinal);
+                    .Replace("]", "", StringComparison.Ordinal).Replace("'", "", StringComparison.Ordinal)
+                    .Replace("`", "", StringComparison.Ordinal).Replace("\"", "", StringComparison.Ordinal);
                 tables.Add(tableName);
             }
         }
