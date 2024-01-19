@@ -39,7 +39,7 @@
         <ReportAnalyzer>true</ReportAnalyzer>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Meziantou.Analyzer" Version="2.0.120">
+        <PackageReference Include="Meziantou.Analyzer" Version="2.0.136">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -55,7 +55,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.15.0.81779">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.17.0.82934">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

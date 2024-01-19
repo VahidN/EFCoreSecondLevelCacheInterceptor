@@ -24,8 +24,8 @@
         <!--<PackageReference Include="dotMorten.Microsoft.SqlServer.Types" Version="1.1.0" />-->
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="8.0.0"/>
-        <PackageReference Include="Microsoft.SqlServer.Types" Version="14.0.1016.290"/>
-        <PackageReference Include="System.Data.SqlClient" Version="4.8.5"/>
+        <PackageReference Include="Microsoft.SqlServer.Types" Version="160.1000.6"/>
+        <PackageReference Include="System.Data.SqlClient" Version="4.8.6"/>
     </ItemGroup>
     <!--
     <ItemGroup>
