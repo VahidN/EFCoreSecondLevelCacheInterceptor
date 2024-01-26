@@ -30,7 +30,7 @@ You can use the following cache providers:
 - [EasyCaching.Core memory provider](#Using-EasyCaching.Core-as-the-cache-provider)
 - [EasyCaching.Core dynamic cache provider](#Using-EasyCaching.Core-as-a-dynamic-cache-provider)
 - [CacheManager.Core cache provider](#Using-CacheManager.Core-as-the-cache-provider-\[It's-not-actively-maintained\])
-- [A custom cache provider](#Using-a-custom-cache-provider)]
+- [A custom cache provider](#Using-a-custom-cache-provider)
 
 #### Using the built-in In-Memory cache provider
 
