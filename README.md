@@ -66,7 +66,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 }
 ```
 
-### Using EasyCaching.Core as the cache provider
+#### Using EasyCaching.Core as the cache provider
 
 Here you can use the [EasyCaching.Core](https://github.com/dotnetcore/EasyCaching), as a highly configurable cache manager too.
 To use its in-memory caching mechanism, add this entry to the `.csproj` file:
@@ -190,7 +190,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
 [Here is a sample about it](/src/Tests/Issues/Issue123WithMessagePack/EFServiceProvider.cs).
 
 
-### Using EasyCaching.Core as a dynamic cache provider
+#### Using EasyCaching.Core as a dynamic cache provider
 
 If you want to support multitenancy in your application and have a different Redis database per each tenant, first register multiple pre-configured providers with known `providerName`s and then select these `providerName`s based on the current tenant this way dynamically:
 
@@ -209,7 +209,7 @@ services.AddEFSecondLevelCache(options =>
 ```
 
 
-### Using CacheManager.Core as the cache provider [It's not actively maintained]
+#### Using CacheManager.Core as the cache provider [It's not actively maintained]
 
 Also here you can use the [CacheManager.Core](https://github.com/MichaCo/CacheManager), as a highly configurable cache manager too.
 To use its in-memory caching mechanism, add these entries to the `.csproj` file:
@@ -292,7 +292,7 @@ services.AddEFSecondLevelCache(options =>
 
 [Here is](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/Settings/EFServiceProvider.cs#L21) the definition of the SpecialTypesConverter.
 
-### Using a custom cache provider
+#### Using a custom cache provider
 
 If you don't want to use the above cache providers, implement your custom `IEFCacheServiceProvider` and then introduce it using the `options.UseCustomCacheProvider<T>()` method.
 
