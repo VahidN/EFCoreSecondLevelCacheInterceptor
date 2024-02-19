@@ -114,6 +114,10 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         return cacheKey.ToString().Trim();
     }
 
+#if NET5_0 || NET6_0 || NET7_0 || NET8_0	
+    private static string? getParameterValue(DbParameter parameter)
+	=> System.Text.Json.JsonSerializer.Serialize(parameter.Value);
+#else		
     private static string? getParameterValue(DbParameter parameter)
     {
         return parameter.Value switch
@@ -148,4 +152,5 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
 
         return sb.ToString();
     }
+#endif			   
 }

@@ -1,10 +1,6 @@
 # EF Core 3.1.x, 5x, 6x, 7x & 8x Second Level Cache Interceptor
 
-<p align="left">
-  <a href="https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor">
-     <img alt="GitHub Actions status" src="https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/workflows/.NET%20Core%20Build/badge.svg">
-  </a>
-</p>
+[![EFCoreSecondLevelCacheInterceptor](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/workflows/.NET%20Core%20Build/badge.svg)](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor)
 
 Second level caching is a query cache. The results of EF commands will be stored in the cache, so that the same EF commands will retrieve their data from the cache rather than executing them against the database again.
 
@@ -22,7 +18,7 @@ You can also view the [package page](http://www.nuget.org/packages/EFCoreSecondL
 
 ## Usage ([1](#1--register-a-preferred-cache-provider) & [2](#2--add-secondlevelcacheinterceptor-to-your-dbcontextoptionsbuilder-pipeline) are mandatory)
 
-### 1- [Register a preferred cache provider](/src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample/Startup.cs):
+### 1- [Register a preferred cache provider](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample/Startup.cs):
 
 You can use the following cache providers:
 
@@ -34,7 +30,7 @@ You can use the following cache providers:
 
 #### Using the built-in In-Memory cache provider
 
-![performance](/src/Tests/EFCoreSecondLevelCacheInterceptor.PerformanceTests/int-pref.png)
+![performance](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.PerformanceTests/int-pref.png)
 
 ```csharp
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
@@ -195,7 +191,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
 }
 ```
 
-[Here is a sample about it](/src/Tests/Issues/Issue123WithMessagePack/EFServiceProvider.cs).
+[Here is a sample about it](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/Issues/Issue123WithMessagePack/EFServiceProvider.cs).
 
 
 #### Using EasyCaching.Core as a dynamic cache provider
@@ -298,13 +294,13 @@ services.AddEFSecondLevelCache(options =>
 );
 ```
 
-[Here is](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/Settings/EFServiceProvider.cs#L21) the definition of the SpecialTypesConverter.
+[Here is](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/Settings/EFServiceProvider.cs#L21) the definition of the SpecialTypesConverter.
 
 #### Using a custom cache provider
 
 If you don't want to use the above cache providers, implement your custom `IEFCacheServiceProvider` and then introduce it using the `options.UseCustomCacheProvider<T>()` method.
 
-### 2- [Add SecondLevelCacheInterceptor](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/MsSqlServiceCollectionExtensions.cs) to your `DbContextOptionsBuilder` pipeline:
+### 2- [Add SecondLevelCacheInterceptor](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/MsSqlServiceCollectionExtensions.cs) to your `DbContextOptionsBuilder` pipeline:
 
 ```csharp
     public static class MsSqlServiceCollectionExtensions
@@ -328,7 +324,7 @@ If you don't want to use the above cache providers, implement your custom `IEFCa
     }
 ```
 
-Note: Some database providers don't support special fields such as `DateTimeOffset`, `TimeSpan`, etc. For these scenarios you will need [the related converters](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/blob/master/src/Tests/Issues/Issue9SQLiteInt32/DataLayer/ApplicationDbContext.cs#L35).
+Note: Some database providers don't support special fields such as `DateTimeOffset`, `TimeSpan`, etc. For these scenarios you will need [the related converters](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/blob/masterhttps://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/Issues/Issue9SQLiteInt32/DataLayer/ApplicationDbContext.cs#L35).
 
 ### 3- Setting up the cache invalidation:
 
@@ -364,7 +360,7 @@ var post1 = context.Posts
                    .FirstOrDefault();  // Async methods are supported too.
 ```
 
-NOTE: It doesn't matter where the `Cacheable` method is located in this expression tree. [It just adds](/src/EFCoreSecondLevelCacheInterceptor/EFCachedQueryExtensions.cs) the standard `TagWith` method to mark this query as `Cacheable`. Later `SecondLevelCacheInterceptor` will use this tag to identify the `Cacheable` queries.
+NOTE: It doesn't matter where the `Cacheable` method is located in this expression tree. [It just adds](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/EFCoreSecondLevelCacheInterceptor/EFCachedQueryExtensions.cs) the standard `TagWith` method to mark this query as `Cacheable`. Later `SecondLevelCacheInterceptor` will use this tag to identify the `Cacheable` queries.
 
 Also it's possible to set the `Cacheable()` method's settings globally:
 
@@ -545,7 +541,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 
 ## Using a different hash provider  
 
-This library uses the [XxHash64Unsafe](/src/EFCoreSecondLevelCacheInterceptor/XxHash64Unsafe.cs) class to calculate the hash of a query and its parameters to produce a corresponding cache-key.
+This library uses the [XxHash64Unsafe](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/EFCoreSecondLevelCacheInterceptor/XxHash64Unsafe.cs) class to calculate the hash of a query and its parameters to produce a corresponding cache-key.
 `xxHash` is an extremely fast `non-cryptographic` Hash algorithm. If you don't like it or you want to change it, just implement the `IEFHashProvider` interface and then introduce it this way:  
 
 ```csharp
@@ -607,9 +603,9 @@ Notes:
 
 ## Samples
 
-- [Console App Sample](/src/Tests/EFCoreSecondLevelCacheInterceptor.ConsoleSample/)
-- [ASP.NET Core App Sample](/src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample/)
-- [Tests](/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/)
+- [Console App Sample](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.ConsoleSample/)
+- [ASP.NET Core App Sample](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample/)
+- [Tests](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/)
 
 ## Guidance
 

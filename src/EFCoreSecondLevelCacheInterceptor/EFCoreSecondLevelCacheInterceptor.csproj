@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>Entity Framework Core Second Level Caching Library.</Description>
-        <VersionPrefix>4.2.0</VersionPrefix>
+        <VersionPrefix>4.2.1</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
         <TargetFrameworks>net8.0;net7.0;net6.0;net5.0;netstandard2.1;netstandard2.0;net462;netcoreapp3.1;</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -22,6 +22,7 @@
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <NoWarn>NU5104</NoWarn>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     <PropertyGroup>
         <LangVersion>latest</LangVersion>
@@ -39,11 +40,11 @@
         <ReportAnalyzer>true</ReportAnalyzer>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Meziantou.Analyzer" Version="2.0.136">
+        <PackageReference Include="Meziantou.Analyzer" Version="2.0.142">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.8.14">
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.9.28">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -55,14 +56,15 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.17.0.82934">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.19.0.84025">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
-		<PackageReference Include="AsyncKeyedLock" Version="[6.3.4,)"/>
+	<PackageReference Include="AsyncKeyedLock" Version="[6.3.4,)"/>
+        <None Include="../../README.md" Link="README.md" Pack="true" PackagePath="/" Visible="false" />
     </ItemGroup>
     <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
         <Reference Include="System"/>
