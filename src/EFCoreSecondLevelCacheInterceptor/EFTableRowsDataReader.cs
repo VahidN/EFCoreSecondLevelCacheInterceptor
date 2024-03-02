@@ -159,7 +159,7 @@ public class EFTableRowsDataReader : DbDataReader
             return (ulong)Convert.ChangeType(value, TypeExtensions.UlongTYpe, CultureInfo.InvariantCulture) != 0;
         }
 
-        return (bool)value;
+        return Convert.ToBoolean(value, CultureInfo.InvariantCulture);
     }
 
     private Type GetOrdinalValueType(int ordinal, object value)
@@ -204,7 +204,7 @@ public class EFTableRowsDataReader : DbDataReader
             return (byte)Convert.ChangeType(value, TypeExtensions.ByteType, CultureInfo.InvariantCulture);
         }
 
-        return (byte)value;
+        return Convert.ToByte(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -245,7 +245,7 @@ public class EFTableRowsDataReader : DbDataReader
             return checked((char)GetInt64(ordinal));
         }
 
-        return (char)value;
+        return Convert.ToChar(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -307,7 +307,7 @@ public class EFTableRowsDataReader : DbDataReader
             return (decimal)Convert.ChangeType(value, TypeExtensions.DecimalType, CultureInfo.InvariantCulture);
         }
 
-        return (decimal)value;
+        return Convert.ToDecimal(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -329,7 +329,7 @@ public class EFTableRowsDataReader : DbDataReader
             return (double)Convert.ChangeType(value, TypeExtensions.DoubleType, CultureInfo.InvariantCulture);
         }
 
-        return (double)value;
+        return Convert.ToDouble(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -362,7 +362,7 @@ public class EFTableRowsDataReader : DbDataReader
             return (float)Convert.ChangeType(value, TypeExtensions.FloatType, CultureInfo.InvariantCulture);
         }
 
-        return (float)value;
+        return Convert.ToSingle(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -423,7 +423,7 @@ public class EFTableRowsDataReader : DbDataReader
             return (short)Convert.ChangeType(value, TypeExtensions.ShortType, CultureInfo.InvariantCulture);
         }
 
-        return (short)value;
+        return Convert.ToInt16(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -455,7 +455,7 @@ public class EFTableRowsDataReader : DbDataReader
             return (int)Convert.ChangeType(value, TypeExtensions.IntType, CultureInfo.InvariantCulture);
         }
 
-        return (int)value;
+        return Convert.ToInt32(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -482,7 +482,7 @@ public class EFTableRowsDataReader : DbDataReader
             return (long)Convert.ChangeType(value, TypeExtensions.LongType, CultureInfo.InvariantCulture);
         }
 
-        return (long)value;
+        return Convert.ToInt64(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
