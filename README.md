@@ -587,6 +587,8 @@ And then change the log level to `Debug` in your `appsettings.json` file:
 }
 ```
 
+Or ... you can use the second optional parameter of the `DisableLogging` method to access the published events of this library more easily.
+
 Now after running a query multiple times, you should have these logged lines:
 
 ```
