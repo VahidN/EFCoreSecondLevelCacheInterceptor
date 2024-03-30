@@ -9,4 +9,9 @@ public interface IEFDebugLogger
     ///     Determines whether the debug logger is enabled.
     /// </summary>
     bool IsLoggerEnabled { get; }
+
+    /// <summary>
+    ///     If you set DisableLogging to false, this delegate will give you the internal caching events of the library.
+    /// </summary>
+    void NotifyCacheableEvent(CacheableLogEventId eventId, string message);
 }

@@ -101,4 +101,9 @@ public class EFCoreSecondLevelCacheSettings
     ///     Here you can decide based on the correct executing result, should we cache this result or not?
     /// </summary>
     public Predicate<(string CommandText, object Value)>? SkipCachingResults { set; get; }
+
+    /// <summary>
+    ///     If you set DisableLogging to false, this delegate will give you the internal caching events of the library.
+    /// </summary>
+    public Action<(CacheableLogEventId EventId, string Message)>? CacheableEvent { set; get; }
 }

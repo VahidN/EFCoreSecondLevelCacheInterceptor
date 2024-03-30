@@ -19,18 +19,19 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     /// <summary>
     ///     Using IMemoryCache as a cache service.
     /// </summary>
-    public EFCacheManagerCoreProvider(
-        ICacheManager<ISet<string>> dependenciesCacheManager,
+    public EFCacheManagerCoreProvider(ICacheManager<ISet<string>> dependenciesCacheManager,
         ICacheManager<EFCachedData> valuesCacheManager,
         IEFDebugLogger logger,
         ILogger<EFCacheManagerCoreProvider> cacheManagerCoreProviderLogger)
     {
         _dependenciesCacheManager = dependenciesCacheManager ??
                                     throw new ArgumentNullException(nameof(dependenciesCacheManager),
-                                                                    "Please register the `ICacheManager`.");
+                                        "Please register the `ICacheManager`.");
+
         _valuesCacheManager = valuesCacheManager ??
                               throw new ArgumentNullException(nameof(valuesCacheManager),
-                                                              "Please register the `ICacheManager`.");
+                                  "Please register the `ICacheManager`.");
+
         _logger = logger;
         _cacheManagerCoreProviderLogger = cacheManagerCoreProviderLogger;
 
@@ -55,21 +56,25 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
 
         if (value == null)
         {
-            value = new EFCachedData { IsNull = true };
+            value = new EFCachedData
+            {
+                IsNull = true
+            };
         }
 
         var keyHash = cacheKey.KeyHash;
 
         foreach (var rootCacheKey in cacheKey.CacheDependencies)
         {
-            _dependenciesCacheManager.AddOrUpdate(
-                                                  rootCacheKey,
-                                                  new HashSet<string>(StringComparer.OrdinalIgnoreCase) { keyHash },
-                                                  set =>
-                                                  {
-                                                      set.Add(keyHash);
-                                                      return set;
-                                                  });
+            _dependenciesCacheManager.AddOrUpdate(rootCacheKey, new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                keyHash
+            }, set =>
+            {
+                set.Add(keyHash);
+
+                return set;
+            });
         }
 
         if (cachePolicy == null)
@@ -78,14 +83,10 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
         }
         else
         {
-            _valuesCacheManager.Add(new CacheItem<EFCachedData>(
-                                                                keyHash,
-                                                                value,
-                                                                cachePolicy.CacheExpirationMode ==
-                                                                CacheExpirationMode.Absolute
-                                                                    ? ExpirationMode.Absolute
-                                                                    : ExpirationMode.Sliding,
-                                                                cachePolicy.CacheTimeout));
+            _valuesCacheManager.Add(new CacheItem<EFCachedData>(keyHash, value,
+                cachePolicy.CacheExpirationMode == CacheExpirationMode.Absolute
+                    ? ExpirationMode.Absolute
+                    : ExpirationMode.Sliding, cachePolicy.CacheTimeout));
         }
     }
 
@@ -134,16 +135,20 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
 
             var cachedValue = _valuesCacheManager.Get<EFCachedData>(cacheKey.KeyHash);
             var dependencyKeys = _dependenciesCacheManager.Get<HashSet<string>>(rootCacheKey);
+
             if (AreRootCacheKeysExpired(cachedValue, dependencyKeys))
             {
                 if (_logger.IsLoggerEnabled)
                 {
-                    _cacheManagerCoreProviderLogger.LogDebug(CacheableEventId.QueryResultInvalidated,
-                                                             "Invalidated all of the cache entries due to early expiration of a root cache key[{RootCacheKey}].",
-                                                             rootCacheKey);
+                    var message =
+                        $"Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].";
+
+                    _cacheManagerCoreProviderLogger.LogDebug(CacheableEventId.QueryResultInvalidated, message);
+                    _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultInvalidated, message);
                 }
 
                 ClearAllCachedEntries();
+
                 return;
             }
 

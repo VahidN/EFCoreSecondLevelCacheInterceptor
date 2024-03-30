@@ -18,24 +18,18 @@ public static class CacheableEventId
     /// <summary>
     ///     A query result is returned from cache.
     /// </summary>
-    public static readonly EventId CacheHit = MakeQueryId(Id.CacheHit);
+    public static readonly EventId CacheHit = MakeQueryId(CacheableLogEventId.CacheHit);
 
     /// <summary>
     ///     A query result is stored by the cache.
     /// </summary>
-    public static readonly EventId QueryResultCached = MakeQueryId(Id.QueryResultCached);
+    public static readonly EventId QueryResultCached = MakeQueryId(CacheableLogEventId.QueryResultCached);
 
     /// <summary>
     ///     A query result is removed from the cache.
     /// </summary>
-    public static readonly EventId QueryResultInvalidated = MakeQueryId(Id.QueryResultInvalidated);
+    public static readonly EventId QueryResultInvalidated = MakeQueryId(CacheableLogEventId.QueryResultInvalidated);
 
-    private static EventId MakeQueryId(Id id) => new((int)id, _queryPrefix + id);
-
-    private enum Id
-    {
-        CacheHit = CacheableBaseId,
-        QueryResultCached,
-        QueryResultInvalidated,
-    }
+    private static EventId MakeQueryId(CacheableLogEventId id)
+        => new((int)id, _queryPrefix + id);
 }

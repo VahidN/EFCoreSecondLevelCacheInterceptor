@@ -9,28 +9,32 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFDebugLogger : IEFDebugLogger
 {
+    private readonly Action<(CacheableLogEventId EventId, string Message)>? _cacheableEvent;
+
     /// <summary>
     ///     Formats and writes a debug log message.
     /// </summary>
-    public EFDebugLogger(
-        IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
-        ILogger<EFDebugLogger> logger)
+    public EFDebugLogger(IOptions<EFCoreSecondLevelCacheSettings> cacheSettings, ILogger<EFDebugLogger> logger)
     {
         if (cacheSettings == null)
         {
             throw new ArgumentNullException(nameof(cacheSettings));
         }
 
-        var disableLogging = cacheSettings.Value.DisableLogging;
         if (logger is null)
         {
             throw new ArgumentNullException(nameof(logger));
         }
 
+        var disableLogging = cacheSettings.Value.DisableLogging;
+        _cacheableEvent = cacheSettings.Value.CacheableEvent;
         IsLoggerEnabled = !disableLogging && logger.IsEnabled(LogLevel.Debug);
+
         if (IsLoggerEnabled)
         {
-            logger.LogDebug("InstanceId: {Id}, Started @{Date} UTC.", Guid.NewGuid(), DateTime.UtcNow);
+            var message = $"InstanceId: {Guid.NewGuid()}, Started @{DateTime.UtcNow} UTC.";
+            logger.LogDebug(message);
+            NotifyCacheableEvent(CacheableLogEventId.CachingSystemStarted, message);
         }
     }
 
@@ -38,4 +42,15 @@ public class EFDebugLogger : IEFDebugLogger
     ///     Determines whether the debug logger is enabled.
     /// </summary>
     public bool IsLoggerEnabled { get; }
+
+    /// <summary>
+    ///     If you set DisableLogging to false, this delegate will give you the internal caching events of the library.
+    /// </summary>
+    public void NotifyCacheableEvent(CacheableLogEventId eventId, string message)
+    {
+        if (IsLoggerEnabled && _cacheableEvent is not null)
+        {
+            _cacheableEvent.Invoke((eventId, message));
+        }
+    }
 }

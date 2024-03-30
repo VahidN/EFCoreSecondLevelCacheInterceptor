@@ -19,11 +19,12 @@ public class EFCoreSecondLevelCacheOptions
     public EFCoreSecondLevelCacheOptions CacheAllQueries(CacheExpirationMode expirationMode, TimeSpan timeout)
     {
         Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
-                                          {
-                                              ExpirationMode = expirationMode,
-                                              Timeout = timeout,
-                                              IsActive = true,
-                                          };
+        {
+            ExpirationMode = expirationMode,
+            Timeout = timeout,
+            IsActive = true
+        };
+
         return this;
     }
 
@@ -41,20 +42,20 @@ public class EFCoreSecondLevelCacheOptions
     ///     Queries containing these names will be cached.
     ///     Table names are not case sensitive.
     /// </param>
-    public EFCoreSecondLevelCacheOptions CacheQueriesContainingTableNames(
-        CacheExpirationMode expirationMode,
+    public EFCoreSecondLevelCacheOptions CacheQueriesContainingTableNames(CacheExpirationMode expirationMode,
         TimeSpan timeout,
         TableNameComparison tableNameComparison = TableNameComparison.Contains,
         params string[] realTableNames)
     {
         Settings.CacheSpecificQueriesOptions = new CacheSpecificQueriesOptions(null)
-                                               {
-                                                   ExpirationMode = expirationMode,
-                                                   Timeout = timeout,
-                                                   IsActive = true,
-                                                   TableNames = realTableNames,
-                                                   TableNameComparison = tableNameComparison,
-                                               };
+        {
+            ExpirationMode = expirationMode,
+            Timeout = timeout,
+            IsActive = true,
+            TableNames = realTableNames,
+            TableNameComparison = tableNameComparison
+        };
+
         return this;
     }
 
@@ -68,19 +69,19 @@ public class EFCoreSecondLevelCacheOptions
     /// <param name="timeout">The expiration timeout.</param>
     /// <param name="tableTypeComparison">How should we determine which tables should be cached?</param>
     /// <param name="entityTypes">The real entity types. Queries containing these types will be cached.</param>
-    public EFCoreSecondLevelCacheOptions CacheQueriesContainingTypes(
-        CacheExpirationMode expirationMode,
+    public EFCoreSecondLevelCacheOptions CacheQueriesContainingTypes(CacheExpirationMode expirationMode,
         TimeSpan timeout,
         TableTypeComparison tableTypeComparison = TableTypeComparison.Contains,
         params Type[] entityTypes)
     {
         Settings.CacheSpecificQueriesOptions = new CacheSpecificQueriesOptions(entityTypes)
-                                               {
-                                                   ExpirationMode = expirationMode,
-                                                   Timeout = timeout,
-                                                   IsActive = true,
-                                                   TableTypeComparison = tableTypeComparison,
-                                               };
+        {
+            ExpirationMode = expirationMode,
+            Timeout = timeout,
+            IsActive = true,
+            TableTypeComparison = tableTypeComparison
+        };
+
         return this;
     }
 
@@ -90,20 +91,23 @@ public class EFCoreSecondLevelCacheOptions
     ///     `xxHash` is an extremely fast `non-cryptographic` Hash algorithm, working at speeds close to RAM limits.
     /// </summary>
     /// <typeparam name="T">Implements IEFHashProvider</typeparam>
-    public EFCoreSecondLevelCacheOptions UseCustomHashProvider<T>() where T : IEFHashProvider
+    public EFCoreSecondLevelCacheOptions UseCustomHashProvider<T>()
+        where T : IEFHashProvider
     {
         Settings.HashProvider = typeof(T);
+
         return this;
     }
-
 
     /// <summary>
     ///     You can introduce a custom IEFCacheServiceProvider to be used as the CacheProvider.
     /// </summary>
     /// <typeparam name="T">Implements IEFCacheServiceProvider</typeparam>
-    public EFCoreSecondLevelCacheOptions UseCustomCacheProvider<T>() where T : IEFCacheServiceProvider
+    public EFCoreSecondLevelCacheOptions UseCustomCacheProvider<T>()
+        where T : IEFCacheServiceProvider
     {
         Settings.CacheProvider = typeof(T);
+
         return this;
     }
 
@@ -114,16 +118,18 @@ public class EFCoreSecondLevelCacheOptions
     /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
     /// <param name="timeout">The expiration timeout.</param>
     /// <typeparam name="T">Implements IEFCacheServiceProvider</typeparam>
-    public EFCoreSecondLevelCacheOptions UseCustomCacheProvider<T>(CacheExpirationMode expirationMode,
-                                                                   TimeSpan timeout) where T : IEFCacheServiceProvider
+    public EFCoreSecondLevelCacheOptions UseCustomCacheProvider<T>(CacheExpirationMode expirationMode, TimeSpan timeout)
+        where T : IEFCacheServiceProvider
     {
         Settings.CacheProvider = typeof(T);
+
         Settings.CachableQueriesOptions = new CachableQueriesOptions
-                                          {
-                                              ExpirationMode = expirationMode,
-                                              Timeout = timeout,
-                                              IsActive = true,
-                                          };
+        {
+            ExpirationMode = expirationMode,
+            Timeout = timeout,
+            IsActive = true
+        };
+
         return this;
     }
 
@@ -133,6 +139,7 @@ public class EFCoreSecondLevelCacheOptions
     public EFCoreSecondLevelCacheOptions UseMemoryCacheProvider()
     {
         Settings.CacheProvider = typeof(EFMemoryCacheServiceProvider);
+
         return this;
     }
 
@@ -142,16 +149,17 @@ public class EFCoreSecondLevelCacheOptions
     /// </summary>
     /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
     /// <param name="timeout">The expiration timeout.</param>
-    public EFCoreSecondLevelCacheOptions UseMemoryCacheProvider(CacheExpirationMode expirationMode,
-                                                                TimeSpan timeout)
+    public EFCoreSecondLevelCacheOptions UseMemoryCacheProvider(CacheExpirationMode expirationMode, TimeSpan timeout)
     {
         Settings.CacheProvider = typeof(EFMemoryCacheServiceProvider);
+
         Settings.CachableQueriesOptions = new CachableQueriesOptions
-                                          {
-                                              ExpirationMode = expirationMode,
-                                              Timeout = timeout,
-                                              IsActive = true,
-                                          };
+        {
+            ExpirationMode = expirationMode,
+            Timeout = timeout,
+            IsActive = true
+        };
+
         return this;
     }
 
@@ -161,6 +169,7 @@ public class EFCoreSecondLevelCacheOptions
     public EFCoreSecondLevelCacheOptions UseCacheManagerCoreProvider()
     {
         Settings.CacheProvider = typeof(EFCacheManagerCoreProvider);
+
         return this;
     }
 
@@ -171,15 +180,17 @@ public class EFCoreSecondLevelCacheOptions
     /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
     /// <param name="timeout">The expiration timeout.</param>
     public EFCoreSecondLevelCacheOptions UseCacheManagerCoreProvider(CacheExpirationMode expirationMode,
-                                                                     TimeSpan timeout)
+        TimeSpan timeout)
     {
         Settings.CacheProvider = typeof(EFCacheManagerCoreProvider);
+
         Settings.CachableQueriesOptions = new CachableQueriesOptions
-                                          {
-                                              ExpirationMode = expirationMode,
-                                              Timeout = timeout,
-                                              IsActive = true,
-                                          };
+        {
+            ExpirationMode = expirationMode,
+            Timeout = timeout,
+            IsActive = true
+        };
+
         return this;
     }
 
@@ -193,6 +204,7 @@ public class EFCoreSecondLevelCacheOptions
         Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
         Settings.ProviderName = providerName;
         Settings.IsHybridCache = isHybridCache;
+
         return this;
     }
 
@@ -212,6 +224,7 @@ public class EFCoreSecondLevelCacheOptions
         Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
         Settings.CacheProviderName = providerName;
         Settings.IsHybridCache = isHybridCache;
+
         return this;
     }
 
@@ -223,8 +236,7 @@ public class EFCoreSecondLevelCacheOptions
     /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
     /// <param name="timeout">The expiration timeout.</param>
     /// <param name="isHybridCache">Is an instance of EasyCaching.HybridCache</param>
-    public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(
-        string providerName,
+    public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(string providerName,
         CacheExpirationMode expirationMode,
         TimeSpan timeout,
         bool isHybridCache = false)
@@ -232,12 +244,14 @@ public class EFCoreSecondLevelCacheOptions
         Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
         Settings.ProviderName = providerName;
         Settings.IsHybridCache = isHybridCache;
+
         Settings.CachableQueriesOptions = new CachableQueriesOptions
-                                          {
-                                              ExpirationMode = expirationMode,
-                                              Timeout = timeout,
-                                              IsActive = true,
-                                          };
+        {
+            ExpirationMode = expirationMode,
+            Timeout = timeout,
+            IsActive = true
+        };
+
         return this;
     }
 
@@ -262,12 +276,14 @@ public class EFCoreSecondLevelCacheOptions
         Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
         Settings.CacheProviderName = providerName;
         Settings.IsHybridCache = isHybridCache;
+
         Settings.CachableQueriesOptions = new CachableQueriesOptions
-                                          {
-                                              ExpirationMode = expirationMode,
-                                              Timeout = timeout,
-                                              IsActive = true,
-                                          };
+        {
+            ExpirationMode = expirationMode,
+            Timeout = timeout,
+            IsActive = true
+        };
+
         return this;
     }
 
@@ -283,6 +299,7 @@ public class EFCoreSecondLevelCacheOptions
     public EFCoreSecondLevelCacheOptions UseCacheKeyPrefix(Func<IServiceProvider, string>? prefix)
     {
         Settings.CacheKeyPrefixSelector = prefix;
+
         return this;
     }
 
@@ -296,6 +313,7 @@ public class EFCoreSecondLevelCacheOptions
     public EFCoreSecondLevelCacheOptions UseCacheKeyPrefix(string prefix)
     {
         Settings.CacheKeyPrefix = prefix;
+
         return this;
     }
 
@@ -303,9 +321,18 @@ public class EFCoreSecondLevelCacheOptions
     ///     Should the debug level logging be disabled?
     ///     Set it to true for maximum performance.
     /// </summary>
-    public EFCoreSecondLevelCacheOptions DisableLogging(bool value = false)
+    /// <param name="disable">Set it to false, to enable logging</param>
+    /// <param name="cacheableEvent">
+    ///     If you set DisableLogging to false, this delegate will give you the internal caching
+    ///     events of the library.
+    /// </param>
+    /// <returns></returns>
+    public EFCoreSecondLevelCacheOptions DisableLogging(bool disable = false,
+        Action<(CacheableLogEventId EventId, string Message)>? cacheableEvent = null)
     {
-        Settings.DisableLogging = value;
+        Settings.DisableLogging = disable;
+        Settings.CacheableEvent = cacheableEvent;
+
         return this;
     }
 
@@ -316,6 +343,7 @@ public class EFCoreSecondLevelCacheOptions
     {
         Settings.UseDbCallsIfCachingProviderIsDown = true;
         Settings.NextCacheServerAvailabilityCheck = nextAvailabilityCheck;
+
         return this;
     }
 
@@ -326,6 +354,7 @@ public class EFCoreSecondLevelCacheOptions
     public EFCoreSecondLevelCacheOptions AllowCachingWithExplicitTransactions(bool value = false)
     {
         Settings.AllowCachingWithExplicitTransactions = value;
+
         return this;
     }
 
@@ -336,6 +365,7 @@ public class EFCoreSecondLevelCacheOptions
     public EFCoreSecondLevelCacheOptions SkipCachingCommands(Predicate<string> predicate)
     {
         Settings.SkipCachingCommands = predicate ?? throw new ArgumentNullException(nameof(predicate));
+
         return this;
     }
 
@@ -346,6 +376,7 @@ public class EFCoreSecondLevelCacheOptions
     public EFCoreSecondLevelCacheOptions SkipCachingResults(Predicate<(string CommandText, object Value)> predicate)
     {
         Settings.SkipCachingResults = predicate ?? throw new ArgumentNullException(nameof(predicate));
+
         return this;
     }
 
@@ -356,6 +387,7 @@ public class EFCoreSecondLevelCacheOptions
     public EFCoreSecondLevelCacheOptions SkipCacheInvalidationCommands(Predicate<string> predicate)
     {
         Settings.SkipCacheInvalidationCommands = predicate ?? throw new ArgumentNullException(nameof(predicate));
+
         return this;
     }
 
@@ -371,18 +403,18 @@ public class EFCoreSecondLevelCacheOptions
     ///     Queries containing these names will not be cached.
     ///     Table names are not case sensitive.
     /// </param>
-    public EFCoreSecondLevelCacheOptions CacheAllQueriesExceptContainingTableNames(
-        CacheExpirationMode expirationMode,
+    public EFCoreSecondLevelCacheOptions CacheAllQueriesExceptContainingTableNames(CacheExpirationMode expirationMode,
         TimeSpan timeout,
         params string[] realTableNames)
     {
         Settings.SkipCacheSpecificQueriesOptions = new SkipCacheSpecificQueriesOptions(null)
-                                                   {
-                                                       ExpirationMode = expirationMode,
-                                                       Timeout = timeout,
-                                                       IsActive = true,
-                                                       TableNames = realTableNames,
-                                                   };
+        {
+            ExpirationMode = expirationMode,
+            Timeout = timeout,
+            IsActive = true,
+            TableNames = realTableNames
+        };
+
         return this;
     }
 
@@ -394,17 +426,17 @@ public class EFCoreSecondLevelCacheOptions
     /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
     /// <param name="timeout">The expiration timeout.</param>
     /// <param name="entityTypes">The real entity types. Queries containing these types will not be cached.</param>
-    public EFCoreSecondLevelCacheOptions CacheAllQueriesExceptContainingTypes(
-        CacheExpirationMode expirationMode,
+    public EFCoreSecondLevelCacheOptions CacheAllQueriesExceptContainingTypes(CacheExpirationMode expirationMode,
         TimeSpan timeout,
         params Type[] entityTypes)
     {
         Settings.SkipCacheSpecificQueriesOptions = new SkipCacheSpecificQueriesOptions(entityTypes)
-                                                   {
-                                                       ExpirationMode = expirationMode,
-                                                       Timeout = timeout,
-                                                       IsActive = true,
-                                                   };
+        {
+            ExpirationMode = expirationMode,
+            Timeout = timeout,
+            IsActive = true
+        };
+
         return this;
     }
 }

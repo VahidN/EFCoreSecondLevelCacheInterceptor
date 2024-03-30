@@ -18,9 +18,9 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0"/>
-        <PackageReference Include="EasyCaching.Core" Version="1.9.1"/>
-        <PackageReference Include="EasyCaching.Redis" Version="1.9.1"/>
-        <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.9.1"/>
+        <PackageReference Include="EasyCaching.Core" Version="1.9.2"/>
+        <PackageReference Include="EasyCaching.Redis" Version="1.9.2"/>
+        <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.9.2"/>
         <PackageReference Include="EFCore.BulkExtensions" Version="8.0.0"/>
     </ItemGroup>
     <ItemGroup>

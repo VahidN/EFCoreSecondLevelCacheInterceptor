@@ -17,16 +17,14 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     private readonly ILogger<EFEasyCachingCoreProvider> _easyCachingCoreProviderLogger;
     private readonly IEFDebugLogger _logger;
 
-    private readonly ConcurrentDictionary<string, IEasyCachingProviderBase> _providers =
-        new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, IEasyCachingProviderBase> _providers = new(StringComparer.Ordinal);
 
     private readonly IServiceProvider _serviceProvider;
 
     /// <summary>
     ///     Using IMemoryCache as a cache service.
     /// </summary>
-    public EFEasyCachingCoreProvider(
-        IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
+    public EFEasyCachingCoreProvider(IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
         IServiceProvider serviceProvider,
         IEFDebugLogger logger,
         ILogger<EFEasyCachingCoreProvider> easyCachingCoreProviderLogger)
@@ -62,7 +60,10 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
 
         if (value == null)
         {
-            value = new EFCachedData { IsNull = true };
+            value = new EFCachedData
+            {
+                IsNull = true
+            };
         }
 
         var easyCachingProvider = GetEasyCachingProvider(cacheKey);
@@ -77,11 +78,13 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
             }
 
             var items = easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
+
             if (items.IsNull)
             {
-                easyCachingProvider.Set(rootCacheKey,
-                                        new HashSet<string>(StringComparer.OrdinalIgnoreCase) { keyHash },
-                                        cachePolicy.CacheTimeout);
+                easyCachingProvider.Set(rootCacheKey, new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    keyHash
+                }, cachePolicy.CacheTimeout);
             }
             else
             {
@@ -120,6 +123,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
         }
 
         var easyCachingProvider = GetEasyCachingProvider(cacheKey);
+
         return easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash).Value;
     }
 
@@ -145,16 +149,20 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
 
             var cachedValue = easyCachingProvider.Get<EFCachedData>(cacheKey.KeyHash);
             var dependencyKeys = easyCachingProvider.Get<HashSet<string>>(rootCacheKey);
+
             if (AreRootCacheKeysExpired(cachedValue, dependencyKeys))
             {
                 if (_logger.IsLoggerEnabled)
                 {
-                    _easyCachingCoreProviderLogger.LogDebug(CacheableEventId.QueryResultInvalidated,
-                                                            "Invalidated all of the cache entries due to early expiration of a root cache key[{RootCacheKey}].",
-                                                            rootCacheKey);
+                    var message =
+                        $"Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].";
+
+                    _easyCachingCoreProviderLogger.LogDebug(CacheableEventId.QueryResultInvalidated, message);
+                    _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultInvalidated, message);
                 }
 
                 ClearAllCachedEntries();
+
                 return;
             }
 
@@ -178,14 +186,14 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
         }
     }
 
-    private static bool AreRootCacheKeysExpired(
-        CacheValue<EFCachedData> cachedValue,
+    private static bool AreRootCacheKeysExpired(CacheValue<EFCachedData> cachedValue,
         CacheValue<HashSet<string>> dependencyKeys)
         => !cachedValue.IsNull && dependencyKeys.IsNull;
 
     private IEasyCachingProviderBase GetEasyCachingProvider(EFCacheKey? cacheKey)
     {
         string providerName;
+
         if (_cacheSettings.ProviderName is not null)
         {
             providerName = _cacheSettings.ProviderName;
@@ -196,23 +204,22 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
         }
         else
         {
-            throw
-                new InvalidOperationException("Please set the ProviderName or CacheProviderName of the CacheSettings");
+            throw new InvalidOperationException(
+                "Please set the ProviderName or CacheProviderName of the CacheSettings");
         }
 
-        return _providers.GetOrAdd(providerName,
-                                   name =>
-                                   {
-                                       if (_cacheSettings.IsHybridCache)
-                                       {
-                                           var hybridFactory =
-                                               _serviceProvider.GetRequiredService<IHybridProviderFactory>();
-                                           return hybridFactory.GetHybridCachingProvider(name);
-                                       }
+        return _providers.GetOrAdd(providerName, name =>
+        {
+            if (_cacheSettings.IsHybridCache)
+            {
+                var hybridFactory = _serviceProvider.GetRequiredService<IHybridProviderFactory>();
 
-                                       var providerFactory =
-                                           _serviceProvider.GetRequiredService<IEasyCachingProviderFactory>();
-                                       return providerFactory.GetCachingProvider(name);
-                                   });
+                return hybridFactory.GetHybridCachingProvider(name);
+            }
+
+            var providerFactory = _serviceProvider.GetRequiredService<IEasyCachingProviderFactory>();
+
+            return providerFactory.GetCachingProvider(name);
+        });
     }
 }
