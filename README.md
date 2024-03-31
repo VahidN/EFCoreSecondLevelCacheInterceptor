@@ -593,30 +593,37 @@ Or ... you can use the second optional parameter of the `DisableLogging` method 
 ```c#
  .DisableLogging(disable: !environment.IsDevelopment(), cacheableEvent: args =>
             {
-                switch (args.EventId)
-                {
-                    case CacheableLogEventId.CacheHit:
-                        break;
-                    case CacheableLogEventId.QueryResultCached:
-                        break;
-                    case CacheableLogEventId.QueryResultInvalidated:
-                        break;
-                    case CacheableLogEventId.CachingSkipped:
-                        break;
-                    case CacheableLogEventId.InvalidationSkipped:
-                        break;
-                    case CacheableLogEventId.CachingSystemStarted:
-                        break;
-                    case CacheableLogEventId.CachingError:
-                        break;
-                    case CacheableLogEventId.QueryResultSuppressed:
-                        break;
-                    case CacheableLogEventId.CacheDependenciesCalculated:
-                        break;
-                    case CacheableLogEventId.CachePolicyCalculated:
-                        break;
-                }
-                Console.WriteLine($"{args.EventId} -> {args.Message}");
+                    switch (args.EventId)
+                    {
+                        case CacheableLogEventId.CacheHit:
+                            break;
+                        case CacheableLogEventId.QueryResultCached:
+                            break;
+                        case CacheableLogEventId.QueryResultInvalidated:
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"{Environment.NewLine}{args.EventId} -> {args.Message}");
+
+                            break;
+                        case CacheableLogEventId.CachingSkipped:
+                            break;
+                        case CacheableLogEventId.InvalidationSkipped:
+                            break;
+                        case CacheableLogEventId.CachingSystemStarted:
+                            break;
+                        case CacheableLogEventId.CachingError:
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"{Environment.NewLine}{args.EventId} -> {args.Message}");
+
+                            break;
+                        case CacheableLogEventId.QueryResultSuppressed:
+                            break;
+                        case CacheableLogEventId.CacheDependenciesCalculated:
+                            break;
+                        case CacheableLogEventId.CachePolicyCalculated:
+                            break;
+                    }
+
+                    Console.ResetColor();
             })
 ```
 
