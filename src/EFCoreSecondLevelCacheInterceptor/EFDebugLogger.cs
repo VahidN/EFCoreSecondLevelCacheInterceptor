@@ -28,7 +28,7 @@ public class EFDebugLogger : IEFDebugLogger
 
         var disableLogging = cacheSettings.Value.DisableLogging;
         _cacheableEvent = cacheSettings.Value.CacheableEvent;
-        IsLoggerEnabled = !disableLogging && logger.IsEnabled(LogLevel.Debug);
+        IsLoggerEnabled = !disableLogging && (_cacheableEvent is not null || logger.IsEnabled(LogLevel.Debug));
 
         if (IsLoggerEnabled)
         {
