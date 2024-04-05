@@ -353,7 +353,7 @@ public class EFCoreSecondLevelCacheOptions
     /// </summary>
     public EFCoreSecondLevelCacheOptions EnableCachingInterceptor(bool enable = true)
     {
-        Settings.IsCachingInterceptorEnabled = true;
+        Settings.IsCachingInterceptorEnabled = enable;
 
         return this;
     }
