@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
@@ -26,12 +27,14 @@ public static class EFCachedQueryExtensions
     /// <param name="expirationMode">Defines the expiration mode of the cache item.</param>
     /// <param name="timeout">The expiration timeout.</param>
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
-    public static IQueryable<TType> Cacheable<TType>(
-        this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout)
+    public static IQueryable<TType> Cacheable<TType>(this IQueryable<TType> query,
+        CacheExpirationMode expirationMode,
+        TimeSpan timeout)
     {
         sanityCheck(query);
-        return query.TagWith(EFCachePolicy.Configure(options =>
-                                                         options.ExpirationMode(expirationMode).Timeout(timeout)));
+
+        return query.TagWith(
+            EFCachePolicy.Configure(options => options.ExpirationMode(expirationMode).Timeout(timeout)));
     }
 
     /// <summary>
@@ -52,15 +55,17 @@ public static class EFCachedQueryExtensions
     ///     value.
     /// </param>
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
-    public static IQueryable<TType> Cacheable<TType>(
-        this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies,
+    public static IQueryable<TType> Cacheable<TType>(this IQueryable<TType> query,
+        CacheExpirationMode expirationMode,
+        TimeSpan timeout,
+        string[] cacheDependencies,
         string saltKey)
     {
         sanityCheck(query);
-        return query.TagWith(EFCachePolicy.Configure(options =>
-                                                         options.ExpirationMode(expirationMode).Timeout(timeout)
-                                                                .CacheDependencies(cacheDependencies)
-                                                                .SaltKey(saltKey)));
+
+        return query.TagWith(EFCachePolicy.Configure(options
+            => options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)
+                .SaltKey(saltKey)));
     }
 
     /// <summary>
@@ -77,13 +82,15 @@ public static class EFCachedQueryExtensions
     ///     This array will be used to invalidate the related cache of all related queries automatically.
     /// </param>
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
-    public static IQueryable<TType> Cacheable<TType>(
-        this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies)
+    public static IQueryable<TType> Cacheable<TType>(this IQueryable<TType> query,
+        CacheExpirationMode expirationMode,
+        TimeSpan timeout,
+        string[] cacheDependencies)
     {
         sanityCheck(query);
-        return query.TagWith(EFCachePolicy.Configure(options =>
-                                                         options.ExpirationMode(expirationMode).Timeout(timeout)
-                                                                .CacheDependencies(cacheDependencies)));
+
+        return query.TagWith(EFCachePolicy.Configure(options
+            => options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)));
     }
 
     /// <summary>
@@ -98,13 +105,15 @@ public static class EFCachedQueryExtensions
     ///     value.
     /// </param>
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
-    public static IQueryable<TType> Cacheable<TType>(
-        this IQueryable<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string saltKey)
+    public static IQueryable<TType> Cacheable<TType>(this IQueryable<TType> query,
+        CacheExpirationMode expirationMode,
+        TimeSpan timeout,
+        string saltKey)
     {
         sanityCheck(query);
-        return query.TagWith(EFCachePolicy.Configure(options =>
-                                                         options.ExpirationMode(expirationMode).Timeout(timeout)
-                                                                .SaltKey(saltKey)));
+
+        return query.TagWith(EFCachePolicy.Configure(options
+            => options.ExpirationMode(expirationMode).Timeout(timeout).SaltKey(saltKey)));
     }
 
     /// <summary>
@@ -113,13 +122,13 @@ public static class EFCachedQueryExtensions
     /// <typeparam name="TType">Entity type.</typeparam>
     /// <param name="query">The input EF query.</param>
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
-    public static IQueryable<TType> Cacheable<TType>(
-        this IQueryable<TType> query)
+    public static IQueryable<TType> Cacheable<TType>(this IQueryable<TType> query)
     {
         sanityCheck(query);
-        return query.TagWith(EFCachePolicy.Configure(options =>
-                                                         options.ExpirationMode(CacheExpirationMode.Absolute)
-                                                                .Timeout(_thirtyMinutes).DefaultCacheableMethod(true)));
+
+        return query.TagWith(EFCachePolicy.Configure(options
+            => options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes)
+                .DefaultCacheableMethod(true)));
     }
 
     /// <summary>
@@ -128,13 +137,14 @@ public static class EFCachedQueryExtensions
     /// <typeparam name="TType">Entity type.</typeparam>
     /// <param name="query">The input EF query.</param>
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
-    public static IQueryable<TType> Cacheable<TType>(
-        this DbSet<TType> query) where TType : class
+    public static IQueryable<TType> Cacheable<TType>(this DbSet<TType> query)
+        where TType : class
     {
         sanityCheck(query);
-        return query.TagWith(EFCachePolicy.Configure(options =>
-                                                         options.ExpirationMode(CacheExpirationMode.Absolute)
-                                                                .Timeout(_thirtyMinutes).DefaultCacheableMethod(true)));
+
+        return query.TagWith(EFCachePolicy.Configure(options
+            => options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes)
+                .DefaultCacheableMethod(true)));
     }
 
     /// <summary>
@@ -145,12 +155,15 @@ public static class EFCachedQueryExtensions
     /// <param name="expirationMode">Defines the expiration mode of the cache item.</param>
     /// <param name="timeout">The expiration timeout.</param>
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
-    public static IQueryable<TType> Cacheable<TType>(
-        this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout) where TType : class
+    public static IQueryable<TType> Cacheable<TType>(this DbSet<TType> query,
+        CacheExpirationMode expirationMode,
+        TimeSpan timeout)
+        where TType : class
     {
         sanityCheck(query);
-        return query.TagWith(EFCachePolicy.Configure(options =>
-                                                         options.ExpirationMode(expirationMode).Timeout(timeout)));
+
+        return query.TagWith(
+            EFCachePolicy.Configure(options => options.ExpirationMode(expirationMode).Timeout(timeout)));
     }
 
     /// <summary>
@@ -171,15 +184,18 @@ public static class EFCachedQueryExtensions
     ///     value.
     /// </param>
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
-    public static IQueryable<TType> Cacheable<TType>(
-        this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies,
-        string saltKey) where TType : class
+    public static IQueryable<TType> Cacheable<TType>(this DbSet<TType> query,
+        CacheExpirationMode expirationMode,
+        TimeSpan timeout,
+        string[] cacheDependencies,
+        string saltKey)
+        where TType : class
     {
         sanityCheck(query);
-        return query.TagWith(EFCachePolicy.Configure(options =>
-                                                         options.ExpirationMode(expirationMode).Timeout(timeout)
-                                                                .CacheDependencies(cacheDependencies)
-                                                                .SaltKey(saltKey)));
+
+        return query.TagWith(EFCachePolicy.Configure(options
+            => options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)
+                .SaltKey(saltKey)));
     }
 
     /// <summary>
@@ -196,14 +212,16 @@ public static class EFCachedQueryExtensions
     ///     This array will be used to invalidate the related cache of all related queries automatically.
     /// </param>
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
-    public static IQueryable<TType> Cacheable<TType>(
-        this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string[] cacheDependencies)
+    public static IQueryable<TType> Cacheable<TType>(this DbSet<TType> query,
+        CacheExpirationMode expirationMode,
+        TimeSpan timeout,
+        string[] cacheDependencies)
         where TType : class
     {
         sanityCheck(query);
-        return query.TagWith(EFCachePolicy.Configure(options =>
-                                                         options.ExpirationMode(expirationMode).Timeout(timeout)
-                                                                .CacheDependencies(cacheDependencies)));
+
+        return query.TagWith(EFCachePolicy.Configure(options
+            => options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)));
     }
 
     /// <summary>
@@ -218,14 +236,16 @@ public static class EFCachedQueryExtensions
     ///     value.
     /// </param>
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
-    public static IQueryable<TType> Cacheable<TType>(
-        this DbSet<TType> query, CacheExpirationMode expirationMode, TimeSpan timeout, string saltKey)
+    public static IQueryable<TType> Cacheable<TType>(this DbSet<TType> query,
+        CacheExpirationMode expirationMode,
+        TimeSpan timeout,
+        string saltKey)
         where TType : class
     {
         sanityCheck(query);
-        return query.TagWith(EFCachePolicy.Configure(options =>
-                                                         options.ExpirationMode(expirationMode).Timeout(timeout)
-                                                                .SaltKey(saltKey)));
+
+        return query.TagWith(EFCachePolicy.Configure(options
+            => options.ExpirationMode(expirationMode).Timeout(timeout).SaltKey(saltKey)));
     }
 
     /// <summary>
@@ -237,6 +257,7 @@ public static class EFCachedQueryExtensions
     public static IQueryable<TType> NotCacheable<TType>(this IQueryable<TType> query)
     {
         sanityCheck(query);
+
         return query.TagWith(IsNotCachableMarker);
     }
 
@@ -246,9 +267,11 @@ public static class EFCachedQueryExtensions
     /// <typeparam name="TType">Entity type.</typeparam>
     /// <param name="query">The input EF query.</param>
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
-    public static IQueryable<TType> NotCacheable<TType>(this DbSet<TType> query) where TType : class
+    public static IQueryable<TType> NotCacheable<TType>(this DbSet<TType> query)
+        where TType : class
     {
         sanityCheck(query);
+
         return query.TagWith(IsNotCachableMarker);
     }
 
@@ -259,9 +282,9 @@ public static class EFCachedQueryExtensions
             throw new ArgumentNullException(nameof(query));
         }
 
-        if (!(query.Provider is EntityQueryProvider))
+        if (query.Provider is not EntityQueryProvider)
         {
-            throw new NotSupportedException("`Cacheable` method is designed only for relational EF Core queries.");
+            Debug.WriteLine("`Cacheable` method is designed only for relational EF Core queries.");
         }
     }
 }
