@@ -77,6 +77,12 @@ public class EFCoreSecondLevelCacheSettings
     public bool UseDbCallsIfCachingProviderIsDown { set; get; }
 
     /// <summary>
+    ///     Set it to false to disable this caching interceptor.
+    ///     Its default value is `true`.
+    /// </summary>
+    public bool IsCachingInterceptorEnabled { set; get; } = true;
+
+    /// <summary>
     ///     The cache server's availability check interval value.
     /// </summary>
     public TimeSpan NextCacheServerAvailabilityCheck { set; get; } = TimeSpan.FromMinutes(1);

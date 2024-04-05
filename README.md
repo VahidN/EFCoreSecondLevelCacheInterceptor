@@ -560,6 +560,12 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             // ...
 ```
 
+
+## Disabling the interceptor for a while
+
+If you want to disable this interceptor for a while, use the `.EnableCachingInterceptor(enable: false)` method. Its default value is true.
+
+
 ## Does it work?!
 
 You should enable the logging system to see the behind the scene of the caching interceptor.

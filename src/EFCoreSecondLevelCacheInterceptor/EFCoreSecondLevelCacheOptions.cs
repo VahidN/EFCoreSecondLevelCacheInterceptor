@@ -348,6 +348,17 @@ public class EFCoreSecondLevelCacheOptions
     }
 
     /// <summary>
+    ///     Set it to false to disable this caching interceptor entirely.
+    ///     Its default value is `true`.
+    /// </summary>
+    public EFCoreSecondLevelCacheOptions EnableCachingInterceptor(bool enable = true)
+    {
+        Settings.IsCachingInterceptorEnabled = true;
+
+        return this;
+    }
+
+    /// <summary>
     ///     Possibility to allow caching with explicit transactions.
     ///     Its default value is false.
     /// </summary>

@@ -19,7 +19,7 @@ public class EFCacheServiceCheck : IEFCacheServiceCheck
     ///     Is the configured cache provider online?
     /// </summary>
     public EFCacheServiceCheck(IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
-                               IEFCacheServiceProvider cacheServiceProvider)
+        IEFCacheServiceProvider cacheServiceProvider)
     {
         if (cacheSettings == null)
         {
@@ -35,6 +35,11 @@ public class EFCacheServiceCheck : IEFCacheServiceCheck
     /// </summary>
     public bool IsCacheServiceAvailable()
     {
+        if (!_cacheSettings.IsCachingInterceptorEnabled)
+        {
+            return false;
+        }
+
         if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
         {
             return true;
@@ -42,8 +47,7 @@ public class EFCacheServiceCheck : IEFCacheServiceCheck
 
         var now = DateTime.UtcNow;
 
-        if (_lastCheckTime.HasValue &&
-            _isCacheServerAvailable.HasValue &&
+        if (_lastCheckTime.HasValue && _isCacheServerAvailable.HasValue &&
             now - _lastCheckTime.Value < _cacheSettings.NextCacheServerAvailabilityCheck)
         {
             return _isCacheServerAvailable.Value;
@@ -52,14 +56,21 @@ public class EFCacheServiceCheck : IEFCacheServiceCheck
         try
         {
             _lastCheckTime = now;
+
             _ = _cacheServiceProvider.GetValue(new EFCacheKey(new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-                                                              { "__Name__" }) { KeyHash = "__Test__" },
-                                               new EFCachePolicy());
+            {
+                "__Name__"
+            })
+            {
+                KeyHash = "__Test__"
+            }, new EFCachePolicy());
+
             _isCacheServerAvailable = true;
         }
         catch
         {
             _isCacheServerAvailable = false;
+
             if (_cacheSettings.UseDbCallsIfCachingProviderIsDown)
             {
                 throw;
