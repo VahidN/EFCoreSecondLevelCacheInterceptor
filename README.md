@@ -50,7 +50,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEFSecondLevelCache(options =>
-                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
+                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
                        // Fallback on db if the caching provider fails.
                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
 
@@ -92,7 +92,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
         {
             const string providerName1 = "InMemory1";
             services.AddEFSecondLevelCache(options =>
-                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).DisableLogging(true).UseCacheKeyPrefix("EF_")
+                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).ConfigureLogging(true).UseCacheKeyPrefix("EF_")
                            // Fallback on db if the caching provider fails.
                            .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
             );
@@ -151,7 +151,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
         {
             const string providerName1 = "Redis1";
             services.AddEFSecondLevelCache(options =>
-                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).DisableLogging(true).UseCacheKeyPrefix("EF_")
+                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).ConfigureLogging(true).UseCacheKeyPrefix("EF_")
                            // Fallback on db if the caching provider fails (for example, if Redis is down).
                            .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
             );
@@ -205,7 +205,7 @@ services.AddEFSecondLevelCache(options =>
 	   isHybridCache: false)
 	// `Or` you can set the cache key prefix per tenant dynamically  
 	.UseCacheKeyPrefix(serviceProvider => "EF_" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"])
-	.DisableLogging(true)
+	.ConfigureLogging(true)
 	.UseCacheKeyPrefix("EF_")
         // Fallback on db if the caching provider fails.
         .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
@@ -236,7 +236,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEFSecondLevelCache(options =>
-                options.UseCacheManagerCoreProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
+                options.UseCacheManagerCoreProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
                        // Fallback on db if the caching provider fails.
                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
             );
@@ -288,7 +288,7 @@ services.AddSingleton(typeof(ICacheManagerConfiguration),
 services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
 
 services.AddEFSecondLevelCache(options =>
-    options.UseCacheManagerCoreProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
+    options.UseCacheManagerCoreProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
            // Fallback on db if the caching provider fails.
            .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
 );
@@ -365,7 +365,7 @@ NOTE: It doesn't matter where the `Cacheable` method is located in this expressi
 Also it's possible to set the `Cacheable()` method's settings globally:
 
 ```csharp
-services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true)
+services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).ConfigureLogging(true)
                                           	 .UseCacheKeyPrefix("EF_")
                                                  // Fallback on db if the caching provider fails.
                                                  .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
@@ -397,7 +397,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_");
+                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_");
                 options.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
                 // Fallback on db if the caching provider fails.
                 options.UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1));
@@ -421,7 +421,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
+                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
                        // Fallback on db if the caching provider fails.
                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
                     /*.CacheQueriesContainingTypes(
@@ -452,7 +452,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
+                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
                        // Fallback on db if the caching provider fails.
                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
                         // How to skip caching specific commands
@@ -475,7 +475,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
+                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
                         // Fallback on db if the caching provider fails.
                         .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
                         // Don't cache null values. Remove this optional setting if it's not necessary.
@@ -498,7 +498,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
+                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
                       // Fallback on db if the caching provider fails.
                       .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
                     /*.CacheAllQueriesExceptContainingTypes(
@@ -529,7 +529,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
         {
             services.AddEFSecondLevelCache(options =>
             {
-                options.UseMemoryCacheProvider().DisableLogging(true).UseCacheKeyPrefix("EF_")
+                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
                     // Fallback on db if the caching provider fails.
                     .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
                     .SkipCacheInvalidationCommands(commandText =>
@@ -563,11 +563,11 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 ## Does it work?!
 
 You should enable the logging system to see the behind the scene of the caching interceptor.
-First set the `DisableLogging(false)`:
+First set the `ConfigureLogging(true)`:
 
 ```c#
  services.AddEFSecondLevelCache(options =>
-                options.UseMemoryCacheProvider().DisableLogging(false).UseCacheKeyPrefix("EF_")
+                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
                        // Fallback on db if the caching provider fails.
                       .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
 ```
@@ -587,11 +587,11 @@ And then change the log level to `Debug` in your `appsettings.json` file:
 }
 ```
 
-Or ... you can use the second optional parameter of the `DisableLogging` method to access the published events of this library more easily:
+Or ... you can use the second optional parameter of the `ConfigureLogging` method to access the published events of this library more easily:
 
 
 ```c#
- .DisableLogging(disable: !environment.IsDevelopment(), cacheableEvent: args =>
+ .ConfigureLogging(enable: environment.IsDevelopment(), cacheableEvent: args =>
             {
                     switch (args.EventId)
                     {

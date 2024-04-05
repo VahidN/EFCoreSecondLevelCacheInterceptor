@@ -67,9 +67,9 @@ public class EFCoreSecondLevelCacheSettings
     public SkipCacheSpecificQueriesOptions SkipCacheSpecificQueriesOptions { get; set; } = new(null);
 
     /// <summary>
-    ///     Should the debug level logging be disabled?
+    ///     Should the debug level logging be enabled?
     /// </summary>
-    public bool DisableLogging { set; get; }
+    public bool EnableLogging { set; get; }
 
     /// <summary>
     ///     Fallback on db if the caching provider (redis) is down.

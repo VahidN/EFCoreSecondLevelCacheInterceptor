@@ -21,7 +21,8 @@ public static class EFServiceProvider
     /// </summary>
     public static IServiceProvider Instance { get; } = _serviceProviderBuilder.Value;
 
-    public static T GetRequiredService<T>() => Instance.GetRequiredService<T>();
+    public static T GetRequiredService<T>()
+        => Instance.GetRequiredService<T>();
 
     public static void RunInContext(Action<ApplicationDbContext> action)
     {
@@ -45,42 +46,45 @@ public static class EFServiceProvider
         services.AddLogging(cfg => cfg.AddConsole().AddDebug().SetMinimumLevel(LogLevel.Debug));
 
         services.AddEFSecondLevelCache(o =>
-                                       {
-                                           o.UseMemoryCacheProvider().DisableLogging();
-                                           o.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(10));
-                                       });
+        {
+            o.UseMemoryCacheProvider().ConfigureLogging(true);
+            o.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(10));
+        });
 
         var basePath = Directory.GetCurrentDirectory();
         Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
-        var configuration = new ConfigurationBuilder()
-                            .SetBasePath(basePath)
-                            .AddJsonFile("appsettings.json", false, true)
-                            .Build();
+
+        var configuration = new ConfigurationBuilder().SetBasePath(basePath)
+            .AddJsonFile("appsettings.json", false, true).Build();
+
         services.AddSingleton(_ => configuration);
+
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
-                                                    {
-                                                        options
-                                                            .AddInterceptors(serviceProvider
-                                                                                 .GetRequiredService<
-                                                                                     SecondLevelCacheInterceptor>())
-                                                            .UseSqlServer(GetConnectionString(basePath, configuration))
-                                                            .LogTo(sql => Console.WriteLine(sql));
-                                                    });
+        {
+            options.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())
+                .UseSqlServer(GetConnectionString(basePath, configuration)).LogTo(sql => Console.WriteLine(sql));
+        });
 
         return services.BuildServiceProvider();
     }
 
     public static string GetConnectionString(string basePath, IConfigurationRoot configuration)
     {
-        var testsFolder = basePath.Split(new[] { "\\Issues\\" }, StringSplitOptions.RemoveEmptyEntries)[0];
+        var testsFolder = basePath.Split(new[]
+        {
+            "\\Issues\\"
+        }, StringSplitOptions.RemoveEmptyEntries)[0];
+
         var contentRootPath = Path.Combine(testsFolder, "Issues", "Issue192");
         var connectionString = configuration["ConnectionStrings:ApplicationDbContextConnection"];
+
         if (connectionString.Contains("%CONTENTROOTPATH%"))
         {
             connectionString = connectionString.Replace("%CONTENTROOTPATH%", contentRootPath);
         }
 
         Console.WriteLine($"Using {connectionString}");
+
         return connectionString;
     }
 }

@@ -318,19 +318,19 @@ public class EFCoreSecondLevelCacheOptions
     }
 
     /// <summary>
-    ///     Should the debug level logging be disabled?
-    ///     Set it to true for maximum performance.
+    ///     Should the debug level logging be enabled?
+    ///     Set it to false for maximum performance.
     /// </summary>
-    /// <param name="disable">Set it to false, to enable logging</param>
+    /// <param name="enable">Set it to true, to enable logging</param>
     /// <param name="cacheableEvent">
-    ///     If you set DisableLogging to false, this delegate will give you the internal caching
+    ///     If you set EnableLogging to true, this delegate will give you the internal caching
     ///     events of the library.
     /// </param>
     /// <returns></returns>
-    public EFCoreSecondLevelCacheOptions DisableLogging(bool disable = false,
+    public EFCoreSecondLevelCacheOptions ConfigureLogging(bool enable = false,
         Action<(CacheableLogEventId EventId, string Message)>? cacheableEvent = null)
     {
-        Settings.DisableLogging = disable;
+        Settings.EnableLogging = enable;
         Settings.CacheableEvent = cacheableEvent;
 
         return this;
