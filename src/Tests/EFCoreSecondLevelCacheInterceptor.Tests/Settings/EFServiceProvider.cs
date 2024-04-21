@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
+using AsyncKeyedLock;
 using CacheManager.Core;
 using EasyCaching.Core.Configurations;
 using EasyCaching.InMemory;
@@ -54,7 +54,7 @@ public class SpecialTypesConverter : JsonConverter
 
 public static class EFServiceProvider
 {
-    private static readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
+    private static readonly AsyncNonKeyedLocker _locker = new();
 
     public static IEFCacheServiceProvider GetCacheServiceProvider(TestCacheProvider provider)
     {
@@ -377,8 +377,7 @@ public static class EFServiceProvider
         bool cacheAllQueries,
         params Action<ApplicationDbContext, DebugLoggerProvider>[] actions)
     {
-        _semaphoreSlim.Wait();
-        try
+        using (_locker.Lock())
         {
             var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
             var cacheServiceProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
@@ -394,10 +393,6 @@ public static class EFServiceProvider
                 }
             }
         }
-        finally
-        {
-            _semaphoreSlim.Release();
-        }
     }
 
     public static async Task RunInContextAsync(
@@ -406,8 +401,7 @@ public static class EFServiceProvider
         bool cacheAllQueries,
         params Func<ApplicationDbContext, DebugLoggerProvider, Task>[] actions)
     {
-        await _semaphoreSlim.WaitAsync();
-        try
+        using (await _locker.LockAsync())
         {
             var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
             var cacheServiceProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
@@ -423,10 +417,6 @@ public static class EFServiceProvider
                     }
                 }
             }
-        }
-        finally
-        {
-            _semaphoreSlim.Release();
         }
     }
 
