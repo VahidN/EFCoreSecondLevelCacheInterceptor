@@ -1,4 +1,7 @@
 using System;
+#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+using System.Text.Json;
+#endif
 
 namespace EFCoreSecondLevelCacheInterceptor;
 
@@ -8,6 +11,20 @@ namespace EFCoreSecondLevelCacheInterceptor;
 public class EFCoreSecondLevelCacheOptions
 {
     internal EFCoreSecondLevelCacheSettings Settings { get; } = new();
+
+#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+    /// <summary>
+    ///     Provides options to control the serialization behavior.
+    ///     EFCacheKeyProvider uses these options to serialize the parameter values.
+    ///     Its default value is null.
+    /// </summary>
+    public EFCoreSecondLevelCacheOptions UseJsonSerializerOptions(JsonSerializerOptions? options)
+    {
+        Settings.JsonSerializerOptions = options;
+
+        return this;
+    }
+#endif
 
     /// <summary>
     ///     Puts the whole system in cache. In this case calling the `Cacheable()` methods won't be necessary.

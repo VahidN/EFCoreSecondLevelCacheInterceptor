@@ -566,6 +566,11 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 If you want to disable this interceptor for a while, use the `.EnableCachingInterceptor(enable: false)` method. Its default value is true.
 
 
+## Providing options to control the serialization behavior
+
+The EFCacheKeyProvider class serializes parameter values of a DbCommand to JSON values. If it causes an exception in some cases, you can specify a custom JsonSerializerOptions for it using the `UseJsonSerializerOptions(options)` method.
+
+
 ## Does it work?!
 
 You should enable the logging system to see the behind the scene of the caching interceptor.

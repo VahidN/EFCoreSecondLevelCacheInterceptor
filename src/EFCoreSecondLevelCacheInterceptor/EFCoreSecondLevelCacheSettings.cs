@@ -1,4 +1,7 @@
 using System;
+#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+using System.Text.Json;
+#endif
 
 namespace EFCoreSecondLevelCacheInterceptor;
 
@@ -7,6 +10,13 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFCoreSecondLevelCacheSettings
 {
+#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+    /// <summary>
+    ///     Options to control the serialization behavior
+    /// </summary>
+    public JsonSerializerOptions? JsonSerializerOptions { get; set; }
+#endif
+
     /// <summary>
     ///     The selected cache provider
     /// </summary>

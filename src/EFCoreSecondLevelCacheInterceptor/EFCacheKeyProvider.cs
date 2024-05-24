@@ -1,10 +1,16 @@
 ﻿using System;
-using System.Collections;
 using System.Data.Common;
-using System.Globalization;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+using System.Text.Json;
+
+#else
+using System.Collections;
+using System.Globalization;
+#endif
 
 namespace EFCoreSecondLevelCacheInterceptor;
 
@@ -13,6 +19,10 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFCacheKeyProvider : IEFCacheKeyProvider
 {
+#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+    private readonly EFCoreSecondLevelCacheSettings _settings;
+#endif
+
     private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
     private readonly IEFCacheKeyPrefixProvider _cacheKeyPrefixProvider;
     private readonly IEFCachePolicyParser _cachePolicyParser;
@@ -25,11 +35,16 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
     ///     A custom cache key provider for EF queries.
     /// </summary>
     public EFCacheKeyProvider(IEFCacheDependenciesProcessor cacheDependenciesProcessor,
-                              IEFCachePolicyParser cachePolicyParser,
-                              IEFDebugLogger logger,
-                              ILogger<EFCacheKeyProvider> keyProviderLogger,
-                              IEFHashProvider hashProvider,
-                              IEFCacheKeyPrefixProvider cacheKeyPrefixProvider)
+        IEFCachePolicyParser cachePolicyParser,
+        IEFDebugLogger logger,
+        ILogger<EFCacheKeyProvider> keyProviderLogger,
+        IEFHashProvider hashProvider,
+        IEFCacheKeyPrefixProvider cacheKeyPrefixProvider
+#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+        ,
+        IOptions<EFCoreSecondLevelCacheSettings> cacheSettings
+#endif
+    )
     {
         _cacheDependenciesProcessor = cacheDependenciesProcessor;
         _logger = logger;
@@ -37,6 +52,9 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         _cachePolicyParser = cachePolicyParser;
         _hashProvider = hashProvider ?? throw new ArgumentNullException(nameof(hashProvider));
         _cacheKeyPrefixProvider = cacheKeyPrefixProvider;
+#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+        _settings = cacheSettings?.Value ?? throw new ArgumentNullException(nameof(cacheSettings));
+#endif
     }
 
     /// <summary>
@@ -65,27 +83,26 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
 
         var cacheKey = getCacheKey(command, cachePolicy.CacheSaltKey);
         var cacheKeyPrefix = _cacheKeyPrefixProvider.GetCacheKeyPrefix();
-        var cacheKeyHash =
-            !string.IsNullOrEmpty(cacheKeyPrefix)
-                ? $"{cacheKeyPrefix}{_hashProvider.ComputeHash(cacheKey):X}"
-                : $"{_hashProvider.ComputeHash(cacheKey):X}";
+
+        var cacheKeyHash = !string.IsNullOrEmpty(cacheKeyPrefix)
+            ? $"{cacheKeyPrefix}{_hashProvider.ComputeHash(cacheKey):X}"
+            : $"{_hashProvider.ComputeHash(cacheKey):X}";
+
         var cacheDbContextType = context.GetType();
         var cacheDependencies = _cacheDependenciesProcessor.GetCacheDependencies(command, context, cachePolicy);
 
         if (_logger.IsLoggerEnabled)
         {
-            _keyProviderLogger
-                .LogDebug("KeyHash: {CacheKeyHash}, DbContext: {Name}, CacheDependencies: {Dependencies}.",
-                          cacheKeyHash,
-                          cacheDbContextType?.Name,
-                          string.Join(", ", cacheDependencies));
+            _keyProviderLogger.LogDebug(
+                "KeyHash: {CacheKeyHash}, DbContext: {Name}, CacheDependencies: {Dependencies}.", cacheKeyHash,
+                cacheDbContextType?.Name, string.Join(", ", cacheDependencies));
         }
 
         return new EFCacheKey(cacheDependencies)
-               {
-                   KeyHash = cacheKeyHash,
-                   DbContext = cacheDbContextType,
-               };
+        {
+            KeyHash = cacheKeyHash,
+            DbContext = cacheDbContextType
+        };
     }
 
     private string getCacheKey(DbCommand command, string saltKey)
@@ -103,35 +120,52 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
             }
 
             cacheKey.Append(parameter.ParameterName)
-                    .Append('=').Append(getParameterValue(parameter)).Append(',')
-                    .Append("Size").Append('=').Append(parameter.Size).Append(',')
-                    .Append("Precision").Append('=').Append(parameter.Precision).Append(',')
-                    .Append("Scale").Append('=').Append(parameter.Scale).Append(',')
-                    .Append("Direction").Append('=').Append(parameter.Direction).Append(',');
+                .Append('=')
+                .Append(GetParameterValue(parameter))
+                .Append(',')
+                .Append("Size")
+                .Append('=')
+                .Append(parameter.Size)
+                .Append(',')
+                .Append("Precision")
+                .Append('=')
+                .Append(parameter.Precision)
+                .Append(',')
+                .Append("Scale")
+                .Append('=')
+                .Append(parameter.Scale)
+                .Append(',')
+                .Append("Direction")
+                .Append('=')
+                .Append(parameter.Direction)
+                .Append(',');
         }
 
         cacheKey.AppendLine("SaltKey").Append('=').Append(saltKey);
+
         return cacheKey.ToString().Trim();
     }
 
-#if NET5_0 || NET6_0 || NET7_0 || NET8_0	
-    private static string? getParameterValue(DbParameter parameter)
-	=> System.Text.Json.JsonSerializer.Serialize(parameter.Value);
-#else		
-    private static string? getParameterValue(DbParameter parameter)
+#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+    private string? GetParameterValue(DbParameter parameter)
+        => _settings.JsonSerializerOptions is null
+            ? JsonSerializer.Serialize(parameter.Value)
+            : JsonSerializer.Serialize(parameter.Value, _settings.JsonSerializerOptions);
+#else
+    private static string? GetParameterValue(DbParameter parameter)
     {
         return parameter.Value switch
                {
                    DBNull => "null",
                    null => "null",
-                   byte[] buffer => bytesToHex(buffer),
-                   Array array => enumerableToString(array),
-                   IEnumerable enumerable => enumerableToString(enumerable),
+                   byte[] buffer => BytesToHex(buffer),
+                   Array array => EnumerableToString(array),
+                   IEnumerable enumerable => EnumerableToString(enumerable),
                    _ => Convert.ToString(parameter.Value, CultureInfo.InvariantCulture),
                };
     }
 
-    private static string enumerableToString(IEnumerable array)
+    private static string EnumerableToString(IEnumerable array)
     {
         var sb = new StringBuilder();
         foreach (var item in array)
@@ -142,7 +176,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         return sb.ToString();
     }
 
-    private static string bytesToHex(byte[] buffer)
+    private static string BytesToHex(byte[] buffer)
     {
         var sb = new StringBuilder(buffer.Length * 2);
         foreach (var @byte in buffer)
@@ -152,5 +186,5 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
 
         return sb.ToString();
     }
-#endif			   
+#endif
 }
