@@ -104,7 +104,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     {
         if (!_cacheSettings.IsHybridCache)
         {
-            var easyCachingProvider = GetEasyCachingProvider(null);
+            var easyCachingProvider = GetEasyCachingProvider(cacheKey: null);
             ((IEasyCachingProvider)easyCachingProvider).Flush();
         }
     }
@@ -158,7 +158,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
                         $"Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].";
 
                     _easyCachingCoreProviderLogger.LogDebug(CacheableEventId.QueryResultInvalidated, message);
-                    _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultInvalidated, message);
+                    _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultInvalidated, message, commandText: "");
                 }
 
                 ClearAllCachedEntries();
@@ -205,7 +205,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
         else
         {
             throw new InvalidOperationException(
-                "Please set the ProviderName or CacheProviderName of the CacheSettings");
+                message: "Please set the ProviderName or CacheProviderName of the CacheSettings");
         }
 
         return _providers.GetOrAdd(providerName, name =>

@@ -64,7 +64,7 @@ public class EFCoreSecondLevelCacheOptions
         TableNameComparison tableNameComparison = TableNameComparison.Contains,
         params string[] realTableNames)
     {
-        Settings.CacheSpecificQueriesOptions = new CacheSpecificQueriesOptions(null)
+        Settings.CacheSpecificQueriesOptions = new CacheSpecificQueriesOptions(entityTypes: null)
         {
             ExpirationMode = expirationMode,
             Timeout = timeout,
@@ -345,7 +345,7 @@ public class EFCoreSecondLevelCacheOptions
     /// </param>
     /// <returns></returns>
     public EFCoreSecondLevelCacheOptions ConfigureLogging(bool enable = false,
-        Action<(CacheableLogEventId EventId, string Message)>? cacheableEvent = null)
+        Action<EFCacheableLogEvent>? cacheableEvent = null)
     {
         Settings.EnableLogging = enable;
         Settings.CacheableEvent = cacheableEvent;
@@ -435,7 +435,7 @@ public class EFCoreSecondLevelCacheOptions
         TimeSpan timeout,
         params string[] realTableNames)
     {
-        Settings.SkipCacheSpecificQueriesOptions = new SkipCacheSpecificQueriesOptions(null)
+        Settings.SkipCacheSpecificQueriesOptions = new SkipCacheSpecificQueriesOptions(entityTypes: null)
         {
             ExpirationMode = expirationMode,
             Timeout = timeout,

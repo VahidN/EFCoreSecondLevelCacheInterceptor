@@ -26,11 +26,10 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     {
         _dependenciesCacheManager = dependenciesCacheManager ??
                                     throw new ArgumentNullException(nameof(dependenciesCacheManager),
-                                        "Please register the `ICacheManager`.");
+                                        message: "Please register the `ICacheManager`.");
 
-        _valuesCacheManager = valuesCacheManager ??
-                              throw new ArgumentNullException(nameof(valuesCacheManager),
-                                  "Please register the `ICacheManager`.");
+        _valuesCacheManager = valuesCacheManager ?? throw new ArgumentNullException(nameof(valuesCacheManager),
+            message: "Please register the `ICacheManager`.");
 
         _logger = logger;
         _cacheManagerCoreProviderLogger = cacheManagerCoreProviderLogger;
@@ -144,7 +143,7 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
                         $"Invalidated all of the cache entries due to early expiration of a root cache key[{rootCacheKey}].";
 
                     _cacheManagerCoreProviderLogger.LogDebug(CacheableEventId.QueryResultInvalidated, message);
-                    _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultInvalidated, message);
+                    _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultInvalidated, message, commandText: "");
                 }
 
                 ClearAllCachedEntries();

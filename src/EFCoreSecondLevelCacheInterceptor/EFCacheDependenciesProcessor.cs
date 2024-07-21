@@ -80,7 +80,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
 
         if (cacheDependencies.Count != 0)
         {
-            logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies);
+            logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies, commandText);
 
             return PrefixCacheDependencies(cacheDependencies);
         }
@@ -95,7 +95,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
                     $"It's not possible to calculate the related table names of the current query[{commandText}]. Please use EFCachePolicy.Configure(options => options.CacheDependencies(\"real_table_name_1\", \"real_table_name_2\")) to specify them explicitly.";
 
                 _dependenciesProcessorLogger.LogDebug(message);
-                _logger.NotifyCacheableEvent(CacheableLogEventId.CachingError, message);
+                _logger.NotifyCacheableEvent(CacheableLogEventId.CachingError, message, commandText);
             }
 
             cacheDependencies = new SortedSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -104,7 +104,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
             };
         }
 
-        logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies);
+        logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies, commandText);
 
         return PrefixCacheDependencies(cacheDependencies);
     }
@@ -125,7 +125,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
             {
                 var message = $"Skipped invalidating a none-CRUD command[{commandText}].";
                 _dependenciesProcessorLogger.LogDebug(message);
-                _logger.NotifyCacheableEvent(CacheableLogEventId.InvalidationSkipped, message);
+                _logger.NotifyCacheableEvent(CacheableLogEventId.InvalidationSkipped, message, commandText);
             }
 
             return false;
@@ -139,7 +139,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
                     $"Skipped invalidating the related cache entries of this query[{commandText}] based on the provided predicate.";
 
                 _dependenciesProcessorLogger.LogDebug(message);
-                _logger.NotifyCacheableEvent(CacheableLogEventId.InvalidationSkipped, message);
+                _logger.NotifyCacheableEvent(CacheableLogEventId.InvalidationSkipped, message, commandText);
             }
 
             return false;
@@ -151,9 +151,9 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
 
         if (_logger.IsLoggerEnabled)
         {
-            var message = $"Invalidated [{string.Join(", ", cacheKey.CacheDependencies)}] dependencies.";
+            var message = $"Invalidated [{string.Join(separator: ", ", cacheKey.CacheDependencies)}] dependencies.";
             _dependenciesProcessorLogger.LogDebug(CacheableEventId.QueryResultInvalidated, message);
-            _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultInvalidated, message);
+            _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultInvalidated, message, commandText);
         }
 
         return true;
@@ -161,19 +161,23 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
 
     private void logProcess(SortedSet<string> tableNames,
         SortedSet<string> textsInsideSquareBrackets,
-        SortedSet<string>? cacheDependencies)
+        SortedSet<string>? cacheDependencies,
+        string commandText)
     {
         if (_logger.IsLoggerEnabled)
         {
-            var names = string.Join(", ", tableNames);
-            var texts = string.Join(", ", cacheDependencies ?? new SortedSet<string>(StringComparer.Ordinal));
-            var dependencies = string.Join(", ", textsInsideSquareBrackets);
+            var names = string.Join(separator: ", ", tableNames);
+
+            var texts = string.Join(separator: ", ",
+                cacheDependencies ?? new SortedSet<string>(StringComparer.Ordinal));
+
+            var dependencies = string.Join(separator: ", ", textsInsideSquareBrackets);
 
             var message =
                 $"ContextTableNames: {names}, PossibleQueryTableNames: {texts} -> CacheDependencies: {dependencies}.";
 
             _dependenciesProcessorLogger.LogDebug(message);
-            _logger.NotifyCacheableEvent(CacheableLogEventId.CacheDependenciesCalculated, message);
+            _logger.NotifyCacheableEvent(CacheableLogEventId.CacheDependenciesCalculated, message, commandText);
         }
     }
 

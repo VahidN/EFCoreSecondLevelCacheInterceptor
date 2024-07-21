@@ -85,14 +85,14 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             return commandText;
         }
 
-        var endIndex = commandText.IndexOf('\n', startIndex);
+        var endIndex = commandText.IndexOf(value: '\n', startIndex);
 
         if (endIndex == -1)
         {
             return commandText;
         }
 
-        var additionalNewlineIndex = commandText.IndexOf('\n', endIndex + 1) - endIndex;
+        var additionalNewlineIndex = commandText.IndexOf(value: '\n', endIndex + 1) - endIndex;
 
         if (additionalNewlineIndex == 1 || additionalNewlineIndex == 2)
         {
@@ -130,8 +130,8 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         if (efCachePolicy != null && _logger.IsLoggerEnabled)
         {
             var message = $"Using EFCachePolicy: {efCachePolicy}.";
-            _policyParserLogger.LogDebug("Using EFCachePolicy: {EfCachePolicy}.", efCachePolicy);
-            _logger.NotifyCacheableEvent(CacheableLogEventId.CachePolicyCalculated, message);
+            _policyParserLogger.LogDebug(message: "Using EFCachePolicy: {EfCachePolicy}.", efCachePolicy);
+            _logger.NotifyCacheableEvent(CacheableLogEventId.CachePolicyCalculated, message, commandText);
         }
 
         return efCachePolicy;
@@ -145,7 +145,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         {
             var message = $"Skipped caching of this command[{commandText}] based on the provided predicate.";
             _policyParserLogger.LogDebug(message);
-            _logger.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, message);
+            _logger.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, message, commandText);
         }
 
         return result;
@@ -384,10 +384,11 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             return null;
         }
 
-        var commandTextLines = commandText.Split('\n');
+        var commandTextLines = commandText.Split(separator: '\n');
 
         var efCachePolicyCommentLine = commandTextLines
-            .First(textLine => textLine.StartsWith(EFCachePolicyTagPrefix, StringComparison.Ordinal)).Trim();
+            .First(textLine => textLine.StartsWith(EFCachePolicyTagPrefix, StringComparison.Ordinal))
+            .Trim();
 
         var parts = efCachePolicyCommentLine.Split(new[]
         {
@@ -399,10 +400,11 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             return null;
         }
 
-        var options = parts[1].Split(new[]
-        {
-            EFCachePolicy.ItemsSeparator
-        }, StringSplitOptions.None);
+        var options = parts[1]
+            .Split(new[]
+            {
+                EFCachePolicy.ItemsSeparator
+            }, StringSplitOptions.None);
 
         if (options.Length < 2)
         {
@@ -422,10 +424,11 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         var saltKey = options.Length >= 3 ? options[2] : string.Empty;
 
         var cacheDependencies = options.Length >= 4
-            ? options[3].Split(new[]
-            {
-                EFCachePolicy.CacheDependenciesSeparator
-            }, StringSplitOptions.RemoveEmptyEntries)
+            ? options[3]
+                .Split(new[]
+                {
+                    EFCachePolicy.CacheDependenciesSeparator
+                }, StringSplitOptions.RemoveEmptyEntries)
             : Array.Empty<string>();
 
         var isDefaultCacheableMethod = options.Length >= 5 && bool.Parse(options[4]);
@@ -441,7 +444,9 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             timeout = _cacheSettings.CachableQueriesOptions.Timeout;
         }
 
-        return new EFCachePolicy().ExpirationMode(expirationMode).SaltKey(saltKey).Timeout(timeout)
+        return new EFCachePolicy().ExpirationMode(expirationMode)
+            .SaltKey(saltKey)
+            .Timeout(timeout)
             .CacheDependencies(cacheDependencies);
     }
 
@@ -454,7 +459,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             {
                 var message = $"Skipped caching because of the non-deterministic function -> `{item}`.";
                 _policyParserLogger.LogDebug(message);
-                _logger.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, message);
+                _logger.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, message, commandText);
             }
 
             return hasFn;

@@ -611,9 +611,10 @@ Or ... you can use the second optional parameter of the `ConfigureLogging` metho
                         case CacheableLogEventId.QueryResultCached:
                             break;
                         case CacheableLogEventId.QueryResultInvalidated:
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine($"{Environment.NewLine}{args.EventId} -> {args.Message}");
-
+                            args.ServiceProvider.GetRequiredService<ILoggerFactory>()
+                                .CreateLogger(nameof(EFCoreSecondLevelCacheInterceptor))
+                                .LogWarning(message: "{EventId} -> {Message} -> {CommandText}", args.EventId,
+                                    args.Message, args.CommandText);
                             break;
                         case CacheableLogEventId.CachingSkipped:
                             break;
@@ -622,9 +623,6 @@ Or ... you can use the second optional parameter of the `ConfigureLogging` metho
                         case CacheableLogEventId.CachingSystemStarted:
                             break;
                         case CacheableLogEventId.CachingError:
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"{Environment.NewLine}{args.EventId} -> {args.Message}");
-
                             break;
                         case CacheableLogEventId.QueryResultSuppressed:
                             break;
@@ -633,8 +631,6 @@ Or ... you can use the second optional parameter of the `ConfigureLogging` metho
                         case CacheableLogEventId.CachePolicyCalculated:
                             break;
                     }
-
-                    Console.ResetColor();
             })
 ```
 

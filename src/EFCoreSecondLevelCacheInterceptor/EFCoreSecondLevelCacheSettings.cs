@@ -64,7 +64,7 @@ public class EFCoreSecondLevelCacheSettings
     /// <summary>
     ///     Cache Specific Queries Options
     /// </summary>
-    public CacheSpecificQueriesOptions CacheSpecificQueriesOptions { get; set; } = new(null);
+    public CacheSpecificQueriesOptions CacheSpecificQueriesOptions { get; set; } = new(entityTypes: null);
 
     /// <summary>
     ///     Cachable Queries Options
@@ -74,7 +74,7 @@ public class EFCoreSecondLevelCacheSettings
     /// <summary>
     ///     Skip Cache Specific Queries Options
     /// </summary>
-    public SkipCacheSpecificQueriesOptions SkipCacheSpecificQueriesOptions { get; set; } = new(null);
+    public SkipCacheSpecificQueriesOptions SkipCacheSpecificQueriesOptions { get; set; } = new(entityTypes: null);
 
     /// <summary>
     ///     Should the debug level logging be enabled?
@@ -95,7 +95,7 @@ public class EFCoreSecondLevelCacheSettings
     /// <summary>
     ///     The cache server's availability check interval value.
     /// </summary>
-    public TimeSpan NextCacheServerAvailabilityCheck { set; get; } = TimeSpan.FromMinutes(1);
+    public TimeSpan NextCacheServerAvailabilityCheck { set; get; } = TimeSpan.FromMinutes(value: 1);
 
     /// <summary>
     ///     Possibility to allow caching with explicit transactions.
@@ -121,5 +121,5 @@ public class EFCoreSecondLevelCacheSettings
     /// <summary>
     ///     If you set DisableLogging to false, this delegate will give you the internal caching events of the library.
     /// </summary>
-    public Action<(CacheableLogEventId EventId, string Message)>? CacheableEvent { set; get; }
+    public Action<EFCacheableLogEvent>? CacheableEvent { set; get; }
 }

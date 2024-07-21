@@ -13,5 +13,5 @@ public interface IEFDebugLogger
     /// <summary>
     ///     If you set DisableLogging to false, this delegate will give you the internal caching events of the library.
     /// </summary>
-    void NotifyCacheableEvent(CacheableLogEventId eventId, string message);
+    void NotifyCacheableEvent(CacheableLogEventId eventId, string message, string commandText);
 }
