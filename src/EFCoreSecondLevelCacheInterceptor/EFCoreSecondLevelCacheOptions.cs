@@ -354,7 +354,7 @@ public class EFCoreSecondLevelCacheOptions
     }
 
     /// <summary>
-    ///     Determines which entities are involved in the current cache-invation event.
+    ///     Determines which entities are involved in the current cache-invalidation event.
     /// </summary>
     public EFCoreSecondLevelCacheOptions NotifyCacheInvalidation(Action<EFCacheInvalidationInfo>? cacheableEvent = null)
     {

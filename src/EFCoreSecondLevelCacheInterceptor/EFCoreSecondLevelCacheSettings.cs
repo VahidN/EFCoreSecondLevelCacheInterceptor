@@ -124,7 +124,7 @@ public class EFCoreSecondLevelCacheSettings
     public Action<EFCacheableLogEvent>? CacheableEvent { set; get; }
 
     /// <summary>
-    ///     Determines which entities are involved in the current cache-invation event.
+    ///     Determines which entities are involved in the current cache-invalidation event.
     /// </summary>
     public Action<EFCacheInvalidationInfo>? CacheInvalidationEvent { set; get; }
 }
