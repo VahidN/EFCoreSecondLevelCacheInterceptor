@@ -340,6 +340,22 @@ _cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<str
 } {  KeyHash = "empty" }));
 ```
 
+I you want to get notified about the cache-invalidation events and involved cache dependencies, use the `NotifyCacheInvalidation` method:
+```C#
+services.AddEFSecondLevelCache(options =>
+{
+   options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(value: 30))
+                .NotifyCacheInvalidation(invalidationInfo =>
+                {
+                    invalidationInfo.ServiceProvider.GetRequiredService<ILoggerFactory>()
+                        .CreateLogger(categoryName: "NotifyCacheInvalidation")
+                        .LogWarning(message: "{Message}",
+                            invalidationInfo.ClearAllCachedEntries
+                                ? "Invalidated all the cache entries!"
+                                : $"Invalidated [{string.Join(separator: ", ", invalidationInfo.CacheDependencies)}] dependencies.");
+                })
+```
+
 
 ### 4- To cache the results of the normal queries like:
 

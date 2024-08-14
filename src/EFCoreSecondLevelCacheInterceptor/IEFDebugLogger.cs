@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace EFCoreSecondLevelCacheInterceptor;
 
 /// <summary>
@@ -14,4 +16,9 @@ public interface IEFDebugLogger
     ///     If you set DisableLogging to false, this delegate will give you the internal caching events of the library.
     /// </summary>
     void NotifyCacheableEvent(CacheableLogEventId eventId, string message, string commandText);
+
+    /// <summary>
+    ///     Represents some information about the current cache invalidation event
+    /// </summary>
+    void NotifyCacheInvalidation(bool clearAllCachedEntries, ISet<string> cacheDependencies);
 }

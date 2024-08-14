@@ -246,3 +246,4 @@ ModelManifest.xml
 /.idea
 /src/Tests/EFCoreSecondLevelCacheInterceptor.PerformanceTests/BenchmarkDotNet.Artifacts
 src/Tests/redis-64.3.0.503/dump.rdb
+/src/Tests/Issues/Issue154/App_Data/*.sqlite

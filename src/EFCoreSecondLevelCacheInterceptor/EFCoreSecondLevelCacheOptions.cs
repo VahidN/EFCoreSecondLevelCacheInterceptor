@@ -354,6 +354,16 @@ public class EFCoreSecondLevelCacheOptions
     }
 
     /// <summary>
+    ///     Determines which entities are involved in the current cache-invation event.
+    /// </summary>
+    public EFCoreSecondLevelCacheOptions NotifyCacheInvalidation(Action<EFCacheInvalidationInfo>? cacheableEvent = null)
+    {
+        Settings.CacheInvalidationEvent = cacheableEvent;
+
+        return this;
+    }
+
+    /// <summary>
     ///     Fallback on db if the caching provider (redis) is down.
     /// </summary>
     public EFCoreSecondLevelCacheOptions UseDbCallsIfCachingProviderIsDown(TimeSpan nextAvailabilityCheck)

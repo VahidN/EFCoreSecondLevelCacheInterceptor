@@ -96,6 +96,9 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     {
         _valuesCacheManager.Clear();
         _dependenciesCacheManager.Clear();
+
+        _logger.NotifyCacheInvalidation(clearAllCachedEntries: true,
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase));
     }
 
     /// <summary>

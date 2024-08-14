@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>Entity Framework Core Second Level Caching Library.</Description>
-        <VersionPrefix>4.6.0</VersionPrefix>
+        <VersionPrefix>4.7.0</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
         <TargetFrameworks>net8.0;net7.0;net6.0;net5.0;netstandard2.1;netstandard2.0;net462;netcoreapp3.1;</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -40,11 +40,11 @@
         <ReportAnalyzer>true</ReportAnalyzer>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Meziantou.Analyzer" Version="2.0.161">
+        <PackageReference Include="Meziantou.Analyzer" Version="2.0.163">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -56,7 +56,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.29.0.95321">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.31.0.96804">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

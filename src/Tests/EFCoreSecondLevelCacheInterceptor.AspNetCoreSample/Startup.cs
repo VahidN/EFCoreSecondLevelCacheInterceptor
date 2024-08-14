@@ -29,6 +29,15 @@ public class Startup
         services.AddEFSecondLevelCache(options =>
         {
             options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(value: 30))
+                .NotifyCacheInvalidation(invalidationInfo =>
+                {
+                    invalidationInfo.ServiceProvider.GetRequiredService<ILoggerFactory>()
+                        .CreateLogger(categoryName: "NotifyCacheInvalidation")
+                        .LogWarning(message: "{Message}",
+                            invalidationInfo.ClearAllCachedEntries
+                                ? "Invalidated all the cache entries!"
+                                : $"Invalidated [{string.Join(separator: ", ", invalidationInfo.CacheDependencies)}] dependencies.");
+                })
                 .ConfigureLogging(_env.IsDevelopment(), args =>
                 {
                     switch (args.EventId)

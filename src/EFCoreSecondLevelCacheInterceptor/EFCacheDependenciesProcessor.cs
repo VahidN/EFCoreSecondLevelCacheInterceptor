@@ -80,7 +80,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
 
         if (cacheDependencies.Count != 0)
         {
-            logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies, commandText);
+            LogProcess(tableNames, textsInsideSquareBrackets, cacheDependencies, commandText);
 
             return PrefixCacheDependencies(cacheDependencies);
         }
@@ -104,7 +104,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
             };
         }
 
-        logProcess(tableNames, textsInsideSquareBrackets, cacheDependencies, commandText);
+        LogProcess(tableNames, textsInsideSquareBrackets, cacheDependencies, commandText);
 
         return PrefixCacheDependencies(cacheDependencies);
     }
@@ -131,7 +131,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
             return false;
         }
 
-        if (shouldSkipCacheInvalidationCommands(commandText))
+        if (ShouldSkipCacheInvalidationCommands(commandText))
         {
             if (_logger.IsLoggerEnabled)
             {
@@ -156,10 +156,12 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
             _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultInvalidated, message, commandText);
         }
 
+        _logger.NotifyCacheInvalidation(clearAllCachedEntries: false, cacheKey.CacheDependencies);
+
         return true;
     }
 
-    private void logProcess(SortedSet<string> tableNames,
+    private void LogProcess(SortedSet<string> tableNames,
         SortedSet<string> textsInsideSquareBrackets,
         SortedSet<string>? cacheDependencies,
         string commandText)
@@ -181,7 +183,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
         }
     }
 
-    private bool shouldSkipCacheInvalidationCommands(string commandText)
+    private bool ShouldSkipCacheInvalidationCommands(string commandText)
         => _cacheSettings.SkipCacheInvalidationCommands != null &&
            _cacheSettings.SkipCacheInvalidationCommands(commandText);
 

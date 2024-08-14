@@ -8,6 +8,7 @@ dotnet_diagnostic.S3878.severity = suggestion
 dotnet_diagnostic.S127.severity = suggestion
 dotnet_diagnostic.S2857.severity = suggestion
 dotnet_diagnostic.S2094.severity = suggestion
+dotnet_diagnostic.CA2227.severity = suggestion 
 dotnet_diagnostic.IDE0055.severity = none
 
 # CA1510: Use 'ArgumentNullException.ThrowIfNull' instead of explicitly throwing a new exception instance

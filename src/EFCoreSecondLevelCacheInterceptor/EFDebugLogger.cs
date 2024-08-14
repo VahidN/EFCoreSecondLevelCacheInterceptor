@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -10,6 +11,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 public class EFDebugLogger : IEFDebugLogger
 {
     private readonly Action<EFCacheableLogEvent>? _cacheableEvent;
+    private readonly Action<EFCacheInvalidationInfo>? _cacheInvalidationEvent;
     private readonly IServiceProvider _serviceProvider;
 
     /// <summary>
@@ -33,6 +35,7 @@ public class EFDebugLogger : IEFDebugLogger
 
         var enableLogging = cacheSettings.Value.EnableLogging;
         _cacheableEvent = cacheSettings.Value.CacheableEvent;
+        _cacheInvalidationEvent = cacheSettings.Value.CacheInvalidationEvent;
         IsLoggerEnabled = enableLogging && (_cacheableEvent is not null || logger.IsEnabled(LogLevel.Debug));
 
         if (IsLoggerEnabled)
@@ -64,4 +67,15 @@ public class EFDebugLogger : IEFDebugLogger
             });
         }
     }
+
+    /// <summary>
+    ///     Represents some information about the current cache invalidation event
+    /// </summary>
+    public void NotifyCacheInvalidation(bool clearAllCachedEntries, ISet<string> cacheDependencies)
+        => _cacheInvalidationEvent?.Invoke(new EFCacheInvalidationInfo
+        {
+            CacheDependencies = cacheDependencies,
+            ClearAllCachedEntries = clearAllCachedEntries,
+            ServiceProvider = _serviceProvider
+        });
 }

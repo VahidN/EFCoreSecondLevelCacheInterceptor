@@ -122,4 +122,9 @@ public class EFCoreSecondLevelCacheSettings
     ///     If you set DisableLogging to false, this delegate will give you the internal caching events of the library.
     /// </summary>
     public Action<EFCacheableLogEvent>? CacheableEvent { set; get; }
+
+    /// <summary>
+    ///     Determines which entities are involved in the current cache-invation event.
+    /// </summary>
+    public Action<EFCacheInvalidationInfo>? CacheInvalidationEvent { set; get; }
 }

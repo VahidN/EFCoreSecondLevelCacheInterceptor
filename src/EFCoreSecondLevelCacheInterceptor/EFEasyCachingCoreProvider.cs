@@ -107,6 +107,9 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
             var easyCachingProvider = GetEasyCachingProvider(cacheKey: null);
             ((IEasyCachingProvider)easyCachingProvider).Flush();
         }
+
+        _logger.NotifyCacheInvalidation(clearAllCachedEntries: true,
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase));
     }
 
     /// <summary>

@@ -17,7 +17,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
     /// </summary>
     public static readonly string EFCachePolicyTagPrefix = $"-- {nameof(EFCachePolicy)}";
 
-    private static readonly HashSet<string> _nonDeterministicFunctions = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly HashSet<string> NonDeterministicFunctions = new(StringComparer.OrdinalIgnoreCase)
     {
         "NEWID()",
         "GETDATE()",
@@ -114,18 +114,18 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             throw new ArgumentNullException(nameof(commandText));
         }
 
-        if (containsNonDeterministicFunction(commandText))
+        if (ContainsNonDeterministicFunction(commandText))
         {
             return null;
         }
 
-        if (shouldSkipCachingCommands(commandText))
+        if (ShouldSkipCachingCommands(commandText))
         {
             return null;
         }
 
-        var efCachePolicy = getParsedPolicy(commandText) ?? getSpecificGlobalPolicy(commandText, allEntityTypes) ??
-            getSkippedGlobalPolicy(commandText, allEntityTypes) ?? getGlobalPolicy(commandText);
+        var efCachePolicy = GetParsedPolicy(commandText) ?? GetSpecificGlobalPolicy(commandText, allEntityTypes) ??
+            GetSkippedGlobalPolicy(commandText, allEntityTypes) ?? GetGlobalPolicy(commandText);
 
         if (efCachePolicy != null && _logger.IsLoggerEnabled)
         {
@@ -137,7 +137,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         return efCachePolicy;
     }
 
-    private bool shouldSkipCachingCommands(string commandText)
+    private bool ShouldSkipCachingCommands(string commandText)
     {
         var result = _cacheSettings.SkipCachingCommands != null && _cacheSettings.SkipCachingCommands(commandText);
 
@@ -151,7 +151,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         return result;
     }
 
-    private EFCachePolicy? getSpecificGlobalPolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
+    private EFCachePolicy? GetSpecificGlobalPolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
     {
         var options = _cacheSettings.CacheSpecificQueriesOptions;
 
@@ -255,16 +255,14 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         switch (options.TableNameComparison)
         {
             case TableNameComparison.Contains:
-                if (options.TableNames.Any(tableName
-                        => commandTableNames.Contains(tableName, StringComparer.OrdinalIgnoreCase)))
+                if (options.TableNames.Any(tableName => commandTableNames.Contains(tableName)))
                 {
                     return true;
                 }
 
                 break;
             case TableNameComparison.DoesNotContain:
-                if (options.TableNames.Any(tableName
-                        => !commandTableNames.Contains(tableName, StringComparer.OrdinalIgnoreCase)))
+                if (options.TableNames.Any(tableName => !commandTableNames.Contains(tableName)))
                 {
                     return true;
                 }
@@ -328,7 +326,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         return false;
     }
 
-    private EFCachePolicy? getSkippedGlobalPolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
+    private EFCachePolicy? GetSkippedGlobalPolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
     {
         var options = _cacheSettings.SkipCacheSpecificQueriesOptions;
 
@@ -344,8 +342,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         {
             var commandTableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
-            if (options.TableNames.Any(tableName
-                    => commandTableNames.Contains(tableName, StringComparer.OrdinalIgnoreCase)))
+            if (options.TableNames.Any(tableName => commandTableNames.Contains(tableName)))
             {
                 shouldBeCached = false;
             }
@@ -366,7 +363,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             : null;
     }
 
-    private EFCachePolicy? getGlobalPolicy(string commandText)
+    private EFCachePolicy? GetGlobalPolicy(string commandText)
     {
         var cacheAllQueriesOptions = _cacheSettings.CacheAllQueriesOptions;
 
@@ -377,7 +374,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             : null;
     }
 
-    private EFCachePolicy? getParsedPolicy(string commandText)
+    private EFCachePolicy? GetParsedPolicy(string commandText)
     {
         if (!HasEFCachePolicy(commandText))
         {
@@ -429,7 +426,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
                 {
                     EFCachePolicy.CacheDependenciesSeparator
                 }, StringSplitOptions.RemoveEmptyEntries)
-            : Array.Empty<string>();
+            : [];
 
         var isDefaultCacheableMethod = options.Length >= 5 && bool.Parse(options[4]);
 
@@ -450,8 +447,8 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             .CacheDependencies(cacheDependencies);
     }
 
-    private bool containsNonDeterministicFunction(string commandText)
-        => _nonDeterministicFunctions.Any(item =>
+    private bool ContainsNonDeterministicFunction(string commandText)
+        => NonDeterministicFunctions.Any(item =>
         {
             var hasFn = commandText.Contains(item, StringComparison.OrdinalIgnoreCase);
 
