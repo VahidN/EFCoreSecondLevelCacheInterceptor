@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 #if NET5_0 || NET6_0 || NET7_0 || NET8_0
 using System.Text.Json;
 #endif
@@ -112,6 +113,11 @@ public class EFCoreSecondLevelCacheSettings
     ///     Here you can decide based on the correct executing SQL command, should we invalidate the cache or not?
     /// </summary>
     public Predicate<string>? SkipCacheInvalidationCommands { set; get; }
+
+    /// <summary>
+    ///     Queries containing these types will not be cached.
+    /// </summary>
+    public IList<Type>? SkipCachingDbContexts { set; get; }
 
     /// <summary>
     ///     Here you can decide based on the correct executing result, should we cache this result or not?

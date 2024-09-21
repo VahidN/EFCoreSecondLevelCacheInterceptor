@@ -454,6 +454,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 ```
 
 This will put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some of the queries from this global cache, apply the `NotCacheable()` method to them.
+Also you can skip caching some of the defined DbContexts using `SkipCachingDbContexts()` method.
 
 ## Skip caching of some of the queries
 

@@ -430,6 +430,17 @@ public class EFCoreSecondLevelCacheOptions
     }
 
     /// <summary>
+    ///     Here you can decide based on the given context, should we cache its result or not?
+    /// </summary>
+    /// <param name="dbContextTypes">The real DbContext types. Queries containing these types will not be cached.</param>
+    public EFCoreSecondLevelCacheOptions SkipCachingDbContexts(params Type[]? dbContextTypes)
+    {
+        Settings.SkipCachingDbContexts = dbContextTypes;
+
+        return this;
+    }
+
+    /// <summary>
     ///     Puts the whole system in cache except for the specified `realTableNames`.
     ///     In this case calling the `Cacheable()` methods won't be necessary.
     ///     If you specify the `Cacheable()` method, its setting will override this global setting.

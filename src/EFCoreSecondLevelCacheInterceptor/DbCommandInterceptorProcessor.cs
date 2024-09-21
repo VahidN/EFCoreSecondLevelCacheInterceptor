@@ -354,6 +354,12 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         }
 
         var commandCommandText = command.CommandText ?? "";
+
+        if (ShouldSkipCachingDbContext(context, commandCommandText))
+        {
+            return (true, null);
+        }
+
         var cachePolicy = GetCachePolicy(context, commandCommandText);
 
         if (ShouldSkipQueriesInsideExplicitTransaction(command))
@@ -367,6 +373,21 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         }
 
         return cachePolicy is null ? (true, null) : (false, cachePolicy);
+    }
+
+    private bool ShouldSkipCachingDbContext(DbContext context, string commandText)
+    {
+        var result = _cacheSettings.SkipCachingDbContexts is not null &&
+                     _cacheSettings.SkipCachingDbContexts.Contains(context.GetType());
+
+        if (result && _logger.IsLoggerEnabled)
+        {
+            var message = $"Skipped caching of this DbContext: {context.GetType()}";
+            _interceptorProcessorLogger.LogDebug(message);
+            _logger.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, message, commandText);
+        }
+
+        return result;
     }
 
     private bool ShouldSkipQueriesInsideExplicitTransaction(DbCommand? command)
