@@ -1567,7 +1567,7 @@ public class EFTableRowsDataReaderTests
     }
 
     [Fact]
-    public void GetFieldValue__ShouldReturnExpectedDateTimeOffsetValueFromString()
+    public void GetFieldValue_ShouldReturnExpectedDateOnlyValueFromString()
     {
         // Arrange
         var values = new List<object> { DateOnly.MaxValue.ToString(CultureInfo.InvariantCulture) };
@@ -1580,15 +1580,42 @@ public class EFTableRowsDataReaderTests
                 { 0, new EFTableColumnInfo { DbTypeName = nameof(String), Ordinal = 0 } }
             }
         };
+
         var dataReader = new EFTableRowsDataReader(tableRows);
 
         dataReader.Read();
 
         // Act
-        void Act() => dataReader.GetFieldValue<DateOnly>(0);
+        var actual = dataReader.GetFieldValue<DateOnly>(0);
 
         // Assert
-        Assert.Throws<InvalidCastException>(Act);
+        Assert.Equal(DateOnly.MaxValue, actual);
+    }
+
+    [Fact]
+    public void GetFieldValue_ShouldNotThrowInvalidCastExceptionWhenValueConversionFromStringToDateOnly()
+    {
+        // Arrange
+        var values = new List<object> { DateOnly.MaxValue.ToString(CultureInfo.InvariantCulture) };
+        var tableRow = new EFTableRow(values);
+        var tableRows = new EFTableRows
+        {
+            Rows = new List<EFTableRow> { tableRow },
+            ColumnsInfo = new Dictionary<int, EFTableColumnInfo>
+            {
+                { 0, new EFTableColumnInfo { DbTypeName = nameof(String), Ordinal = 0 } }
+            }
+        };
+
+        var dataReader = new EFTableRowsDataReader(tableRows);
+
+        dataReader.Read();
+
+        // Act
+        var exception = Record.Exception(() => dataReader.GetFieldValue<DateOnly>(0));
+
+        // Assert
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -1645,6 +1672,32 @@ public class EFTableRowsDataReaderTests
     public void GetFieldValue_ShouldReturnExpectedTimeOnlyValueFromString()
     {
         // Arrange
+        var values = new List<object> { TimeOnly.MaxValue.ToString("O", CultureInfo.InvariantCulture) };
+        var tableRow = new EFTableRow(values);
+        var tableRows = new EFTableRows
+        {
+            Rows = new List<EFTableRow> { tableRow },
+            ColumnsInfo = new Dictionary<int, EFTableColumnInfo>
+            {
+                { 0, new EFTableColumnInfo { DbTypeName = nameof(String), Ordinal = 0 } }
+            }
+        };
+
+        var dataReader = new EFTableRowsDataReader(tableRows);
+
+        dataReader.Read();
+
+        // Act
+        var actual = dataReader.GetFieldValue<TimeOnly>(0);
+
+        // Assert
+        Assert.Equal(TimeOnly.MaxValue, actual);
+    }
+
+    [Fact]
+    public void GetFieldValue_ShouldNotThrowInvalidCastExceptionWhenValueConversionFromStringToTimeOnly()
+    {
+        // Arrange
         var values = new List<object> { TimeOnly.MaxValue.ToString(CultureInfo.InvariantCulture) };
         var tableRow = new EFTableRow(values);
         var tableRows = new EFTableRows
@@ -1652,18 +1705,19 @@ public class EFTableRowsDataReaderTests
             Rows = new List<EFTableRow> { tableRow },
             ColumnsInfo = new Dictionary<int, EFTableColumnInfo>
             {
-                { 0, new EFTableColumnInfo { DbTypeName = nameof(TimeSpan), Ordinal = 0 } }
+                { 0, new EFTableColumnInfo { DbTypeName = nameof(String), Ordinal = 0 } }
             }
         };
+
         var dataReader = new EFTableRowsDataReader(tableRows);
 
         dataReader.Read();
 
         // Act
-        void Act() => dataReader.GetFieldValue<DateOnly>(0);
+        var exception = Record.Exception(() => dataReader.GetFieldValue<TimeOnly>(0));
 
         // Assert
-        Assert.Throws<InvalidCastException>(Act);
+        Assert.Null(exception);
     }
 
     [Fact]
