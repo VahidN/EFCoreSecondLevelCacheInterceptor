@@ -579,9 +579,19 @@ public class EFTableRowsDataReader : DbDataReader
             return (T)(object)DateOnly.FromDateTime((DateTime)value);
         }
 
+        if (expectedValueType == TypeExtensions.DateOnlyType && actualValueType == TypeExtensions.StringType)
+        {
+            return (T)(object)DateOnly.Parse((string)value, CultureInfo.InvariantCulture);
+        }
+
         if (expectedValueType == TypeExtensions.TimeOnlyType && actualValueType == TypeExtensions.TimeSpanType)
         {
             return (T)(object)TimeOnly.FromTimeSpan((TimeSpan)value);
+        }
+
+        if (expectedValueType == TypeExtensions.TimeOnlyType && actualValueType == TypeExtensions.StringType)
+        {
+            return (T)(object)TimeOnly.Parse((string)value, CultureInfo.InvariantCulture);
         }
 
         if (expectedValueType == TypeExtensions.TimeOnlyType && isActualValueTypeNumber)
