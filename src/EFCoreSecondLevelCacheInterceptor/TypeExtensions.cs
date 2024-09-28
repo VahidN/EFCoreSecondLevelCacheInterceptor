@@ -29,6 +29,11 @@ public static class TypeExtensions
     public static readonly Type ByteType = typeof(byte);
 
     /// <summary>
+    ///     Cached version of typeof(sbyte)
+    /// </summary>
+    public static readonly Type SByteType = typeof(sbyte);
+
+    /// <summary>
     ///     Cached version of typeof(string)
     /// </summary>
     public static readonly Type StringType = typeof(string);
@@ -62,6 +67,11 @@ public static class TypeExtensions
     ///     Cached version of typeof(short)
     /// </summary>
     public static readonly Type ShortType = typeof(short);
+
+    /// <summary>
+    ///     Cached version of typeof(ushort)
+    /// </summary>
+    public static readonly Type UShortType = typeof(ushort);
 
     /// <summary>
     ///     Cached version of typeof(int)
@@ -112,7 +122,10 @@ public static class TypeExtensions
     public static bool IsNumber(Type type) =>
         type == UintType || type == IntType ||
         type == UlongTYpe || type == LongType ||
-        type == ShortType || type == ByteType || type == CharType;
+        type == UShortType || type == ShortType ||
+        type == SByteType || type == ByteType ||
+        type == FloatType || type == DoubleType || type == DecimalType ||
+        type == CharType;
 
 #if NET8_0 || NET7_0 || NET6_0
     /// <summary>
