@@ -1386,17 +1386,22 @@ public class EFTableRowsDataReaderTests
     public static IEnumerable<object[]> ValidNumberData =>
         new List<object[]>
         {
+            new object[] { (sbyte)1 },
             new object[] { (byte)1 },
+            new object[] { (short)1 },
+            new object[] { (ushort)1 },
             new object[] { 1 },
-            new object[] { (uint)1 },
+            new object[] { 1U },
             new object[] { 1L },
             new object[] { 1UL },
-            new object[] { (short)1 }
+            new object[] { 1F },
+            new object[] { 1D },
+            new object[] { 1M }
         };
-    
+
     [Theory]
     [MemberData(nameof(ValidNumberData))]
-    public void GetFieldValue_ShouldReturnExpectedNumber(object value)
+    public void GetFieldValue_ShouldReturnExpectedDecimalNumber(object value)
     {
         // Arrange
         var values = new List<object> { value };
@@ -1414,23 +1419,69 @@ public class EFTableRowsDataReaderTests
         dataReader.Read();
 
         // Act
-        var actual = dataReader.GetFieldValue<long>(0);
+        var actual = dataReader.GetFieldValue<decimal>(0);
 
         // Assert
-        Assert.Equal(1L, actual);
+        Assert.Equal(1M, actual);
+    }
+
+    [Fact]
+    public void GetFieldValue_ShouldReturnExpectedByteNumberFromChar()
+    {
+        // Arrange
+        var values = new List<object> { '1' };
+        var tableRow = new EFTableRow(values);
+        var tableRows = new EFTableRows
+        {
+            Rows = new List<EFTableRow> { tableRow },
+            ColumnsInfo = new Dictionary<int, EFTableColumnInfo>
+            {
+                { 0, new EFTableColumnInfo { DbTypeName = nameof(Char), Ordinal = 0 } }
+            }
+        };
+        var dataReader = new EFTableRowsDataReader(tableRows);
+
+        dataReader.Read();
+
+        // Act
+        var actual = dataReader.GetFieldValue<byte>(0);
+
+        // Assert
+        Assert.Equal(49, actual);
+    }
+
+    [Theory]
+    [MemberData(nameof(ValidNumberData))]
+    public void GetFieldValue_ShouldNotThrowInvalidCastExceptionWhenConvertToDecimal(object value)
+    {
+        // Arrange
+        var values = new List<object> { value };
+        var tableRow = new EFTableRow(values);
+        var tableRows = new EFTableRows
+        {
+            Rows = new List<EFTableRow> { tableRow },
+            ColumnsInfo = new Dictionary<int, EFTableColumnInfo>
+            {
+                { 0, new EFTableColumnInfo { DbTypeName = value.GetType().Name, Ordinal = 0 } }
+            }
+        };
+        var dataReader = new EFTableRowsDataReader(tableRows);
+
+        dataReader.Read();
+
+        // Act
+        var exception = Record.Exception(() => dataReader.GetFieldValue<decimal>(0));
+
+        // Assert
+        Assert.Null(exception);
     }
 
     public static IEnumerable<object[]> InvalidNumberData =>
         new List<object[]>
         {
-            new object[] { (sbyte)1 },
-            new object[] { "1" },
-            new object[] { 1M },
-            new object[] { 1.0 },
-            new object[] { 1.0F },
             new object[] { (nint)1 },
             new object[] { (nuint)1 },
-            new object[] { (ushort)1 }
+            new object[] { "1" }
         };
 
     [Theory]
@@ -1453,7 +1504,7 @@ public class EFTableRowsDataReaderTests
         dataReader.Read();
 
         // Act
-        void Act() => dataReader.GetFieldValue<long>(0);
+        void Act() => dataReader.GetFieldValue<decimal>(0);
 
         // Assert
         Assert.Throws<InvalidCastException>(Act);
