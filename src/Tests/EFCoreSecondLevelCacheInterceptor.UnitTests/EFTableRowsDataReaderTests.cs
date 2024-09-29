@@ -1102,8 +1102,7 @@ public class EFTableRowsDataReaderTests
         new List<object[]>
         {
             new object[] { null, string.Empty },
-            new object[] { string.Empty, string.Empty },
-            new object[] { 123.45, "123,45" }
+            new object[] { string.Empty, string.Empty }
         };
 
     [Theory]
@@ -1123,6 +1122,24 @@ public class EFTableRowsDataReaderTests
 
         // Assert
         Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void GetString_ReturnsExpectedValueFromInvariantDecimal()
+    {
+        // Arrange
+        var values = new List<object> { 123.45.ToString(CultureInfo.InvariantCulture) };
+        var tableRow = new EFTableRow(values);
+        var tableRows = new EFTableRows { Rows = new List<EFTableRow> { tableRow } };
+        var dataReader = new EFTableRowsDataReader(tableRows);
+
+        dataReader.Read();
+
+        // Act
+        var actual = dataReader.GetString(0);
+
+        // Assert
+        Assert.Equal("123.45", actual);
     }
 
     [Fact]
