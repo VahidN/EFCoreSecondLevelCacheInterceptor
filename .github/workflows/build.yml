@@ -16,6 +16,9 @@ jobs:
     - name: Build EFCoreSecondLevelCacheInterceptor lib
       run: dotnet build ./src/EFCoreSecondLevelCacheInterceptor/EFCoreSecondLevelCacheInterceptor.csproj --configuration Release
 
+    - name: Run EFCoreSecondLevelCacheInterceptor lib unit tests
+      run: dotnet test ./src/Tests/EFCoreSecondLevelCacheInterceptor.UnitTests/EFCoreSecondLevelCacheInterceptor.UnitTests.csproj --no-restore --logger "console;verbosity=detailed"
+
     - name: Push Package to NuGet.org
       if: github.event_name == 'push'
       run: dotnet nuget push **\*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
