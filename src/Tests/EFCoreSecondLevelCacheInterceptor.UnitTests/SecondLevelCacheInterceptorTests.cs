@@ -115,7 +115,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public void NonQueryExecuted_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public void NonQueryExecuted_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         const int expected = int.MaxValue;
@@ -235,7 +235,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public async Task NonQueryExecutedAsync_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public async Task NonQueryExecutedAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         const int expected = 1;
@@ -353,7 +353,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public void NonQueryExecuting_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public void NonQueryExecuting_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         var expected = InterceptionResult<int>.SuppressWithResult(int.MaxValue);
@@ -472,7 +472,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public async Task NonQueryExecutingAsync_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public async Task NonQueryExecutingAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         var expected = InterceptionResult<int>.SuppressWithResult(int.MaxValue);
@@ -586,7 +586,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public void ReaderExecuted_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public void ReaderExecuted_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         var expected = Mock.Of<DbDataReader>();
@@ -699,7 +699,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public async Task ReaderExecutedAsync_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public async Task ReaderExecutedAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         var expected = Mock.Of<DbDataReader>();
@@ -817,7 +817,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public void ReaderExecuting_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public void ReaderExecuting_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         var dataReader = Mock.Of<DbDataReader>();
@@ -939,7 +939,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public async Task ReaderExecutingAsync_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public async Task ReaderExecutingAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         var dataReader = Mock.Of<DbDataReader>();
@@ -1058,7 +1058,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public void ScalarExecuted_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public void ScalarExecuted_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         var expected = new object();
@@ -1178,7 +1178,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public async Task ScalarExecutedAsync_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public async Task ScalarExecutedAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         var expected = new object();
@@ -1296,7 +1296,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public void ScalarExecuting_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public void ScalarExecuting_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         var expected = InterceptionResult<object>.SuppressWithResult(new object());
@@ -1415,7 +1415,7 @@ public class SecondLevelCacheInterceptorTests
     }
 
     [Fact]
-    public async Task ScalarExecutingAsync_ShouldNotArgumentNullException_WhenAnyParameterIsNull()
+    public async Task ScalarExecutingAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
         var expected = InterceptionResult<object>.SuppressWithResult(new object());

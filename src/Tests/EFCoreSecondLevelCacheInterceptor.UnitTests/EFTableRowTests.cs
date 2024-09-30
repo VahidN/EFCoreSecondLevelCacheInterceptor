@@ -1,5 +1,6 @@
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+// ReSharper disable once InconsistentNaming
 public class EFTableRowTests
 {
     [Fact]

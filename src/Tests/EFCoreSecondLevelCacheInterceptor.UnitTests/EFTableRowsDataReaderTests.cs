@@ -3,6 +3,7 @@ using System.Text.Json;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+// ReSharper disable once InconsistentNaming
 public class EFTableRowsDataReaderTests
 {
     [Fact]
@@ -310,7 +311,7 @@ public class EFTableRowsDataReaderTests
     }
 
     [Fact]
-    public void GetFieldType_ReturnsCorrectType_WhenOrdinalIsValid()
+    public void GetFieldType_ReturnsExpectedType_WhenOrdinalIsValid()
     {
         // Arrange
         var tableRows = new EFTableRows
@@ -1487,10 +1488,10 @@ public class EFTableRowsDataReaderTests
         dataReader.Read();
 
         // Act
-        var exception = Record.Exception(() => dataReader.GetFieldValue<decimal>(0));
+        var actual = Record.Exception(() => dataReader.GetFieldValue<decimal>(0));
 
         // Assert
-        Assert.Null(exception);
+        Assert.Null(actual);
     }
 
     public static IEnumerable<object[]> InvalidNumberData =>
@@ -1680,10 +1681,10 @@ public class EFTableRowsDataReaderTests
         dataReader.Read();
 
         // Act
-        var exception = Record.Exception(() => dataReader.GetFieldValue<DateOnly>(0));
+        var actual = Record.Exception(() => dataReader.GetFieldValue<DateOnly>(0));
 
         // Assert
-        Assert.Null(exception);
+        Assert.Null(actual);
     }
 
     [Fact]
@@ -1782,10 +1783,10 @@ public class EFTableRowsDataReaderTests
         dataReader.Read();
 
         // Act
-        var exception = Record.Exception(() => dataReader.GetFieldValue<TimeOnly>(0));
+        var actual = Record.Exception(() => dataReader.GetFieldValue<TimeOnly>(0));
 
         // Assert
-        Assert.Null(exception);
+        Assert.Null(actual);
     }
 
     [Fact]
