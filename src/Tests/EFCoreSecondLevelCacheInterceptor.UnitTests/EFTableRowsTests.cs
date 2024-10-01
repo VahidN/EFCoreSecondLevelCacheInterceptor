@@ -3,6 +3,7 @@ using Moq;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+// ReSharper disable once InconsistentNaming
 public class EFTableRowsTests
 {
     [Fact]
@@ -12,6 +13,7 @@ public class EFTableRowsTests
         DbDataReader reader = null;
 
         // Act & Assert
+        // ReSharper disable once AssignNullToNotNullAttribute
         Assert.Throws<ArgumentNullException>("reader", () => new EFTableRows(reader));
     }
 
@@ -75,7 +77,7 @@ public class EFTableRowsTests
     }
 
     [Fact]
-    public void Indexer_ReturnsCorrectRow_WhenIndexIsValid()
+    public void Indexer_ReturnsExpectedRow_WhenIndexIsValid()
     {
         // Arrange
         var rows = new List<EFTableRow>
@@ -87,14 +89,14 @@ public class EFTableRowsTests
         var tableRows = new EFTableRows { Rows = rows };
 
         // Act
-        var result = tableRows[1];
+        var actual = tableRows[1];
 
         // Assert
-        Assert.Equal(2, result.Values[0]);
+        Assert.Equal(2, actual.Values[0]);
     }
 
     [Fact]
-    public void Indexer_SetsCorrectRow_WhenIndexIsValid()
+    public void Indexer_SetsExpectedRow_WhenIndexIsValid()
     {
         // Arrange
         var rows = new List<EFTableRow>
@@ -160,7 +162,7 @@ public class EFTableRowsTests
     }
 
     [Fact]
-    public void Get_ShouldReturnCorrectRow()
+    public void Get_ShouldReturnExpectedRow()
     {
         // Arrange
         var tableRows = new EFTableRows();
@@ -169,14 +171,14 @@ public class EFTableRowsTests
         tableRows.Add(row);
 
         // Act
-        var result = tableRows.Get(0);
+        var actual = tableRows.Get(0);
 
         // Assert
-        Assert.Equal(row, result);
+        Assert.Equal(row, actual);
     }
 
     [Fact]
-    public void GetOrdinal_ShouldReturnCorrectOrdinal()
+    public void GetOrdinal_ShouldReturnExpectedOrdinal()
     {
         // Arrange
         var tableRows = new EFTableRows()
@@ -195,7 +197,7 @@ public class EFTableRowsTests
     }
 
     [Fact]
-    public void GetName_ShouldReturnCorrectName()
+    public void GetName_ShouldReturnExpectedName()
     {
         // Arrange
         var tableRows = new EFTableRows()
@@ -240,7 +242,7 @@ public class EFTableRowsTests
     }
 
     [Fact]
-    public void VisibleFieldCount_ReturnsCorrectValue_WhenSet()
+    public void VisibleFieldCount_ReturnsExpectedValue_WhenSet()
     {
         // Arrange
         var tableRows = new EFTableRows { VisibleFieldCount = 5 };
@@ -269,9 +271,9 @@ public class EFTableRowsTests
         var tableRows = new EFTableRows { ColumnsInfo = columnsInfo };
 
         // Act
-        var result = tableRows.GetFieldTypeName(0);
+        var actual = tableRows.GetFieldTypeName(0);
 
-        Assert.Equal("System.String", result);
+        Assert.Equal("System.String", actual);
     }
 
     [Fact]
@@ -286,9 +288,9 @@ public class EFTableRowsTests
         var tableRows = new EFTableRows { ColumnsInfo = columnsInfo };
 
         // Act
-        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => tableRows.GetFieldTypeName(0));
+        var actual = Assert.Throws<ArgumentOutOfRangeException>(() => tableRows.GetFieldTypeName(0));
 
         // Assert
-        Assert.Equal("Index[0] was outside of array's bounds. (Parameter 'ordinal')", exception.Message);
+        Assert.Equal("Index[0] was outside of array's bounds. (Parameter 'ordinal')", actual.Message);
     }
 }

@@ -12,40 +12,39 @@ public class DbCommandInterceptorProcessorTests
 {
     private readonly IDbCommandInterceptorProcessor _processor;
     private readonly Mock<IEFDebugLogger> _loggerMock;
-    private readonly Mock<ILogger<DbCommandInterceptorProcessor>> _interceptorProcessorLoggerMock;
     private readonly Mock<IEFCacheServiceProvider> _cacheServiceMock;
     private readonly Mock<IEFCacheDependenciesProcessor> _cacheDependenciesProcessorMock;
     private readonly Mock<IEFCacheKeyProvider> _cacheKeyProviderMock;
     private readonly Mock<IEFCachePolicyParser> _cachePolicyParserMock;
     private readonly Mock<IEFSqlCommandsProcessor> _sqlCommandsProcessorMock;
-    private readonly Mock<IOptions<EFCoreSecondLevelCacheSettings>> _cacheSettingsMock;
     private readonly Mock<IEFCacheServiceCheck> _cacheServiceCheckMock;
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
 
     public DbCommandInterceptorProcessorTests()
     {
+        var interceptorProcessorLoggerMock = new Mock<ILogger<DbCommandInterceptorProcessor>>();
+        var cacheSettingsMock = new Mock<IOptions<EFCoreSecondLevelCacheSettings>>();
+
         _loggerMock = new Mock<IEFDebugLogger>();
-        _interceptorProcessorLoggerMock = new Mock<ILogger<DbCommandInterceptorProcessor>>();
         _cacheServiceMock = new Mock<IEFCacheServiceProvider>();
         _cacheDependenciesProcessorMock = new Mock<IEFCacheDependenciesProcessor>();
         _cacheKeyProviderMock = new Mock<IEFCacheKeyProvider>();
         _cachePolicyParserMock = new Mock<IEFCachePolicyParser>();
         _sqlCommandsProcessorMock = new Mock<IEFSqlCommandsProcessor>();
-        _cacheSettingsMock = new Mock<IOptions<EFCoreSecondLevelCacheSettings>>();
         _cacheServiceCheckMock = new Mock<IEFCacheServiceCheck>();
         _cacheSettings = new EFCoreSecondLevelCacheSettings();
-
-        _cacheSettingsMock.SetupGet(x => x.Value).Returns(_cacheSettings);
+        
+        cacheSettingsMock.SetupGet(x => x.Value).Returns(_cacheSettings);
 
         _processor = new DbCommandInterceptorProcessor(
             _loggerMock.Object,
-            _interceptorProcessorLoggerMock.Object,
+            interceptorProcessorLoggerMock.Object,
             _cacheServiceMock.Object,
             _cacheDependenciesProcessorMock.Object,
             _cacheKeyProviderMock.Object,
             _cachePolicyParserMock.Object,
             _sqlCommandsProcessorMock.Object,
-            _cacheSettingsMock.Object,
+            cacheSettingsMock.Object,
             _cacheServiceCheckMock.Object);
     }
 
@@ -71,6 +70,7 @@ public class DbCommandInterceptorProcessorTests
             cacheKeyProvider,
             cachePolicyParser,
             sqlCommandsProcessor,
+            // ReSharper disable once AssignNullToNotNullAttribute
             null,
             cacheServiceCheck));
     }
@@ -112,6 +112,8 @@ public class DbCommandInterceptorProcessorTests
         DbContext context = null;
 
         // Act
+        // ReSharper disable once ExpressionIsAlwaysNull
+        // ReSharper disable once AssignNullToNotNullAttribute
         var actual = _processor.ProcessExecutedCommands<object>(null, context, null);
 
         // Assert
@@ -125,6 +127,7 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
 
         // Act
+        // ReSharper disable once AssignNullToNotNullAttribute
         var actual = _processor.ProcessExecutedCommands<object>(null, context, null);
 
         // Assert
@@ -222,7 +225,7 @@ public class DbCommandInterceptorProcessorTests
         _cacheSettings.SkipCachingDbContexts = new List<Type> { context.GetType() };
 
         // Act
-        var actual = _processor.ProcessExecutedCommands(command, context, result);
+        _processor.ProcessExecutedCommands(command, context, result);
 
         // Assert
         _loggerMock.Verify(x => x.NotifyCacheableEvent(
@@ -861,7 +864,7 @@ public class DbCommandInterceptorProcessorTests
     public void ProcessExecutedCommands_ReturnsNull_WhenResultIsNull()
     {
         // Arrange
-        object expected = null;
+        object result = null;
 
         var commandMock = new Mock<DbCommand>();
         var transaction = Mock.Of<DbTransaction>();
@@ -879,7 +882,8 @@ public class DbCommandInterceptorProcessorTests
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
-        var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, expected);
+        // ReSharper disable once ExpressionIsAlwaysNull
+        var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, result);
 
         // Assert
         Assert.Null(actual);
@@ -892,6 +896,8 @@ public class DbCommandInterceptorProcessorTests
         DbContext context = null;
 
         // Act
+        // ReSharper disable once AssignNullToNotNullAttribute
+        // ReSharper disable once ExpressionIsAlwaysNull
         var actual = _processor.ProcessExecutingCommands<object>(null, context, null);
 
         // Assert
@@ -905,6 +911,7 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
 
         // Act
+        // ReSharper disable once AssignNullToNotNullAttribute
         var actual = _processor.ProcessExecutingCommands<object>(null, context, null);
 
         // Assert
@@ -1367,6 +1374,7 @@ public class DbCommandInterceptorProcessorTests
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
+        // ReSharper disable once ExpressionIsAlwaysNull
         _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert
@@ -1397,6 +1405,7 @@ public class DbCommandInterceptorProcessorTests
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
+        // ReSharper disable once ExpressionIsAlwaysNull
         var actual = _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert

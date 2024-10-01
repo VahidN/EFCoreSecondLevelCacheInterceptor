@@ -8,10 +8,10 @@ public class TypeExtensionsTests
     public void IsNull_ShouldReturnTrue_WhenValueIsNull()
     {
         // Arrange && Act
-        var result = ((object)null).IsNull();
+        var actual = ((object)null).IsNull();
 
         // Assert
-        Assert.True(result);
+        Assert.True(actual);
     }
 
     [Fact]
@@ -21,10 +21,10 @@ public class TypeExtensionsTests
         object value = DBNull.Value;
 
         // Act
-        var result = value.IsNull();
+        var actual = value.IsNull();
 
         // Assert
-        Assert.True(result);
+        Assert.True(actual);
     }
 
     [Fact]
@@ -34,10 +34,10 @@ public class TypeExtensionsTests
         object value = new object();
 
         // Act
-        var result = value.IsNull();
+        var actual = value.IsNull();
 
         // Assert
-        Assert.False(result);
+        Assert.False(actual);
     }
 
     [Theory]
