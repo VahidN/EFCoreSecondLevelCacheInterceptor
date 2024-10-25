@@ -24,21 +24,21 @@
         <PackageReference Include="EasyCaching.Bus.Redis" Version="1.9.2"/>
         <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.9.2"/>
         <PackageReference Include="EasyCaching.Serialization.SystemTextJson" Version="1.9.2"/>
-        <PackageReference Include="MessagePack" Version="2.4.35"/>
-        <PackageReference Include="StackExchange.Redis" Version="2.6.70"/>
+        <PackageReference Include="MessagePack" Version="2.5.187"/>
+        <PackageReference Include="StackExchange.Redis" Version="2.8.16"/>
 
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0"/>
-        <PackageReference Include="MSTest.TestFramework" Version="3.0.2"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1"/>
+        <PackageReference Include="MSTest.TestFramework" Version="3.6.1"/>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0"/>
-        <PackageReference Include="MSTest.TestAdapter" Version="3.0.2"/>
+        <PackageReference Include="MSTest.TestAdapter" Version="3.6.1"/>
         <PackageReference Include="CacheManager.StackExchange.Redis" Version="1.2.0"/>
         <PackageReference Include="CacheManager.Core" Version="1.2.0"/>
         <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="1.2.0"/>
         <PackageReference Include="CacheManager.Serialization.Json" Version="1.2.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.2"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
     </ItemGroup>
 </Project>
