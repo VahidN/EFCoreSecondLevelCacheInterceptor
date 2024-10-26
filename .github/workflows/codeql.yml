@@ -47,7 +47,7 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
         config-file: ./.github/workflows/codeql/codeql-config.yml
@@ -62,7 +62,7 @@ jobs:
     # Autobuild attempts to build any compiled languages (C/C++, C#, Go, Java, or Swift).
     # If this step fails, then you should remove it and run the build manually (see below)
     # - name: Autobuild
-    #  uses: github/codeql-action/autobuild@v2
+    #  uses: github/codeql-action/autobuild@v3
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
@@ -81,6 +81,6 @@ jobs:
     #     ./location_of_script_within_repo/buildscript.sh
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
