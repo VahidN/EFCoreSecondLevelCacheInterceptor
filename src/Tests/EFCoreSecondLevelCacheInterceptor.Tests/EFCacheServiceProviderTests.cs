@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests;
@@ -225,5 +226,51 @@ public class EFCacheServiceProviderTests
 
         var value1 = cacheService.GetValue(key1, efCachePolicy);
         Assert.IsTrue(value1.IsNull, $"value1 is `{value1}`");
+    }
+
+    [DataTestMethod]
+    [DataRow(TestCacheProvider.EasyCachingCoreInMemory)]
+    [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
+    [DataRow(TestCacheProvider.BuiltInInMemory)]
+    public virtual async Task TestConcurrentCacheInsertAndInvalidation(TestCacheProvider cacheProvider)
+    {
+        const string rootKey = "entity1";
+        var cacheService = EFServiceProvider.GetCacheServiceProvider(cacheProvider);
+        var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(10))
+            .ExpirationMode(CacheExpirationMode.Absolute);
+
+        await Task.WhenAll(Task.Run(InsertValues), Task.Run(InvalidateCacheDependencies));
+
+        void InsertValues()
+        {
+            for (var i = 0; i < 10000; i++)
+            {
+                var key = new EFCacheKey(new HashSet<string> { rootKey })
+                {
+                    KeyHash = $"EF_key{i}",
+                };
+
+                cacheService.InsertValue(
+                    key,
+                    new EFCachedData { Scalar = $"value{i}" }, efCachePolicy);
+            }
+        }
+
+        void InvalidateCacheDependencies()
+        {
+            var defaultKey = new EFCacheKey(new HashSet<string> { rootKey })
+            {
+                KeyHash = "EF_key",
+            };
+
+            cacheService.InsertValue(
+                defaultKey,
+                new EFCachedData { Scalar = "value" }, efCachePolicy);
+
+            for (var i = 0; i < 5000; i++)
+            {
+                cacheService.InvalidateCacheDependencies(defaultKey);
+            }
+        }
     }
 }
