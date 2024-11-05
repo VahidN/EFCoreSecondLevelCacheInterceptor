@@ -52,7 +52,7 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             services.AddEFSecondLevelCache(options =>
                 options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
                        // Fallback on db if the caching provider fails.
-                       .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
+                       .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1)))
 
             // Please use the `CacheManager.Core` or `EasyCaching.Redis` for the Redis cache provider.
             );
