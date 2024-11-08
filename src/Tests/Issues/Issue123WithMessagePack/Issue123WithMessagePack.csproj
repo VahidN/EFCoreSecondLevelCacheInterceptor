@@ -22,4 +22,7 @@
     <PackageReference Include="EasyCaching.Redis" Version="1.9.2" />
     <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.9.2" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

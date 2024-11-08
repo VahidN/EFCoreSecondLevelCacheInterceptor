@@ -136,7 +136,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 
                 using (var dbReaderLoader = new EFDataReaderLoader(dataReader))
                 {
-                    tableRows = dbReaderLoader.LoadAndClose();
+                    tableRows = dbReaderLoader.Load();
                 }
 
                 if (!ShouldSkipCachingResults(commandText, tableRows))

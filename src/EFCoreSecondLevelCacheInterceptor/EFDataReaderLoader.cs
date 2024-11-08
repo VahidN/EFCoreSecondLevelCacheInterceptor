@@ -22,11 +22,12 @@ public class EFDataReaderLoader : DbDataReader
     public EFDataReaderLoader(DbDataReader dbReader)
     {
         _dbReader = dbReader;
+
         _tableRows = new EFTableRows(_dbReader)
-                     {
-                         FieldCount = _dbReader.FieldCount,
-                         VisibleFieldCount = _dbReader.VisibleFieldCount,
-                     };
+        {
+            FieldCount = _dbReader.FieldCount,
+            VisibleFieldCount = _dbReader.VisibleFieldCount
+        };
     }
 
     /// <summary>
@@ -182,6 +183,7 @@ public class EFDataReaderLoader : DbDataReader
     public override int GetValues(object[] values)
     {
         Array.Copy(_rowValues, values, _rowValues.Length);
+
         return _rowValues.Length;
     }
 
@@ -231,15 +233,17 @@ public class EFDataReaderLoader : DbDataReader
         }
 
         _tableRows?.Add(new EFTableRow(_rowValues)
-                        {
-                            Depth = _dbReader.Depth,
-                        });
+        {
+            Depth = _dbReader.Depth
+        });
+
         return true;
     }
 
     private byte[] getSqlBytes(int ordinal)
     {
         byte[] buffer;
+
         using (var stream = _dbReader.GetStream(ordinal))
         {
             if (stream.Length > int.MaxValue)
@@ -248,12 +252,14 @@ public class EFDataReaderLoader : DbDataReader
             }
 
             buffer = new byte[stream.Length];
+
             if (stream.Position != 0)
             {
-                stream.Seek(0, SeekOrigin.Begin);
+                stream.Seek(offset: 0, SeekOrigin.Begin);
             }
 
-            var count = stream.Read(buffer, 0, checked((int)stream.Length));
+            var count = stream.Read(buffer, offset: 0, checked((int)stream.Length));
+
             if (count <= 0)
             {
                 return buffer;
@@ -266,21 +272,21 @@ public class EFDataReaderLoader : DbDataReader
     private bool isBinary(int ordinal)
     {
         var typeName = _tableRows.GetFieldTypeName(ordinal);
-        return string.Equals(typeName, "Microsoft.SqlServer.Types.SqlGeography", StringComparison.Ordinal)
-               || string.Equals(typeName, "Microsoft.SqlServer.Types.SqlGeometry", StringComparison.Ordinal);
+
+        return string.Equals(typeName, b: "Microsoft.SqlServer.Types.SqlGeography", StringComparison.Ordinal) ||
+               string.Equals(typeName, b: "Microsoft.SqlServer.Types.SqlGeometry", StringComparison.Ordinal);
     }
 
     /// <summary>
     ///     Converts a DbDataReader to an EFTableRows
     /// </summary>
-    public EFTableRows LoadAndClose()
+    public EFTableRows Load()
     {
         while (Read())
         {
             // Read all data
         }
 
-        Close();
         return _tableRows;
     }
 }

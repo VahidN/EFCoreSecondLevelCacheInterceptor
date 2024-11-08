@@ -82,6 +82,8 @@ public static class EFServiceProvider
             o.UseEasyCachingCoreProvider(providerName).ConfigureLogging(true);
             o.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(10));
             o.UseCacheKeyPrefix("EF_");
+            // Fallback on db if the caching provider fails.
+            o.UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1));
         });
 
         var basePath = Directory.GetCurrentDirectory();
