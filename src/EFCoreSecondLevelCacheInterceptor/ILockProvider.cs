@@ -1,5 +1,4 @@
-﻿using AsyncKeyedLock;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,10 +12,10 @@ public interface ILockProvider : IDisposable
     /// <summary>
     ///     Tries to enter the sync lock
     /// </summary>
-    AsyncNonKeyedLockReleaser Lock(CancellationToken cancellationToken = default);
+    IDisposable? Lock(CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Tries to enter the async lock
     /// </summary>
-    ValueTask<AsyncNonKeyedLockReleaser> LockAsync(CancellationToken cancellationToken = default);
+    ValueTask<IDisposable?> LockAsync(CancellationToken cancellationToken = default);
 }

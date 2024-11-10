@@ -1,2 +1,2 @@
-dotnet test
+dotnet test --logger "console;verbosity=detailed"
 pause

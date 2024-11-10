@@ -6,7 +6,7 @@ using Moq;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
-[SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+[SuppressMessage(category: "ReSharper", checkId: "AssignNullToNotNullAttribute")]
 public class SecondLevelCacheInterceptorTests
 {
     [Fact]
@@ -25,7 +25,8 @@ public class SecondLevelCacheInterceptorTests
     {
         var lockProviderMock = new Mock<ILockProvider>();
 
-        Assert.Throws<ArgumentNullException>(() => new SecondLevelCacheInterceptor(null, lockProviderMock.Object));
+        Assert.Throws<ArgumentNullException>(()
+            => new SecondLevelCacheInterceptor(processor: null, lockProviderMock.Object));
     }
 
     [Fact]
@@ -33,7 +34,8 @@ public class SecondLevelCacheInterceptorTests
     {
         var processorMock = new Mock<IDbCommandInterceptorProcessor>();
 
-        Assert.Throws<ArgumentNullException>(() => new SecondLevelCacheInterceptor(processorMock.Object, null));
+        Assert.Throws<ArgumentNullException>(()
+            => new SecondLevelCacheInterceptor(processorMock.Object, lockProvider: null));
     }
 
     [Fact]
@@ -44,21 +46,10 @@ public class SecondLevelCacheInterceptorTests
         const int result = int.MinValue;
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -83,21 +74,10 @@ public class SecondLevelCacheInterceptorTests
         const int result = int.MinValue;
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -122,21 +102,10 @@ public class SecondLevelCacheInterceptorTests
         const int result = int.MinValue;
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -147,12 +116,11 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() => interceptor.NonQueryExecuted(null, null, result));
+        var actual = Record.Exception(() => interceptor.NonQueryExecuted(command: null, eventData: null, result));
 
         // Assert
         Assert.Null(actual);
     }
-
 
     [Fact]
     public async Task NonQueryExecutedAsync_ShouldLock()
@@ -162,27 +130,16 @@ public class SecondLevelCacheInterceptorTests
         const int result = int.MinValue;
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<AsyncNonKeyedLockReleaser>(new AsyncNonKeyedLockReleaser()));
+            .Returns(new ValueTask<IDisposable>(new MockDisposable()));
 
         processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
 
@@ -203,21 +160,10 @@ public class SecondLevelCacheInterceptorTests
         const int result = int.MinValue;
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -242,21 +188,10 @@ public class SecondLevelCacheInterceptorTests
         const int result = 1;
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -267,8 +202,8 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record
-            .ExceptionAsync(async () => await interceptor.NonQueryExecutedAsync(null, null, result));
+        var actual = await Record.ExceptionAsync(async ()
+            => await interceptor.NonQueryExecutedAsync(command: null, eventData: null, result));
 
         // Assert
         Assert.Null(actual);
@@ -282,21 +217,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<int>.SuppressWithResult(int.MinValue);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -321,21 +245,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<int>.SuppressWithResult(int.MinValue);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -360,21 +273,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<int>.SuppressWithResult(int.MinValue);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -385,7 +287,7 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() => interceptor.NonQueryExecuting(null, null, result));
+        var actual = Record.Exception(() => interceptor.NonQueryExecuting(command: null, eventData: null, result));
 
         // Assert
         Assert.Null(actual);
@@ -399,27 +301,16 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<int>.SuppressWithResult(int.MinValue);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<AsyncNonKeyedLockReleaser>(new AsyncNonKeyedLockReleaser()));
+            .Returns(new ValueTask<IDisposable>(new MockDisposable()));
 
         processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
 
@@ -440,21 +331,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<int>.SuppressWithResult(int.MinValue);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -479,21 +359,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<int>.SuppressWithResult(int.MinValue);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -504,8 +373,8 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record
-            .ExceptionAsync(async () => await interceptor.NonQueryExecutingAsync(null, null, result));
+        var actual = await Record.ExceptionAsync(async ()
+            => await interceptor.NonQueryExecutingAsync(command: null, eventData: null, result));
 
         // Assert
         Assert.Null(actual);
@@ -517,21 +386,10 @@ public class SecondLevelCacheInterceptorTests
         // Arrange
         var expected = Mock.Of<DbDataReader>();
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -554,21 +412,10 @@ public class SecondLevelCacheInterceptorTests
         // Arrange
         var expected = Mock.Of<DbDataReader>();
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -591,21 +438,10 @@ public class SecondLevelCacheInterceptorTests
         // Arrange
         var expected = Mock.Of<DbDataReader>();
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -616,7 +452,7 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() => interceptor.ReaderExecuted(null, null, expected));
+        var actual = Record.Exception(() => interceptor.ReaderExecuted(command: null, eventData: null, expected));
 
         // Assert
         Assert.Null(actual);
@@ -628,27 +464,16 @@ public class SecondLevelCacheInterceptorTests
         // Arrange
         var expected = Mock.Of<DbDataReader>();
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<AsyncNonKeyedLockReleaser>(new AsyncNonKeyedLockReleaser()));
+            .Returns(new ValueTask<IDisposable>(new MockDisposable()));
 
         processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
 
@@ -667,21 +492,10 @@ public class SecondLevelCacheInterceptorTests
         // Arrange
         var expected = Mock.Of<DbDataReader>();
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -704,21 +518,10 @@ public class SecondLevelCacheInterceptorTests
         // Arrange
         var expected = Mock.Of<DbDataReader>();
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -729,8 +532,8 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record
-            .ExceptionAsync(async () => await interceptor.ReaderExecutedAsync(null, null, expected));
+        var actual = await Record.ExceptionAsync(async ()
+            => await interceptor.ReaderExecutedAsync(command: null, eventData: null, expected));
 
         // Assert
         Assert.Null(actual);
@@ -745,21 +548,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<DbDataReader>.SuppressWithResult(dataReader);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -785,21 +577,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<DbDataReader>.SuppressWithResult(dataReader);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -825,21 +606,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<DbDataReader>.SuppressWithResult(dataReader);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -850,7 +620,7 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() => interceptor.ReaderExecuting(null, null, result));
+        var actual = Record.Exception(() => interceptor.ReaderExecuting(command: null, eventData: null, result));
 
         // Assert
         Assert.Null(actual);
@@ -865,27 +635,16 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<DbDataReader>.SuppressWithResult(dataReader);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<AsyncNonKeyedLockReleaser>(new AsyncNonKeyedLockReleaser()));
+            .Returns(new ValueTask<IDisposable>(new MockDisposable()));
 
         processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
 
@@ -907,21 +666,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<DbDataReader>.SuppressWithResult(dataReader);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -947,21 +695,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<DbDataReader>.SuppressWithResult(dataReader);
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -972,8 +709,8 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record
-            .ExceptionAsync(async () => await interceptor.ReaderExecutingAsync(null, null, result));
+        var actual = await Record.ExceptionAsync(async ()
+            => await interceptor.ReaderExecutingAsync(command: null, eventData: null, result));
 
         // Assert
         Assert.Null(actual);
@@ -987,21 +724,10 @@ public class SecondLevelCacheInterceptorTests
         var result = new object();
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -1026,21 +752,10 @@ public class SecondLevelCacheInterceptorTests
         var result = new object();
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -1065,21 +780,10 @@ public class SecondLevelCacheInterceptorTests
         var result = new object();
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -1090,12 +794,11 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() => interceptor.ScalarExecuted(null, null, result));
+        var actual = Record.Exception(() => interceptor.ScalarExecuted(command: null, eventData: null, result));
 
         // Assert
         Assert.Null(actual);
     }
-
 
     [Fact]
     public async Task ScalarExecutedAsync_ShouldLock()
@@ -1105,27 +808,16 @@ public class SecondLevelCacheInterceptorTests
         var result = new object();
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<AsyncNonKeyedLockReleaser>(new AsyncNonKeyedLockReleaser()));
+            .Returns(new ValueTask<IDisposable>(new MockDisposable()));
 
         processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
 
@@ -1146,21 +838,10 @@ public class SecondLevelCacheInterceptorTests
         var result = new object();
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -1185,21 +866,10 @@ public class SecondLevelCacheInterceptorTests
         var result = new object();
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -1210,8 +880,8 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record
-            .ExceptionAsync(async () => await interceptor.ScalarExecutedAsync(null, null, result));
+        var actual = await Record.ExceptionAsync(async ()
+            => await interceptor.ScalarExecutedAsync(command: null, eventData: null, result));
 
         // Assert
         Assert.Null(actual);
@@ -1225,21 +895,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<object>.SuppressWithResult(new object());
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -1264,21 +923,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<object>.SuppressWithResult(new object());
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -1303,21 +951,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<object>.SuppressWithResult(new object());
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -1328,7 +965,7 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() => interceptor.ScalarExecuting(null, null, result));
+        var actual = Record.Exception(() => interceptor.ScalarExecuting(command: null, eventData: null, result));
 
         // Assert
         Assert.Null(actual);
@@ -1342,27 +979,16 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<object>.SuppressWithResult(new object());
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
         lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<AsyncNonKeyedLockReleaser>(new AsyncNonKeyedLockReleaser()));
+            .Returns(new ValueTask<IDisposable>(new MockDisposable()));
 
         processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
 
@@ -1383,21 +1009,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<object>.SuppressWithResult(new object());
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -1422,21 +1037,10 @@ public class SecondLevelCacheInterceptorTests
         var result = InterceptionResult<object>.SuppressWithResult(new object());
 
         var command = Mock.Of<DbCommand>();
-        var eventData = new CommandExecutedEventData(
-            null,
-            null,
-            null,
-            command,
-            null,
-            DbCommandMethod.ExecuteNonQuery,
-            Guid.Empty,
-            Guid.Empty,
-            null,
-            false,
-            false,
-            DateTimeOffset.Now,
-            TimeSpan.Zero,
-            CommandSource.LinqQuery);
+
+        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
+            command, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty, result: null, async: false,
+            logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero, CommandSource.LinqQuery);
 
         var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
@@ -1447,8 +1051,8 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record
-            .ExceptionAsync(async () => await interceptor.ScalarExecutingAsync(null, null, result));
+        var actual = await Record.ExceptionAsync(async ()
+            => await interceptor.ScalarExecutingAsync(command: null, eventData: null, result));
 
         // Assert
         Assert.Null(actual);

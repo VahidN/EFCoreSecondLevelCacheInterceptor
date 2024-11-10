@@ -1,5 +1,3 @@
-using AsyncKeyedLock;
-
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
 public class LockProviderTests
@@ -14,7 +12,7 @@ public class LockProviderTests
         var releaser = lockProvider.Lock();
 
         // Assert
-        Assert.IsType<AsyncNonKeyedLockReleaser>(releaser);
+        Assert.IsAssignableFrom<IDisposable>(releaser);
     }
 
     [Fact]
@@ -27,7 +25,7 @@ public class LockProviderTests
         var releaser = await lockProvider.LockAsync();
 
         // Assert
-        Assert.IsType<AsyncNonKeyedLockReleaser>(releaser);
+        Assert.IsAssignableFrom<IDisposable>(releaser);
     }
 
     [Fact]
@@ -38,10 +36,10 @@ public class LockProviderTests
         var releaser = lockProvider.Lock();
 
         // Act
-        releaser.Dispose();
+        releaser?.Dispose();
 
         // Assert
-        Assert.True(true); // If no exception is thrown, the test passes
+        Assert.True(condition: true); // If no exception is thrown, the test passes
     }
 
     [Fact]
@@ -52,10 +50,10 @@ public class LockProviderTests
         var releaser = await lockProvider.LockAsync();
 
         // Act
-        releaser.Dispose();
+        releaser?.Dispose();
 
         // Assert
-        Assert.True(true); // If no exception is thrown, the test passes
+        Assert.True(condition: true); // If no exception is thrown, the test passes
     }
 
     [Fact]
@@ -68,6 +66,6 @@ public class LockProviderTests
         lockProvider.Dispose();
 
         // Assert
-        Assert.True(true); // If no exception is thrown, the test passes
+        Assert.True(condition: true); // If no exception is thrown, the test passes
     }
 }
