@@ -71,7 +71,7 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
-        <PackageReference Include="AsyncKeyedLock" Version="7.0.2"/>
+        <PackageReference Include="AsyncKeyedLock" Version="7.1.2"/>
         <None Include="../../README.md" Link="README.md" Pack="true" PackagePath="/" Visible="false"/>
     </ItemGroup>
     <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
