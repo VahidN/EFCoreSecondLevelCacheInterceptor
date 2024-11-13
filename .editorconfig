@@ -180,3 +180,5 @@ dotnet_diagnostic.HAA0502.severity = none
 # HAA0505: Initializer reference type allocation
 dotnet_diagnostic.HAA0505.severity = silent
 
+# force file scoped namespaces
+csharp_style_namespace_declarations = file_scoped:warning
