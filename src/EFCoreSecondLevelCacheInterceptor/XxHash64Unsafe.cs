@@ -1,4 +1,4 @@
-#if NET8_0
+#if NET9_0 || NET8_0
 using System;
 using System.IO.Hashing;
 using System.Text;
@@ -12,6 +12,7 @@ public class XxHash64Unsafe : IEFHashProvider
     public ulong ComputeHash(string data)
     {
         ArgumentNullException.ThrowIfNull(data);
+
         return XxHash64.HashToUInt64(Encoding.UTF8.GetBytes(data));
     }
 
@@ -19,6 +20,7 @@ public class XxHash64Unsafe : IEFHashProvider
     public ulong ComputeHash(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
+
         return XxHash64.HashToUInt64(data);
     }
 
@@ -26,6 +28,7 @@ public class XxHash64Unsafe : IEFHashProvider
     public ulong ComputeHash(byte[] data, int offset, int len, uint seed)
     {
         ArgumentNullException.ThrowIfNull(data);
+
         return XxHash64.HashToUInt64(data.AsSpan(offset, len), seed);
     }
 }

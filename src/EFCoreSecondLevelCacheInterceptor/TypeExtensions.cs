@@ -103,31 +103,28 @@ public static class TypeExtensions
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static bool IsNull(this object? value) => value is null || value is DBNull;
+    public static bool IsNull(this object? value) => value is null or DBNull;
 
     /// <summary>
     ///     IsGenericType or IsArray
     /// </summary>
     /// <param name="expectedValueType"></param>
     /// <returns></returns>
-    public static bool IsArrayOrGenericList(Type? expectedValueType) =>
-        (expectedValueType?.IsGenericType == true && expectedValueType.GetGenericTypeDefinition() == typeof(List<>)) ||
-        expectedValueType?.IsArray == true;
+    public static bool IsArrayOrGenericList(Type? expectedValueType)
+        => (expectedValueType?.IsGenericType == true &&
+            expectedValueType.GetGenericTypeDefinition() == typeof(List<>)) || expectedValueType?.IsArray == true;
 
     /// <summary>
     ///     Is it a number type
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public static bool IsNumber(Type type) =>
-        type == UintType || type == IntType ||
-        type == UlongTYpe || type == LongType ||
-        type == UShortType || type == ShortType ||
-        type == SByteType || type == ByteType ||
-        type == FloatType || type == DoubleType || type == DecimalType ||
-        type == CharType;
+    public static bool IsNumber(Type type)
+        => type == UintType || type == IntType || type == UlongTYpe || type == LongType || type == UShortType ||
+           type == ShortType || type == SByteType || type == ByteType || type == FloatType || type == DoubleType ||
+           type == DecimalType || type == CharType;
 
-#if NET8_0 || NET7_0 || NET6_0
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0
     /// <summary>
     ///     Cached version of typeof(DateOnly)
     /// </summary>

@@ -3,9 +3,9 @@ using System.Data.Common;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
 using System.Text.Json;
+using Microsoft.Extensions.Options;
 
 #else
 using System.Collections;
@@ -19,7 +19,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFCacheKeyProvider : IEFCacheKeyProvider
 {
-#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
     private readonly EFCoreSecondLevelCacheSettings _settings;
 #endif
 
@@ -40,7 +40,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         ILogger<EFCacheKeyProvider> keyProviderLogger,
         IEFHashProvider hashProvider,
         IEFCacheKeyPrefixProvider cacheKeyPrefixProvider
-#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
         ,
         IOptions<EFCoreSecondLevelCacheSettings> cacheSettings
 #endif
@@ -52,7 +52,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         _cachePolicyParser = cachePolicyParser;
         _hashProvider = hashProvider ?? throw new ArgumentNullException(nameof(hashProvider));
         _cacheKeyPrefixProvider = cacheKeyPrefixProvider;
-#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
         _settings = cacheSettings?.Value ?? throw new ArgumentNullException(nameof(cacheSettings));
 #endif
     }
@@ -81,7 +81,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
             throw new ArgumentNullException(nameof(cachePolicy));
         }
 
-        var cacheKey = getCacheKey(command, cachePolicy.CacheSaltKey);
+        var cacheKey = GetCacheKey(command, cachePolicy.CacheSaltKey);
         var cacheKeyPrefix = _cacheKeyPrefixProvider.GetCacheKeyPrefix();
 
         var cacheKeyHash = !string.IsNullOrEmpty(cacheKeyPrefix)
@@ -94,8 +94,8 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         if (_logger.IsLoggerEnabled)
         {
             _keyProviderLogger.LogDebug(
-                "KeyHash: {CacheKeyHash}, DbContext: {Name}, CacheDependencies: {Dependencies}.", cacheKeyHash,
-                cacheDbContextType?.Name, string.Join(", ", cacheDependencies));
+                message: "KeyHash: {CacheKeyHash}, DbContext: {Name}, CacheDependencies: {Dependencies}.", cacheKeyHash,
+                cacheDbContextType?.Name, string.Join(separator: ", ", cacheDependencies));
         }
 
         return new EFCacheKey(cacheDependencies)
@@ -105,12 +105,12 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         };
     }
 
-    private string getCacheKey(DbCommand command, string saltKey)
+    private string GetCacheKey(DbCommand command, string saltKey)
     {
         var cacheKey = new StringBuilder();
         cacheKey.AppendLine(_cachePolicyParser.RemoveEFCachePolicyTag(command.CommandText));
 
-        cacheKey.AppendLine("ConnectionString").Append('=').Append(command.Connection?.ConnectionString);
+        cacheKey.AppendLine(value: "ConnectionString").Append(value: '=').Append(command.Connection?.ConnectionString);
 
         foreach (DbParameter? parameter in command.Parameters)
         {
@@ -120,33 +120,33 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
             }
 
             cacheKey.Append(parameter.ParameterName)
-                .Append('=')
+                .Append(value: '=')
                 .Append(GetParameterValue(parameter))
-                .Append(',')
-                .Append("Size")
-                .Append('=')
+                .Append(value: ',')
+                .Append(value: "Size")
+                .Append(value: '=')
                 .Append(parameter.Size)
-                .Append(',')
-                .Append("Precision")
-                .Append('=')
+                .Append(value: ',')
+                .Append(value: "Precision")
+                .Append(value: '=')
                 .Append(parameter.Precision)
-                .Append(',')
-                .Append("Scale")
-                .Append('=')
+                .Append(value: ',')
+                .Append(value: "Scale")
+                .Append(value: '=')
                 .Append(parameter.Scale)
-                .Append(',')
-                .Append("Direction")
-                .Append('=')
+                .Append(value: ',')
+                .Append(value: "Direction")
+                .Append(value: '=')
                 .Append(parameter.Direction)
-                .Append(',');
+                .Append(value: ',');
         }
 
-        cacheKey.AppendLine("SaltKey").Append('=').Append(saltKey);
+        cacheKey.AppendLine(value: "SaltKey").Append(value: '=').Append(saltKey);
 
         return cacheKey.ToString().Trim();
     }
 
-#if NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
     private string? GetParameterValue(DbParameter parameter)
         => _settings.JsonSerializerOptions is null
             ? JsonSerializer.Serialize(parameter.Value)

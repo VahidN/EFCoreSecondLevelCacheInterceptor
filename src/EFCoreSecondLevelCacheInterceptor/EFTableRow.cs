@@ -7,20 +7,18 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// <summary>
 ///     TableRow's structure
 /// </summary>
+/// <remarks>
+///     TableRow's structure
+/// </remarks>
 [Serializable]
 [DataContract]
-public class EFTableRow
+public class EFTableRow(IList<object> values)
 {
-    /// <summary>
-    ///     TableRow's structure
-    /// </summary>
-    public EFTableRow(IList<object> values) => Values = values;
-
     /// <summary>
     ///     An array of objects with the column values of the current row.
     /// </summary>
     [DataMember(Order = 0)]
-    public IList<object> Values { get; }
+    public IList<object> Values { get; } = values;
 
     /// <summary>
     ///     Gets or sets a value that indicates the depth of nesting for the current row.

@@ -58,13 +58,10 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cachePolicy));
         }
 
-        if (value == null)
+        value ??= new EFCachedData
         {
-            value = new EFCachedData
-            {
-                IsNull = true
-            };
-        }
+            IsNull = true
+        };
 
         var easyCachingProvider = GetEasyCachingProvider(cacheKey);
 

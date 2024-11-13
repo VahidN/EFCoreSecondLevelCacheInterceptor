@@ -15,24 +15,21 @@ public class EFMemoryCacheChangeTokenProvider : IMemoryCacheChangeTokenProvider
     /// <summary>
     ///     Propagates notifications that a change has occurred.
     /// </summary>
-    public EFMemoryCacheChangeTokenProvider() => _changeTokens =
-                                                     new ConcurrentDictionary<string, ChangeTokenInfo>(StringComparer
-                                                                                                           .OrdinalIgnoreCase);
+    public EFMemoryCacheChangeTokenProvider()
+        => _changeTokens = new ConcurrentDictionary<string, ChangeTokenInfo>(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     ///     Gets or adds a change notification token.
     /// </summary>
     public IChangeToken GetChangeToken(string key)
-    {
-        return _changeTokens.GetOrAdd(
-                                      key,
-                                      _ =>
-                                      {
-                                          var cancellationTokenSource = new CancellationTokenSource();
-                                          var changeToken = new CancellationChangeToken(cancellationTokenSource.Token);
-                                          return new ChangeTokenInfo(changeToken, cancellationTokenSource);
-                                      }).ChangeToken;
-    }
+        => _changeTokens.GetOrAdd(key, _ =>
+            {
+                var cancellationTokenSource = new CancellationTokenSource();
+                var changeToken = new CancellationChangeToken(cancellationTokenSource.Token);
+
+                return new ChangeTokenInfo(changeToken, cancellationTokenSource);
+            })
+            .ChangeToken;
 
     /// <summary>
     ///     Removes a change notification token.
@@ -56,16 +53,10 @@ public class EFMemoryCacheChangeTokenProvider : IMemoryCacheChangeTokenProvider
         }
     }
 
-    private struct ChangeTokenInfo
+    private readonly struct ChangeTokenInfo(IChangeToken changeToken, CancellationTokenSource tokenSource)
     {
-        public ChangeTokenInfo(IChangeToken changeToken, CancellationTokenSource tokenSource)
-        {
-            ChangeToken = changeToken;
-            TokenSource = tokenSource;
-        }
+        public IChangeToken ChangeToken { get; } = changeToken;
 
-        public IChangeToken ChangeToken { get; }
-
-        public CancellationTokenSource TokenSource { get; }
+        public CancellationTokenSource TokenSource { get; } = tokenSource;
     }
 }

@@ -5,7 +5,7 @@ using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
-#if NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
 using System.Text.Json;
 #endif
 
@@ -21,7 +21,7 @@ public class EFTableRowsDataReader : DbDataReader
     private readonly Dictionary<int, Type> _valueTypes;
     private int _currentRow;
     private bool _isClosed;
-    private IList<object> _rowValues = new List<object>();
+    private IList<object> _rowValues = [];
 
     /// <summary>
     ///     Converts an EFTableRows to a DbDataReader.
@@ -76,44 +76,37 @@ public class EFTableRowsDataReader : DbDataReader
     /// <summary>
     ///     Gets a string representing the data type of the specified column.
     /// </summary>
-    public override string GetDataTypeName(int ordinal)
-        => _tableRows.GetDataTypeName(ordinal);
+    public override string GetDataTypeName(int ordinal) => _tableRows.GetDataTypeName(ordinal);
 
     /// <summary>
     ///     Gets the Type that is the data type of the object.
     /// </summary>
-    public override Type GetFieldType(int ordinal)
-        => _tableRows.GetFieldType(ordinal);
+    public override Type GetFieldType(int ordinal) => _tableRows.GetFieldType(ordinal);
 
     /// <summary>
     ///     Gets the name of the specified column.
     /// </summary>
-    public override string GetName(int ordinal)
-        => _tableRows.GetName(ordinal);
+    public override string GetName(int ordinal) => _tableRows.GetName(ordinal);
 
     /// <summary>
     ///     Gets the column ordinal, given the name of the column.
     /// </summary>
-    public override int GetOrdinal(string name)
-        => _tableRows.GetOrdinal(name);
+    public override int GetOrdinal(string name) => _tableRows.GetOrdinal(name);
 
     /// <summary>
     ///     Returns a DataTable that describes the column metadata of the SqlDataReader.
     /// </summary>
-    public override DataTable GetSchemaTable()
-        => throw new InvalidOperationException();
+    public override DataTable GetSchemaTable() => throw new InvalidOperationException();
 
     /// <summary>
     ///     Advances the data reader to the next result, when reading the results of batch Transact-SQL statements.
     /// </summary>
-    public override bool NextResult()
-        => false;
+    public override bool NextResult() => false;
 
     /// <summary>
     ///     Closes the SqlDataReader object.
     /// </summary>
-    public override void Close()
-        => _isClosed = true;
+    public override void Close() => _isClosed = true;
 
     /// <summary>
     ///     Advances the SqlDataReader to the next record.
@@ -211,8 +204,7 @@ public class EFTableRowsDataReader : DbDataReader
     ///     Reads a stream of bytes from the specified column offset into the buffer an array starting at the given buffer
     ///     offset.
     /// </summary>
-    public override long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length)
-        => 0L;
+    public override long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length) => 0L;
 
     /// <summary>
     ///     Gets the value of the specified column as a single character.
@@ -239,7 +231,7 @@ public class EFTableRowsDataReader : DbDataReader
 
             if (val.Length == 1)
             {
-                return val[0];
+                return val[index: 0];
             }
 
             return checked((char)GetInt64(ordinal));
@@ -252,8 +244,7 @@ public class EFTableRowsDataReader : DbDataReader
     ///     Reads a stream of characters from the specified column offset into the buffer as an array starting at the given
     ///     buffer offset.
     /// </summary>
-    public override long GetChars(int ordinal, long dataOffset, char[]? buffer, int bufferOffset, int length)
-        => 0L;
+    public override long GetChars(int ordinal, long dataOffset, char[]? buffer, int bufferOffset, int length) => 0L;
 
     /// <summary>
     ///     Gets the value of the specified column as a DateTime object.
@@ -335,8 +326,7 @@ public class EFTableRowsDataReader : DbDataReader
     /// <summary>
     ///     Returns an IEnumerator that iterates through the SqlDataReader.
     /// </summary>
-    public override IEnumerator GetEnumerator()
-        => throw new NotSupportedException();
+    public override IEnumerator GetEnumerator() => throw new NotSupportedException();
 
     /// <summary>
     ///     Gets the value of the specified column as a single-precision floating point number.
@@ -492,19 +482,13 @@ public class EFTableRowsDataReader : DbDataReader
     {
         var value = GetValue(ordinal);
 
-        if (value.IsNull())
-        {
-            return string.Empty;
-        }
-
-        return value.ToString() ?? string.Empty;
+        return value.IsNull() ? string.Empty : value.ToString() ?? string.Empty;
     }
 
     /// <summary>
     ///     Gets the value of the specified column in its native format.
     /// </summary>
-    public override object GetValue(int ordinal)
-        => _rowValues[ordinal];
+    public override object GetValue(int ordinal) => _rowValues[ordinal];
 
     /// <inheritdoc />
     public override T GetFieldValue<T>(int ordinal)
@@ -563,17 +547,17 @@ public class EFTableRowsDataReader : DbDataReader
             return ProcessPostgresArrayOrList<T>(expectedValueType, enumerable);
         }
 
-#if NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
         var dbTypeName = GetDataTypeName(ordinal);
 
         if (actualValueType == TypeExtensions.StringType &&
-            string.Equals(dbTypeName, "jsonb", StringComparison.OrdinalIgnoreCase))
+            string.Equals(dbTypeName, b: "jsonb", StringComparison.OrdinalIgnoreCase))
         {
             return JsonSerializer.Deserialize<T>((string)value)!;
         }
 #endif
 
-#if NET8_0 || NET7_0 || NET6_0
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0
         if (expectedValueType == TypeExtensions.DateOnlyType && actualValueType == TypeExtensions.DateTimeType)
         {
             return (T)(object)DateOnly.FromDateTime((DateTime)value);

@@ -1,5 +1,4 @@
 using System.Data.Common;
-using System.Threading;
 using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreSecondLevelCacheInterceptor;

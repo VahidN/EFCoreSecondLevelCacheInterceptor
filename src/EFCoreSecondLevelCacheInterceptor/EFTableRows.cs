@@ -24,15 +24,16 @@ public class EFTableRows
         }
 
         ColumnsInfo = new Dictionary<int, EFTableColumnInfo>(reader.FieldCount);
+
         for (var i = 0; i < reader.FieldCount; i++)
         {
             ColumnsInfo.Add(i, new EFTableColumnInfo
-                               {
-                                   Ordinal = i,
-                                   Name = reader.GetName(i),
-                                   DbTypeName = reader.GetDataTypeName(i) ?? typeof(string).ToString(),
-                                   TypeName = reader.GetFieldType(i)?.ToString() ?? typeof(string).ToString(),
-                               });
+            {
+                Ordinal = i,
+                Name = reader.GetName(i),
+                DbTypeName = reader.GetDataTypeName(i) ?? typeof(string).ToString(),
+                TypeName = reader.GetFieldType(i)?.ToString() ?? typeof(string).ToString()
+            });
         }
     }
 
@@ -45,7 +46,7 @@ public class EFTableRows
     ///     Rows of the table
     /// </summary>
     [DataMember]
-    public IList<EFTableRow> Rows { get; set; } = new List<EFTableRow>();
+    public IList<EFTableRow> Rows { get; set; } = [];
 
     /// <summary>
     ///     TableColumn's Info
@@ -121,6 +122,7 @@ public class EFTableRows
     {
         var keyValuePair =
             ColumnsInfo.FirstOrDefault(pair => pair.Value.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
         if (keyValuePair.Value != null)
         {
             return keyValuePair.Value.Ordinal;
@@ -132,26 +134,27 @@ public class EFTableRows
     /// <summary>
     ///     Gets the name of the specified column.
     /// </summary>
-    public string GetName(int ordinal) => getColumnInfo(ordinal).Name;
+    public string GetName(int ordinal) => GetColumnInfo(ordinal).Name;
 
     /// <summary>
     ///     Gets a string representing the data type of the specified column.
     /// </summary>
-    public string GetDataTypeName(int ordinal) => getColumnInfo(ordinal).DbTypeName;
+    public string GetDataTypeName(int ordinal) => GetColumnInfo(ordinal).DbTypeName;
 
     /// <summary>
     ///     Gets the Type that is the data type of the object.
     /// </summary>
-    public Type GetFieldType(int ordinal) => Type.GetType(getColumnInfo(ordinal).TypeName) ?? typeof(string);
+    public Type GetFieldType(int ordinal) => Type.GetType(GetColumnInfo(ordinal).TypeName) ?? typeof(string);
 
     /// <summary>
     ///     Gets the Type that is the data type of the object.
     /// </summary>
-    public string GetFieldTypeName(int ordinal) => getColumnInfo(ordinal).TypeName;
+    public string GetFieldTypeName(int ordinal) => GetColumnInfo(ordinal).TypeName;
 
-    private EFTableColumnInfo getColumnInfo(int ordinal)
+    private EFTableColumnInfo GetColumnInfo(int ordinal)
     {
         var dbColumnInfo = ColumnsInfo[ordinal];
+
         if (dbColumnInfo != null)
         {
             return dbColumnInfo;

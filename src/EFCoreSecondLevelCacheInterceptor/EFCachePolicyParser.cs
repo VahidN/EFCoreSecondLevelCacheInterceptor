@@ -94,7 +94,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
 
         var additionalNewlineIndex = commandText.IndexOf(value: '\n', endIndex + 1) - endIndex;
 
-        if (additionalNewlineIndex == 1 || additionalNewlineIndex == 2)
+        if (additionalNewlineIndex is 1 or 2)
         {
             // EF's TagWith(..) method inserts an additional line break between
             // comments which we can remove as well
@@ -197,7 +197,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         switch (options.TableTypeComparison)
         {
             case TableTypeComparison.Contains:
-                if (queryEntityTypes.Any(entityType => options.EntityTypes.Contains(entityType)))
+                if (queryEntityTypes.Any(options.EntityTypes.Contains))
                 {
                     return true;
                 }
@@ -219,7 +219,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
 
                 break;
             case TableTypeComparison.ContainsOnly:
-                if (queryEntityTypes.All(x => options.EntityTypes.Contains(x)))
+                if (queryEntityTypes.All(options.EntityTypes.Contains))
                 {
                     return true;
                 }
@@ -255,7 +255,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         switch (options.TableNameComparison)
         {
             case TableNameComparison.Contains:
-                if (options.TableNames.Any(tableName => commandTableNames.Contains(tableName)))
+                if (options.TableNames.Any(commandTableNames.Contains))
                 {
                     return true;
                 }
@@ -342,7 +342,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         {
             var commandTableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
-            if (options.TableNames.Any(tableName => commandTableNames.Contains(tableName)))
+            if (options.TableNames.Any(commandTableNames.Contains))
             {
                 shouldBeCached = false;
             }
@@ -352,7 +352,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         {
             var queryEntityTypes = _sqlCommandsProcessor.GetSqlCommandEntityTypes(commandText, allEntityTypes);
 
-            if (queryEntityTypes.Any(entityType => options.EntityTypes.Contains(entityType)))
+            if (queryEntityTypes.Any(options.EntityTypes.Contains))
             {
                 shouldBeCached = false;
             }
@@ -387,21 +387,15 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             .First(textLine => textLine.StartsWith(EFCachePolicyTagPrefix, StringComparison.Ordinal))
             .Trim();
 
-        var parts = efCachePolicyCommentLine.Split(new[]
-        {
-            EFCachePolicy.PartsSeparator
-        }, StringSplitOptions.RemoveEmptyEntries);
+        var parts = efCachePolicyCommentLine.Split([EFCachePolicy.PartsSeparator],
+            StringSplitOptions.RemoveEmptyEntries);
 
         if (parts.Length != 2)
         {
             return null;
         }
 
-        var options = parts[1]
-            .Split(new[]
-            {
-                EFCachePolicy.ItemsSeparator
-            }, StringSplitOptions.None);
+        var options = parts[1].Split([EFCachePolicy.ItemsSeparator], StringSplitOptions.None);
 
         if (options.Length < 2)
         {
@@ -421,11 +415,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         var saltKey = options.Length >= 3 ? options[2] : string.Empty;
 
         var cacheDependencies = options.Length >= 4
-            ? options[3]
-                .Split(new[]
-                {
-                    EFCachePolicy.CacheDependenciesSeparator
-                }, StringSplitOptions.RemoveEmptyEntries)
+            ? options[3].Split([EFCachePolicy.CacheDependenciesSeparator], StringSplitOptions.RemoveEmptyEntries)
             : [];
 
         var isDefaultCacheableMethod = options.Length >= 5 && bool.Parse(options[4]);

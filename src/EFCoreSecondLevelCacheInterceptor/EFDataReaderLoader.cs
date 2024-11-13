@@ -14,7 +14,7 @@ public class EFDataReaderLoader : DbDataReader
     private readonly DbDataReader _dbReader;
     private readonly EFTableRows _tableRows;
 
-    private object[] _rowValues = Array.Empty<object>();
+    private object[] _rowValues = [];
 
     /// <summary>
     ///     Converts a DbDataReader to an EFTableRows
@@ -222,14 +222,7 @@ public class EFDataReaderLoader : DbDataReader
 
         for (var i = 0; i < _dbReader.FieldCount; i++)
         {
-            if (isBinary(i))
-            {
-                _rowValues[i] = getSqlBytes(i);
-            }
-            else
-            {
-                _rowValues[i] = _dbReader.GetValue(i);
-            }
+            _rowValues[i] = IsBinary(i) ? GetSqlBytes(i) : _dbReader.GetValue(i);
         }
 
         _tableRows?.Add(new EFTableRow(_rowValues)
@@ -240,7 +233,7 @@ public class EFDataReaderLoader : DbDataReader
         return true;
     }
 
-    private byte[] getSqlBytes(int ordinal)
+    private byte[] GetSqlBytes(int ordinal)
     {
         byte[] buffer;
 
@@ -269,7 +262,7 @@ public class EFDataReaderLoader : DbDataReader
         return buffer;
     }
 
-    private bool isBinary(int ordinal)
+    private bool IsBinary(int ordinal)
     {
         var typeName = _tableRows.GetFieldTypeName(ordinal);
 

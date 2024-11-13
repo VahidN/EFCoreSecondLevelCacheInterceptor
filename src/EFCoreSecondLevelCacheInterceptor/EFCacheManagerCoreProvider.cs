@@ -53,13 +53,10 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        if (value == null)
+        value ??= new EFCachedData
         {
-            value = new EFCachedData
-            {
-                IsNull = true
-            };
-        }
+            IsNull = true
+        };
 
         var keyHash = cacheKey.KeyHash;
 

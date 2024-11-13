@@ -236,7 +236,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 
             var efCacheKey = _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
 
-            if (!(_cacheService.GetValue(efCacheKey, cachePolicy) is EFCachedData cacheResult))
+            if (_cacheService.GetValue(efCacheKey, cachePolicy) is not { } cacheResult)
             {
                 if (_logger.IsLoggerEnabled)
                 {

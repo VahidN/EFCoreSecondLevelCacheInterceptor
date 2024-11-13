@@ -6,21 +6,14 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// <summary>
 ///     Using IMemoryCache as a cache service.
 /// </summary>
-public class EFMemoryCacheServiceProvider : IEFCacheServiceProvider
+/// <remarks>
+///     Using IMemoryCache as a cache service.
+/// </remarks>
+public class EFMemoryCacheServiceProvider(IMemoryCache memoryCache, IMemoryCacheChangeTokenProvider signal)
+    : IEFCacheServiceProvider
 {
-    private readonly IMemoryCache _memoryCache;
-    private readonly IMemoryCacheChangeTokenProvider _signal;
-
-    /// <summary>
-    ///     Using IMemoryCache as a cache service.
-    /// </summary>
-    public EFMemoryCacheServiceProvider(
-        IMemoryCache memoryCache,
-        IMemoryCacheChangeTokenProvider signal)
-    {
-        _memoryCache = memoryCache;
-        _signal = signal;
-    }
+    private readonly IMemoryCache _memoryCache = memoryCache;
+    private readonly IMemoryCacheChangeTokenProvider _signal = signal;
 
     /// <summary>
     ///     Adds a new item to the cache.
@@ -40,12 +33,15 @@ public class EFMemoryCacheServiceProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cachePolicy));
         }
 
-        if (value == null)
+        value ??= new EFCachedData
         {
-            value = new EFCachedData { IsNull = true };
-        }
+            IsNull = true
+        };
 
-        var options = new MemoryCacheEntryOptions { Size = 1 };
+        var options = new MemoryCacheEntryOptions
+        {
+            Size = 1
+        };
 
         if (cachePolicy.CacheExpirationMode == CacheExpirationMode.Absolute)
         {
@@ -67,10 +63,7 @@ public class EFMemoryCacheServiceProvider : IEFCacheServiceProvider
     /// <summary>
     ///     Removes the cached entries added by this library.
     /// </summary>
-    public void ClearAllCachedEntries()
-    {
-        _signal.RemoveAllChangeTokens();
-    }
+    public void ClearAllCachedEntries() => _signal.RemoveAllChangeTokens();
 
     /// <summary>
     ///     Gets a cached entry by key.

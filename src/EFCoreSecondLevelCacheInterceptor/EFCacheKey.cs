@@ -6,13 +6,11 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// <summary>
 ///     Stores information of the computed key of the input LINQ query.
 /// </summary>
-public class EFCacheKey
+/// <remarks>
+///     Stores information of the computed key of the input LINQ query.
+/// </remarks>
+public class EFCacheKey(ISet<string> cacheDependencies)
 {
-    /// <summary>
-    ///     Stores information of the computed key of the input LINQ query.
-    /// </summary>
-    public EFCacheKey(ISet<string> cacheDependencies) => CacheDependencies = cacheDependencies;
-
     /// <summary>
     ///     Hash of the input LINQ query's computed key.
     /// </summary>
@@ -27,7 +25,7 @@ public class EFCacheKey
     ///     Determines which entities are used in this LINQ query.
     ///     This array will be used to invalidate the related cache of all related queries automatically.
     /// </summary>
-    public ISet<string> CacheDependencies { get; }
+    public ISet<string> CacheDependencies { get; } = cacheDependencies;
 
     /// <summary>
     ///     Equals
@@ -40,7 +38,8 @@ public class EFCacheKey
             return false;
         }
 
-        return string.Equals(KeyHash, efCacheKey.KeyHash, StringComparison.Ordinal) && DbContext == efCacheKey.DbContext;
+        return string.Equals(KeyHash, efCacheKey.KeyHash, StringComparison.Ordinal) &&
+               DbContext == efCacheKey.DbContext;
     }
 
     /// <summary>
@@ -51,13 +50,15 @@ public class EFCacheKey
         unchecked
         {
             var hash = 17;
-            return hash * 23 + KeyHash.GetHashCode(StringComparison.Ordinal) + (DbContext == null ? 0 : DbContext.Name.GetHashCode(StringComparison.Ordinal));
+
+            return hash * 23 + KeyHash.GetHashCode(StringComparison.Ordinal) +
+                   (DbContext == null ? 0 : DbContext.Name.GetHashCode(StringComparison.Ordinal));
         }
     }
 
     /// <summary>
     ///     ToString
     /// </summary>
-    public override string ToString() =>
-        $"KeyHash: {KeyHash}, DbContext: {DbContext?.Name}, CacheDependencies: {string.Join(", ", CacheDependencies)}.";
+    public override string ToString()
+        => $"KeyHash: {KeyHash}, DbContext: {DbContext?.Name}, CacheDependencies: {string.Join(separator: ", ", CacheDependencies)}.";
 }

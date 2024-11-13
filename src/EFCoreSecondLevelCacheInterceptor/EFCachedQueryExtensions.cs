@@ -11,7 +11,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public static class EFCachedQueryExtensions
 {
-    private static readonly TimeSpan _thirtyMinutes = TimeSpan.FromMinutes(30);
+    private static readonly TimeSpan _thirtyMinutes = TimeSpan.FromMinutes(value: 30);
 
     /// <summary>
     ///     IsNotCachable Marker
@@ -31,7 +31,7 @@ public static class EFCachedQueryExtensions
         CacheExpirationMode expirationMode,
         TimeSpan timeout)
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(
             EFCachePolicy.Configure(options => options.ExpirationMode(expirationMode).Timeout(timeout)));
@@ -61,10 +61,12 @@ public static class EFCachedQueryExtensions
         string[] cacheDependencies,
         string saltKey)
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(EFCachePolicy.Configure(options
-            => options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)
+            => options.ExpirationMode(expirationMode)
+                .Timeout(timeout)
+                .CacheDependencies(cacheDependencies)
                 .SaltKey(saltKey)));
     }
 
@@ -87,7 +89,7 @@ public static class EFCachedQueryExtensions
         TimeSpan timeout,
         string[] cacheDependencies)
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(EFCachePolicy.Configure(options
             => options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)));
@@ -110,7 +112,7 @@ public static class EFCachedQueryExtensions
         TimeSpan timeout,
         string saltKey)
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(EFCachePolicy.Configure(options
             => options.ExpirationMode(expirationMode).Timeout(timeout).SaltKey(saltKey)));
@@ -124,11 +126,12 @@ public static class EFCachedQueryExtensions
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
     public static IQueryable<TType> Cacheable<TType>(this IQueryable<TType> query)
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(EFCachePolicy.Configure(options
-            => options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes)
-                .DefaultCacheableMethod(true)));
+            => options.ExpirationMode(CacheExpirationMode.Absolute)
+                .Timeout(_thirtyMinutes)
+                .DefaultCacheableMethod(state: true)));
     }
 
     /// <summary>
@@ -140,11 +143,12 @@ public static class EFCachedQueryExtensions
     public static IQueryable<TType> Cacheable<TType>(this DbSet<TType> query)
         where TType : class
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(EFCachePolicy.Configure(options
-            => options.ExpirationMode(CacheExpirationMode.Absolute).Timeout(_thirtyMinutes)
-                .DefaultCacheableMethod(true)));
+            => options.ExpirationMode(CacheExpirationMode.Absolute)
+                .Timeout(_thirtyMinutes)
+                .DefaultCacheableMethod(state: true)));
     }
 
     /// <summary>
@@ -160,7 +164,7 @@ public static class EFCachedQueryExtensions
         TimeSpan timeout)
         where TType : class
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(
             EFCachePolicy.Configure(options => options.ExpirationMode(expirationMode).Timeout(timeout)));
@@ -191,10 +195,12 @@ public static class EFCachedQueryExtensions
         string saltKey)
         where TType : class
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(EFCachePolicy.Configure(options
-            => options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)
+            => options.ExpirationMode(expirationMode)
+                .Timeout(timeout)
+                .CacheDependencies(cacheDependencies)
                 .SaltKey(saltKey)));
     }
 
@@ -218,7 +224,7 @@ public static class EFCachedQueryExtensions
         string[] cacheDependencies)
         where TType : class
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(EFCachePolicy.Configure(options
             => options.ExpirationMode(expirationMode).Timeout(timeout).CacheDependencies(cacheDependencies)));
@@ -242,7 +248,7 @@ public static class EFCachedQueryExtensions
         string saltKey)
         where TType : class
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(EFCachePolicy.Configure(options
             => options.ExpirationMode(expirationMode).Timeout(timeout).SaltKey(saltKey)));
@@ -256,7 +262,7 @@ public static class EFCachedQueryExtensions
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
     public static IQueryable<TType> NotCacheable<TType>(this IQueryable<TType> query)
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(IsNotCachableMarker);
     }
@@ -270,12 +276,12 @@ public static class EFCachedQueryExtensions
     public static IQueryable<TType> NotCacheable<TType>(this DbSet<TType> query)
         where TType : class
     {
-        sanityCheck(query);
+        SanityCheck(query);
 
         return query.TagWith(IsNotCachableMarker);
     }
 
-    private static void sanityCheck<TType>(IQueryable<TType> query)
+    private static void SanityCheck<TType>(IQueryable<TType> query)
     {
         if (query == null)
         {
@@ -284,7 +290,7 @@ public static class EFCachedQueryExtensions
 
         if (query.Provider is not EntityQueryProvider)
         {
-            Debug.WriteLine("`Cacheable` method is designed only for relational EF Core queries.");
+            Debug.WriteLine(message: "`Cacheable` method is designed only for relational EF Core queries.");
         }
     }
 }
