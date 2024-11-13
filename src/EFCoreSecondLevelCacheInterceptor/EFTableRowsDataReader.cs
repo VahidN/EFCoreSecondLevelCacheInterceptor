@@ -5,7 +5,7 @@ using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
 using System.Text.Json;
 #endif
 
@@ -17,6 +17,11 @@ namespace EFCoreSecondLevelCacheInterceptor;
 public class EFTableRowsDataReader : DbDataReader
 {
     private readonly int _rowsCount;
+
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+    private readonly EFCoreSecondLevelCacheSettings _settings;
+#endif
+
     private readonly EFTableRows _tableRows;
     private readonly Dictionary<int, Type> _valueTypes;
     private int _currentRow;
@@ -26,11 +31,19 @@ public class EFTableRowsDataReader : DbDataReader
     /// <summary>
     ///     Converts an EFTableRows to a DbDataReader.
     /// </summary>
-    public EFTableRowsDataReader(EFTableRows tableRows)
+    public EFTableRowsDataReader(EFTableRows tableRows
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+        ,
+        EFCoreSecondLevelCacheSettings settings
+#endif
+    )
     {
         _tableRows = tableRows;
         _rowsCount = _tableRows.RowsCount;
         _valueTypes = new Dictionary<int, Type>(_tableRows.FieldCount);
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+        _settings = settings;
+#endif
     }
 
     /// <summary>
@@ -547,13 +560,15 @@ public class EFTableRowsDataReader : DbDataReader
             return ProcessPostgresArrayOrList<T>(expectedValueType, enumerable);
         }
 
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
         var dbTypeName = GetDataTypeName(ordinal);
 
         if (actualValueType == TypeExtensions.StringType &&
             string.Equals(dbTypeName, b: "jsonb", StringComparison.OrdinalIgnoreCase))
         {
-            return JsonSerializer.Deserialize<T>((string)value)!;
+            return _settings.JsonSerializerOptions is null
+                ? JsonSerializer.Deserialize<T>((string)value)!
+                : JsonSerializer.Deserialize<T>((string)value, _settings.JsonSerializerOptions)!;
         }
 #endif
 

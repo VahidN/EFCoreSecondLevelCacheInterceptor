@@ -154,7 +154,11 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                     }
                 }
 
-                return (T)(object)new EFTableRowsDataReader(tableRows);
+                return (T)(object)new EFTableRowsDataReader(tableRows
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+                    , _cacheSettings
+#endif
+                );
             }
 
             if (result is object)
@@ -258,7 +262,11 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                         _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed, message, commandText);
                     }
 
-                    using var rows = new EFTableRowsDataReader(new EFTableRows());
+                    using var rows = new EFTableRowsDataReader(new EFTableRows()
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+                        , _cacheSettings
+#endif
+                    );
 
                     return (T)Convert.ChangeType(InterceptionResult<DbDataReader>.SuppressWithResult(rows), typeof(T),
                         CultureInfo.InvariantCulture);
@@ -273,7 +281,11 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                     _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed, message, commandText);
                 }
 
-                using var dataRows = new EFTableRowsDataReader(cacheResult.TableRows);
+                using var dataRows = new EFTableRowsDataReader(cacheResult.TableRows
+#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+                    , _cacheSettings
+#endif
+                );
 
                 return (T)Convert.ChangeType(InterceptionResult<DbDataReader>.SuppressWithResult(dataRows), typeof(T),
                     CultureInfo.InvariantCulture);

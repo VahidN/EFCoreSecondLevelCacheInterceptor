@@ -10,15 +10,15 @@ namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
 public class DbCommandInterceptorProcessorTests
 {
-    private readonly IDbCommandInterceptorProcessor _processor;
-    private readonly Mock<IEFDebugLogger> _loggerMock;
-    private readonly Mock<IEFCacheServiceProvider> _cacheServiceMock;
     private readonly Mock<IEFCacheDependenciesProcessor> _cacheDependenciesProcessorMock;
     private readonly Mock<IEFCacheKeyProvider> _cacheKeyProviderMock;
     private readonly Mock<IEFCachePolicyParser> _cachePolicyParserMock;
-    private readonly Mock<IEFSqlCommandsProcessor> _sqlCommandsProcessorMock;
     private readonly Mock<IEFCacheServiceCheck> _cacheServiceCheckMock;
+    private readonly Mock<IEFCacheServiceProvider> _cacheServiceMock;
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+    private readonly Mock<IEFDebugLogger> _loggerMock;
+    private readonly IDbCommandInterceptorProcessor _processor;
+    private readonly Mock<IEFSqlCommandsProcessor> _sqlCommandsProcessorMock;
 
     public DbCommandInterceptorProcessorTests()
     {
@@ -33,18 +33,12 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock = new Mock<IEFSqlCommandsProcessor>();
         _cacheServiceCheckMock = new Mock<IEFCacheServiceCheck>();
         _cacheSettings = new EFCoreSecondLevelCacheSettings();
-        
+
         cacheSettingsMock.SetupGet(x => x.Value).Returns(_cacheSettings);
 
-        _processor = new DbCommandInterceptorProcessor(
-            _loggerMock.Object,
-            interceptorProcessorLoggerMock.Object,
-            _cacheServiceMock.Object,
-            _cacheDependenciesProcessorMock.Object,
-            _cacheKeyProviderMock.Object,
-            _cachePolicyParserMock.Object,
-            _sqlCommandsProcessorMock.Object,
-            cacheSettingsMock.Object,
+        _processor = new DbCommandInterceptorProcessor(_loggerMock.Object, interceptorProcessorLoggerMock.Object,
+            _cacheServiceMock.Object, _cacheDependenciesProcessorMock.Object, _cacheKeyProviderMock.Object,
+            _cachePolicyParserMock.Object, _sqlCommandsProcessorMock.Object, cacheSettingsMock.Object,
             _cacheServiceCheckMock.Object);
     }
 
@@ -62,17 +56,11 @@ public class DbCommandInterceptorProcessorTests
         var cacheServiceCheck = new Mock<IEFCacheServiceCheck>().Object;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new DbCommandInterceptorProcessor(
-            logger,
-            interceptorProcessorLogger,
-            cacheService,
-            cacheDependenciesProcessor,
-            cacheKeyProvider,
-            cachePolicyParser,
-            sqlCommandsProcessor,
+        Assert.Throws<ArgumentNullException>(() => new DbCommandInterceptorProcessor(logger, interceptorProcessorLogger,
+            cacheService, cacheDependenciesProcessor, cacheKeyProvider, cachePolicyParser, sqlCommandsProcessor,
+
             // ReSharper disable once AssignNullToNotNullAttribute
-            null,
-            cacheServiceCheck));
+            cacheSettings: null, cacheServiceCheck));
     }
 
     [Fact]
@@ -90,15 +78,8 @@ public class DbCommandInterceptorProcessorTests
         var cacheServiceCheck = new Mock<IEFCacheServiceCheck>().Object;
 
         // Act
-        var processor = new DbCommandInterceptorProcessor(
-            logger,
-            interceptorProcessorLogger,
-            cacheService,
-            cacheDependenciesProcessor,
-            cacheKeyProvider,
-            cachePolicyParser,
-            sqlCommandsProcessor,
-            cacheSettings,
+        var processor = new DbCommandInterceptorProcessor(logger, interceptorProcessorLogger, cacheService,
+            cacheDependenciesProcessor, cacheKeyProvider, cachePolicyParser, sqlCommandsProcessor, cacheSettings,
             cacheServiceCheck);
 
         // Assert
@@ -114,7 +95,7 @@ public class DbCommandInterceptorProcessorTests
         // Act
         // ReSharper disable once ExpressionIsAlwaysNull
         // ReSharper disable once AssignNullToNotNullAttribute
-        var actual = _processor.ProcessExecutedCommands<object>(null, context, null);
+        var actual = _processor.ProcessExecutedCommands<object>(command: null, context, result: null);
 
         // Assert
         Assert.Null(actual);
@@ -128,7 +109,7 @@ public class DbCommandInterceptorProcessorTests
 
         // Act
         // ReSharper disable once AssignNullToNotNullAttribute
-        var actual = _processor.ProcessExecutedCommands<object>(null, context, null);
+        var actual = _processor.ProcessExecutedCommands<object>(command: null, context, result: null);
 
         // Assert
         Assert.Null(actual);
@@ -159,7 +140,7 @@ public class DbCommandInterceptorProcessorTests
         var command = Mock.Of<DbCommand>();
         var context = Mock.Of<DbContext>();
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Throws<InvalidOperationException>();
         _cacheSettings.UseDbCallsIfCachingProviderIsDown = true;
 
@@ -167,12 +148,12 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(command, context, expected);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.CachingError,
-            It.Is<string>(message =>
-                message.Contains(
-                    "System.InvalidOperationException: Operation is not valid due to the current state of the object.")),
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingError,
+                It.Is<string>(message
+                    => message.Contains(
+                        "System.InvalidOperationException: Operation is not valid due to the current state of the object.")),
+                null), Times.Once);
     }
 
     [Fact]
@@ -183,7 +164,7 @@ public class DbCommandInterceptorProcessorTests
         var command = Mock.Of<DbCommand>();
         var context = Mock.Of<DbContext>();
 
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(false);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: false);
 
         // Act
         var actual = _processor.ProcessExecutedCommands(command, context, expected);
@@ -201,8 +182,12 @@ public class DbCommandInterceptorProcessorTests
         var command = Mock.Of<DbCommand>();
         var context = Mock.Of<DbContext>();
 
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
-        _cacheSettings.SkipCachingDbContexts = new List<Type> { context.GetType() };
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
+
+        _cacheSettings.SkipCachingDbContexts = new List<Type>
+        {
+            context.GetType()
+        };
 
         // Act
         var actual = _processor.ProcessExecutedCommands(command, context, expected);
@@ -220,18 +205,21 @@ public class DbCommandInterceptorProcessorTests
         var command = Mock.Of<DbCommand>();
         var context = Mock.Of<DbContext>();
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
-        _cacheSettings.SkipCachingDbContexts = new List<Type> { context.GetType() };
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
+
+        _cacheSettings.SkipCachingDbContexts = new List<Type>
+        {
+            context.GetType()
+        };
 
         // Act
         _processor.ProcessExecutedCommands(command, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.CachingSkipped,
-            "Skipped caching of this DbContext: Castle.Proxies.DbContextProxy",
-            string.Empty), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped,
+                "Skipped caching of this DbContext: Castle.Proxies.DbContextProxy", string.Empty), Times.Once);
     }
 
     [Fact]
@@ -244,9 +232,9 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
 
         // Act
         var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, expected);
@@ -264,9 +252,9 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -285,10 +273,10 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -310,11 +298,14 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
-        _cacheDependenciesProcessorMock.Setup(x => x.InvalidateCacheDependencies(null, efCacheKey)).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
+
+        _cacheDependenciesProcessorMock.Setup(x => x.InvalidateCacheDependencies(null, efCacheKey))
+            .Returns(value: true);
+
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -335,38 +326,37 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
         _processor.ProcessExecutedCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.CachingSkipped,
-            "Skipping a none-cachable command[].",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, "Skipping a none-cachable command[].",
+                null), Times.Once);
     }
 
     [Fact]
     public void ProcessExecutedCommands_ReturnsCachedTableRows()
     {
         // Arrange
-        var expected = new EFTableRowsDataReader(new EFTableRows());
+        var expected = new EFTableRowsDataReader(new EFTableRows(), new EFCoreSecondLevelCacheSettings());
         var commandMock = new Mock<DbCommand>();
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -385,7 +375,7 @@ public class DbCommandInterceptorProcessorTests
         var result = new EFTableRowsDataReader(new EFTableRows
         {
             TableName = string.Empty
-        });
+        }, new EFCoreSecondLevelCacheSettings());
 
         var commandMock = new Mock<DbCommand>();
         var transaction = Mock.Of<DbTransaction>();
@@ -393,11 +383,11 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -406,10 +396,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.CacheHit,
-            "Returning the cached TableRows[].",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CacheHit, "Returning the cached TableRows[].", null),
+            Times.Once);
     }
 
     [Fact]
@@ -424,10 +413,10 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -437,10 +426,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, expected);
 
         // Assert
-        _cacheServiceMock.Verify(x => x.InsertValue(
-            efCacheKey,
-            It.Is<EFCachedData>(data => data.NonQuery == expected),
-            cachePolicy), Times.Never);
+        _cacheServiceMock.Verify(
+            x => x.InsertValue(efCacheKey, It.Is<EFCachedData>(data => data.NonQuery == expected), cachePolicy),
+            Times.Never);
     }
 
     [Fact]
@@ -455,11 +443,11 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -469,10 +457,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.CachingSkipped,
-            "Skipped caching of this result based on the provided predicate.",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped,
+                "Skipped caching of this result based on the provided predicate.", null), Times.Once);
     }
 
     [Fact]
@@ -487,10 +474,10 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -499,10 +486,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, expected);
 
         // Assert
-        _cacheServiceMock.Verify(x => x.InsertValue(
-            efCacheKey,
-            It.Is<EFCachedData>(data => data.NonQuery == expected),
-            cachePolicy), Times.Once);
+        _cacheServiceMock.Verify(
+            x => x.InsertValue(efCacheKey, It.Is<EFCachedData>(data => data.NonQuery == expected), cachePolicy),
+            Times.Once);
     }
 
     [Fact]
@@ -517,11 +503,11 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -530,10 +516,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.QueryResultCached,
-            "[2147483647] added to the cache[KeyHash: , DbContext: , CacheDependencies: .].",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultCached,
+                "[2147483647] added to the cache[KeyHash: , DbContext: , CacheDependencies: .].", null), Times.Once);
     }
 
     [Fact]
@@ -548,11 +533,11 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -575,10 +560,10 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -602,10 +587,10 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -615,10 +600,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, dataReaderMock.Object);
 
         // Assert
-        _cacheServiceMock.Verify(x => x.InsertValue(
-            efCacheKey,
-            It.Is<EFCachedData>(data => data.TableRows != null),
-            cachePolicy), Times.Never);
+        _cacheServiceMock.Verify(
+            x => x.InsertValue(efCacheKey, It.Is<EFCachedData>(data => data.TableRows != null), cachePolicy),
+            Times.Never);
     }
 
     [Fact]
@@ -632,11 +616,11 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -646,10 +630,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, dataReaderMock.Object);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.CachingSkipped,
-            "Skipped caching of this result based on the provided predicate.",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped,
+                "Skipped caching of this result based on the provided predicate.", null), Times.Once);
     }
 
     [Fact]
@@ -663,10 +646,10 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -675,10 +658,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, dataReaderMock.Object);
 
         // Assert
-        _cacheServiceMock.Verify(x => x.InsertValue(
-            efCacheKey,
-            It.Is<EFCachedData>(data => data.TableRows != null),
-            cachePolicy), Times.Once);
+        _cacheServiceMock.Verify(
+            x => x.InsertValue(efCacheKey, It.Is<EFCachedData>(data => data.TableRows != null), cachePolicy),
+            Times.Once);
     }
 
     [Fact]
@@ -692,11 +674,11 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -705,13 +687,12 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, dataReaderMock.Object);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.QueryResultCached,
-            It.Is<string>(message =>
-                message.Contains(" added to the cache[KeyHash: , DbContext: , CacheDependencies: .].")),
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultCached,
+                It.Is<string>(message
+                    => message.Contains(" added to the cache[KeyHash: , DbContext: , CacheDependencies: .].")), null),
+            Times.Once);
     }
-
 
     [Fact]
     public void ProcessExecutedCommands_SkipsCachingResultsIfResultIsObjectType()
@@ -724,10 +705,10 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -737,10 +718,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, result);
 
         // Assert
-        _cacheServiceMock.Verify(x => x.InsertValue(
-            efCacheKey,
-            It.Is<EFCachedData>(data => data.Scalar == result),
-            cachePolicy), Times.Never);
+        _cacheServiceMock.Verify(
+            x => x.InsertValue(efCacheKey, It.Is<EFCachedData>(data => data.Scalar == result), cachePolicy),
+            Times.Never);
     }
 
     [Fact]
@@ -754,11 +734,11 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -768,10 +748,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.CachingSkipped,
-            "Skipped caching of this result based on the provided predicate.",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped,
+                "Skipped caching of this result based on the provided predicate.", null), Times.Once);
     }
 
     [Fact]
@@ -785,10 +764,10 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -797,10 +776,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, result);
 
         // Assert
-        _cacheServiceMock.Verify(x => x.InsertValue(
-            efCacheKey,
-            It.Is<EFCachedData>(data => data.Scalar == result),
-            cachePolicy), Times.Once);
+        _cacheServiceMock.Verify(
+            x => x.InsertValue(efCacheKey, It.Is<EFCachedData>(data => data.Scalar == result), cachePolicy),
+            Times.Once);
     }
 
     [Fact]
@@ -814,11 +792,11 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -827,10 +805,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutedCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.QueryResultCached,
-            "[System.Object] added to the cache[KeyHash: , DbContext: , CacheDependencies: .].",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultCached,
+                "[System.Object] added to the cache[KeyHash: , DbContext: , CacheDependencies: .].", null), Times.Once);
     }
 
     [Fact]
@@ -844,11 +821,11 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -872,11 +849,11 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -898,7 +875,7 @@ public class DbCommandInterceptorProcessorTests
         // Act
         // ReSharper disable once AssignNullToNotNullAttribute
         // ReSharper disable once ExpressionIsAlwaysNull
-        var actual = _processor.ProcessExecutingCommands<object>(null, context, null);
+        var actual = _processor.ProcessExecutingCommands<object>(command: null, context, result: null);
 
         // Assert
         Assert.Null(actual);
@@ -912,7 +889,7 @@ public class DbCommandInterceptorProcessorTests
 
         // Act
         // ReSharper disable once AssignNullToNotNullAttribute
-        var actual = _processor.ProcessExecutingCommands<object>(null, context, null);
+        var actual = _processor.ProcessExecutingCommands<object>(command: null, context, result: null);
 
         // Assert
         Assert.Null(actual);
@@ -943,7 +920,7 @@ public class DbCommandInterceptorProcessorTests
         var command = Mock.Of<DbCommand>();
         var context = Mock.Of<DbContext>();
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Throws<InvalidOperationException>();
         _cacheSettings.UseDbCallsIfCachingProviderIsDown = true;
 
@@ -951,12 +928,12 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutingCommands(command, context, expected);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.CachingError,
-            It.Is<string>(message =>
-                message.Contains(
-                    "System.InvalidOperationException: Operation is not valid due to the current state of the object.")),
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingError,
+                It.Is<string>(message
+                    => message.Contains(
+                        "System.InvalidOperationException: Operation is not valid due to the current state of the object.")),
+                null), Times.Once);
     }
 
     [Fact]
@@ -967,7 +944,7 @@ public class DbCommandInterceptorProcessorTests
         var command = Mock.Of<DbCommand>();
         var context = Mock.Of<DbContext>();
 
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(false);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: false);
 
         // Act
         var actual = _processor.ProcessExecutingCommands(command, context, expected);
@@ -985,8 +962,12 @@ public class DbCommandInterceptorProcessorTests
         var command = Mock.Of<DbCommand>();
         var context = Mock.Of<DbContext>();
 
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
-        _cacheSettings.SkipCachingDbContexts = new List<Type> { context.GetType() };
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
+
+        _cacheSettings.SkipCachingDbContexts = new List<Type>
+        {
+            context.GetType()
+        };
 
         // Act
         var actual = _processor.ProcessExecutingCommands(command, context, expected);
@@ -1004,18 +985,21 @@ public class DbCommandInterceptorProcessorTests
         var command = Mock.Of<DbCommand>();
         var context = Mock.Of<DbContext>();
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
-        _cacheSettings.SkipCachingDbContexts = new List<Type> { context.GetType() };
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
+
+        _cacheSettings.SkipCachingDbContexts = new List<Type>
+        {
+            context.GetType()
+        };
 
         // Act
         _processor.ProcessExecutingCommands(command, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.CachingSkipped,
-            "Skipped caching of this DbContext: Castle.Proxies.DbContextProxy",
-            string.Empty), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped,
+                "Skipped caching of this DbContext: Castle.Proxies.DbContextProxy", string.Empty), Times.Once);
     }
 
     [Fact]
@@ -1028,9 +1012,9 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
 
         // Act
         var actual = _processor.ProcessExecutingCommands(commandMock.Object, context, expected);
@@ -1048,9 +1032,9 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1069,10 +1053,10 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1091,21 +1075,20 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
 
-        commandMock.Protected().Setup<DbTransaction>("DbTransaction").Returns(transaction);
+        commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
         _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.CachingSkipped,
-            "Skipping a none-cachable command[].",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, "Skipping a none-cachable command[].",
+                null), Times.Once);
     }
 
     [Fact]
@@ -1118,9 +1101,9 @@ public class DbCommandInterceptorProcessorTests
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -1143,10 +1126,10 @@ public class DbCommandInterceptorProcessorTests
         var efCacheKey = new EFCacheKey(new HashSet<string>());
         var cacheResult = new EFCachedData();
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _cacheServiceMock.Setup(x => x.GetValue(efCacheKey, cachePolicy)).Returns(cacheResult);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -1155,10 +1138,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.QueryResultSuppressed,
-            "Suppressed the result with an empty TableRows.",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed,
+                "Suppressed the result with an empty TableRows.", null), Times.Once);
     }
 
     [Fact]
@@ -1172,10 +1154,10 @@ public class DbCommandInterceptorProcessorTests
         var efCacheKey = new EFCacheKey(new HashSet<string>());
         var cacheResult = new EFCachedData();
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _cacheServiceMock.Setup(x => x.GetValue(efCacheKey, cachePolicy)).Returns(cacheResult);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -1196,6 +1178,7 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
+
         var cacheResult = new EFCachedData
         {
             IsNull = false,
@@ -1205,10 +1188,10 @@ public class DbCommandInterceptorProcessorTests
             }
         };
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _cacheServiceMock.Setup(x => x.GetValue(efCacheKey, cachePolicy)).Returns(cacheResult);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -1217,10 +1200,10 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.QueryResultSuppressed,
-            "Suppressed the result with the TableRows[] from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed,
+                "Suppressed the result with the TableRows[] from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
+                null), Times.Once);
     }
 
     [Fact]
@@ -1232,16 +1215,17 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
+
         var cacheResult = new EFCachedData
         {
             IsNull = false,
             NonQuery = int.MaxValue
         };
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _cacheServiceMock.Setup(x => x.GetValue(efCacheKey, cachePolicy)).Returns(cacheResult);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -1250,10 +1234,10 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.QueryResultSuppressed,
-            "Suppressed the result with 2147483647 from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed,
+                "Suppressed the result with 2147483647 from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
+                null), Times.Once);
     }
 
     [Fact]
@@ -1267,16 +1251,17 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
+
         var cacheResult = new EFCachedData
         {
             IsNull = false,
             NonQuery = expected
         };
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _cacheServiceMock.Setup(x => x.GetValue(efCacheKey, cachePolicy)).Returns(cacheResult);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -1298,16 +1283,17 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
+
         var cacheResult = new EFCachedData
         {
             IsNull = false,
             Scalar = expected
         };
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _cacheServiceMock.Setup(x => x.GetValue(efCacheKey, cachePolicy)).Returns(cacheResult);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -1316,10 +1302,10 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.QueryResultSuppressed,
-            "Suppressed the result with System.Object from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed,
+                "Suppressed the result with System.Object from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
+                null), Times.Once);
     }
 
     [Fact]
@@ -1332,16 +1318,17 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
         var efCacheKey = new EFCacheKey(new HashSet<string>());
+
         var cacheResult = new EFCachedData
         {
             IsNull = false,
             Scalar = expected
         };
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _cacheServiceMock.Setup(x => x.GetValue(efCacheKey, cachePolicy)).Returns(cacheResult);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -1365,10 +1352,10 @@ public class DbCommandInterceptorProcessorTests
         var efCacheKey = new EFCacheKey(new HashSet<string>());
         var cacheResult = new EFCachedData();
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _cacheServiceMock.Setup(x => x.GetValue(efCacheKey, cachePolicy)).Returns(cacheResult);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
@@ -1378,10 +1365,9 @@ public class DbCommandInterceptorProcessorTests
         _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert
-        _loggerMock.Verify(x => x.NotifyCacheableEvent(
-            CacheableLogEventId.CachingSkipped,
-            "Skipped the result with  type.",
-            null), Times.Once);
+        _loggerMock.Verify(
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, "Skipped the result with  type.", null),
+            Times.Once);
     }
 
     [Fact]
@@ -1396,10 +1382,10 @@ public class DbCommandInterceptorProcessorTests
         var efCacheKey = new EFCacheKey(new HashSet<string>());
         var cacheResult = new EFCachedData();
 
-        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(true);
+        _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _cacheServiceMock.Setup(x => x.GetValue(efCacheKey, cachePolicy)).Returns(cacheResult);
-        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(true);
-        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(true);
+        _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
+        _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
         _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
