@@ -8,7 +8,7 @@
     <ProjectReference Include="..\EFCoreSecondLevelCacheInterceptor.Tests.DataLayer\EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Lamar.Microsoft.DependencyInjection" Version="13.1.0" />
+    <PackageReference Include="Lamar.Microsoft.DependencyInjection" Version="14.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
