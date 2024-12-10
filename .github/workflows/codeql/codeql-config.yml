@@ -3,6 +3,10 @@ name: "Security and Quality"
 queries:
   - uses: security-and-quality
 
+paths-ignore:
+  - '**/*.g.cs'
+  - '**/*.g.i.cs'
+
 query-filters:
   - exclude:
       id: cs/useless-if-statement
