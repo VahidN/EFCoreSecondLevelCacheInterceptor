@@ -42,7 +42,7 @@ public class EFDebugLogger : IEFDebugLogger
         {
             var message = $"InstanceId: {Guid.NewGuid()}, Started @{DateTime.UtcNow} UTC.";
             logger.LogDebug(message);
-            NotifyCacheableEvent(CacheableLogEventId.CachingSystemStarted, message, commandText: "");
+            NotifyCacheableEvent(CacheableLogEventId.CachingSystemStarted, message, commandText: "", efCacheKey: null);
         }
     }
 
@@ -54,7 +54,10 @@ public class EFDebugLogger : IEFDebugLogger
     /// <summary>
     ///     If you set DisableLogging to false, this delegate will give you the internal caching events of the library.
     /// </summary>
-    public void NotifyCacheableEvent(CacheableLogEventId eventId, string message, string commandText)
+    public void NotifyCacheableEvent(CacheableLogEventId eventId,
+        string message,
+        string commandText,
+        EFCacheKey? efCacheKey)
     {
         if (IsLoggerEnabled && _cacheableEvent is not null)
         {
@@ -63,6 +66,7 @@ public class EFDebugLogger : IEFDebugLogger
                 EventId = eventId,
                 Message = message,
                 CommandText = commandText,
+                EFCacheKey = efCacheKey,
                 ServiceProvider = _serviceProvider
             });
         }

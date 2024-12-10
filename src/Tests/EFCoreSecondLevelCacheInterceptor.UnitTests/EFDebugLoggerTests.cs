@@ -9,8 +9,8 @@ public class EFDebugLoggerTests
 {
     private readonly Mock<Action<EFCacheableLogEvent>> _cacheableEventMock;
     private readonly Mock<Action<EFCacheInvalidationInfo>> _cacheInvalidationEventMock;
-    private readonly Mock<IServiceProvider> _serviceProviderMock;
     private readonly IEFDebugLogger _debugLogger;
+    private readonly Mock<IServiceProvider> _serviceProviderMock;
 
     public EFDebugLoggerTests()
     {
@@ -20,6 +20,7 @@ public class EFDebugLoggerTests
 
         var cacheSettingsMock = new Mock<IOptions<EFCoreSecondLevelCacheSettings>>();
         var loggerMock = new Mock<ILogger<EFDebugLogger>>();
+
         var cacheSettings = new EFCoreSecondLevelCacheSettings
         {
             EnableLogging = true,
@@ -28,12 +29,9 @@ public class EFDebugLoggerTests
         };
 
         cacheSettingsMock.Setup(c => c.Value).Returns(cacheSettings);
-        loggerMock.Setup(l => l.IsEnabled(LogLevel.Debug)).Returns(true);
+        loggerMock.Setup(l => l.IsEnabled(LogLevel.Debug)).Returns(value: true);
 
-        _debugLogger = new EFDebugLogger(
-            cacheSettingsMock.Object,
-            loggerMock.Object,
-            _serviceProviderMock.Object);
+        _debugLogger = new EFDebugLogger(cacheSettingsMock.Object, loggerMock.Object, _serviceProviderMock.Object);
     }
 
     [Fact]
@@ -43,8 +41,8 @@ public class EFDebugLoggerTests
         var loggerMock = new Mock<ILogger<EFDebugLogger>>();
         var serviceProviderMock = new Mock<IServiceProvider>();
 
-        Assert.Throws<ArgumentNullException>(() =>
-            new EFDebugLogger(null!, loggerMock.Object, serviceProviderMock.Object));
+        Assert.Throws<ArgumentNullException>(()
+            => new EFDebugLogger(null!, loggerMock.Object, serviceProviderMock.Object));
     }
 
     [Fact]
@@ -55,8 +53,8 @@ public class EFDebugLoggerTests
         var serviceProviderMock = new Mock<IServiceProvider>();
 
         // Act && Assert
-        Assert.Throws<ArgumentNullException>(() =>
-            new EFDebugLogger(cacheSettingsMock.Object, null!, serviceProviderMock.Object));
+        Assert.Throws<ArgumentNullException>(()
+            => new EFDebugLogger(cacheSettingsMock.Object, null!, serviceProviderMock.Object));
     }
 
     [Fact]
@@ -67,8 +65,13 @@ public class EFDebugLoggerTests
         var loggerMock = new Mock<ILogger<EFDebugLogger>>();
         var serviceProviderMock = new Mock<IServiceProvider>();
 
-        cacheSettingsMock.Setup(c => c.Value).Returns(new EFCoreSecondLevelCacheSettings { EnableLogging = true });
-        loggerMock.Setup(l => l.IsEnabled(LogLevel.Debug)).Returns(true);
+        cacheSettingsMock.Setup(c => c.Value)
+            .Returns(new EFCoreSecondLevelCacheSettings
+            {
+                EnableLogging = true
+            });
+
+        loggerMock.Setup(l => l.IsEnabled(LogLevel.Debug)).Returns(value: true);
 
         // Act
         var logger = new EFDebugLogger(cacheSettingsMock.Object, loggerMock.Object, serviceProviderMock.Object);
@@ -85,7 +88,11 @@ public class EFDebugLoggerTests
         var loggerMock = new Mock<ILogger<EFDebugLogger>>();
         var serviceProviderMock = new Mock<IServiceProvider>();
 
-        cacheSettingsMock.Setup(c => c.Value).Returns(new EFCoreSecondLevelCacheSettings { EnableLogging = false });
+        cacheSettingsMock.Setup(c => c.Value)
+            .Returns(new EFCoreSecondLevelCacheSettings
+            {
+                EnableLogging = false
+            });
 
         // Act
         var logger = new EFDebugLogger(cacheSettingsMock.Object, loggerMock.Object, serviceProviderMock.Object);
@@ -98,16 +105,14 @@ public class EFDebugLoggerTests
     public void NotifyCacheableEvent_InvokesCacheableEvent_WhenLoggerIsEnabled()
     {
         // Arrange && Act
-        _debugLogger.NotifyCacheableEvent(CacheableLogEventId.CachingSystemStarted, "TestMessage", "TestCommand");
+        _debugLogger.NotifyCacheableEvent(CacheableLogEventId.CachingSystemStarted, message: "TestMessage",
+            commandText: "TestCommand", efCacheKey: null);
 
         // Assert
-        _cacheableEventMock.Verify(e => e.Invoke(It.Is<EFCacheableLogEvent>(
-                x =>
-                    x.EventId == CacheableLogEventId.CachingSystemStarted
-                    && x.Message == "TestMessage"
-                    && x.CommandText == "TestCommand"
-                    && x.ServiceProvider == _serviceProviderMock.Object)),
-            Times.Once);
+        _cacheableEventMock.Verify(
+            e => e.Invoke(It.Is<EFCacheableLogEvent>(x
+                => x.EventId == CacheableLogEventId.CachingSystemStarted && x.Message == "TestMessage" &&
+                   x.CommandText == "TestCommand" && x.ServiceProvider == _serviceProviderMock.Object)), Times.Once);
     }
 
     [Fact]
@@ -119,13 +124,19 @@ public class EFDebugLoggerTests
         var serviceProviderMock = new Mock<IServiceProvider>();
         var cacheableEventMock = new Mock<Action<EFCacheableLogEvent>>();
 
-        cacheSettingsMock.Setup(c => c.Value).Returns(new EFCoreSecondLevelCacheSettings { EnableLogging = false });
+        cacheSettingsMock.Setup(c => c.Value)
+            .Returns(new EFCoreSecondLevelCacheSettings
+            {
+                EnableLogging = false
+            });
+
         cacheSettingsMock.Object.Value.CacheableEvent = cacheableEventMock.Object;
 
         var logger = new EFDebugLogger(cacheSettingsMock.Object, loggerMock.Object, serviceProviderMock.Object);
 
         // Act
-        logger.NotifyCacheableEvent(CacheableLogEventId.CachingSystemStarted, "TestMessage", "TestCommand");
+        logger.NotifyCacheableEvent(CacheableLogEventId.CachingSystemStarted, message: "TestMessage",
+            commandText: "TestCommand", efCacheKey: null);
 
         // Assert
         cacheableEventMock.Verify(e => e.Invoke(It.IsAny<EFCacheableLogEvent>()), Times.Never);
@@ -140,13 +151,19 @@ public class EFDebugLoggerTests
         var loggerMock = new Mock<ILogger<EFDebugLogger>>();
         var cacheableEventMock = new Mock<Action<EFCacheableLogEvent>>();
 
-        cacheSettingsMock.Setup(c => c.Value).Returns(new EFCoreSecondLevelCacheSettings { EnableLogging = true });
-        loggerMock.Setup(l => l.IsEnabled(LogLevel.Debug)).Returns(true);
+        cacheSettingsMock.Setup(c => c.Value)
+            .Returns(new EFCoreSecondLevelCacheSettings
+            {
+                EnableLogging = true
+            });
+
+        loggerMock.Setup(l => l.IsEnabled(LogLevel.Debug)).Returns(value: true);
 
         var logger = new EFDebugLogger(cacheSettingsMock.Object, loggerMock.Object, serviceProviderMock.Object);
 
         // Act
-        logger.NotifyCacheableEvent(CacheableLogEventId.CachingSystemStarted, "TestMessage", "TestCommand");
+        logger.NotifyCacheableEvent(CacheableLogEventId.CachingSystemStarted, message: "TestMessage",
+            commandText: "TestCommand", efCacheKey: null);
 
         // Assert
         cacheableEventMock.Verify(e => e.Invoke(It.IsAny<EFCacheableLogEvent>()), Times.Never);
@@ -159,14 +176,12 @@ public class EFDebugLoggerTests
         var cacheDependencies = new HashSet<string>();
 
         // Act
-        _debugLogger.NotifyCacheInvalidation(true, cacheDependencies);
+        _debugLogger.NotifyCacheInvalidation(clearAllCachedEntries: true, cacheDependencies);
 
         // Assert
-        _cacheInvalidationEventMock.Verify(e => e.Invoke(It.Is<EFCacheInvalidationInfo>(
-                x =>
-                    x.CacheDependencies == cacheDependencies
-                    && x.ClearAllCachedEntries == true
-                    && x.ServiceProvider == _serviceProviderMock.Object)),
-            Times.Once);
+        _cacheInvalidationEventMock.Verify(
+            e => e.Invoke(It.Is<EFCacheInvalidationInfo>(x
+                => x.CacheDependencies == cacheDependencies && x.ClearAllCachedEntries == true &&
+                   x.ServiceProvider == _serviceProviderMock.Object)), Times.Once);
     }
 }

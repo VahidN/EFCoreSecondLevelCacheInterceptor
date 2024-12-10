@@ -23,6 +23,11 @@ public class EFCacheableLogEvent
     public string CommandText { set; get; } = default!;
 
     /// <summary>
+    ///     Stores information of the computed key of the input LINQ query.
+    /// </summary>
+    public EFCacheKey? EFCacheKey { set; get; }
+
+    /// <summary>
     ///     Defines a mechanism for retrieving a service object.
     ///     For instance, you can create an ILoggerFactory by using it.
     /// </summary>

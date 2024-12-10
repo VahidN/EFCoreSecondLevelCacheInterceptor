@@ -95,7 +95,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
                     $"It's not possible to calculate the related table names of the current query[{commandText}]. Please use EFCachePolicy.Configure(options => options.CacheDependencies(\"real_table_name_1\", \"real_table_name_2\")) to specify them explicitly.";
 
                 _dependenciesProcessorLogger.LogDebug(message);
-                _logger.NotifyCacheableEvent(CacheableLogEventId.CachingError, message, commandText);
+                _logger.NotifyCacheableEvent(CacheableLogEventId.CachingError, message, commandText, efCacheKey: null);
             }
 
             cacheDependencies = new SortedSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -125,7 +125,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
             {
                 var message = $"Skipped invalidating a none-CRUD command[{commandText}].";
                 _dependenciesProcessorLogger.LogDebug(message);
-                _logger.NotifyCacheableEvent(CacheableLogEventId.InvalidationSkipped, message, commandText);
+                _logger.NotifyCacheableEvent(CacheableLogEventId.InvalidationSkipped, message, commandText, cacheKey);
             }
 
             return false;
@@ -139,7 +139,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
                     $"Skipped invalidating the related cache entries of this query[{commandText}] based on the provided predicate.";
 
                 _dependenciesProcessorLogger.LogDebug(message);
-                _logger.NotifyCacheableEvent(CacheableLogEventId.InvalidationSkipped, message, commandText);
+                _logger.NotifyCacheableEvent(CacheableLogEventId.InvalidationSkipped, message, commandText, cacheKey);
             }
 
             return false;
@@ -153,7 +153,7 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
         {
             var message = $"Invalidated [{string.Join(separator: ", ", cacheKey.CacheDependencies)}] dependencies.";
             _dependenciesProcessorLogger.LogDebug(CacheableEventId.QueryResultInvalidated, message);
-            _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultInvalidated, message, commandText);
+            _logger.NotifyCacheableEvent(CacheableLogEventId.QueryResultInvalidated, message, commandText, cacheKey);
         }
 
         _logger.NotifyCacheInvalidation(clearAllCachedEntries: false, cacheKey.CacheDependencies);
@@ -179,7 +179,9 @@ public class EFCacheDependenciesProcessor : IEFCacheDependenciesProcessor
                 $"ContextTableNames: {names}, PossibleQueryTableNames: {texts} -> CacheDependencies: {dependencies}.";
 
             _dependenciesProcessorLogger.LogDebug(message);
-            _logger.NotifyCacheableEvent(CacheableLogEventId.CacheDependenciesCalculated, message, commandText);
+
+            _logger.NotifyCacheableEvent(CacheableLogEventId.CacheDependenciesCalculated, message, commandText,
+                efCacheKey: null);
         }
     }
 

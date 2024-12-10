@@ -153,7 +153,7 @@ public class DbCommandInterceptorProcessorTests
                 It.Is<string>(message
                     => message.Contains(
                         "System.InvalidOperationException: Operation is not valid due to the current state of the object.")),
-                null), Times.Once);
+                null, null), Times.Once);
     }
 
     [Fact]
@@ -219,7 +219,7 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped,
-                "Skipped caching of this DbContext: Castle.Proxies.DbContextProxy", string.Empty), Times.Once);
+                "Skipped caching of this DbContext: Castle.Proxies.DbContextProxy", string.Empty, null), Times.Once);
     }
 
     [Fact]
@@ -338,7 +338,7 @@ public class DbCommandInterceptorProcessorTests
 
         // Assert
         _loggerMock.Verify(
-            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, "Skipping a none-cachable command[].",
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, "Skipping a none-cachable command[].", null,
                 null), Times.Once);
     }
 
@@ -397,7 +397,7 @@ public class DbCommandInterceptorProcessorTests
 
         // Assert
         _loggerMock.Verify(
-            x => x.NotifyCacheableEvent(CacheableLogEventId.CacheHit, "Returning the cached TableRows[].", null),
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CacheHit, "Returning the cached TableRows[].", null, null),
             Times.Once);
     }
 
@@ -459,7 +459,7 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped,
-                "Skipped caching of this result based on the provided predicate.", null), Times.Once);
+                "Skipped caching of this result based on the provided predicate.", null, null), Times.Once);
     }
 
     [Fact]
@@ -518,7 +518,8 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultCached,
-                "[2147483647] added to the cache[KeyHash: , DbContext: , CacheDependencies: .].", null), Times.Once);
+                "[2147483647] added to the cache[KeyHash: , DbContext: , CacheDependencies: .].", null, efCacheKey),
+            Times.Once);
     }
 
     [Fact]
@@ -632,7 +633,7 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped,
-                "Skipped caching of this result based on the provided predicate.", null), Times.Once);
+                "Skipped caching of this result based on the provided predicate.", null, null), Times.Once);
     }
 
     [Fact]
@@ -690,8 +691,8 @@ public class DbCommandInterceptorProcessorTests
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultCached,
                 It.Is<string>(message
-                    => message.Contains(" added to the cache[KeyHash: , DbContext: , CacheDependencies: .].")), null),
-            Times.Once);
+                    => message.Contains(" added to the cache[KeyHash: , DbContext: , CacheDependencies: .].")), null,
+                efCacheKey), Times.Once);
     }
 
     [Fact]
@@ -750,7 +751,7 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped,
-                "Skipped caching of this result based on the provided predicate.", null), Times.Once);
+                "Skipped caching of this result based on the provided predicate.", null, null), Times.Once);
     }
 
     [Fact]
@@ -807,7 +808,8 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultCached,
-                "[System.Object] added to the cache[KeyHash: , DbContext: , CacheDependencies: .].", null), Times.Once);
+                "[System.Object] added to the cache[KeyHash: , DbContext: , CacheDependencies: .].", null, efCacheKey),
+            Times.Once);
     }
 
     [Fact]
@@ -933,7 +935,7 @@ public class DbCommandInterceptorProcessorTests
                 It.Is<string>(message
                     => message.Contains(
                         "System.InvalidOperationException: Operation is not valid due to the current state of the object.")),
-                null), Times.Once);
+                null, null), Times.Once);
     }
 
     [Fact]
@@ -999,7 +1001,7 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped,
-                "Skipped caching of this DbContext: Castle.Proxies.DbContextProxy", string.Empty), Times.Once);
+                "Skipped caching of this DbContext: Castle.Proxies.DbContextProxy", string.Empty, null), Times.Once);
     }
 
     [Fact]
@@ -1087,7 +1089,7 @@ public class DbCommandInterceptorProcessorTests
 
         // Assert
         _loggerMock.Verify(
-            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, "Skipping a none-cachable command[].",
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, "Skipping a none-cachable command[].", null,
                 null), Times.Once);
     }
 
@@ -1140,7 +1142,7 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed,
-                "Suppressed the result with an empty TableRows.", null), Times.Once);
+                "Suppressed the result with an empty TableRows.", null, efCacheKey), Times.Once);
     }
 
     [Fact]
@@ -1203,7 +1205,7 @@ public class DbCommandInterceptorProcessorTests
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed,
                 "Suppressed the result with the TableRows[] from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
-                null), Times.Once);
+                null, efCacheKey), Times.Once);
     }
 
     [Fact]
@@ -1237,7 +1239,7 @@ public class DbCommandInterceptorProcessorTests
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed,
                 "Suppressed the result with 2147483647 from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
-                null), Times.Once);
+                null, efCacheKey), Times.Once);
     }
 
     [Fact]
@@ -1305,7 +1307,7 @@ public class DbCommandInterceptorProcessorTests
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed,
                 "Suppressed the result with System.Object from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
-                null), Times.Once);
+                null, efCacheKey), Times.Once);
     }
 
     [Fact]
@@ -1366,8 +1368,8 @@ public class DbCommandInterceptorProcessorTests
 
         // Assert
         _loggerMock.Verify(
-            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, "Skipped the result with  type.", null),
-            Times.Once);
+            x => x.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, "Skipped the result with  type.", null,
+                efCacheKey), Times.Once);
     }
 
     [Fact]
