@@ -24,7 +24,7 @@
         <PackageReference Include="EasyCaching.Bus.Redis" Version="1.9.2"/>
         <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.9.2"/>
         <PackageReference Include="EasyCaching.Serialization.SystemTextJson" Version="1.9.2"/>
-        <PackageReference Include="MessagePack" Version="3.1.0"/>
+        <PackageReference Include="MessagePack" Version="3.1.1"/>
         <PackageReference Include="StackExchange.Redis" Version="2.8.24"/>
 
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0"/>
