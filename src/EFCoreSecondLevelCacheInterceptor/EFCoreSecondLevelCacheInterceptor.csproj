@@ -119,6 +119,7 @@
     <ItemGroup Condition="('$(TargetFramework)' == 'net6.0')">
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[6,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[6,)"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="[6.0.2,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net6.0')">
         <DefineConstants>NET6_0</DefineConstants>
@@ -136,6 +137,7 @@
         <PackageReference Include="System.IO.Hashing" Version="[8.0.0,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[8.0.0,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[8.0.0,)"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="[8.0.1,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net8.0')">
         <DefineConstants>NET8_0</DefineConstants>
