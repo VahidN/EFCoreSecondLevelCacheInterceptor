@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
@@ -435,9 +436,12 @@ public class EFCacheServiceProviderTests
         var services = new ServiceCollection();
         services.AddMemoryCache();
         services.AddSingleton<IMemoryCacheChangeTokenProvider, EFMemoryCacheChangeTokenProvider>();
+        services.AddSingleton<IEFDebugLogger, EFDebugLogger>();
         var serviceProvider = services.BuildServiceProvider();
 
+        var loggerMock = new Mock<IEFDebugLogger>();
+
         return new EFMemoryCacheServiceProvider(serviceProvider.GetRequiredService<IMemoryCache>(),
-            serviceProvider.GetRequiredService<IMemoryCacheChangeTokenProvider>());
+            serviceProvider.GetRequiredService<IMemoryCacheChangeTokenProvider>(), loggerMock.Object);
     }
 }

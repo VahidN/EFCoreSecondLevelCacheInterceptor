@@ -43,7 +43,7 @@ public class EFMemoryCacheChangeTokenProvider : IMemoryCacheChangeTokenProvider
     }
 
     /// <summary>
-    ///     Removes all of the change notification tokens.
+    ///     Removes all the change notification tokens.
     /// </summary>
     public void RemoveAllChangeTokens()
     {

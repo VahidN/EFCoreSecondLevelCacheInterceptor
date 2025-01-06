@@ -13,8 +13,7 @@ public static class EFServiceCollectionExtensions
     /// <summary>
     ///     Registers the required services of the EFCoreSecondLevelCacheInterceptor.
     /// </summary>
-    public static IServiceCollection AddEFSecondLevelCache(
-        this IServiceCollection services,
+    public static IServiceCollection AddEFSecondLevelCache(this IServiceCollection services,
         Action<EFCoreSecondLevelCacheOptions> options)
     {
         if (options == null)
@@ -22,7 +21,6 @@ public static class EFServiceCollectionExtensions
             throw new ArgumentNullException(nameof(options));
         }
 
-        services.AddMemoryCache();
         services.TryAddSingleton<IEFDebugLogger, EFDebugLogger>();
         services.TryAddSingleton<IEFCacheServiceCheck, EFCacheServiceCheck>();
         services.TryAddSingleton<IEFCacheKeyPrefixProvider, EFCacheKeyPrefixProvider>();
@@ -31,7 +29,6 @@ public static class EFServiceCollectionExtensions
         services.TryAddSingleton<IEFSqlCommandsProcessor, EFSqlCommandsProcessor>();
         services.TryAddSingleton<IEFCacheDependenciesProcessor, EFCacheDependenciesProcessor>();
         services.TryAddSingleton<ILockProvider, LockProvider>();
-        services.TryAddSingleton<IMemoryCacheChangeTokenProvider, EFMemoryCacheChangeTokenProvider>();
         services.TryAddSingleton<IDbCommandInterceptorProcessor, DbCommandInterceptorProcessor>();
         services.TryAddSingleton<SecondLevelCacheInterceptor>();
 
@@ -42,7 +39,14 @@ public static class EFServiceCollectionExtensions
 
     private static void ConfigOptions(IServiceCollection services, Action<EFCoreSecondLevelCacheOptions> options)
     {
-        var cacheOptions = new EFCoreSecondLevelCacheOptions();
+        var cacheOptions = new EFCoreSecondLevelCacheOptions
+        {
+            Settings =
+            {
+                Services = services
+            }
+        };
+
         options.Invoke(cacheOptions);
 
         AddHashProvider(services, cacheOptions);
@@ -63,19 +67,17 @@ public static class EFServiceCollectionExtensions
     }
 
     private static void AddOptions(IServiceCollection services, EFCoreSecondLevelCacheOptions cacheOptions)
-    {
-        services.TryAddSingleton(Options.Create(cacheOptions.Settings));
-    }
+        => services.TryAddSingleton(Options.Create(cacheOptions.Settings));
 
     private static void AddCacheServiceProvider(IServiceCollection services, EFCoreSecondLevelCacheOptions cacheOptions)
     {
         if (cacheOptions.Settings.CacheProvider == null)
         {
-            services.TryAddSingleton<IEFCacheServiceProvider, EFMemoryCacheServiceProvider>();
+            throw new InvalidOperationException(
+                message:
+                "Please select an appropriate IEFCacheServiceProvider, such as `UseMemoryCacheProvider()`, `UseEasyCachingCoreProvider()`, etc. Each of these providers requires a separate nuget package. More info: https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/blob/master/README.md");
         }
-        else
-        {
-            services.TryAddSingleton(typeof(IEFCacheServiceProvider), cacheOptions.Settings.CacheProvider);
-        }
+
+        services.TryAddSingleton(typeof(IEFCacheServiceProvider), cacheOptions.Settings.CacheProvider);
     }
 }

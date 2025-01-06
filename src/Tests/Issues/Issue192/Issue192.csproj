@@ -4,6 +4,7 @@
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
+        <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.MemoryCache\EFCoreSecondLevelCacheInterceptor.MemoryCache.csproj"/>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor\EFCoreSecondLevelCacheInterceptor.csproj"/>
     </ItemGroup>
     <ItemGroup>
@@ -21,7 +22,7 @@
         <PackageReference Include="EasyCaching.Core" Version="1.9.2"/>
         <PackageReference Include="EasyCaching.Redis" Version="1.9.2"/>
         <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.9.2"/>
-        <PackageReference Include="EFCore.BulkExtensions" Version="9.0.0"/>
+        <PackageReference Include="EFCore.BulkExtensions" Version="9.0.0-rc.1"/>
     </ItemGroup>
     <ItemGroup>
         <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>

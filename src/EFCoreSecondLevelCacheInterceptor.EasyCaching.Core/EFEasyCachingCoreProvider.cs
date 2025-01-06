@@ -13,6 +13,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
 {
+    private readonly IEFCacheKeyPrefixProvider _cacheKeyPrefixProvider;
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
     private readonly ILogger<EFEasyCachingCoreProvider> _easyCachingCoreProviderLogger;
     private readonly IEFDebugLogger _logger;
@@ -22,11 +23,12 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     private readonly IServiceProvider _serviceProvider;
 
     /// <summary>
-    ///     Using IMemoryCache as a cache service.
+    ///     Using EasyCachingCore as a cache service.
     /// </summary>
     public EFEasyCachingCoreProvider(IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
         IServiceProvider serviceProvider,
         IEFDebugLogger logger,
+        IEFCacheKeyPrefixProvider cacheKeyPrefixProvider,
         ILogger<EFEasyCachingCoreProvider> easyCachingCoreProviderLogger)
     {
         if (cacheSettings == null)
@@ -37,6 +39,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
         _cacheSettings = cacheSettings.Value;
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         _logger = logger;
+        _cacheKeyPrefixProvider = cacheKeyPrefixProvider;
         _easyCachingCoreProviderLogger = easyCachingCoreProviderLogger;
     }
 
@@ -46,7 +49,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     /// <param name="cacheKey">key</param>
     /// <param name="value">value</param>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public void InsertValue(EFCacheKey cacheKey, EFCachedData value, EFCachePolicy cachePolicy)
+    public void InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
     {
         if (cacheKey is null)
         {
@@ -99,10 +102,28 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     /// </summary>
     public void ClearAllCachedEntries()
     {
-        if (!_cacheSettings.IsHybridCache)
+        var easyCachingProvider = GetEasyCachingProvider(cacheKey: null);
+
+        switch (easyCachingProvider)
         {
-            var easyCachingProvider = GetEasyCachingProvider(cacheKey: null);
-            ((IEasyCachingProvider)easyCachingProvider).Flush();
+            case IHybridCachingProvider hcp:
+                // IHybridCachingProvider doesn't have a `Flush()` method:
+                // https://github.com/dotnetcore/EasyCaching/issues/351
+                var cacheKeyPrefix = _cacheKeyPrefixProvider.GetCacheKeyPrefix();
+
+                if (string.IsNullOrWhiteSpace(cacheKeyPrefix))
+                {
+                    throw new InvalidOperationException(
+                        message: "Please specify a CacheKeyPrefix by calling the `.UseCacheKeyPrefix(...)` method.");
+                }
+
+                hcp.RemoveByPrefix(cacheKeyPrefix);
+
+                break;
+            case IEasyCachingProvider ecp:
+                ecp.Flush();
+
+                break;
         }
 
         _logger.NotifyCacheInvalidation(clearAllCachedEntries: true,
@@ -128,7 +149,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
     }
 
     /// <summary>
-    ///     Invalidates all of the cache entries which are dependent on any of the specified root keys.
+    ///     Invalidates all the cache entries which are dependent on any of the specified root keys.
     /// </summary>
     /// <param name="cacheKey">Stores information of the computed key of the input LINQ query.</param>
     public void InvalidateCacheDependencies(EFCacheKey cacheKey)

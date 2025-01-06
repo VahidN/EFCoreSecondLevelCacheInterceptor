@@ -18,7 +18,7 @@ public interface IMemoryCacheChangeTokenProvider
     void RemoveChangeToken(string key);
 
     /// <summary>
-    ///     Removes all of the change notification tokens.
+    ///     Removes all the change notification tokens.
     /// </summary>
     void RemoveAllChangeTokens();
 }

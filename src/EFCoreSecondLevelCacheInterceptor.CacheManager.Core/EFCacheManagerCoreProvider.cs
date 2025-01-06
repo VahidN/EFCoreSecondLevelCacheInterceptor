@@ -17,7 +17,7 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     private readonly ICacheManager<EFCachedData> _valuesCacheManager;
 
     /// <summary>
-    ///     Using IMemoryCache as a cache service.
+    ///     Using CacheManagerCore as a cache service.
     /// </summary>
     public EFCacheManagerCoreProvider(ICacheManager<ISet<string>> dependenciesCacheManager,
         ICacheManager<EFCachedData> valuesCacheManager,
@@ -46,7 +46,7 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
     /// <param name="cacheKey">key</param>
     /// <param name="value">value</param>
     /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
-    public void InsertValue(EFCacheKey cacheKey, EFCachedData value, EFCachePolicy cachePolicy)
+    public void InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
     {
         if (cacheKey is null)
         {

@@ -1,12 +1,16 @@
-# EF Core 3.1.x, 5x, 6x, 7x & 8x Second Level Cache Interceptor
+# EF Core Second Level Cache Interceptor
 
 [![EFCoreSecondLevelCacheInterceptor](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/workflows/.NET%20Core%20Build/badge.svg)](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor)
 
 Second level caching is a query cache. The results of EF commands will be stored in the cache, so that the same EF commands will retrieve their data from the cache rather than executing them against the database again.
 
-## Install via NuGet
 
-To install EFCoreSecondLevelCacheInterceptor, run the following command in the Package Manager Console:
+## How to upgrade to version 5
+
+To support more advanced caching providers, this library uses different assemblies and NuGet packages now.
+To upgrade to version 5, first remove the `EFCoreSecondLevelCacheInterceptor` dependency. It doesn't have any built-in caching provider anymore. 
+But you can still use it to introduce your own custom caching provider by calling its `options.UseCustomCacheProvider<T>()` method (and you won't need the new packages).
+To install `EFCoreSecondLevelCacheInterceptor` as before, run the following command in the Package Manager Console:
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor/)
 
@@ -14,7 +18,110 @@ To install EFCoreSecondLevelCacheInterceptor, run the following command in the P
 PM> Install-Package EFCoreSecondLevelCacheInterceptor
 ```
 
-You can also view the [package page](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor/) on NuGet.
+But if you were using the built-in `In-Memory` cache provider, just install this new package:
+
+[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.MemoryCache)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.MemoryCache/)
+```powershell
+PM> Install-Package EFCoreSecondLevelCacheInterceptor.MemoryCache
+```
+
+Or if you were using the `EasyCaching.Core provider`, install the new `EFCoreSecondLevelCacheInterceptor.EasyCaching.Core` package:
+
+[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core/)
+```powershell
+PM> Install-Package EFCoreSecondLevelCacheInterceptor.EasyCaching.Core
+```
+
+Or if you were using the `CacheManager.Core provider`, install the new `EFCoreSecondLevelCacheInterceptor.CacheManager.Core` package:
+
+[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.CacheManager.Core)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.CacheManager.Core/)
+```powershell
+PM> Install-Package EFCoreSecondLevelCacheInterceptor.CacheManager.Core
+```
+
+Also there are two new caching providers available in V5:
+
+### 1- EFCoreSecondLevelCacheInterceptor.StackExchange.Redis
+
+This provider uses the StackExchange.Redis as a cache provider and it's preconfigured with a MessagePack serializer. To use it, first you should install its new NuGet package:
+
+[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis/)
+```powershell
+PM> Install-Package EFCoreSecondLevelCacheInterceptor.StackExchange.Redis
+```
+
+And then you need to register its required services:
+
+```csharp
+var redisOptions = new ConfigurationOptions
+                   {
+                     EndPoints = new EndPointCollection
+                     {
+                        {
+                            "127.0.0.1", 6379
+                        }
+                     },
+                     AllowAdmin = true,
+                     ConnectTimeout = 10000
+                   };
+				   
+services.AddEFSecondLevelCache(options
+                    => options.UseStackExchangeRedisCacheProvider(redisOptions, TimeSpan.FromMinutes(minutes: 5)));
+```
+
+### 2- EFCoreSecondLevelCacheInterceptor.FusionCache
+
+This provider uses the [FusionCache](https://github.com/ZiggyCreatures/FusionCache) as a cache provider. To use it, first you should install its new NuGet package:
+
+[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.FusionCache)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.FusionCache/)
+```powershell
+PM> Install-Package EFCoreSecondLevelCacheInterceptor.FusionCache
+```
+
+And then this is how you can register its required services:
+
+```csharp
+services.AddFusionCache()
+            .WithOptions(options =>
+            {
+                options.DefaultEntryOptions = new FusionCacheEntryOptions
+                {
+                    // CACHE DURATION
+                    Duration = TimeSpan.FromMinutes(minutes: 1),
+
+                    // FAIL-SAFE OPTIONS
+                    IsFailSafeEnabled = true,
+                    FailSafeMaxDuration = TimeSpan.FromHours(hours: 2),
+                    FailSafeThrottleDuration = TimeSpan.FromSeconds(seconds: 30),
+
+                    // FACTORY TIMEOUTS
+                    FactorySoftTimeout = TimeSpan.FromMilliseconds(milliseconds: 500),
+                    FactoryHardTimeout = TimeSpan.FromMilliseconds(milliseconds: 1500),
+
+                    // DISTRIBUTED CACHE
+                    DistributedCacheSoftTimeout = TimeSpan.FromSeconds(seconds: 10),
+                    DistributedCacheHardTimeout = TimeSpan.FromSeconds(seconds: 20),
+                    AllowBackgroundDistributedCacheOperations = true,
+
+                    // JITTERING
+                    JitterMaxDuration = TimeSpan.FromSeconds(seconds: 2)
+                };
+
+                // DISTIBUTED CACHE CIRCUIT-BREAKER
+                options.DistributedCacheCircuitBreakerDuration = TimeSpan.FromSeconds(seconds: 2);
+
+                // CUSTOM LOG LEVELS
+                options.FailSafeActivationLogLevel = LogLevel.Debug;
+                options.SerializationErrorsLogLevel = LogLevel.Warning;
+                options.DistributedCacheSyntheticTimeoutsLogLevel = LogLevel.Debug;
+                options.DistributedCacheErrorsLogLevel = LogLevel.Error;
+                options.FactorySyntheticTimeoutsLogLevel = LogLevel.Debug;
+                options.FactoryErrorsLogLevel = LogLevel.Error;
+            });
+			
+services.AddEFSecondLevelCache(options => options.UseFusionCacheProvider());
+```
+
 
 ## Usage ([1](#1--register-a-preferred-cache-provider) & [2](#2--add-secondlevelcacheinterceptor-to-your-dbcontextoptionsbuilder-pipeline) are mandatory)
 

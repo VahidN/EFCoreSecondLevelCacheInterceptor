@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>Entity Framework Core Second Level Caching Library.</Description>
-        <VersionPrefix>4.9.0</VersionPrefix>
+        <VersionPrefix>5.0.0</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
         <TargetFrameworks>net9.0;net8.0;net7.0;net6.0;net5.0;netstandard2.1;netstandard2.0;net462;netcoreapp3.1;</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -48,7 +48,7 @@
         </WarningsNotAsErrors>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Meziantou.Analyzer" Version="2.0.182">
+        <PackageReference Include="Meziantou.Analyzer" Version="2.0.184">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -64,7 +64,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="10.3.0.106239">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="10.4.0.108396">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -79,8 +79,6 @@
         <Reference Include="Microsoft.CSharp"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)"/>
-        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.9.2,)"/>
     </ItemGroup>
     <PropertyGroup Condition="'$(TargetFramework)' == 'net462'">
         <DefineConstants>NET4_6_2</DefineConstants>
@@ -89,8 +87,6 @@
     <ItemGroup Condition=" ('$(TargetFramework)' == 'netstandard2.0')">
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)"/>
-        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.9.2,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.0')">
         <DefineConstants>NETSTANDARD2_0</DefineConstants>
@@ -99,8 +95,6 @@
     <ItemGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[3.1,6)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,6)"/>
-        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.9.2,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
         <DefineConstants>NETCORE3_1</DefineConstants>
@@ -109,8 +103,6 @@
     <ItemGroup Condition="('$(TargetFramework)' == 'netstandard2.1')">
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[5,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)"/>
-        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.9.2,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'netstandard2.1')">
         <DefineConstants>NETSTANDARD2_1</DefineConstants>
@@ -119,8 +111,6 @@
     <ItemGroup Condition="('$(TargetFramework)' == 'net5.0')">
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[5,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)"/>
-        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.9.2,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net5.0')">
         <DefineConstants>NET5_0</DefineConstants>
@@ -129,9 +119,6 @@
     <ItemGroup Condition="('$(TargetFramework)' == 'net6.0')">
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[6,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[6,)"/>
-        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.9.2,)"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="[6.0.2,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net6.0')">
         <DefineConstants>NET6_0</DefineConstants>
@@ -140,8 +127,6 @@
     <ItemGroup Condition="('$(TargetFramework)' == 'net7.0')">
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[7,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[7,)"/>
-        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.9.2,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net7.0')">
         <DefineConstants>NET7_0</DefineConstants>
@@ -151,9 +136,6 @@
         <PackageReference Include="System.IO.Hashing" Version="[8.0.0,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[8.0.0,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[8.0.0,)"/>
-        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.9.2,)"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="[8.0.1,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net8.0')">
         <DefineConstants>NET8_0</DefineConstants>
@@ -163,8 +145,6 @@
         <PackageReference Include="System.IO.Hashing" Version="[9.0.0,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="[9.0.0,)"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="[9.0.0,)"/>
-        <PackageReference Include="CacheManager.Core" Version="[1.2,)"/>
-        <PackageReference Include="EasyCaching.Core" Version="[1.9.2,)"/>
     </ItemGroup>
     <PropertyGroup Condition="('$(TargetFramework)' == 'net9.0')">
         <DefineConstants>NET9_0</DefineConstants>

@@ -25,7 +25,7 @@ public class EFServiceCollectionExtensionsTests
 
         // Act
         services.TryAddSingleton(typeof(ILogger<>), typeof(Logger<>));
-        services.AddEFSecondLevelCache(_ => { });
+        services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider());
 
         // Assert
         var serviceProvider = services.BuildServiceProvider();
@@ -50,7 +50,11 @@ public class EFServiceCollectionExtensionsTests
         var services = new ServiceCollection();
 
         // Act
-        services.AddEFSecondLevelCache(options => { options.Settings.HashProvider = null; });
+        services.AddEFSecondLevelCache(options =>
+        {
+            options.UseMemoryCacheProvider();
+            options.Settings.HashProvider = null;
+        });
 
         // Assert
         var serviceProvider = services.BuildServiceProvider();
@@ -65,7 +69,11 @@ public class EFServiceCollectionExtensionsTests
         var services = new ServiceCollection();
 
         // Act
-        services.AddEFSecondLevelCache(options => { options.Settings.HashProvider = typeof(CustomHashProvider); });
+        services.AddEFSecondLevelCache(options =>
+        {
+            options.UseMemoryCacheProvider();
+            options.Settings.HashProvider = typeof(CustomHashProvider);
+        });
 
         // Assert
         var serviceProvider = services.BuildServiceProvider();
@@ -76,16 +84,12 @@ public class EFServiceCollectionExtensionsTests
     [Fact]
     public void AddEFSecondLevelCache_RegistersDefaultCacheProvider_WhenCacheProviderIsNull()
     {
-        // Arrange
         var services = new ServiceCollection();
 
-        // Act
-        services.AddEFSecondLevelCache(options => { options.Settings.CacheProvider = null; });
-
-        // Assert
-        var serviceProvider = services.BuildServiceProvider();
-
-        Assert.IsType<EFMemoryCacheServiceProvider>(serviceProvider.GetService<IEFCacheServiceProvider>());
+        Assert.Throws<InvalidOperationException>(() => services.AddEFSecondLevelCache(options =>
+        {
+            options.Settings.CacheProvider = null;
+        }));
     }
 
     [Fact]
@@ -105,13 +109,18 @@ public class EFServiceCollectionExtensionsTests
 
     private class Logger<TCategoryName> : ILogger<TCategoryName>
     {
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception,
-            Func<TState, Exception, string> formatter) => throw new NotImplementedException();
+        public void Log<TState>(LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception exception,
+            Func<TState, Exception, string> formatter)
+            => throw new NotImplementedException();
 
         public bool IsEnabled(LogLevel logLevel) => throw new NotImplementedException();
 
-        public IDisposable BeginScope<TState>(TState state) where TState : notnull =>
-            throw new NotImplementedException();
+        public IDisposable BeginScope<TState>(TState state)
+            where TState : notnull
+            => throw new NotImplementedException();
     }
 
     private class CustomHashProvider : IEFHashProvider
@@ -127,11 +136,11 @@ public class EFServiceCollectionExtensionsTests
     {
         public void ClearAllCachedEntries() => throw new NotImplementedException();
 
-        public EFCachedData GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy) =>
-            throw new NotImplementedException();
+        public EFCachedData GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
+            => throw new NotImplementedException();
 
-        public void InsertValue(EFCacheKey cacheKey, EFCachedData value, EFCachePolicy cachePolicy) =>
-            throw new NotImplementedException();
+        public void InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
+            => throw new NotImplementedException();
 
         public void InvalidateCacheDependencies(EFCacheKey cacheKey) => throw new NotImplementedException();
     }

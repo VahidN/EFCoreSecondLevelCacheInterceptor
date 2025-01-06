@@ -19,6 +19,21 @@ jobs:
     - name: Run EFCoreSecondLevelCacheInterceptor lib unit tests
       run: dotnet test ./src/Tests/EFCoreSecondLevelCacheInterceptor.UnitTests/EFCoreSecondLevelCacheInterceptor.UnitTests.csproj --logger "console;verbosity=detailed"
 
+    - name: Build EFCoreSecondLevelCacheInterceptor.CacheManager.Core lib
+      run: dotnet build ./src/EFCoreSecondLevelCacheInterceptor.CacheManager.Core/EFCoreSecondLevelCacheInterceptor.CacheManager.Core.csproj --configuration Release
+
+    - name: Build EFCoreSecondLevelCacheInterceptor.EasyCaching.Core lib
+      run: dotnet build ./src/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core.csproj --configuration Release
+
+    - name: Build EFCoreSecondLevelCacheInterceptor.MemoryCache lib
+      run: dotnet build ./src/EFCoreSecondLevelCacheInterceptor.MemoryCache/EFCoreSecondLevelCacheInterceptor.MemoryCache.csproj --configuration Release
+
+    - name: Build EFCoreSecondLevelCacheInterceptor.FusionCache lib
+      run: dotnet build ./src/EFCoreSecondLevelCacheInterceptor.FusionCache/EFCoreSecondLevelCacheInterceptor.FusionCache.csproj --configuration Release
+
+    - name: Build EFCoreSecondLevelCacheInterceptor.StackExchange.Redis lib
+      run: dotnet build ./src/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis.csproj --configuration Release
+
     - name: Push Package to NuGet.org
       if: github.event_name == 'push'
       run: dotnet nuget push **\*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate

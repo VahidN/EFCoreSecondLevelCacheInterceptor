@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 #if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
 using System.Text.Json;
 #endif
@@ -11,6 +12,11 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFCoreSecondLevelCacheSettings
 {
+    /// <summary>
+    ///     Returns a collection of required services
+    /// </summary>
+    public IServiceCollection? Services { get; set; }
+
 #if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
     /// <summary>
     ///     Options to control the serialization behavior
@@ -34,7 +40,7 @@ public class EFCoreSecondLevelCacheSettings
     public string? ProviderName { get; set; }
 
     /// <summary>
-    ///     This option will let you to choose a different redis database for your current tenant.
+    ///     This option will let you choose a different redis database for your current tenant.
     ///     <![CDATA[ Such as: (serviceProvider, cacheKey) => "redis-db-" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"]; ]]>
     /// </summary>
     public Func<IServiceProvider, EFCacheKey?, string>? CacheProviderName { set; get; }
@@ -88,7 +94,7 @@ public class EFCoreSecondLevelCacheSettings
     public bool UseDbCallsIfCachingProviderIsDown { set; get; }
 
     /// <summary>
-    ///     Set it to false to disable this caching interceptor.
+    ///     Set it to `false` to disable this caching interceptor.
     ///     Its default value is `true`.
     /// </summary>
     public bool IsCachingInterceptorEnabled { set; get; } = true;
@@ -133,4 +139,9 @@ public class EFCoreSecondLevelCacheSettings
     ///     Determines which entities are involved in the current cache-invalidation event.
     /// </summary>
     public Action<EFCacheInvalidationInfo>? CacheInvalidationEvent { set; get; }
+
+    /// <summary>
+    ///     Provides some optional data
+    /// </summary>
+    public object? AdditionalData { set; get; }
 }

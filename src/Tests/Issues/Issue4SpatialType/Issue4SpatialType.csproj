@@ -4,6 +4,7 @@
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
+        <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.MemoryCache\EFCoreSecondLevelCacheInterceptor.MemoryCache.csproj"/>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor\EFCoreSecondLevelCacheInterceptor.csproj"/>
     </ItemGroup>
     <ItemGroup>

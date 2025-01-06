@@ -11,6 +11,10 @@
         <NoWarn>RCS1090</NoWarn>
     </PropertyGroup>
     <ItemGroup>
+        <ProjectReference Include="..\..\EFCoreSecondLevelCacheInterceptor.CacheManager.Core\EFCoreSecondLevelCacheInterceptor.CacheManager.Core.csproj"/>
+        <ProjectReference Include="..\..\EFCoreSecondLevelCacheInterceptor.EasyCaching.Core\EFCoreSecondLevelCacheInterceptor.EasyCaching.Core.csproj"/>
+        <ProjectReference Include="..\..\EFCoreSecondLevelCacheInterceptor.FusionCache\EFCoreSecondLevelCacheInterceptor.FusionCache.csproj"/>
+        <ProjectReference Include="..\..\EFCoreSecondLevelCacheInterceptor.StackExchange.Redis\EFCoreSecondLevelCacheInterceptor.StackExchange.Redis.csproj"/>
         <ProjectReference Include="..\..\EFCoreSecondLevelCacheInterceptor\EFCoreSecondLevelCacheInterceptor.csproj"/>
         <ProjectReference Include="..\EFCoreSecondLevelCacheInterceptor.Tests.DataLayer\EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.csproj"/>
     </ItemGroup>
@@ -24,7 +28,7 @@
         <PackageReference Include="EasyCaching.Bus.Redis" Version="1.9.2"/>
         <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.9.2"/>
         <PackageReference Include="EasyCaching.Serialization.SystemTextJson" Version="1.9.2"/>
-        <PackageReference Include="MessagePack" Version="3.1.0"/>
+        <PackageReference Include="MessagePack" Version="3.1.1"/>
         <PackageReference Include="StackExchange.Redis" Version="2.8.24"/>
 
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0"/>

@@ -4,6 +4,8 @@
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
+        <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.EasyCaching.Core\EFCoreSecondLevelCacheInterceptor.EasyCaching.Core.csproj"/>
+        <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.MemoryCache\EFCoreSecondLevelCacheInterceptor.MemoryCache.csproj"/>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor\EFCoreSecondLevelCacheInterceptor.csproj"/>
     </ItemGroup>
     <ItemGroup>
@@ -26,7 +28,7 @@
         <PackageReference Include="EasyCaching.Redis" Version="1.9.2"/>
         <PackageReference Include="EasyCaching.HybridCache" Version="1.9.2"/>
         <PackageReference Include="EasyCaching.Bus.Redis" Version="1.9.2"/>
-        <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.9.2" />
+        <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.9.2"/>
     </ItemGroup>
 
     <ItemGroup>

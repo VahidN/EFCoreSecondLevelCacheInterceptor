@@ -10,7 +10,10 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFCoreSecondLevelCacheOptions
 {
-    internal EFCoreSecondLevelCacheSettings Settings { get; } = new();
+    /// <summary>
+    ///     Global Cache Settings
+    /// </summary>
+    public EFCoreSecondLevelCacheSettings Settings { get; } = new();
 
 #if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
     /// <summary>
@@ -57,7 +60,7 @@ public class EFCoreSecondLevelCacheOptions
     /// <param name="realTableNames">
     ///     The real table names.
     ///     Queries containing these names will be cached.
-    ///     Table names are not case sensitive.
+    ///     Table names are not case-sensitive.
     /// </param>
     public EFCoreSecondLevelCacheOptions CacheQueriesContainingTableNames(CacheExpirationMode expirationMode,
         TimeSpan timeout,
@@ -151,165 +154,11 @@ public class EFCoreSecondLevelCacheOptions
     }
 
     /// <summary>
-    ///     Introduces the built-in `EFMemoryCacheServiceProvider` to be used as the CacheProvider.
-    /// </summary>
-    public EFCoreSecondLevelCacheOptions UseMemoryCacheProvider()
-    {
-        Settings.CacheProvider = typeof(EFMemoryCacheServiceProvider);
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Introduces the built-in `EFMemoryCacheServiceProvider` to be used as the CacheProvider.
-    ///     If you specify the `Cacheable()` method options, its setting will override this global setting.
-    /// </summary>
-    /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
-    /// <param name="timeout">The expiration timeout.</param>
-    public EFCoreSecondLevelCacheOptions UseMemoryCacheProvider(CacheExpirationMode expirationMode, TimeSpan timeout)
-    {
-        Settings.CacheProvider = typeof(EFMemoryCacheServiceProvider);
-
-        Settings.CachableQueriesOptions = new CachableQueriesOptions
-        {
-            ExpirationMode = expirationMode,
-            Timeout = timeout,
-            IsActive = true
-        };
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Introduces the built-in `CacheManagerCoreProvider` to be used as the CacheProvider.
-    /// </summary>
-    public EFCoreSecondLevelCacheOptions UseCacheManagerCoreProvider()
-    {
-        Settings.CacheProvider = typeof(EFCacheManagerCoreProvider);
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Introduces the built-in `CacheManagerCoreProvider` to be used as the CacheProvider.
-    ///     If you specify the `Cacheable()` method options, its setting will override this global setting.
-    /// </summary>
-    /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
-    /// <param name="timeout">The expiration timeout.</param>
-    public EFCoreSecondLevelCacheOptions UseCacheManagerCoreProvider(CacheExpirationMode expirationMode,
-        TimeSpan timeout)
-    {
-        Settings.CacheProvider = typeof(EFCacheManagerCoreProvider);
-
-        Settings.CachableQueriesOptions = new CachableQueriesOptions
-        {
-            ExpirationMode = expirationMode,
-            Timeout = timeout,
-            IsActive = true
-        };
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Introduces the built-in `EasyCachingCoreProvider` to be used as the CacheProvider.
-    /// </summary>
-    /// <param name="providerName">Selected caching provider name.</param>
-    /// <param name="isHybridCache">Is an instance of EasyCaching.HybridCache</param>
-    public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(string providerName, bool isHybridCache = false)
-    {
-        Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
-        Settings.ProviderName = providerName;
-        Settings.IsHybridCache = isHybridCache;
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Introduces the built-in `EasyCachingCoreProvider` to be used as the CacheProvider.
-    /// </summary>
-    /// <param name="providerName">
-    ///     Selected caching provider name.
-    ///     This option will let you to choose a different redis database for your current tenant.
-    ///     <![CDATA[ Such as: (serviceProvider, cacheKey) => "redis-db-" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"]; ]]>
-    /// </param>
-    /// <param name="isHybridCache">Is an instance of EasyCaching.HybridCache</param>
-    public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(
-        Func<IServiceProvider, EFCacheKey?, string> providerName,
-        bool isHybridCache = false)
-    {
-        Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
-        Settings.CacheProviderName = providerName;
-        Settings.IsHybridCache = isHybridCache;
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Introduces the built-in `EasyCachingCoreProvider` to be used as the CacheProvider.
-    ///     If you specify the `Cacheable()` method options, its setting will override this global setting.
-    /// </summary>
-    /// <param name="providerName">Selected caching provider name.</param>
-    /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
-    /// <param name="timeout">The expiration timeout.</param>
-    /// <param name="isHybridCache">Is an instance of EasyCaching.HybridCache</param>
-    public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(string providerName,
-        CacheExpirationMode expirationMode,
-        TimeSpan timeout,
-        bool isHybridCache = false)
-    {
-        Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
-        Settings.ProviderName = providerName;
-        Settings.IsHybridCache = isHybridCache;
-
-        Settings.CachableQueriesOptions = new CachableQueriesOptions
-        {
-            ExpirationMode = expirationMode,
-            Timeout = timeout,
-            IsActive = true
-        };
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Introduces the built-in `EasyCachingCoreProvider` to be used as the CacheProvider.
-    ///     If you specify the `Cacheable()` method options, its setting will override this global setting.
-    /// </summary>
-    /// <param name="providerName">
-    ///     Selected caching provider name.
-    ///     This option will let you to choose a different redis database for your current tenant.
-    ///     <![CDATA[ Such as: (serviceProvider, cacheKey) => "redis-db-" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"]; ]]>
-    /// </param>
-    /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
-    /// <param name="timeout">The expiration timeout.</param>
-    /// <param name="isHybridCache">Is an instance of EasyCaching.HybridCache</param>
-    public EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(
-        Func<IServiceProvider, EFCacheKey?, string> providerName,
-        CacheExpirationMode expirationMode,
-        TimeSpan timeout,
-        bool isHybridCache = false)
-    {
-        Settings.CacheProvider = typeof(EFEasyCachingCoreProvider);
-        Settings.CacheProviderName = providerName;
-        Settings.IsHybridCache = isHybridCache;
-
-        Settings.CachableQueriesOptions = new CachableQueriesOptions
-        {
-            ExpirationMode = expirationMode,
-            Timeout = timeout,
-            IsActive = true
-        };
-
-        return this;
-    }
-
-    /// <summary>
     ///     Sets a dynamic prefix for the current cachedKey.
     /// </summary>
     /// <param name="prefix">
     ///     Selected cache key prefix.
-    ///     This option will let you to choose a different cache key prefix for your current tenant.
+    ///     This option will let you choose a different cache key prefix for your current tenant.
     ///     <![CDATA[ Such as: serviceProvider => "EF_" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"] ]]>
     /// </param>
     /// <returns>EFCoreSecondLevelCacheOptions.</returns>
@@ -322,7 +171,7 @@ public class EFCoreSecondLevelCacheOptions
 
     /// <summary>
     ///     Uses the cache key prefix.
-    ///     Sets the prefix to all of the cachedKey's.
+    ///     Sets the prefix to all the cachedKey's.
     ///     Its default value is `EF_`.
     /// </summary>
     /// <param name="prefix">The prefix.</param>
@@ -375,7 +224,7 @@ public class EFCoreSecondLevelCacheOptions
     }
 
     /// <summary>
-    ///     Set it to false to disable this caching interceptor entirely.
+    ///     Set it to `false` to disable this caching interceptor entirely.
     ///     Its default value is `true`.
     /// </summary>
     public EFCoreSecondLevelCacheOptions EnableCachingInterceptor(bool enable = true)
@@ -450,7 +299,7 @@ public class EFCoreSecondLevelCacheOptions
     /// <param name="realTableNames">
     ///     The real table names.
     ///     Queries containing these names will not be cached.
-    ///     Table names are not case sensitive.
+    ///     Table names are not case-sensitive.
     /// </param>
     public EFCoreSecondLevelCacheOptions CacheAllQueriesExceptContainingTableNames(CacheExpirationMode expirationMode,
         TimeSpan timeout,
