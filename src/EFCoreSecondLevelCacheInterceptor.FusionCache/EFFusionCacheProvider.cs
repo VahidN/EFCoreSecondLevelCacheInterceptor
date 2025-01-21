@@ -7,10 +7,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// <remarks>
 ///     Using FusionCache as a cache service.
 /// </remarks>
-public class EFFusionCacheProvider(
-    IFusionCache fusionCache,
-    IEFFusionCacheDependenciesStore cacheDependenciesStore,
-    IEFDebugLogger logger) : IEFCacheServiceProvider
+public class EFFusionCacheProvider(IFusionCache fusionCache, IEFDebugLogger logger) : IEFCacheServiceProvider
 {
     /// <summary>
     ///     Adds a new item to the cache.
@@ -37,8 +34,6 @@ public class EFFusionCacheProvider(
                 entryOptions.SetFailSafe(isEnabled: true, cachePolicy.CacheTimeout.Add(cachePolicy.CacheTimeout));
             }
         }, cacheKey.CacheDependencies);
-
-        cacheDependenciesStore.AddCacheDependencies(cacheKey.CacheDependencies);
     }
 
     /// <summary>
@@ -46,7 +41,7 @@ public class EFFusionCacheProvider(
     /// </summary>
     public void ClearAllCachedEntries()
     {
-        InvalidateTaggedEntries(cacheDependenciesStore.GetAllCacheDependencies());
+        fusionCache.Clear();
 
         logger.NotifyCacheInvalidation(clearAllCachedEntries: true,
             new HashSet<string>(StringComparer.OrdinalIgnoreCase));
@@ -82,7 +77,5 @@ public class EFFusionCacheProvider(
         {
             fusionCache.RemoveByTag(rootCacheKey);
         }
-
-        cacheDependenciesStore.RemoveCacheDependencies(cacheDependencies);
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace EFCoreSecondLevelCacheInterceptor;
 
@@ -15,7 +14,6 @@ public static class EFFusionCacheProviderOptions
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        options.Settings.Services?.TryAddSingleton<IEFFusionCacheDependenciesStore, EFFusionCacheDependenciesStore>();
         options.Settings.CacheProvider = typeof(EFFusionCacheProvider);
 
         return options;
