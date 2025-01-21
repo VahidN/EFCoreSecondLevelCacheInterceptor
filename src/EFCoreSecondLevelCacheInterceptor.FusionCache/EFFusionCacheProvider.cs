@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -7,8 +8,30 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// <remarks>
 ///     Using FusionCache as a cache service.
 /// </remarks>
-public class EFFusionCacheProvider(IFusionCache fusionCache, IEFDebugLogger logger) : IEFCacheServiceProvider
+public class EFFusionCacheProvider : IEFCacheServiceProvider
 {
+    private readonly IFusionCache _fusionCache;
+    private readonly IEFDebugLogger _logger;
+
+    /// <remarks>
+    ///     Using FusionCache as a cache service.
+    /// </remarks>
+    public EFFusionCacheProvider(IFusionCacheProvider fusionCacheProvider,
+        IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
+        IEFDebugLogger logger)
+    {
+        ArgumentNullException.ThrowIfNull(fusionCacheProvider);
+        ArgumentNullException.ThrowIfNull(cacheSettings);
+
+        var options = cacheSettings.Value.AdditionalData as EFFusionCacheConfigurationOptions;
+
+        _fusionCache = options?.NamedCache is null
+            ? fusionCacheProvider.GetDefaultCache()
+            : fusionCacheProvider.GetCache(options.NamedCache);
+
+        _logger = logger;
+    }
+
     /// <summary>
     ///     Adds a new item to the cache.
     /// </summary>
@@ -25,7 +48,7 @@ public class EFFusionCacheProvider(IFusionCache fusionCache, IEFDebugLogger logg
             IsNull = true
         };
 
-        fusionCache.Set(cacheKey.KeyHash, value, entryOptions =>
+        _fusionCache.Set(cacheKey.KeyHash, value, entryOptions =>
         {
             entryOptions.SetDuration(cachePolicy.CacheTimeout);
 
@@ -41,9 +64,9 @@ public class EFFusionCacheProvider(IFusionCache fusionCache, IEFDebugLogger logg
     /// </summary>
     public void ClearAllCachedEntries()
     {
-        fusionCache.Clear();
+        _fusionCache.Clear();
 
-        logger.NotifyCacheInvalidation(clearAllCachedEntries: true,
+        _logger.NotifyCacheInvalidation(clearAllCachedEntries: true,
             new HashSet<string>(StringComparer.OrdinalIgnoreCase));
     }
 
@@ -57,7 +80,7 @@ public class EFFusionCacheProvider(IFusionCache fusionCache, IEFDebugLogger logg
     {
         ArgumentNullException.ThrowIfNull(cacheKey);
 
-        return fusionCache.GetOrDefault<EFCachedData>(cacheKey.KeyHash);
+        return _fusionCache.GetOrDefault<EFCachedData>(cacheKey.KeyHash);
     }
 
     /// <summary>
@@ -75,7 +98,7 @@ public class EFFusionCacheProvider(IFusionCache fusionCache, IEFDebugLogger logg
     {
         foreach (var rootCacheKey in cacheDependencies)
         {
-            fusionCache.RemoveByTag(rootCacheKey);
+            _fusionCache.RemoveByTag(rootCacheKey);
         }
     }
 }
