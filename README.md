@@ -137,7 +137,7 @@ You can use the following cache providers:
 
 #### Using the built-in In-Memory cache provider
 
-![performance](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.PerformanceTests/int-pref.png)
+![performance](https://raw.githubusercontent.com/VahidN/EFCoreSecondLevelCacheInterceptor/master/src/Tests/EFCoreSecondLevelCacheInterceptor.PerformanceTests/int-pref.png)
 
 ```csharp
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
