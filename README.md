@@ -15,28 +15,28 @@ To install `EFCoreSecondLevelCacheInterceptor` as before, run the following comm
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor/)
 
 ```powershell
-PM> Install-Package EFCoreSecondLevelCacheInterceptor
+dotnet add package EFCoreSecondLevelCacheInterceptor
 ```
 
 But if you were using the built-in `In-Memory` cache provider, just install this new package:
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.MemoryCache)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.MemoryCache/)
 ```powershell
-PM> Install-Package EFCoreSecondLevelCacheInterceptor.MemoryCache
+dotnet add package EFCoreSecondLevelCacheInterceptor.MemoryCache
 ```
 
 Or if you were using the `EasyCaching.Core provider`, install the new `EFCoreSecondLevelCacheInterceptor.EasyCaching.Core` package:
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core/)
 ```powershell
-PM> Install-Package EFCoreSecondLevelCacheInterceptor.EasyCaching.Core
+dotnet add package EFCoreSecondLevelCacheInterceptor.EasyCaching.Core
 ```
 
 Or if you were using the `CacheManager.Core provider`, install the new `EFCoreSecondLevelCacheInterceptor.CacheManager.Core` package:
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.CacheManager.Core)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.CacheManager.Core/)
 ```powershell
-PM> Install-Package EFCoreSecondLevelCacheInterceptor.CacheManager.Core
+dotnet add package EFCoreSecondLevelCacheInterceptor.CacheManager.Core
 ```
 
 Also there are two new caching providers available in V5:
@@ -47,7 +47,7 @@ This provider uses the StackExchange.Redis as a cache provider and it's preconfi
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis/)
 ```powershell
-PM> Install-Package EFCoreSecondLevelCacheInterceptor.StackExchange.Redis
+dotnet add package EFCoreSecondLevelCacheInterceptor.StackExchange.Redis
 ```
 
 And then you need to register its required services:
@@ -75,7 +75,7 @@ This provider uses the [FusionCache](https://github.com/ZiggyCreatures/FusionCac
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.FusionCache)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.FusionCache/)
 ```powershell
-PM> Install-Package EFCoreSecondLevelCacheInterceptor.FusionCache
+dotnet add package EFCoreSecondLevelCacheInterceptor.FusionCache
 ```
 
 And then this is how you can register its required services:
