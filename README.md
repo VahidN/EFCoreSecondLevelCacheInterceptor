@@ -444,7 +444,7 @@ _cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<str
 {
    "EF_TableName1", // "EF_" is the cache key's prefix
    "EF_TableName2"
-} {  KeyHash = "empty" }));
+}));
 ```
 
 I you want to get notified about the cache-invalidation events and involved cache dependencies, use the `NotifyCacheInvalidation` method:
