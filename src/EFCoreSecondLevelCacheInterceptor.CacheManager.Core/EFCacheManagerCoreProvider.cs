@@ -79,10 +79,18 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
         }
         else
         {
-            _valuesCacheManager.Add(new CacheItem<EFCachedData>(keyHash, value,
-                cachePolicy.CacheExpirationMode == CacheExpirationMode.Absolute
-                    ? ExpirationMode.Absolute
-                    : ExpirationMode.Sliding, cachePolicy.CacheTimeout));
+            if (cachePolicy.CacheExpirationMode == CacheExpirationMode.NeverRemove ||
+                !cachePolicy.CacheTimeout.HasValue)
+            {
+                _valuesCacheManager.Add(new CacheItem<EFCachedData>(keyHash, value));
+            }
+            else if (cachePolicy.CacheTimeout.HasValue)
+            {
+                _valuesCacheManager.Add(new CacheItem<EFCachedData>(keyHash, value,
+                    cachePolicy.CacheExpirationMode == CacheExpirationMode.Absolute
+                        ? ExpirationMode.Absolute
+                        : ExpirationMode.Sliding, cachePolicy.CacheTimeout.Value));
+            }
         }
     }
 

@@ -45,10 +45,18 @@ public class EFStackExchangeRedisCacheProvider(
                 continue;
             }
 
-            var expiryTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() +
-                             cachePolicy.CacheTimeout.TotalMilliseconds;
+            if (cachePolicy.CacheTimeout.HasValue)
+            {
+                var expiryTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() +
+                                 cachePolicy.CacheTimeout.Value.TotalMilliseconds;
 
-            redisDb.SortedSetAdd(rootCacheKey, keyHash, expiryTime);
+                redisDb.SortedSetAdd(rootCacheKey, keyHash, expiryTime);
+            }
+            else
+            {
+                redisDb.SortedSetAdd(rootCacheKey, keyHash,
+                    long.MaxValue - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            }
         }
 
         var data = dataSerializer.Serialize(value);

@@ -54,7 +54,7 @@ public static class EFStackExchangeRedisCacheProviderOptions
     }
 
     private static void SetOptions(EFCoreSecondLevelCacheOptions options,
-        TimeSpan timeout,
+        TimeSpan? timeout,
         EFRedisCacheConfigurationOptions configurationOptions)
     {
         options.Settings.Services?.TryAddSingleton<IEFDataSerializer, EFMessagePackSerializer>();

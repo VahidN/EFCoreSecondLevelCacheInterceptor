@@ -15,7 +15,7 @@ public class CacheAllQueriesOptions
     /// <summary>
     ///     The expiration timeout.
     /// </summary>
-    public TimeSpan Timeout { set; get; }
+    public TimeSpan? Timeout { set; get; }
 
     /// <summary>
     ///     Enables or disables the `CacheAllQueries` feature.

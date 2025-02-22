@@ -67,7 +67,7 @@ public static class EFEasyCachingCoreProviderOptions
     public static EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(this EFCoreSecondLevelCacheOptions options,
         string providerName,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout = null,
         bool isHybridCache = false)
     {
         if (options == null)
@@ -105,7 +105,7 @@ public static class EFEasyCachingCoreProviderOptions
     public static EFCoreSecondLevelCacheOptions UseEasyCachingCoreProvider(this EFCoreSecondLevelCacheOptions options,
         Func<IServiceProvider, EFCacheKey?, string> providerName,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout = null,
         bool isHybridCache = false)
     {
         if (options == null)

@@ -29,7 +29,7 @@ public static class EFCachedQueryExtensions
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
     public static IQueryable<TType> Cacheable<TType>(this IQueryable<TType> query,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout)
+        TimeSpan? timeout = null)
     {
         SanityCheck(query);
 
@@ -57,7 +57,7 @@ public static class EFCachedQueryExtensions
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
     public static IQueryable<TType> Cacheable<TType>(this IQueryable<TType> query,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout,
         string[] cacheDependencies,
         string saltKey)
     {
@@ -86,7 +86,7 @@ public static class EFCachedQueryExtensions
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
     public static IQueryable<TType> Cacheable<TType>(this IQueryable<TType> query,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout,
         string[] cacheDependencies)
     {
         SanityCheck(query);
@@ -109,7 +109,7 @@ public static class EFCachedQueryExtensions
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
     public static IQueryable<TType> Cacheable<TType>(this IQueryable<TType> query,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout,
         string saltKey)
     {
         SanityCheck(query);
@@ -161,7 +161,7 @@ public static class EFCachedQueryExtensions
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
     public static IQueryable<TType> Cacheable<TType>(this DbSet<TType> query,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout)
+        TimeSpan? timeout = null)
         where TType : class
     {
         SanityCheck(query);
@@ -190,7 +190,7 @@ public static class EFCachedQueryExtensions
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
     public static IQueryable<TType> Cacheable<TType>(this DbSet<TType> query,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout,
         string[] cacheDependencies,
         string saltKey)
         where TType : class
@@ -220,7 +220,7 @@ public static class EFCachedQueryExtensions
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
     public static IQueryable<TType> Cacheable<TType>(this DbSet<TType> query,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout,
         string[] cacheDependencies)
         where TType : class
     {
@@ -244,7 +244,7 @@ public static class EFCachedQueryExtensions
     /// <returns>Provides functionality to evaluate queries against a specific data source.</returns>
     public static IQueryable<TType> Cacheable<TType>(this DbSet<TType> query,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout,
         string saltKey)
         where TType : class
     {

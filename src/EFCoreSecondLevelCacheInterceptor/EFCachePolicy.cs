@@ -38,7 +38,7 @@ public class EFCachePolicy
     ///     The expiration timeout.
     ///     Its default value is 20 minutes later.
     /// </summary>
-    public TimeSpan CacheTimeout { get; private set; } = TimeSpan.FromMinutes(20);
+    public TimeSpan? CacheTimeout { get; private set; } = TimeSpan.FromMinutes(value: 20);
 
     /// <summary>
     ///     If you think the computed hash of the query to calculate the cache-key is not enough, set this value.
@@ -67,6 +67,7 @@ public class EFCachePolicy
     public EFCachePolicy CacheDependencies(params string[] cacheDependencies)
     {
         CacheItemsDependencies = new SortedSet<string>(cacheDependencies, StringComparer.OrdinalIgnoreCase);
+
         return this;
     }
 
@@ -77,6 +78,7 @@ public class EFCachePolicy
     public EFCachePolicy ExpirationMode(CacheExpirationMode expirationMode)
     {
         CacheExpirationMode = expirationMode;
+
         return this;
     }
 
@@ -84,9 +86,10 @@ public class EFCachePolicy
     ///     The expiration timeout.
     ///     Its default value is 20 minutes later.
     /// </summary>
-    public EFCachePolicy Timeout(TimeSpan timeout)
+    public EFCachePolicy Timeout(TimeSpan? timeout)
     {
         CacheTimeout = timeout;
+
         return this;
     }
 
@@ -97,6 +100,7 @@ public class EFCachePolicy
     public EFCachePolicy SaltKey(string saltKey)
     {
         CacheSaltKey = saltKey;
+
         return this;
     }
 
@@ -106,6 +110,7 @@ public class EFCachePolicy
     public EFCachePolicy DefaultCacheableMethod(bool state)
     {
         IsDefaultCacheableMethod = state;
+
         return this;
     }
 
@@ -121,13 +126,14 @@ public class EFCachePolicy
 
         var cachePolicy = new EFCachePolicy();
         options.Invoke(cachePolicy);
+
         return cachePolicy.ToString();
     }
 
     /// <summary>
     ///     Represents the textual form of the current object
     /// </summary>
-    public override string ToString() =>
-        $"{nameof(EFCachePolicy)} {PartsSeparator} {CacheExpirationMode}{ItemsSeparator}{CacheTimeout}{ItemsSeparator}{CacheSaltKey}{ItemsSeparator}{string.Join(CacheDependenciesSeparator, CacheItemsDependencies)}{ItemsSeparator}{IsDefaultCacheableMethod}"
+    public override string ToString()
+        => $"{nameof(EFCachePolicy)} {PartsSeparator} {CacheExpirationMode}{ItemsSeparator}{CacheTimeout}{ItemsSeparator}{CacheSaltKey}{ItemsSeparator}{string.Join(CacheDependenciesSeparator, CacheItemsDependencies)}{ItemsSeparator}{IsDefaultCacheableMethod}"
             .TrimEnd(ItemsSeparator);
 }

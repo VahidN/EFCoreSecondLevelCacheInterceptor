@@ -50,11 +50,15 @@ public class EFFusionCacheProvider : IEFCacheServiceProvider
 
         _fusionCache.Set(cacheKey.KeyHash, value, entryOptions =>
         {
-            entryOptions.SetDuration(cachePolicy.CacheTimeout);
-
-            if (cachePolicy.CacheExpirationMode == CacheExpirationMode.Sliding)
+            if (cachePolicy.CacheExpirationMode != CacheExpirationMode.NeverRemove && cachePolicy.CacheTimeout.HasValue)
             {
-                entryOptions.SetFailSafe(isEnabled: true, cachePolicy.CacheTimeout.Add(cachePolicy.CacheTimeout));
+                entryOptions.SetDuration(cachePolicy.CacheTimeout.Value);
+
+                if (cachePolicy.CacheExpirationMode == CacheExpirationMode.Sliding)
+                {
+                    entryOptions.SetFailSafe(isEnabled: true,
+                        cachePolicy.CacheTimeout.Value.Add(cachePolicy.CacheTimeout.Value));
+                }
             }
         }, cacheKey.CacheDependencies);
     }

@@ -35,7 +35,7 @@ public static class EFMemoryCacheProviderOptions
     /// <param name="timeout">The expiration timeout.</param>
     public static EFCoreSecondLevelCacheOptions UseMemoryCacheProvider(this EFCoreSecondLevelCacheOptions options,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout)
+        TimeSpan? timeout = null)
     {
         if (options == null)
         {

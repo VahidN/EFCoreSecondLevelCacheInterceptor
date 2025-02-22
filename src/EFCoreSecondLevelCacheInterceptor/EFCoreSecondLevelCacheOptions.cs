@@ -36,7 +36,7 @@ public class EFCoreSecondLevelCacheOptions
     /// </summary>
     /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
     /// <param name="timeout">The expiration timeout.</param>
-    public EFCoreSecondLevelCacheOptions CacheAllQueries(CacheExpirationMode expirationMode, TimeSpan timeout)
+    public EFCoreSecondLevelCacheOptions CacheAllQueries(CacheExpirationMode expirationMode, TimeSpan? timeout = null)
     {
         Settings.CacheAllQueriesOptions = new CacheAllQueriesOptions
         {
@@ -63,7 +63,7 @@ public class EFCoreSecondLevelCacheOptions
     ///     Table names are not case-sensitive.
     /// </param>
     public EFCoreSecondLevelCacheOptions CacheQueriesContainingTableNames(CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout = null,
         TableNameComparison tableNameComparison = TableNameComparison.Contains,
         params string[] realTableNames)
     {
@@ -90,7 +90,7 @@ public class EFCoreSecondLevelCacheOptions
     /// <param name="tableTypeComparison">How should we determine which tables should be cached?</param>
     /// <param name="entityTypes">The real entity types. Queries containing these types will be cached.</param>
     public EFCoreSecondLevelCacheOptions CacheQueriesContainingTypes(CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout = null,
         TableTypeComparison tableTypeComparison = TableTypeComparison.Contains,
         params Type[] entityTypes)
     {
@@ -138,7 +138,8 @@ public class EFCoreSecondLevelCacheOptions
     /// <param name="expirationMode">Defines the expiration mode of the cache items globally.</param>
     /// <param name="timeout">The expiration timeout.</param>
     /// <typeparam name="T">Implements IEFCacheServiceProvider</typeparam>
-    public EFCoreSecondLevelCacheOptions UseCustomCacheProvider<T>(CacheExpirationMode expirationMode, TimeSpan timeout)
+    public EFCoreSecondLevelCacheOptions UseCustomCacheProvider<T>(CacheExpirationMode expirationMode,
+        TimeSpan? timeout = null)
         where T : IEFCacheServiceProvider
     {
         Settings.CacheProvider = typeof(T);
@@ -302,7 +303,7 @@ public class EFCoreSecondLevelCacheOptions
     ///     Table names are not case-sensitive.
     /// </param>
     public EFCoreSecondLevelCacheOptions CacheAllQueriesExceptContainingTableNames(CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout = null,
         params string[] realTableNames)
     {
         Settings.SkipCacheSpecificQueriesOptions = new SkipCacheSpecificQueriesOptions(entityTypes: null)
@@ -325,7 +326,7 @@ public class EFCoreSecondLevelCacheOptions
     /// <param name="timeout">The expiration timeout.</param>
     /// <param name="entityTypes">The real entity types. Queries containing these types will not be cached.</param>
     public EFCoreSecondLevelCacheOptions CacheAllQueriesExceptContainingTypes(CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout = null,
         params Type[] entityTypes)
     {
         Settings.SkipCacheSpecificQueriesOptions = new SkipCacheSpecificQueriesOptions(entityTypes)

@@ -30,7 +30,7 @@ public static class EFHybridCacheProviderOptions
     /// <param name="timeout">The expiration timeout.</param>
     public static EFCoreSecondLevelCacheOptions UseHybridCacheProvider(this EFCoreSecondLevelCacheOptions options,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout)
+        TimeSpan? timeout = null)
     {
         ArgumentNullException.ThrowIfNull(options);
 

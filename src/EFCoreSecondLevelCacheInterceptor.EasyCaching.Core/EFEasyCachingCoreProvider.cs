@@ -69,6 +69,7 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
         var easyCachingProvider = GetEasyCachingProvider(cacheKey);
 
         var keyHash = cacheKey.KeyHash;
+        var timeout = cachePolicy.CacheTimeout ?? TimeSpan.MaxValue;
 
         foreach (var rootCacheKey in cacheKey.CacheDependencies)
         {
@@ -84,17 +85,17 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
                 easyCachingProvider.Set(rootCacheKey, new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
                     keyHash
-                }, cachePolicy.CacheTimeout);
+                }, timeout);
             }
             else
             {
                 items.Value.Add(keyHash);
-                easyCachingProvider.Set(rootCacheKey, items.Value, cachePolicy.CacheTimeout);
+                easyCachingProvider.Set(rootCacheKey, items.Value, timeout);
             }
         }
 
         // We don't support Sliding Expiration at this time. -> https://github.com/dotnetcore/EasyCaching/issues/113
-        easyCachingProvider.Set(keyHash, value, cachePolicy.CacheTimeout);
+        easyCachingProvider.Set(keyHash, value, timeout);
     }
 
     /// <summary>

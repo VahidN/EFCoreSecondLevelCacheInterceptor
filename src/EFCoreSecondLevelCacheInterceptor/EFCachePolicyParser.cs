@@ -409,9 +409,11 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             return null;
         }
 
-        if (!TimeSpan.TryParse(options[1], CultureInfo.InvariantCulture, out var timeout))
+        TimeSpan? cacheTimeout = null;
+
+        if (TimeSpan.TryParse(options[1], CultureInfo.InvariantCulture, out var timeout))
         {
-            return null;
+            cacheTimeout = timeout;
         }
 
         var saltKey = options.Length >= 3 ? options[2] : string.Empty;
@@ -425,17 +427,17 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         if (isDefaultCacheableMethod && _cacheSettings.CacheAllQueriesOptions.IsActive)
         {
             expirationMode = _cacheSettings.CacheAllQueriesOptions.ExpirationMode;
-            timeout = _cacheSettings.CacheAllQueriesOptions.Timeout;
+            cacheTimeout = _cacheSettings.CacheAllQueriesOptions.Timeout;
         }
         else if (isDefaultCacheableMethod && _cacheSettings.CachableQueriesOptions.IsActive)
         {
             expirationMode = _cacheSettings.CachableQueriesOptions.ExpirationMode;
-            timeout = _cacheSettings.CachableQueriesOptions.Timeout;
+            cacheTimeout = _cacheSettings.CachableQueriesOptions.Timeout;
         }
 
         return new EFCachePolicy().ExpirationMode(expirationMode)
             .SaltKey(saltKey)
-            .Timeout(timeout)
+            .Timeout(cacheTimeout)
             .CacheDependencies(cacheDependencies);
     }
 

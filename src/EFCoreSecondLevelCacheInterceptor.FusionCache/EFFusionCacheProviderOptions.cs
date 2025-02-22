@@ -43,7 +43,7 @@ public static class EFFusionCacheProviderOptions
     /// </param>
     public static EFCoreSecondLevelCacheOptions UseFusionCacheProvider(this EFCoreSecondLevelCacheOptions options,
         CacheExpirationMode expirationMode,
-        TimeSpan timeout,
+        TimeSpan? timeout = null,
         string? namedCache = null)
     {
         ArgumentNullException.ThrowIfNull(options);

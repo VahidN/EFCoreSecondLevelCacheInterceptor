@@ -40,13 +40,19 @@ public class EFMemoryCacheServiceProvider(
             Size = 1
         };
 
-        if (cachePolicy.CacheExpirationMode == CacheExpirationMode.Absolute)
+        switch (cachePolicy.CacheExpirationMode)
         {
-            options.AbsoluteExpirationRelativeToNow = cachePolicy.CacheTimeout;
-        }
-        else
-        {
-            options.SlidingExpiration = cachePolicy.CacheTimeout;
+            case CacheExpirationMode.NeverRemove:
+                // the item will theoretically remain cached indefinitely
+                break;
+            case CacheExpirationMode.Absolute:
+                options.AbsoluteExpirationRelativeToNow = cachePolicy.CacheTimeout;
+
+                break;
+            default:
+                options.SlidingExpiration = cachePolicy.CacheTimeout;
+
+                break;
         }
 
         foreach (var rootCacheKey in cacheKey.CacheDependencies)
