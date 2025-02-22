@@ -74,7 +74,7 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
-        <PackageReference Include="ZiggyCreatures.FusionCache" Version="[2.0.0,)"/>
+        <PackageReference Include="ZiggyCreatures.FusionCache" Version="[2.1.0,)"/>
         <None Include="../../README.md" Link="README.md" Pack="true" PackagePath="/" Visible="false"/>
     </ItemGroup>
 </Project>
