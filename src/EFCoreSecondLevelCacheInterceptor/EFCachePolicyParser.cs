@@ -127,6 +127,8 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         var efCachePolicy = GetParsedPolicy(commandText) ?? GetSpecificGlobalPolicy(commandText, allEntityTypes) ??
             GetSkippedGlobalPolicy(commandText, allEntityTypes) ?? GetGlobalPolicy(commandText);
 
+        efCachePolicy = TryOverrideCachePolicy(efCachePolicy, commandText, allEntityTypes);
+
         if (efCachePolicy != null && _logger.IsLoggerEnabled)
         {
             var message = $"Using EFCachePolicy: {efCachePolicy}.";
@@ -134,6 +136,32 @@ public class EFCachePolicyParser : IEFCachePolicyParser
 
             _logger.NotifyCacheableEvent(CacheableLogEventId.CachePolicyCalculated, message, commandText,
                 efCacheKey: null);
+        }
+
+        return efCachePolicy;
+    }
+
+    private EFCachePolicy? TryOverrideCachePolicy(EFCachePolicy? efCachePolicy,
+        string commandText,
+        IList<TableEntityInfo> allEntityTypes)
+    {
+        if (_cacheSettings.OverrideCachePolicy is null)
+        {
+            return efCachePolicy;
+        }
+
+        var newCachePolicy = _cacheSettings.OverrideCachePolicy(new EFCachePolicyContext
+        {
+            CommandText = commandText,
+            CommandTableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText),
+            CommandEntityTypes = _sqlCommandsProcessor.GetSqlCommandEntityTypes(commandText, allEntityTypes),
+            IsCrudCommand = _sqlCommandsProcessor.IsCrudCommand(commandText),
+            CommandCachePolicy = efCachePolicy
+        });
+
+        if (newCachePolicy is not null)
+        {
+            efCachePolicy = newCachePolicy;
         }
 
         return efCachePolicy;

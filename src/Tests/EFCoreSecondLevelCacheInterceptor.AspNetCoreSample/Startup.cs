@@ -92,7 +92,21 @@ public class Startup
                 .SkipCacheInvalidationCommands(commandText =>
 
                     // How to skip invalidating the related cache entries of this query
-                    commandText.Contains(value: "NEWID()", StringComparison.InvariantCultureIgnoreCase));
+                    commandText.Contains(value: "NEWID()", StringComparison.InvariantCultureIgnoreCase))
+                .OverrideCachePolicy(context =>
+                {
+                    if (context.IsCrudCommand)
+                    {
+                        return null;
+                    }
+
+                    if (context.CommandTableNames.Contains(item: "posts"))
+                    {
+                        return new EFCachePolicy().ExpirationMode(CacheExpirationMode.NeverRemove);
+                    }
+
+                    return null; // Use the default/calculated EFCachePolicy 
+                });
         });
 
         var connectionString = Configuration[key: "ConnectionStrings:ApplicationDbContextConnection"];

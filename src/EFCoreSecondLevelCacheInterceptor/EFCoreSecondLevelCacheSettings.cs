@@ -121,6 +121,12 @@ public class EFCoreSecondLevelCacheSettings
     public Predicate<string>? SkipCacheInvalidationCommands { set; get; }
 
     /// <summary>
+    ///     Here you can override the default cache-policy of the current query.
+    ///     Return null, if you want to use the default settings.
+    /// </summary>
+    public Func<EFCachePolicyContext, EFCachePolicy?>? OverrideCachePolicy { set; get; }
+
+    /// <summary>
     ///     Queries containing these types will not be cached.
     /// </summary>
     public IList<Type>? SkipCachingDbContexts { set; get; }

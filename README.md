@@ -2,14 +2,16 @@
 
 [![EFCoreSecondLevelCacheInterceptor](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/workflows/.NET%20Core%20Build/badge.svg)](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor)
 
-Second level caching is a query cache. The results of EF commands will be stored in the cache, so that the same EF commands will retrieve their data from the cache rather than executing them against the database again.
-
+Second level caching is a query cache. The results of EF commands will be stored in the cache, so that the same EF
+commands will retrieve their data from the cache rather than executing them against the database again.
 
 ## How to upgrade to version 5
 
 To support more advanced caching providers, this library uses different assemblies and NuGet packages now.
-To upgrade to version 5, first remove the `EFCoreSecondLevelCacheInterceptor` dependency. It doesn't have any built-in caching provider anymore. 
-But you can still use it to introduce your own custom caching provider by calling its `options.UseCustomCacheProvider<T>()` method (and you won't need the new packages).
+To upgrade to version 5, first remove the `EFCoreSecondLevelCacheInterceptor` dependency. It doesn't have any built-in
+caching provider anymore.
+But you can still use it to introduce your own custom caching provider by calling its
+`options.UseCustomCacheProvider<T>()` method (and you won't need the new packages).
 To install `EFCoreSecondLevelCacheInterceptor` as before, run the following command in the Package Manager Console:
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor/)
@@ -21,20 +23,25 @@ dotnet add package EFCoreSecondLevelCacheInterceptor
 But if you were using the built-in `In-Memory` cache provider, just install this new package:
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.MemoryCache)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.MemoryCache/)
+
 ```powershell
 dotnet add package EFCoreSecondLevelCacheInterceptor.MemoryCache
 ```
 
-Or if you were using the `EasyCaching.Core provider`, install the new `EFCoreSecondLevelCacheInterceptor.EasyCaching.Core` package:
+Or if you were using the `EasyCaching.Core provider`, install the new
+`EFCoreSecondLevelCacheInterceptor.EasyCaching.Core` package:
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core/)
+
 ```powershell
 dotnet add package EFCoreSecondLevelCacheInterceptor.EasyCaching.Core
 ```
 
-Or if you were using the `CacheManager.Core provider`, install the new `EFCoreSecondLevelCacheInterceptor.CacheManager.Core` package:
+Or if you were using the `CacheManager.Core provider`, install the new
+`EFCoreSecondLevelCacheInterceptor.CacheManager.Core` package:
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.CacheManager.Core)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.CacheManager.Core/)
+
 ```powershell
 dotnet add package EFCoreSecondLevelCacheInterceptor.CacheManager.Core
 ```
@@ -43,9 +50,11 @@ Also there are two new caching providers available in V5:
 
 ### 1- EFCoreSecondLevelCacheInterceptor.StackExchange.Redis
 
-This provider uses the StackExchange.Redis as a cache provider and it's preconfigured with a MessagePack serializer. To use it, first you should install its new NuGet package:
+This provider uses the StackExchange.Redis as a cache provider and it's preconfigured with a MessagePack serializer. To
+use it, first you should install its new NuGet package:
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis/)
+
 ```powershell
 dotnet add package EFCoreSecondLevelCacheInterceptor.StackExchange.Redis
 ```
@@ -71,9 +80,11 @@ services.AddEFSecondLevelCache(options
 
 ### 2- EFCoreSecondLevelCacheInterceptor.FusionCache
 
-This provider uses the [FusionCache](https://github.com/ZiggyCreatures/FusionCache) as a cache provider. To use it, first you should install its new NuGet package:
+This provider uses the [FusionCache](https://github.com/ZiggyCreatures/FusionCache) as a cache provider. To use it,
+first you should install its new NuGet package:
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.FusionCache)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.FusionCache/)
+
 ```powershell
 dotnet add package EFCoreSecondLevelCacheInterceptor.FusionCache
 ```
@@ -121,7 +132,6 @@ services.AddFusionCache()
 			
 services.AddEFSecondLevelCache(options => options.UseFusionCacheProvider());
 ```
-
 
 ## Usage ([1](#1--register-a-preferred-cache-provider) & [2](#2--add-secondlevelcacheinterceptor-to-your-dbcontextoptionsbuilder-pipeline) are mandatory)
 
@@ -179,7 +189,8 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 
 #### Using EasyCaching.Core as the cache provider
 
-Here you can use the [EasyCaching.Core](https://github.com/dotnetcore/EasyCaching), as a highly configurable cache manager too.
+Here you can use the [EasyCaching.Core](https://github.com/dotnetcore/EasyCaching), as a highly configurable cache
+manager too.
 To use its in-memory caching mechanism, add this entry to the `.csproj` file:
 
 ```xml
@@ -238,7 +249,8 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
 }
 ```
 
-If you want to use the Redis as the preferred cache provider with `EasyCaching.Core`, first install the following package:
+If you want to use the Redis as the preferred cache provider with `EasyCaching.Core`, first install the following
+package:
 
 ```xml
   <ItemGroup>
@@ -300,10 +312,11 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
 
 [Here is a sample about it](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/Issues/Issue123WithMessagePack/EFServiceProvider.cs).
 
-
 #### Using EasyCaching.Core as a dynamic cache provider
 
-If you want to support multitenancy in your application and have a different Redis database per each tenant, first register multiple pre-configured providers with known `providerName`s and then select these `providerName`s based on the current tenant this way dynamically:
+If you want to support multitenancy in your application and have a different Redis database per each tenant, first
+register multiple pre-configured providers with known `providerName`s and then select these `providerName`s based on the
+current tenant this way dynamically:
 
 ```C#
 services.AddEFSecondLevelCache(options =>
@@ -319,10 +332,10 @@ services.AddEFSecondLevelCache(options =>
 );
 ```
 
-
 #### Using CacheManager.Core as the cache provider [It's not actively maintained]
 
-Also here you can use the [CacheManager.Core](https://github.com/MichaCo/CacheManager), as a highly configurable cache manager too.
+Also here you can use the [CacheManager.Core](https://github.com/MichaCo/CacheManager), as a highly configurable cache
+manager too.
 To use its in-memory caching mechanism, add these entries to the `.csproj` file:
 
 ```xml
@@ -360,7 +373,8 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
 }
 ```
 
-If you want to use the Redis as the preferred cache provider with `CacheManager.Core`, first install the `CacheManager.StackExchange.Redis` package and then register its required services:
+If you want to use the Redis as the preferred cache provider with `CacheManager.Core`, first install the
+`CacheManager.StackExchange.Redis` package and then register its required services:
 
 ```csharp
 // Add Redis cache service provider
@@ -401,13 +415,16 @@ services.AddEFSecondLevelCache(options =>
 );
 ```
 
-[Here is](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/Settings/EFServiceProvider.cs#L21) the definition of the SpecialTypesConverter.
+[Here is](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/Settings/EFServiceProvider.cs#L21)
+the definition of the SpecialTypesConverter.
 
 #### Using a custom cache provider
 
-If you don't want to use the above cache providers, implement your custom `IEFCacheServiceProvider` and then introduce it using the `options.UseCustomCacheProvider<T>()` method.
+If you don't want to use the above cache providers, implement your custom `IEFCacheServiceProvider` and then introduce
+it using the `options.UseCustomCacheProvider<T>()` method.
 
-### 2- [Add SecondLevelCacheInterceptor](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/MsSqlServiceCollectionExtensions.cs) to your `DbContextOptionsBuilder` pipeline:
+### 2- [Add SecondLevelCacheInterceptor](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/MsSqlServiceCollectionExtensions.cs) to your
+`DbContextOptionsBuilder` pipeline:
 
 ```csharp
     public static class MsSqlServiceCollectionExtensions
@@ -431,12 +448,18 @@ If you don't want to use the above cache providers, implement your custom `IEFCa
     }
 ```
 
-Note: Some database providers don't support special fields such as `DateTimeOffset`, `TimeSpan`, etc. For these scenarios you will need [the related converters](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/blob/masterhttps://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/Issues/Issue9SQLiteInt32/DataLayer/ApplicationDbContext.cs#L35).
+Note: Some database providers don't support special fields such as `DateTimeOffset`, `TimeSpan`, etc. For these
+scenarios you will
+need [the related converters](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/blob/masterhttps://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/Issues/Issue9SQLiteInt32/DataLayer/ApplicationDbContext.cs#L35).
 
 ### 3- Setting up the cache invalidation:
 
-This library doesn't need any settings for the cache invalidation. It watches for all of the CRUD operations using its interceptor and then invalidates the related cache entries automatically.
-But if you want to invalidate the whole cache `manually`, inject the `IEFCacheServiceProvider` service and then call its `_cacheServiceProvider.ClearAllCachedEntries()` method or use it this way to specify the root cache keys which are a collection of a Prefix+TableName:
+This library doesn't need any settings for the cache invalidation. It watches for all of the CRUD operations using its
+interceptor and then invalidates the related cache entries automatically.
+But if you want to invalidate the whole cache `manually`, inject the `IEFCacheServiceProvider` service and then call its
+`_cacheServiceProvider.ClearAllCachedEntries()` method or use it this way to specify the root cache keys which are a
+collection of a Prefix+TableName:
+
 ```C#
 // Partial cache invalidation using the specified table names
 // This is useful when you are monitoring your DB's changes using the SqlTableDependency
@@ -447,7 +470,9 @@ _cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<str
 }));
 ```
 
-I you want to get notified about the cache-invalidation events and involved cache dependencies, use the `NotifyCacheInvalidation` method:
+I you want to get notified about the cache-invalidation events and involved cache dependencies, use the
+`NotifyCacheInvalidation` method:
+
 ```C#
 services.AddEFSecondLevelCache(options =>
 {
@@ -462,7 +487,6 @@ services.AddEFSecondLevelCache(options =>
                                 : $"Invalidated [{string.Join(separator: ", ", invalidationInfo.CacheDependencies)}] dependencies.");
                 })
 ```
-
 
 ### 4- To cache the results of the normal queries like:
 
@@ -483,7 +507,10 @@ var post1 = context.Posts
                    .FirstOrDefault();  // Async methods are supported too.
 ```
 
-NOTE: It doesn't matter where the `Cacheable` method is located in this expression tree. [It just adds](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/EFCoreSecondLevelCacheInterceptor/EFCachedQueryExtensions.cs) the standard `TagWith` method to mark this query as `Cacheable`. Later `SecondLevelCacheInterceptor` will use this tag to identify the `Cacheable` queries.
+NOTE: It doesn't matter where the `Cacheable` method is located in this expression
+tree. [It just adds](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/EFCoreSecondLevelCacheInterceptor/EFCachedQueryExtensions.cs)
+the standard `TagWith` method to mark this query as `Cacheable`. Later `SecondLevelCacheInterceptor` will use this tag
+to identify the `Cacheable` queries.
 
 Also it's possible to set the `Cacheable()` method's settings globally:
 
@@ -505,7 +532,8 @@ var post1 = context.Posts
                    .FirstOrDefault();  // Async methods are supported too.
 ```
 
-If you specify the settings of the `Cacheable()` method explicitly such as `Cacheable(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(5))`, its setting will override the global setting.
+If you specify the settings of the `Cacheable()` method explicitly such as
+`Cacheable(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(5))`, its setting will override the global setting.
 
 ## Caching all of the queries
 
@@ -529,11 +557,14 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             // ...
 ```
 
-This will put the whole system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some of the queries from this global cache, apply the `NotCacheable()` method to them.
+This will put the whole system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If
+you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some of the
+queries from this global cache, apply the `NotCacheable()` method to them.
 
 ## Caching some of the queries
 
-To cache some of the system's queries based on their entity-types or table-names, use `CacheQueriesContainingTypes` or `CacheQueriesContainingTableNames` methods:
+To cache some of the system's queries based on their entity-types or table-names, use `CacheQueriesContainingTypes` or
+`CacheQueriesContainingTableNames` methods:
 
 ```csharp
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
@@ -560,7 +591,9 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             // ...
 ```
 
-This will put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some of the queries from this global cache, apply the `NotCacheable()` method to them.
+This will put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be
+necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to
+exclude some of the queries from this global cache, apply the `NotCacheable()` method to them.
 Also you can skip caching some of the defined DbContexts using `SkipCachingDbContexts()` method.
 
 ## Skip caching of some of the queries
@@ -611,7 +644,8 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
 
 ## Skip caching some of the queries based on their table names
 
-To do not cache some of the system's queries based on their entity-types or table-names, use `CacheAllQueriesExceptContainingTypes` or `CacheAllQueriesExceptContainingTableNames` methods:
+To do not cache some of the system's queries based on their entity-types or table-names, use
+`CacheAllQueriesExceptContainingTypes` or `CacheAllQueriesExceptContainingTableNames` methods:
 
 ```csharp
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
@@ -638,11 +672,14 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             // ...
 ```
 
-This will not put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If you specify the `Cacheable()` method, its setting will override this global setting.
+This will not put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be
+necessary. If you specify the `Cacheable()` method, its setting will override this global setting.
 
 ## Skip invalidating the related cache entries of a given query
 
-Sometimes you don't want to invalidate the cache immediately, such when you are updating a post's likes or views count. In this case to skip invalidating the related cache entries of a given CRUD command, set the `SkipCacheInvalidationCommands` predicate:
+Sometimes you don't want to invalidate the cache immediately, such when you are updating a post's likes or views count.
+In this case to skip invalidating the related cache entries of a given CRUD command, set the
+`SkipCacheInvalidationCommands` predicate:
 
 ```csharp
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
@@ -663,10 +700,47 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             // ...
 ```
 
-## Using a different hash provider  
+## Overriding the default cache-policy
 
-This library uses the [XxHash64Unsafe](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/EFCoreSecondLevelCacheInterceptor/XxHash64Unsafe.cs) class to calculate the hash of a query and its parameters to produce a corresponding cache-key.
-`xxHash` is an extremely fast `non-cryptographic` Hash algorithm. If you don't like it or you want to change it, just implement the `IEFHashProvider` interface and then introduce it this way:  
+Use `OverrideCachePolicy()` method to override the default/calculated cache-policy of the currently executing query:
+
+```csharp
+namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddEFSecondLevelCache(options =>
+            {
+                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
+                    // Fallback on db if the caching provider fails.
+                    .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
+                    .OverrideCachePolicy(context =>
+					{
+						if (context.IsCrudCommand)
+						{
+							return null;
+						}
+
+						if (context.CommandTableNames.Contains(item: "posts"))
+						{
+							return new EFCachePolicy().ExpirationMode(CacheExpirationMode.NeverRemove);
+						}
+
+						return null; // Use the default/calculated EFCachePolicy 
+					});
+            });
+            // ...
+```
+
+## Using a different hash provider
+
+This library uses
+the [XxHash64Unsafe](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/EFCoreSecondLevelCacheInterceptor/XxHash64Unsafe.cs)
+class to calculate the hash of a query and its parameters to produce a corresponding cache-key.
+`xxHash` is an extremely fast `non-cryptographic` Hash algorithm. If you don't like it or you want to change it, just
+implement the `IEFHashProvider` interface and then introduce it this way:
 
 ```csharp
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
@@ -684,16 +758,15 @@ namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
             // ...
 ```
 
-
 ## Disabling the interceptor for a while
 
-If you want to disable this interceptor for a while, use the `.EnableCachingInterceptor(enable: false)` method. Its default value is true.
-
+If you want to disable this interceptor for a while, use the `.EnableCachingInterceptor(enable: false)` method. Its
+default value is true.
 
 ## Providing options to control the serialization behavior
 
-The EFCacheKeyProvider class serializes parameter values of a DbCommand to JSON values. If it causes an exception in some cases, you can specify a custom JsonSerializerOptions for it using the `UseJsonSerializerOptions(options)` method.
-
+The EFCacheKeyProvider class serializes parameter values of a DbCommand to JSON values. If it causes an exception in
+some cases, you can specify a custom JsonSerializerOptions for it using the `UseJsonSerializerOptions(options)` method.
 
 ## Does it work?!
 
@@ -722,8 +795,8 @@ And then change the log level to `Debug` in your `appsettings.json` file:
 }
 ```
 
-Or ... you can use the second optional parameter of the `ConfigureLogging` method to access the published events of this library more easily:
-
+Or ... you can use the second optional parameter of the `ConfigureLogging` method to access the published events of this
+library more easily:
 
 ```c#
  .ConfigureLogging(enable: environment.IsDevelopment(), cacheableEvent: args =>
@@ -769,8 +842,11 @@ Notes:
 
 - Having the `Suppressed the result with the TableRows` message means the caching interceptor is working fine.
 - The next `Executed DbCommand` means nothing and it always will be logged by EF.
-- At the beginning there will be a lot of internal commands executed by the EF to run migrations, etc. Ignore these commands, because you will see the `Suppressed the result with the TableRows` messages for the frequently running queries.
-- Also you should verify it with a real DB profiler. It will log the 1st executed query and then on the 2nd run, you won't see it anymore.
+- At the beginning there will be a lot of internal commands executed by the EF to run migrations, etc. Ignore these
+  commands, because you will see the `Suppressed the result with the TableRows` messages for the frequently running
+  queries.
+- Also you should verify it with a real DB profiler. It will log the 1st executed query and then on the 2nd run, you
+  won't see it anymore.
 
 ## Samples
 
@@ -782,16 +858,24 @@ Notes:
 
 ### When to use
 
-Good candidates for query caching are global site settings and public data, such as infrequently changing articles or comments. It can also be beneficial to cache data specific to a user so long as the cache expires frequently enough relative to the size of the user base that memory consumption remains acceptable. Small, per-user data that frequently exceeds the cache's lifetime, such as a user's photo path, is better held in user claims, which are stored in cookies, than in this cache.
+Good candidates for query caching are global site settings and public data, such as infrequently changing articles or
+comments. It can also be beneficial to cache data specific to a user so long as the cache expires frequently enough
+relative to the size of the user base that memory consumption remains acceptable. Small, per-user data that frequently
+exceeds the cache's lifetime, such as a user's photo path, is better held in user claims, which are stored in cookies,
+than in this cache.
 
 ### Scope
 
-This cache is scoped to the application, not the current user. It does not use session variables. Accordingly, when retrieving cached per-user data, be sure queries in include code such as `.Where(x => .... && x.UserId == id)`.
+This cache is scoped to the application, not the current user. It does not use session variables. Accordingly, when
+retrieving cached per-user data, be sure queries in include code such as `.Where(x => .... && x.UserId == id)`.
 
 ### Invalidation
 
-This cache is updated when an entity is changed (insert, update, or delete) via a DbContext that uses this library. If the database is updated through some other means, such as a stored procedure or trigger, the cache becomes stale.
+This cache is updated when an entity is changed (insert, update, or delete) via a DbContext that uses this library. If
+the database is updated through some other means, such as a stored procedure or trigger, the cache becomes stale.
 
 ### Transactions
 
-To avoid complications, all of the queries inside an `explicit` transaction (context.Database.BeginTransaction()) will not be cached. But the cache invalidations due to its CRUD operations will occur. You can use `.AllowCachingWithExplicitTransactions(true)` setting to disable it.
+To avoid complications, all of the queries inside an `explicit` transaction (context.Database.BeginTransaction()) will
+not be cached. But the cache invalidations due to its CRUD operations will occur. You can use
+`.AllowCachingWithExplicitTransactions(true)` setting to disable it.

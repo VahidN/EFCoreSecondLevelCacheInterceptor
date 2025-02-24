@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>Entity Framework Core Second Level Caching Library.</Description>
-        <VersionPrefix>5.1.1</VersionPrefix>
+        <VersionPrefix>5.2.0</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
         <TargetFrameworks>net9.0;net8.0;</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>

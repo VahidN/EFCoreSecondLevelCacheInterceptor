@@ -338,4 +338,15 @@ public class EFCoreSecondLevelCacheOptions
 
         return this;
     }
+
+    /// <summary>
+    ///     Here you can override the default/calculated cache-policy of the current query.
+    ///     Return null, if you want to use the default/calculated settings.
+    /// </summary>
+    public EFCoreSecondLevelCacheOptions OverrideCachePolicy(Func<EFCachePolicyContext, EFCachePolicy?> cachePolicy)
+    {
+        Settings.OverrideCachePolicy = cachePolicy ?? throw new ArgumentNullException(nameof(cachePolicy));
+
+        return this;
+    }
 }
