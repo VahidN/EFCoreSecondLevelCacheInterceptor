@@ -70,19 +70,25 @@ public static class EFServiceProvider
         {
             case TestCacheProvider.BuiltInInMemory:
                 services.AddEFSecondLevelCache(options
-                    => options.UseMemoryCacheProvider().ConfigureLogging(enable: true));
+                    => options.UseMemoryCacheProvider()
+                        .ConfigureLogging(enable: true)
+                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
 
                 break;
             case TestCacheProvider.CacheManagerCoreInMemory:
                 services.AddEFSecondLevelCache(options
-                    => options.UseCacheManagerCoreProvider().ConfigureLogging(enable: true));
+                    => options.UseCacheManagerCoreProvider()
+                        .ConfigureLogging(enable: true)
+                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
 
                 addCacheManagerCoreInMemory(services);
 
                 break;
             case TestCacheProvider.CacheManagerCoreRedis:
                 services.AddEFSecondLevelCache(options
-                    => options.UseCacheManagerCoreProvider().ConfigureLogging(enable: true));
+                    => options.UseCacheManagerCoreProvider()
+                        .ConfigureLogging(enable: true)
+                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
 
                 addCacheManagerCoreRedis(services);
 
@@ -91,7 +97,9 @@ public static class EFServiceProvider
                 const string providerName1 = "InMemory1";
 
                 services.AddEFSecondLevelCache(options
-                    => options.UseEasyCachingCoreProvider(providerName1).ConfigureLogging(enable: true));
+                    => options.UseEasyCachingCoreProvider(providerName1)
+                        .ConfigureLogging(enable: true)
+                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
 
                 addEasyCachingCoreInMemory(services, providerName1);
 
@@ -100,7 +108,9 @@ public static class EFServiceProvider
                 const string providerName2 = "Redis1";
 
                 services.AddEFSecondLevelCache(options
-                    => options.UseEasyCachingCoreProvider(providerName2).ConfigureLogging(enable: true));
+                    => options.UseEasyCachingCoreProvider(providerName2)
+                        .ConfigureLogging(enable: true)
+                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
 
                 addEasyCachingCoreRedis(services, providerName2);
 
@@ -110,7 +120,8 @@ public static class EFServiceProvider
 
                 services.AddEFSecondLevelCache(options
                     => options.UseEasyCachingCoreProvider(providerName3, isHybridCache: true)
-                        .ConfigureLogging(enable: true));
+                        .ConfigureLogging(enable: true)
+                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
 
                 addEasyCachingCoreHybrid(services, providerName3);
 
@@ -119,7 +130,9 @@ public static class EFServiceProvider
                 AddFusionCache(services);
 
                 services.AddEFSecondLevelCache(options
-                    => options.UseFusionCacheProvider().ConfigureLogging(enable: true));
+                    => options.UseFusionCacheProvider()
+                        .ConfigureLogging(enable: true)
+                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
 
                 break;
             case TestCacheProvider.StackExchangeRedis:
@@ -138,7 +151,8 @@ public static class EFServiceProvider
 
                 services.AddEFSecondLevelCache(options
                     => options.UseStackExchangeRedisCacheProvider(redisOptions, TimeSpan.FromMinutes(minutes: 5))
-                        .ConfigureLogging(enable: true));
+                        .ConfigureLogging(enable: true)
+                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
 
                 break;
             default:
@@ -147,7 +161,15 @@ public static class EFServiceProvider
 
         var serviceProvider = services.BuildServiceProvider();
         var cacheProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
-        cacheProvider.ClearAllCachedEntries();
+
+        try
+        {
+            cacheProvider.ClearAllCachedEntries();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
 
         return cacheProvider;
     }
@@ -196,7 +218,12 @@ public static class EFServiceProvider
         var services = new ServiceCollection();
         services.AddOptions();
         services.AddLogging(cfg => cfg.AddConsole().AddDebug());
-        services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider().ConfigureLogging(enable: true));
+
+        services.AddEFSecondLevelCache(options
+            => options.UseMemoryCacheProvider()
+                .ConfigureLogging(enable: true)
+                .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
+
         var serviceProvider = services.BuildServiceProvider();
 
         return serviceProvider.GetRequiredService<T>();
@@ -222,7 +249,7 @@ public static class EFServiceProvider
 
         services.AddEFSecondLevelCache(options =>
         {
-            options.ConfigureLogging(enable: true);
+            options.ConfigureLogging(enable: true).UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1));
 
             switch (cacheProvider)
             {
@@ -520,8 +547,16 @@ public static class EFServiceProvider
         using (_locker.Lock())
         {
             var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
-            var cacheServiceProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
-            cacheServiceProvider.ClearAllCachedEntries();
+
+            try
+            {
+                var cacheServiceProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
+                cacheServiceProvider.ClearAllCachedEntries();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
 
             using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {

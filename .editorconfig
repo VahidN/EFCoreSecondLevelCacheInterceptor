@@ -9,6 +9,7 @@ dotnet_diagnostic.S127.severity = suggestion
 dotnet_diagnostic.S2857.severity = suggestion
 dotnet_diagnostic.S2094.severity = suggestion
 dotnet_diagnostic.CA2227.severity = suggestion 
+dotnet_diagnostic.CA1031.severity = suggestion
 
 dotnet_diagnostic.IDE0055.severity = none
 dotnet_diagnostic.IDE0160.severity = none
