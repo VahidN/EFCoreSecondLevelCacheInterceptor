@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
@@ -14,12 +15,15 @@ public class EFCacheServiceCheckTests
     {
         var cacheOptionsMock = new Mock<IOptions<EFCoreSecondLevelCacheSettings>>();
 
+        var cacheServiceCheckLoggerMock = new Mock<ILogger<EFCacheServiceCheck>>();
+        var loggerMock = new Mock<IEFDebugLogger>();
         _cacheServiceProviderMock = new Mock<IEFCacheServiceProvider>();
         _cacheSettings = new EFCoreSecondLevelCacheSettings();
 
         cacheOptionsMock.Setup(c => c.Value).Returns(_cacheSettings);
 
-        _serviceCheck = new EFCacheServiceCheck(cacheOptionsMock.Object, _cacheServiceProviderMock.Object);
+        _serviceCheck = new EFCacheServiceCheck(cacheOptionsMock.Object, _cacheServiceProviderMock.Object,
+            loggerMock.Object, cacheServiceCheckLoggerMock.Object);
     }
 
     [Fact]
@@ -30,7 +34,8 @@ public class EFCacheServiceCheckTests
 
         // Act && Assert
         // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(() => new EFCacheServiceCheck(null, cacheServiceProviderMock.Object));
+        Assert.Throws<ArgumentNullException>(() => new EFCacheServiceCheck(cacheSettings: null,
+            cacheServiceProviderMock.Object, logger: null, cacheServiceCheckLogger: null));
     }
 
     [Fact]
@@ -44,7 +49,8 @@ public class EFCacheServiceCheckTests
         var cacheServiceProviderMock = new Mock<IEFCacheServiceProvider>();
 
         // Act
-        var serviceCheck = new EFCacheServiceCheck(cacheSettingsMock.Object, cacheServiceProviderMock.Object);
+        var serviceCheck = new EFCacheServiceCheck(cacheSettingsMock.Object, cacheServiceProviderMock.Object,
+            logger: null, cacheServiceCheckLogger: null);
 
         // Assert
         Assert.NotNull(serviceCheck);
@@ -60,7 +66,9 @@ public class EFCacheServiceCheckTests
 
         // ReSharper disable once AssignNullToNotNullAttribute
         // ReSharper disable once ObjectCreationAsStatement
-        void Act() => new EFCacheServiceCheck(cacheSettingsMock.Object, null);
+        void Act()
+            => new EFCacheServiceCheck(cacheSettingsMock.Object, cacheServiceProvider: null, logger: null,
+                cacheServiceCheckLogger: null);
 
         // Act
         var actual = Record.Exception(Act);
@@ -104,8 +112,7 @@ public class EFCacheServiceCheckTests
         _cacheSettings.IsCachingInterceptorEnabled = true;
         _cacheSettings.UseDbCallsIfCachingProviderIsDown = true;
 
-        _cacheServiceProviderMock
-            .Setup(c => c.GetValue(It.IsAny<EFCacheKey>(), It.IsAny<EFCachePolicy>()))
+        _cacheServiceProviderMock.Setup(c => c.GetValue(It.IsAny<EFCacheKey>(), It.IsAny<EFCachePolicy>()))
             .Returns(new EFCachedData());
 
         // Act
@@ -117,21 +124,20 @@ public class EFCacheServiceCheckTests
 
     [Fact]
     public void
-        IsCacheServiceAvailable_ThrowsInvalidOperationException_WhenUseDbCallsIfCachingProviderIsDownIsTrue_And_CacheServerIsNotAvailable()
+        IsCacheServiceAvailable_DoesNotThrowsInvalidOperationException_WhenUseDbCallsIfCachingProviderIsDownIsTrue_And_CacheServerIsNotAvailable()
     {
         // Arrange
         _cacheSettings.IsCachingInterceptorEnabled = true;
         _cacheSettings.UseDbCallsIfCachingProviderIsDown = true;
 
-        _cacheServiceProviderMock
-            .Setup(c => c.GetValue(It.IsAny<EFCacheKey>(), It.IsAny<EFCachePolicy>()))
+        _cacheServiceProviderMock.Setup(c => c.GetValue(It.IsAny<EFCacheKey>(), It.IsAny<EFCachePolicy>()))
             .Throws<InvalidOperationException>();
 
         // Act
-        void Act() => _serviceCheck.IsCacheServiceAvailable();
+        var result = _serviceCheck.IsCacheServiceAvailable();
 
         // Assert
-        Assert.Throws<InvalidOperationException>(Act);
+        Assert.False(result);
     }
 
     [Fact]
@@ -142,8 +148,7 @@ public class EFCacheServiceCheckTests
         _cacheSettings.UseDbCallsIfCachingProviderIsDown = true;
         _cacheSettings.NextCacheServerAvailabilityCheck = TimeSpan.MaxValue;
 
-        _cacheServiceProviderMock
-            .Setup(c => c.GetValue(It.IsAny<EFCacheKey>(), It.IsAny<EFCachePolicy>()))
+        _cacheServiceProviderMock.Setup(c => c.GetValue(It.IsAny<EFCacheKey>(), It.IsAny<EFCachePolicy>()))
             .Returns(new EFCachedData());
 
         _serviceCheck.IsCacheServiceAvailable();
