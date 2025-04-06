@@ -34,6 +34,9 @@ jobs:
     - name: Build EFCoreSecondLevelCacheInterceptor.StackExchange.Redis lib
       run: dotnet build ./src/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis.csproj --configuration Release
 
+    - name: Build EFCoreSecondLevelCacheInterceptor.HybridCache lib
+      run: dotnet build ./src/EFCoreSecondLevelCacheInterceptor.HybridCache/EFCoreSecondLevelCacheInterceptor.HybridCache.csproj --configuration Release
+
     - name: Push Package to NuGet.org
       if: github.event_name == 'push'
       run: dotnet nuget push **\*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
