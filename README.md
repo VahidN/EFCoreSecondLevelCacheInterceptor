@@ -350,7 +350,7 @@ services.AddEFSecondLevelCache(options =>
 );
 ```
 
-#### Using CacheManager.Core as the cache provider [It's not actively maintained]
+#### Using CacheManager.Core as the cache provider
 
 Also here you can use the [CacheManager.Core](https://github.com/MichaCo/CacheManager), as a highly configurable cache
 manager too.
@@ -358,9 +358,9 @@ To use its in-memory caching mechanism, add these entries to the `.csproj` file:
 
 ```xml
   <ItemGroup>
-    <PackageReference Include="CacheManager.Core" Version="1.2.0" />
-    <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="1.2.0" />
-    <PackageReference Include="CacheManager.Serialization.Json" Version="1.2.0" />
+    <PackageReference Include="CacheManager.Core" Version="2.0.0" />
+    <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="2.0.0" />
+    <PackageReference Include="CacheManager.Serialization.Json" Version="2.0.0" />
   </ItemGroup>
 ```
 
