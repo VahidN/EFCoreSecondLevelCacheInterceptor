@@ -46,7 +46,7 @@ Or if you were using the `CacheManager.Core provider`, install the new
 dotnet add package EFCoreSecondLevelCacheInterceptor.CacheManager.Core
 ```
 
-Also there are two new caching providers available in V5:
+Also there are 3 new caching providers available in V5:
 
 ### 1- EFCoreSecondLevelCacheInterceptor.StackExchange.Redis
 
@@ -132,6 +132,24 @@ services.AddFusionCache()
 			
 services.AddEFSecondLevelCache(options => options.UseFusionCacheProvider());
 ```
+
+### 3- EFCoreSecondLevelCacheInterceptor.HybridCache
+
+This provider uses the [HybridCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/hybrid?view=aspnetcore-9.0) as a cache provider. To use it,
+first you should install its new NuGet package:
+
+[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.HybridCache)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.HybridCache/)
+
+```powershell
+dotnet add package EFCoreSecondLevelCacheInterceptor.HybridCache
+```
+
+And then this is how you can register its required services:
+
+```csharp			
+services.AddEFSecondLevelCache(options => options.UseHybridCacheProvider());
+```
+
 
 ## Usage ([1](#1--register-a-preferred-cache-provider) & [2](#2--add-secondlevelcacheinterceptor-to-your-dbcontextoptionsbuilder-pipeline) are mandatory)
 
