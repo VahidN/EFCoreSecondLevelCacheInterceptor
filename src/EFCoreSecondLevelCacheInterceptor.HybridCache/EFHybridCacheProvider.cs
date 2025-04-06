@@ -24,18 +24,19 @@ public class EFHybridCacheProvider(
         ArgumentNullException.ThrowIfNull(cacheKey);
         ArgumentNullException.ThrowIfNull(cachePolicy);
 
-        // NOTE: hybridCache doesn't have a synchronous API!! So ... we will wait!
-
         value ??= new EFCachedData
         {
             IsNull = true
         };
 
         hybridCache.SetAsync(cacheKey.KeyHash, value, new HybridCacheEntryOptions
-        {
-            Expiration = cachePolicy.CacheTimeout,
-            LocalCacheExpiration = cachePolicy.CacheTimeout
-        }, cacheKey.CacheDependencies);
+            {
+                Expiration = cachePolicy.CacheTimeout,
+                LocalCacheExpiration = cachePolicy.CacheTimeout
+            }, cacheKey.CacheDependencies)
+            .Preserve()
+            .GetAwaiter()
+            .GetResult();
 
         cacheDependenciesStore.AddCacheDependencies(cacheKey.CacheDependencies);
     }
@@ -62,10 +63,13 @@ public class EFHybridCacheProvider(
         ArgumentNullException.ThrowIfNull(cacheKey);
 
         return hybridCache.GetOrCreateAsync<EFCachedData?>(cacheKey.KeyHash, factory
-            => ValueTask.FromResult<EFCachedData?>(new EFCachedData
-            {
-                IsNull = true
-            }));
+                => ValueTask.FromResult<EFCachedData?>(new EFCachedData
+                {
+                    IsNull = true
+                }))
+            .Preserve()
+            .GetAwaiter()
+            .GetResult();
     }
 
     /// <summary>
@@ -81,11 +85,7 @@ public class EFHybridCacheProvider(
 
     private void InvalidateTaggedEntries(ISet<string> cacheDependencies)
     {
-        foreach (var rootCacheKey in cacheDependencies)
-        {
-            hybridCache.RemoveByTagAsync(rootCacheKey);
-        }
-
+        hybridCache.RemoveByTagAsync(cacheDependencies).Preserve().GetAwaiter().GetResult();
         cacheDependenciesStore.RemoveCacheDependencies(cacheDependencies);
     }
 }

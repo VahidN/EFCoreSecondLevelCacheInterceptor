@@ -27,10 +27,11 @@ public class EFHybridCacheDependenciesStore(HybridCache hybridCache) : IEFHybrid
     {
         tags ??= [];
 
-        // NOTE: hybridCache doesn't have a synchronous API!! So ... we will wait!
-
-        var currentTags = await hybridCache.GetOrCreateAsync<List<string>>(TagsCacheKey,
-            factory => ValueTask.FromResult<List<string>>([]));
+        var currentTags = hybridCache.GetOrCreateAsync<List<string>>(TagsCacheKey,
+                factory => ValueTask.FromResult<List<string>>([]))
+            .Preserve()
+            .GetAwaiter()
+            .GetResult();
 
         foreach (var tag in tags)
         {
@@ -40,7 +41,7 @@ public class EFHybridCacheDependenciesStore(HybridCache hybridCache) : IEFHybrid
             }
         }
 
-        hybridCache.SetAsync(TagsCacheKey, currentTags, Options);
+        hybridCache.SetAsync(TagsCacheKey, currentTags, Options).Preserve().GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -51,15 +52,18 @@ public class EFHybridCacheDependenciesStore(HybridCache hybridCache) : IEFHybrid
     {
         tags ??= [];
 
-        var currentTags = await hybridCache.GetOrCreateAsync<List<string>>(TagsCacheKey,
-            factory => ValueTask.FromResult<List<string>>([]));
+        var currentTags = hybridCache.GetOrCreateAsync<List<string>>(TagsCacheKey,
+                factory => ValueTask.FromResult<List<string>>([]))
+            .Preserve()
+            .GetAwaiter()
+            .GetResult();
 
         foreach (var tag in tags)
         {
             currentTags.Remove(tag);
         }
 
-        hybridCache.SetAsync(TagsCacheKey, currentTags, Options);
+        hybridCache.SetAsync(TagsCacheKey, currentTags, Options).Preserve().GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -67,6 +71,8 @@ public class EFHybridCacheDependenciesStore(HybridCache hybridCache) : IEFHybrid
     /// </summary>
     public ISet<string> GetAllCacheDependencies()
         => new HashSet<string>(
-            await hybridCache.GetOrCreateAsync<List<string>>(TagsCacheKey,
-                factory => ValueTask.FromResult<List<string>>([])), StringComparer.Ordinal);
+            hybridCache.GetOrCreateAsync<List<string>>(TagsCacheKey, factory => ValueTask.FromResult<List<string>>([]))
+                .Preserve()
+                .GetAwaiter()
+                .GetResult(), StringComparer.Ordinal);
 }
