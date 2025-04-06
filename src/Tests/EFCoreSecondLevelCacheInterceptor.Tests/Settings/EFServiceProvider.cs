@@ -481,7 +481,7 @@ public static class EFServiceProvider
 
         const string redisConfigurationKey = "redis";
 
-        services.AddSingleton(typeof(ICacheManagerConfiguration), new CacheManager.Core.ConfigurationBuilder()
+        services.AddSingleton(typeof(ICacheManagerConfiguration), new CacheConfigurationBuilder()
             .WithJsonSerializer(jss, jss)
             .WithUpdateMode(CacheUpdateMode.Up)
             .WithRedisConfiguration(redisConfigurationKey, config =>
@@ -498,7 +498,6 @@ public static class EFServiceProvider
             .WithMaxRetries(retries: 100)
             .WithRetryTimeout(timeoutMillis: 50)
             .WithRedisCacheHandle(redisConfigurationKey)
-            .DisablePerformanceCounters()
             .DisableStatistics()
             .Build());
 
@@ -508,9 +507,8 @@ public static class EFServiceProvider
     private static void addCacheManagerCoreInMemory(ServiceCollection services)
     {
         services.AddSingleton(typeof(ICacheManagerConfiguration),
-            new CacheManager.Core.ConfigurationBuilder().WithJsonSerializer()
+            new CacheConfigurationBuilder().WithJsonSerializer()
                 .WithMicrosoftMemoryCacheHandle(instanceName: "MemoryCache1")
-                .DisablePerformanceCounters()
                 .DisableStatistics()
                 .Build());
 

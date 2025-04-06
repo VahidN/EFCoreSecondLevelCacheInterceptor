@@ -24,8 +24,7 @@ public static class EFServiceProvider
     /// </summary>
     public static IServiceProvider Instance { get; } = _serviceProviderBuilder.Value;
 
-    public static T GetRequiredService<T>()
-        => Instance.GetRequiredService<T>();
+    public static T GetRequiredService<T>() => Instance.GetRequiredService<T>();
 
     public static void RunInContext(Action<ApplicationDbContext> action)
     {
@@ -52,13 +51,14 @@ public static class EFServiceProvider
         Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
 
         var configuration = new ConfigurationBuilder().SetBasePath(basePath)
-            .AddJsonFile("appsettings.json", false, true).Build();
+            .AddJsonFile(path: "appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
 
         services.AddSingleton(_ => configuration);
 
         services.AddEFSecondLevelCache(options
-                => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5))
-                    .ConfigureLogging(true)
+                => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 5))
+                    .ConfigureLogging(enable: true)
 
             //options.UseCacheManagerCoreProvider()
         );
@@ -81,12 +81,12 @@ public static class EFServiceProvider
             "\\Issues\\"
         }, StringSplitOptions.RemoveEmptyEntries)[0];
 
-        var contentRootPath = Path.Combine(testsFolder, "Issues", "Issue9SQLiteInt32");
-        var connectionString = configuration["ConnectionStrings:ApplicationDbContextConnection"];
+        var contentRootPath = Path.Combine(testsFolder, path2: "Issues", path3: "Issue9SQLiteInt32");
+        var connectionString = configuration[key: "ConnectionStrings:ApplicationDbContextConnection"];
 
-        if (connectionString.Contains("%CONTENTROOTPATH%"))
+        if (connectionString.Contains(value: "%CONTENTROOTPATH%"))
         {
-            connectionString = connectionString.Replace("%CONTENTROOTPATH%", contentRootPath);
+            connectionString = connectionString.Replace(oldValue: "%CONTENTROOTPATH%", contentRootPath);
         }
 
         Console.WriteLine($"Using {connectionString}");
@@ -105,18 +105,25 @@ public static class EFServiceProvider
 
         const string redisConfigurationKey = "redis";
 
-        services.AddSingleton(typeof(ICacheManagerConfiguration), new CacheManager.Core.ConfigurationBuilder()
-            .WithJsonSerializer(jss, jss).WithUpdateMode(CacheUpdateMode.Up).WithRedisConfiguration(
-                redisConfigurationKey, config =>
-                {
-                    config.WithAllowAdmin().WithDatabase(0).WithEndpoint("localhost", 6379)
+        services.AddSingleton(typeof(ICacheManagerConfiguration), new CacheConfigurationBuilder()
+            .WithJsonSerializer(jss, jss)
+            .WithUpdateMode(CacheUpdateMode.Up)
+            .WithRedisConfiguration(redisConfigurationKey, config =>
+            {
+                config.WithAllowAdmin()
+                    .WithDatabase(databaseIndex: 0)
+                    .WithEndpoint(host: "localhost", port: 6379)
 
-                        // Enables keyspace notifications to react on eviction/expiration of items.
-                        // Make sure that all servers are configured correctly and 'notify-keyspace-events' is at least set to 'Exe', otherwise CacheManager will not retrieve any events.
-                        // See https://redis.io/topics/notifications#configuration for configuration details.
-                        .EnableKeyspaceEvents();
-                }).WithMaxRetries(100).WithRetryTimeout(50).WithRedisCacheHandle(redisConfigurationKey)
-            .DisablePerformanceCounters().DisableStatistics().Build());
+                    // Enables keyspace notifications to react on eviction/expiration of items.
+                    // Make sure that all servers are configured correctly and 'notify-keyspace-events' is at least set to 'Exe', otherwise CacheManager will not retrieve any events.
+                    // See https://redis.io/topics/notifications#configuration for configuration details.
+                    .EnableKeyspaceEvents();
+            })
+            .WithMaxRetries(retries: 100)
+            .WithRetryTimeout(timeoutMillis: 50)
+            .WithRedisCacheHandle(redisConfigurationKey)
+            .DisableStatistics()
+            .Build());
 
         services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
     }

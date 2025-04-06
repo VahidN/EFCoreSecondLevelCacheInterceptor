@@ -364,7 +364,7 @@ namespace EFSecondLevelCache.Core.AspNetCoreSample
             // Add an in-memory cache service provider
             services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
             services.AddSingleton(typeof(ICacheManagerConfiguration),
-                new CacheManager.Core.ConfigurationBuilder()
+                new CacheManager.Core.CacheConfigurationBuilder()
                         .WithJsonSerializer()
                         .WithMicrosoftMemoryCacheHandle(instanceName: "MemoryCache1")
                         .Build());
@@ -388,7 +388,7 @@ var jss = new JsonSerializerSettings
 
 const string redisConfigurationKey = "redis";
 services.AddSingleton(typeof(ICacheManagerConfiguration),
-    new CacheManager.Core.ConfigurationBuilder()
+    new CacheManager.Core.CacheConfigurationBuilder()
         .WithJsonSerializer(serializationSettings: jss, deserializationSettings: jss)
         .WithUpdateMode(CacheUpdateMode.Up)
         .WithRedisConfiguration(redisConfigurationKey, config =>
