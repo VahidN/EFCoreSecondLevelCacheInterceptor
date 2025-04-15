@@ -11,22 +11,22 @@
         <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.Extensions.Logging" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
         <!--dotMorten doesn't provide column's names and types-->
-        <!--<PackageReference Include="dotMorten.Microsoft.SqlServer.Types" Version="1.1.0" />-->
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="9.0.0"/>
-        <PackageReference Include="Microsoft.SqlServer.Types" Version="160.1000.6"/>
-        <PackageReference Include="System.Data.SqlClient" Version="4.9.0"/>
+        <!--<PackageReference Include="dotMorten.Microsoft.SqlServer.Types" />-->
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" />
+        <PackageReference Include="Microsoft.SqlServer.Types" />
+        <PackageReference Include="System.Data.SqlClient" />
     </ItemGroup>
     <!--
     <ItemGroup>
