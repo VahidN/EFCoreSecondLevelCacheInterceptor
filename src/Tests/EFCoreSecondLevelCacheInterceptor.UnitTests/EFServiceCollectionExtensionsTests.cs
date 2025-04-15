@@ -139,7 +139,7 @@ public class EFServiceCollectionExtensionsTests
         public EFCachedData GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
             => throw new NotImplementedException();
 
-        public void InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
+        public void InsertValue(EFCacheKey cacheKey, EFCachedData value, EFCachePolicy cachePolicy)
             => throw new NotImplementedException();
 
         public void InvalidateCacheDependencies(EFCacheKey cacheKey) => throw new NotImplementedException();

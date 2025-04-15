@@ -181,7 +181,7 @@ public class EFDebugLoggerTests
         // Assert
         _cacheInvalidationEventMock.Verify(
             e => e.Invoke(It.Is<EFCacheInvalidationInfo>(x
-                => x.CacheDependencies == cacheDependencies && x.ClearAllCachedEntries == true &&
+                => x.CacheDependencies == cacheDependencies && x.ClearAllCachedEntries &&
                    x.ServiceProvider == _serviceProviderMock.Object)), Times.Once);
     }
 }

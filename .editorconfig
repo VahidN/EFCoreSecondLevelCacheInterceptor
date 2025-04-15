@@ -4,12 +4,30 @@ charset = utf-8-bom
 
 [*.cs]
 
+dotnet_diagnostic.MA0025.severity = suggestion
 dotnet_diagnostic.S3878.severity = suggestion
 dotnet_diagnostic.S127.severity = suggestion
 dotnet_diagnostic.S2857.severity = suggestion
 dotnet_diagnostic.S2094.severity = suggestion
 dotnet_diagnostic.CA2227.severity = suggestion 
+dotnet_diagnostic.CA5394.severity = suggestion 
+dotnet_diagnostic.CA1062.severity = suggestion 
+dotnet_diagnostic.CA1852.severity = suggestion 
+dotnet_diagnostic.CA1861.severity = suggestion 
+dotnet_diagnostic.CA1812.severity = suggestion 
 dotnet_diagnostic.CA1031.severity = suggestion
+dotnet_diagnostic.CA1707.severity = suggestion
+dotnet_diagnostic.CA1515.severity = suggestion
+dotnet_diagnostic.CA1860.severity = suggestion
+dotnet_diagnostic.MA0002.severity = suggestion
+dotnet_diagnostic.CA1859.severity = suggestion
+dotnet_diagnostic.CA1806.severity = suggestion
+dotnet_diagnostic.CA2000.severity = suggestion
+dotnet_diagnostic.S1066.severity = suggestion
+dotnet_diagnostic.MA0055.severity = suggestion
+dotnet_diagnostic.S6562.severity = suggestion
+dotnet_diagnostic.S2701.severity = suggestion
+dotnet_diagnostic.S2699.severity = suggestion
 
 dotnet_diagnostic.IDE0055.severity = none
 dotnet_diagnostic.IDE0160.severity = none
