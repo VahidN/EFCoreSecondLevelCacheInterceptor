@@ -1,5 +1,6 @@
 <Project>
     <PropertyGroup>
+        <VersionPrefix>5.2.3</VersionPrefix>
         <LangVersion>latest</LangVersion>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
