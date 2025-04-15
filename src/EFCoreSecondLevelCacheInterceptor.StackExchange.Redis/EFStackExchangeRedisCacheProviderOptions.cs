@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StackExchange.Redis;
 
@@ -16,7 +15,8 @@ public static class EFStackExchangeRedisCacheProviderOptions
     public static EFCoreSecondLevelCacheOptions UseStackExchangeRedisCacheProvider(
         this EFCoreSecondLevelCacheOptions options,
         ConfigurationOptions configurationOptions,
-        TimeSpan timeout)
+        TimeSpan timeout,
+        bool enableCompression = false)
     {
         if (options == null)
         {
@@ -25,7 +25,8 @@ public static class EFStackExchangeRedisCacheProviderOptions
 
         SetOptions(options, timeout, new EFRedisCacheConfigurationOptions
         {
-            ConfigurationOptions = configurationOptions
+            ConfigurationOptions = configurationOptions,
+            EnableCompression = enableCompression
         });
 
         return options;
@@ -38,7 +39,8 @@ public static class EFStackExchangeRedisCacheProviderOptions
     public static EFCoreSecondLevelCacheOptions UseStackExchangeRedisCacheProvider(
         this EFCoreSecondLevelCacheOptions options,
         string redisConnectionString,
-        TimeSpan timeout)
+        TimeSpan timeout,
+        bool enableCompression = false)
     {
         if (options == null)
         {
@@ -47,7 +49,8 @@ public static class EFStackExchangeRedisCacheProviderOptions
 
         SetOptions(options, timeout, new EFRedisCacheConfigurationOptions
         {
-            RedisConnectionString = redisConnectionString
+            RedisConnectionString = redisConnectionString,
+            EnableCompression = enableCompression
         });
 
         return options;

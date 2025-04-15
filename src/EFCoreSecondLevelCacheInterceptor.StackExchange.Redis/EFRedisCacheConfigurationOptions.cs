@@ -16,4 +16,9 @@ public class EFRedisCacheConfigurationOptions
     ///     Redis ConnectionString
     /// </summary>
     public string? RedisConnectionString { set; get; }
+
+    /// <summary>
+    ///     Enables MessagePackCompression.Lz4BlockArray
+    /// </summary>
+    public bool EnableCompression { set; get; }
 }
