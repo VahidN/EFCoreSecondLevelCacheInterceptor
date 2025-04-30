@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
@@ -80,7 +78,14 @@ public class EFStackExchangeRedisCacheProvider(
         var redisDb = RedisConnection.GetDatabase();
         var maybeValue = redisDb.StringGet(cacheKey.KeyHash);
 
-        return maybeValue.HasValue ? dataSerializer.Deserialize<EFCachedData>(maybeValue) : null;
+        if (!maybeValue.HasValue)
+        {
+            return null;
+        }
+
+        ManageSlidingExpiration(cacheKey, cachePolicy, redisDb);
+
+        return dataSerializer.Deserialize<EFCachedData>(maybeValue);
     }
 
     /// <inheritdoc />
@@ -113,6 +118,14 @@ public class EFStackExchangeRedisCacheProvider(
             }
 
             redisDb.KeyDelete(rootCacheKey);
+        }
+    }
+
+    private static void ManageSlidingExpiration(EFCacheKey cacheKey, EFCachePolicy cachePolicy, IDatabase redisDb)
+    {
+        if (cachePolicy.CacheExpirationMode == CacheExpirationMode.Sliding && cachePolicy.CacheTimeout != TimeSpan.Zero)
+        {
+            redisDb.KeyExpire(cacheKey.KeyHash, cachePolicy.CacheTimeout, CommandFlags.FireAndForget);
         }
     }
 
