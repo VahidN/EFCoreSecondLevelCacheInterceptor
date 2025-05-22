@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Hybrid;
@@ -63,10 +63,7 @@ public class EFHybridCacheProvider(
         ArgumentNullException.ThrowIfNull(cacheKey);
 
         return hybridCache.GetOrCreateAsync<EFCachedData?>(cacheKey.KeyHash, factory
-                => ValueTask.FromResult<EFCachedData?>(new EFCachedData
-                {
-                    IsNull = true
-                }))
+                => ValueTask.FromResult<EFCachedData?>(null))
             .Preserve()
             .GetAwaiter()
             .GetResult();
