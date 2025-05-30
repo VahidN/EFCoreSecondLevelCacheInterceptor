@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -29,6 +28,7 @@ public static class EFServiceCollectionExtensions
         services.TryAddSingleton<IEFSqlCommandsProcessor, EFSqlCommandsProcessor>();
         services.TryAddSingleton<IEFCacheDependenciesProcessor, EFCacheDependenciesProcessor>();
         services.TryAddSingleton<ILockProvider, LockProvider>();
+        services.TryAddSingleton<IDbCommandIgnoreCachingProcessor, DbCommandIgnoreCachingProcessor>();
         services.TryAddSingleton<IDbCommandInterceptorProcessor, DbCommandInterceptorProcessor>();
         services.TryAddSingleton<SecondLevelCacheInterceptor>();
 

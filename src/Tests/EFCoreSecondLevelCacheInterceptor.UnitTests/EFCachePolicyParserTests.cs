@@ -37,7 +37,7 @@ public class EFCachePolicyParserTests
       WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0)
       ORDER BY [p].[Id]";
 
-        var cachePolicy = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
+        var (cachePolicy, _) = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
 
         Assert.Equal(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
         Assert.Equal(TimeSpan.FromMinutes(value: 45), cachePolicy.CacheTimeout);
@@ -54,7 +54,7 @@ public class EFCachePolicyParserTests
       WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0)
       ORDER BY [p].[Id]";
 
-        var cachePolicy = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
+        var (cachePolicy, _) = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
 
         Assert.Equal(CacheExpirationMode.NeverRemove, cachePolicy.CacheExpirationMode);
         Assert.Null(cachePolicy.CacheTimeout);
@@ -75,7 +75,7 @@ INNER JOIN [Users] AS [u] ON [p].[UserId] = [u].[Id]
 WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0)
 ORDER BY [p].[Id]";
 
-        var cachePolicy = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
+        var (cachePolicy, _) = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
 
         Assert.Equal(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
         Assert.Equal(TimeSpan.FromMinutes(value: 45), cachePolicy.CacheTimeout);
@@ -90,7 +90,7 @@ ORDER BY [p].[Id]";
                 .SaltKey(saltKey: "saltKey")
                 .CacheDependencies("item 1", "item 2"));
 
-        var cachePolicy = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
+        var (cachePolicy, _) = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
 
         Assert.NotNull(cachePolicy);
         Assert.Equal(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
@@ -113,7 +113,7 @@ ORDER BY [p].[Id]";
                 .SaltKey(saltKey: "saltKey")
                 .CacheDependencies("item 1", "item 2"));
 
-        var cachePolicy = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
+        var (cachePolicy, _) = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
 
         Assert.NotNull(cachePolicy);
         Assert.Equal(CacheExpirationMode.NeverRemove, cachePolicy.CacheExpirationMode);

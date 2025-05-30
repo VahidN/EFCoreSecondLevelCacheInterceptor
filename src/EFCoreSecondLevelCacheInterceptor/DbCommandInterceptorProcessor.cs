@@ -1,7 +1,5 @@
-using System;
 using System.Data.Common;
 using System.Globalization;
-using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -10,41 +8,38 @@ using Microsoft.Extensions.Options;
 namespace EFCoreSecondLevelCacheInterceptor;
 
 /// <summary>
-///     Helps processing SecondLevelCacheInterceptor
+///     Helps process SecondLevelCacheInterceptor
 /// </summary>
 public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 {
     private readonly IEFCacheDependenciesProcessor _cacheDependenciesProcessor;
     private readonly IEFCacheKeyProvider _cacheKeyProvider;
-    private readonly IEFCachePolicyParser _cachePolicyParser;
     private readonly IEFCacheServiceProvider _cacheService;
     private readonly IEFCacheServiceCheck _cacheServiceCheck;
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+    private readonly IDbCommandIgnoreCachingProcessor _ignoreCachingProcessor;
     private readonly ILogger<DbCommandInterceptorProcessor> _interceptorProcessorLogger;
     private readonly IEFDebugLogger _logger;
-    private readonly IEFSqlCommandsProcessor _sqlCommandsProcessor;
 
     /// <summary>
-    ///     Helps processing SecondLevelCacheInterceptor
+    ///     Helps process SecondLevelCacheInterceptor
     /// </summary>
     public DbCommandInterceptorProcessor(IEFDebugLogger logger,
         ILogger<DbCommandInterceptorProcessor> interceptorProcessorLogger,
         IEFCacheServiceProvider cacheService,
         IEFCacheDependenciesProcessor cacheDependenciesProcessor,
         IEFCacheKeyProvider cacheKeyProvider,
-        IEFCachePolicyParser cachePolicyParser,
-        IEFSqlCommandsProcessor sqlCommandsProcessor,
         IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
-        IEFCacheServiceCheck cacheServiceCheck)
+        IEFCacheServiceCheck cacheServiceCheck,
+        IDbCommandIgnoreCachingProcessor ignoreCachingProcessor)
     {
         _cacheService = cacheService;
         _cacheDependenciesProcessor = cacheDependenciesProcessor;
         _cacheKeyProvider = cacheKeyProvider;
-        _cachePolicyParser = cachePolicyParser;
         _logger = logger;
         _interceptorProcessorLogger = interceptorProcessorLogger;
-        _sqlCommandsProcessor = sqlCommandsProcessor;
         _cacheServiceCheck = cacheServiceCheck;
+        _ignoreCachingProcessor = ignoreCachingProcessor;
 
         if (cacheSettings == null)
         {
@@ -73,7 +68,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                 return result;
             }
 
-            var (shouldSkipProcessing, cachePolicy) = ShouldSkipProcessing(command, context);
+            var (shouldSkipProcessing, cachePolicy) = _ignoreCachingProcessor.ShouldSkipProcessing(command, context);
 
             if (shouldSkipProcessing)
             {
@@ -116,7 +111,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 
             if (result is int data)
             {
-                if (!ShouldSkipCachingResults(commandText, data))
+                if (!_ignoreCachingProcessor.ShouldSkipCachingResults(commandText, data))
                 {
                     _cacheService.InsertValue(efCacheKey, new EFCachedData
                     {
@@ -145,7 +140,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                     tableRows = dbReaderLoader.Load();
                 }
 
-                if (!ShouldSkipCachingResults(commandText, tableRows))
+                if (!_ignoreCachingProcessor.ShouldSkipCachingResults(commandText, tableRows))
                 {
                     _cacheService.InsertValue(efCacheKey, new EFCachedData
                     {
@@ -171,7 +166,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 
             if (result is object)
             {
-                if (!ShouldSkipCachingResults(commandText, result))
+                if (!_ignoreCachingProcessor.ShouldSkipCachingResults(commandText, result))
                 {
                     _cacheService.InsertValue(efCacheKey, new EFCachedData
                     {
@@ -231,7 +226,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                 return result;
             }
 
-            var (shouldSkipProcessing, cachePolicy) = ShouldSkipProcessing(command, context);
+            var (shouldSkipProcessing, cachePolicy) = _ignoreCachingProcessor.ShouldSkipProcessing(command, context);
 
             if (shouldSkipProcessing)
             {
@@ -370,84 +365,5 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 
             return result;
         }
-    }
-
-    /// <summary>
-    ///     Is this command marked for caching?
-    /// </summary>
-    private (bool ShouldSkipProcessing, EFCachePolicy? CachePolicy) ShouldSkipProcessing(DbCommand? command,
-        DbContext? context,
-        CancellationToken cancellationToken = default)
-    {
-        if (context is null || command is null)
-        {
-            return (true, null);
-        }
-
-        if (cancellationToken.IsCancellationRequested)
-        {
-            return (true, null);
-        }
-
-        var commandCommandText = command.CommandText ?? "";
-
-        if (ShouldSkipCachingDbContext(context, commandCommandText))
-        {
-            return (true, null);
-        }
-
-        var cachePolicy = GetCachePolicy(context, commandCommandText);
-
-        if (ShouldSkipQueriesInsideExplicitTransaction(command))
-        {
-            return (!_sqlCommandsProcessor.IsCrudCommand(commandCommandText), cachePolicy);
-        }
-
-        if (_sqlCommandsProcessor.IsCrudCommand(commandCommandText))
-        {
-            return (false, cachePolicy);
-        }
-
-        return cachePolicy is null ? (true, null) : (false, cachePolicy);
-    }
-
-    private bool ShouldSkipCachingDbContext(DbContext context, string commandText)
-    {
-        var result = _cacheSettings.SkipCachingDbContexts is not null &&
-                     _cacheSettings.SkipCachingDbContexts.Contains(context.GetType());
-
-        if (result && _logger.IsLoggerEnabled)
-        {
-            var message = $"Skipped caching of this DbContext: {context.GetType()}";
-            _interceptorProcessorLogger.LogDebug(message);
-            _logger.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, message, commandText, efCacheKey: null);
-        }
-
-        return result;
-    }
-
-    private bool ShouldSkipQueriesInsideExplicitTransaction(DbCommand? command)
-        => !_cacheSettings.AllowCachingWithExplicitTransactions && command?.Transaction is not null;
-
-    private EFCachePolicy? GetCachePolicy(DbContext context, string commandText)
-    {
-        var allEntityTypes = _sqlCommandsProcessor.GetAllTableNames(context);
-
-        return _cachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes);
-    }
-
-    private bool ShouldSkipCachingResults(string commandText, object value)
-    {
-        var result = _cacheSettings.SkipCachingResults != null &&
-                     _cacheSettings.SkipCachingResults((commandText, value));
-
-        if (result && _logger.IsLoggerEnabled)
-        {
-            var message = "Skipped caching of this result based on the provided predicate.";
-            _interceptorProcessorLogger.LogDebug(message);
-            _logger.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, message, commandText, efCacheKey: null);
-        }
-
-        return result;
     }
 }

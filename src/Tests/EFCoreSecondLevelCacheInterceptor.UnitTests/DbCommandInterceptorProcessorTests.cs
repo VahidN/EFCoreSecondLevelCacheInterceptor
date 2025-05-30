@@ -16,6 +16,7 @@ public class DbCommandInterceptorProcessorTests
     private readonly Mock<IEFCacheServiceCheck> _cacheServiceCheckMock;
     private readonly Mock<IEFCacheServiceProvider> _cacheServiceMock;
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
+    private readonly IDbCommandIgnoreCachingProcessor _ignoreCachingProcessor;
     private readonly Mock<IEFDebugLogger> _loggerMock;
     private readonly IDbCommandInterceptorProcessor _processor;
     private readonly Mock<IEFSqlCommandsProcessor> _sqlCommandsProcessorMock;
@@ -33,13 +34,17 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock = new Mock<IEFSqlCommandsProcessor>();
         _cacheServiceCheckMock = new Mock<IEFCacheServiceCheck>();
         _cacheSettings = new EFCoreSecondLevelCacheSettings();
+        var intProcessorLoggerMock = new Mock<ILogger<DbCommandIgnoreCachingProcessor>>();
 
         cacheSettingsMock.SetupGet(x => x.Value).Returns(_cacheSettings);
 
+        _ignoreCachingProcessor = new DbCommandIgnoreCachingProcessor(_cachePolicyParserMock.Object,
+            _sqlCommandsProcessorMock.Object, cacheSettingsMock.Object, _loggerMock.Object,
+            intProcessorLoggerMock.Object);
+
         _processor = new DbCommandInterceptorProcessor(_loggerMock.Object, interceptorProcessorLoggerMock.Object,
             _cacheServiceMock.Object, _cacheDependenciesProcessorMock.Object, _cacheKeyProviderMock.Object,
-            _cachePolicyParserMock.Object, _sqlCommandsProcessorMock.Object, cacheSettingsMock.Object,
-            _cacheServiceCheckMock.Object);
+            cacheSettingsMock.Object, _cacheServiceCheckMock.Object, _ignoreCachingProcessor);
     }
 
     [Fact]
@@ -51,16 +56,15 @@ public class DbCommandInterceptorProcessorTests
         var cacheService = new Mock<IEFCacheServiceProvider>().Object;
         var cacheDependenciesProcessor = new Mock<IEFCacheDependenciesProcessor>().Object;
         var cacheKeyProvider = new Mock<IEFCacheKeyProvider>().Object;
-        var cachePolicyParser = new Mock<IEFCachePolicyParser>().Object;
-        var sqlCommandsProcessor = new Mock<IEFSqlCommandsProcessor>().Object;
         var cacheServiceCheck = new Mock<IEFCacheServiceCheck>().Object;
+        var ignoreCachingProcessor = new Mock<IDbCommandIgnoreCachingProcessor>().Object;
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => new DbCommandInterceptorProcessor(logger, interceptorProcessorLogger,
-            cacheService, cacheDependenciesProcessor, cacheKeyProvider, cachePolicyParser, sqlCommandsProcessor,
+            cacheService, cacheDependenciesProcessor, cacheKeyProvider,
 
             // ReSharper disable once AssignNullToNotNullAttribute
-            cacheSettings: null, cacheServiceCheck));
+            cacheSettings: null, cacheServiceCheck, ignoreCachingProcessor));
     }
 
     [Fact]
@@ -72,15 +76,13 @@ public class DbCommandInterceptorProcessorTests
         var cacheService = new Mock<IEFCacheServiceProvider>().Object;
         var cacheDependenciesProcessor = new Mock<IEFCacheDependenciesProcessor>().Object;
         var cacheKeyProvider = new Mock<IEFCacheKeyProvider>().Object;
-        var cachePolicyParser = new Mock<IEFCachePolicyParser>().Object;
-        var sqlCommandsProcessor = new Mock<IEFSqlCommandsProcessor>().Object;
         var cacheSettings = Options.Create(new EFCoreSecondLevelCacheSettings());
         var cacheServiceCheck = new Mock<IEFCacheServiceCheck>().Object;
+        var ignoreCachingProcessor = new Mock<IDbCommandIgnoreCachingProcessor>().Object;
 
         // Act
         var processor = new DbCommandInterceptorProcessor(logger, interceptorProcessorLogger, cacheService,
-            cacheDependenciesProcessor, cacheKeyProvider, cachePolicyParser, sqlCommandsProcessor, cacheSettings,
-            cacheServiceCheck);
+            cacheDependenciesProcessor, cacheKeyProvider, cacheSettings, cacheServiceCheck, ignoreCachingProcessor);
 
         // Assert
         Assert.NotNull(processor);
@@ -307,7 +309,7 @@ public class DbCommandInterceptorProcessorTests
             .Returns(value: true);
 
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -358,7 +360,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -389,7 +391,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -418,7 +420,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
         _cacheSettings.SkipCachingResults = _ => true;
 
@@ -449,7 +451,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
         _cacheSettings.SkipCachingResults = _ => true;
 
@@ -479,7 +481,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -509,7 +511,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -540,7 +542,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -566,7 +568,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
         _cacheSettings.SkipCachingResults = _ => true;
 
@@ -593,7 +595,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
         _cacheSettings.SkipCachingResults = _ => true;
 
@@ -623,7 +625,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
         _cacheSettings.SkipCachingResults = _ => true;
 
@@ -652,7 +654,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -681,7 +683,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -711,7 +713,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
         _cacheSettings.SkipCachingResults = _ => true;
 
@@ -741,7 +743,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
         _cacheSettings.SkipCachingResults = _ => true;
 
@@ -770,7 +772,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -799,7 +801,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -829,7 +831,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -857,7 +859,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1107,7 +1109,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1133,7 +1135,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1161,7 +1163,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1195,7 +1197,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1229,7 +1231,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1265,7 +1267,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1297,7 +1299,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1332,7 +1334,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1359,7 +1361,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, false));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act
@@ -1389,7 +1391,7 @@ public class DbCommandInterceptorProcessorTests
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
         _cacheServiceCheckMock.Setup(x => x.IsCacheServiceAvailable()).Returns(value: true);
         _cacheKeyProviderMock.Setup(x => x.GetEFCacheKey(commandMock.Object, context, cachePolicy)).Returns(efCacheKey);
-        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns(cachePolicy);
+        _cachePolicyParserMock.Setup(x => x.GetEFCachePolicy(string.Empty, null)).Returns((cachePolicy, true));
         _cacheSettings.AllowCachingWithExplicitTransactions = true;
 
         // Act

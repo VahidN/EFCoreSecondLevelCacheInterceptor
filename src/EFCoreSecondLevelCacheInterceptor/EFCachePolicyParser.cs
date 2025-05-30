@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -107,21 +104,17 @@ public class EFCachePolicyParser : IEFCachePolicyParser
     /// <summary>
     ///     Converts the `commandText` to an instance of `EFCachePolicy`
     /// </summary>
-    public EFCachePolicy? GetEFCachePolicy(string commandText, IList<TableEntityInfo> allEntityTypes)
+    public (EFCachePolicy? CachePolicy, bool ShouldSkipCaching) GetEFCachePolicy(string commandText,
+        IList<TableEntityInfo> allEntityTypes)
     {
         if (commandText == null)
         {
             throw new ArgumentNullException(nameof(commandText));
         }
 
-        if (ContainsNonDeterministicFunction(commandText))
+        if (ContainsNonDeterministicFunction(commandText) || ShouldSkipCachingCommands(commandText))
         {
-            return null;
-        }
-
-        if (ShouldSkipCachingCommands(commandText))
-        {
-            return null;
+            return (null, true);
         }
 
         var efCachePolicy = GetParsedPolicy(commandText) ?? GetSpecificGlobalPolicy(commandText, allEntityTypes) ??
@@ -138,7 +131,7 @@ public class EFCachePolicyParser : IEFCachePolicyParser
                 efCacheKey: null);
         }
 
-        return efCachePolicy;
+        return (efCachePolicy, false);
     }
 
     private EFCachePolicy? TryOverrideCachePolicy(EFCachePolicy? efCachePolicy,

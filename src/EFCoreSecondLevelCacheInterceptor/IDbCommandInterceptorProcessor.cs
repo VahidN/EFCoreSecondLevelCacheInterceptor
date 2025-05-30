@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EFCoreSecondLevelCacheInterceptor;
 
 /// <summary>
-///     Helps processing SecondLevelCacheInterceptor
+///     Helps process SecondLevelCacheInterceptor
 /// </summary>
 public interface IDbCommandInterceptorProcessor
 {
