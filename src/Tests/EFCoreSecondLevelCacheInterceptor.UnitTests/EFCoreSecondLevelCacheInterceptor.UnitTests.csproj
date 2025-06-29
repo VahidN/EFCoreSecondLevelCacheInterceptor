@@ -14,11 +14,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="Moq" />
-        <PackageReference Include="xunit" />
-        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="coverlet.collector"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="Moq"/>
+        <PackageReference Include="MSTest.TestFramework"/>
+        <PackageReference Include="xunit"/>
+        <PackageReference Include="xunit.runner.visualstudio"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -27,6 +28,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\EFCoreSecondLevelCacheInterceptor.MemoryCache\EFCoreSecondLevelCacheInterceptor.MemoryCache.csproj"/>
+        <ProjectReference Include="..\..\EFCoreSecondLevelCacheInterceptor.StackExchange.Redis\EFCoreSecondLevelCacheInterceptor.StackExchange.Redis.csproj"/>
         <ProjectReference Include="..\..\EFCoreSecondLevelCacheInterceptor\EFCoreSecondLevelCacheInterceptor.csproj"/>
     </ItemGroup>
 </Project>

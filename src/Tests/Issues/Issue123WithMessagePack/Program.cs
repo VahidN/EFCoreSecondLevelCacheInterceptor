@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using EFCoreSecondLevelCacheInterceptor;
+﻿using EFCoreSecondLevelCacheInterceptor;
 using Issue123WithMessagePack;
 using Issue123WithMessagePack.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -62,7 +60,7 @@ static void InitDb()
 
             context.People.Add(new Person
             {
-                Name = null,
+                Name = "null",
                 Date = now,
                 DateOffset = DateTimeOffset.Now,
                 Span = TimeSpan.FromMinutes(value: 1),

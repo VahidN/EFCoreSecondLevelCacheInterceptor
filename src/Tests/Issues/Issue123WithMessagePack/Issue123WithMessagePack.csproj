@@ -5,23 +5,24 @@
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.EasyCaching.Core\EFCoreSecondLevelCacheInterceptor.EasyCaching.Core.csproj"/>
+        <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.StackExchange.Redis\EFCoreSecondLevelCacheInterceptor.StackExchange.Redis.csproj"/>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor\EFCoreSecondLevelCacheInterceptor.csproj"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
-        <PackageReference Include="Microsoft.Extensions.Logging" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
-        <PackageReference Include="EasyCaching.Core" />
-        <PackageReference Include="EasyCaching.Redis" />
-        <PackageReference Include="EasyCaching.Serialization.MessagePack" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer"/>
+        <PackageReference Include="Microsoft.Extensions.Logging"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Console"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug"/>
+        <PackageReference Include="EasyCaching.Core"/>
+        <PackageReference Include="EasyCaching.Redis"/>
+        <PackageReference Include="EasyCaching.Serialization.MessagePack"/>
     </ItemGroup>
     <ItemGroup>
         <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>

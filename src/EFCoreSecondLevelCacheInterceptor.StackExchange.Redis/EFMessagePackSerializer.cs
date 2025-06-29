@@ -1,4 +1,5 @@
 using MessagePack;
+using MessagePack.Formatters;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Options;
 
@@ -10,11 +11,15 @@ namespace EFCoreSecondLevelCacheInterceptor;
 public class EFMessagePackSerializer : IEFDataSerializer
 {
     private static readonly IFormatterResolver CustomResolvers = CompositeResolver.Create(
-        [EFMessagePackDBNullFormatter.Instance],
         [
-            NativeDateTimeResolver.Instance, ContractlessStandardResolver.Instance,
-            StandardResolverAllowPrivate.Instance, TypelessContractlessStandardResolver.Instance,
-            DynamicGenericResolver.Instance
+            EFMessagePackDBNullFormatter.Instance, NativeDateTimeArrayFormatter.Instance,
+            NativeDateTimeFormatter.Instance,
+            NativeDecimalFormatter.Instance, NativeGuidFormatter.Instance, TypelessFormatter.Instance
+        ],
+        [
+            NativeDateTimeResolver.Instance, NativeDecimalResolver.Instance, NativeGuidResolver.Instance,
+            ContractlessStandardResolver.Instance, StandardResolverAllowPrivate.Instance,
+            TypelessContractlessStandardResolver.Instance, DynamicGenericResolver.Instance
         ]);
 
     private readonly bool _enableCompression;
@@ -32,7 +37,7 @@ public class EFMessagePackSerializer : IEFDataSerializer
         _enableCompression = options.EnableCompression;
     }
 
-    private MessagePackSerializerOptions MessagePackSerializerOptions
+    private MessagePackSerializerOptions EfMessagePackSerializerOptions
         => _messagePackSerializerOptions ??= GetSerializerOptions();
 
     /// <summary>
@@ -41,7 +46,7 @@ public class EFMessagePackSerializer : IEFDataSerializer
     /// <param name="obj"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public byte[] Serialize<T>(T? obj) => MessagePackSerializer.Serialize(obj, MessagePackSerializerOptions);
+    public byte[] Serialize<T>(T? obj) => MessagePackSerializer.Serialize(obj, EfMessagePackSerializerOptions);
 
     /// <summary>
     ///     Deserializes a value of a given type from a sequence of bytes.
@@ -50,7 +55,7 @@ public class EFMessagePackSerializer : IEFDataSerializer
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     public T? Deserialize<T>(byte[]? data)
-        => data is null ? default : MessagePackSerializer.Deserialize<T>(data, MessagePackSerializerOptions);
+        => data is null ? default : MessagePackSerializer.Deserialize<T>(data, EfMessagePackSerializerOptions);
 
     private MessagePackSerializerOptions GetSerializerOptions()
         => _enableCompression

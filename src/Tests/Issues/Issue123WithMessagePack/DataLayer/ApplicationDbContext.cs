@@ -1,15 +1,13 @@
 using Issue123WithMessagePack.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Issue123WithMessagePack.DataLayer
-{
-    public class ApplicationDbContext : DbContext
-    {
-        public ApplicationDbContext(DbContextOptions options)
-            : base(options)
-        {
-        }
+namespace Issue123WithMessagePack.DataLayer;
 
-        public DbSet<Person> People { get; set; }
+public class ApplicationDbContext : DbContext
+{
+    public ApplicationDbContext(DbContextOptions options) : base(options)
+    {
     }
+
+    public DbSet<Person> People { get; set; }
 }
