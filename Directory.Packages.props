@@ -1,128 +1,105 @@
 <Project>
-   <ItemGroup>
-        <PackageVersion Include="CacheManager.Core" Version="2.0.0"/>
-        <PackageVersion Include="CacheManager.StackExchange.Redis" Version="2.0.0"/>
-        <PackageVersion Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="2.0.0"/>
-        <PackageVersion Include="CacheManager.Serialization.Json" Version="2.0.0"/>
-
-        <PackageVersion Include="BenchmarkDotNet" Version="0.15.0"/>
-
-        <PackageVersion Include="EasyCaching.Core" Version="[1.9.2,)"/>
-        <PackageVersion Include="EasyCaching.InMemory" Version="1.9.2"/>
-        <PackageVersion Include="EasyCaching.Redis" Version="1.9.2"/>
-        <PackageVersion Include="EasyCaching.HybridCache" Version="1.9.2"/>
-        <PackageVersion Include="EasyCaching.Bus.Redis" Version="1.9.2"/>
-        <PackageVersion Include="EasyCaching.Serialization.MessagePack" Version="1.9.2"/>
-        <PackageVersion Include="EasyCaching.Serialization.SystemTextJson" Version="1.9.2"/>
-
-        <PackageVersion Include="ZiggyCreatures.FusionCache" Version="2.2.0"/>
-        <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.3.0"/>
-
-        <PackageVersion Include="MessagePack" Version="3.1.4"/>
-        <PackageVersion Include="Newtonsoft.Json" Version="13.0.3"/>
-
-        <PackageVersion Include="StackExchange.Redis" Version="2.8.41"/>
-
-        <PackageVersion Include="coverlet.collector" Version="6.0.4"/>
-        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/>
-        <PackageVersion Include="MSTest.TestFramework" Version="3.9.1"/>
-        <PackageVersion Include="MSTest.TestAdapter" Version="3.9.1"/>
-        <PackageVersion Include="Moq" Version="4.20.72"/>
-        <PackageVersion Include="xunit" Version="2.9.3"/>
-        <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.1"/>
-   </ItemGroup>
-
-    <ItemGroup>
-        <PackageVersion Include="Meziantou.Analyzer" Version="2.0.202" />
-        <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.12.0.118525" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Analyzers" Version="9.0.0"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
-        <PackageVersion Include="AsyncKeyedLock" Version="7.1.6"/>
-    </ItemGroup>
-
-    <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)"/>
-    </ItemGroup>
-
-    <ItemGroup Condition=" ('$(TargetFramework)' == 'netstandard2.0')">
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[3.1,6)"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,6)"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="('$(TargetFramework)' == 'netstandard2.1')">
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[5,)"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="('$(TargetFramework)' == 'net5.0')">
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[5,)"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="('$(TargetFramework)' == 'net6.0')">
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[6,)"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[6,)"/>
-        <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="[6.0.2,)"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="('$(TargetFramework)' == 'net7.0')">
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[7,)"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[7,)"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="('$(TargetFramework)' == 'net8.0')">
-        <PackageVersion Include="System.IO.Hashing" Version="[8.0.0,)"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[8.0.0,)"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[8.0.0,)"/>
-        <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="[8.0.1,)"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="('$(TargetFramework)' == 'net9.0')">
-        <PackageVersion Include="System.IO.Hashing" Version="[9.0.0,)"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[9.0.0,)"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[9.0.0,)"/>
-
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.0" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0"/>
-        <PackageVersion Include="Lamar.Microsoft.DependencyInjection" Version="14.0.1"/>
-
-        <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0"/>
-        <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.0"/>
-        <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0"/>
-        <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.0"/>
-        <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
-
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0"/>
-        <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.0"/>
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0"/>
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0"/> 
-        <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
-
-        <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.0" /> 
-        <PackageVersion Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.0"/>
-
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="9.0.0"/>
-
-        <PackageVersion Include="Microsoft.SqlServer.Types" Version="160.1000.6"/>
-        <PackageVersion Include="System.Data.SqlClient" Version="4.9.0"/>
-
-        <PackageVersion Include="MySql.EntityFrameworkCore" Version="9.0.0"/>
-        <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0"/>
-
-        <PackageVersion Include="EFCore.BulkExtensions" Version="9.0.1"/>
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="9.0.0"/>
-    </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="CacheManager.Core" Version="2.0.0" />
+    <PackageVersion Include="CacheManager.StackExchange.Redis" Version="2.0.0" />
+    <PackageVersion Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="2.0.0" />
+    <PackageVersion Include="CacheManager.Serialization.Json" Version="2.0.0" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.0" />
+    <PackageVersion Include="EasyCaching.Core" Version="[1.9.2,)" />
+    <PackageVersion Include="EasyCaching.InMemory" Version="1.9.2" />
+    <PackageVersion Include="EasyCaching.Redis" Version="1.9.2" />
+    <PackageVersion Include="EasyCaching.HybridCache" Version="1.9.2" />
+    <PackageVersion Include="EasyCaching.Bus.Redis" Version="1.9.2" />
+    <PackageVersion Include="EasyCaching.Serialization.MessagePack" Version="1.9.2" />
+    <PackageVersion Include="EasyCaching.Serialization.SystemTextJson" Version="1.9.2" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.6" />
+    <PackageVersion Include="ZiggyCreatures.FusionCache" Version="2.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.3.0" />
+    <PackageVersion Include="MessagePack" Version="3.1.4" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="StackExchange.Redis" Version="2.8.41" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.9.1" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.9.1" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.1" />
+    <PackageVersion Include="ZiggyCreatures.FusionCache.Serialization.NewtonsoftJson" Version="2.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="Meziantou.Analyzer" Version="2.0.202" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.12.0.118525" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Analyzers" Version="9.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+    <PackageVersion Include="AsyncKeyedLock" Version="7.1.6" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)" />
+  </ItemGroup>
+  <ItemGroup Condition=" ('$(TargetFramework)' == 'netstandard2.0')">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,4)" />
+  </ItemGroup>
+  <ItemGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1')">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[3.1,6)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[3.1,6)" />
+  </ItemGroup>
+  <ItemGroup Condition="('$(TargetFramework)' == 'netstandard2.1')">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[5,)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)" />
+  </ItemGroup>
+  <ItemGroup Condition="('$(TargetFramework)' == 'net5.0')">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[5,)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[5,)" />
+  </ItemGroup>
+  <ItemGroup Condition="('$(TargetFramework)' == 'net6.0')">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[6,)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[6,)" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="[6.0.2,)" />
+  </ItemGroup>
+  <ItemGroup Condition="('$(TargetFramework)' == 'net7.0')">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[7,)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[7,)" />
+  </ItemGroup>
+  <ItemGroup Condition="('$(TargetFramework)' == 'net8.0')">
+    <PackageVersion Include="System.IO.Hashing" Version="[8.0.0,)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[8.0.0,)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[8.0.0,)" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="[8.0.1,)" />
+  </ItemGroup>
+  <ItemGroup Condition="('$(TargetFramework)' == 'net9.0')">
+    <PackageVersion Include="System.IO.Hashing" Version="[9.0.0,)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[9.0.0,)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[9.0.0,)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
+    <PackageVersion Include="Lamar.Microsoft.DependencyInjection" Version="14.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.SqlServer.Types" Version="160.1000.6" />
+    <PackageVersion Include="System.Data.SqlClient" Version="4.9.0" />
+    <PackageVersion Include="MySql.EntityFrameworkCore" Version="9.0.0" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
+    <PackageVersion Include="EFCore.BulkExtensions" Version="9.0.1" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="9.0.0" />
+  </ItemGroup>
 </Project>

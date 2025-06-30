@@ -5,6 +5,7 @@
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.EasyCaching.Core\EFCoreSecondLevelCacheInterceptor.EasyCaching.Core.csproj"/>
+        <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.FusionCache\EFCoreSecondLevelCacheInterceptor.FusionCache.csproj"/>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.StackExchange.Redis\EFCoreSecondLevelCacheInterceptor.StackExchange.Redis.csproj"/>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor\EFCoreSecondLevelCacheInterceptor.csproj"/>
     </ItemGroup>
@@ -15,6 +16,7 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis"/>
         <PackageReference Include="Microsoft.Extensions.Logging"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Console"/>
         <PackageReference Include="Microsoft.Extensions.Configuration.Json"/>
@@ -23,6 +25,7 @@
         <PackageReference Include="EasyCaching.Core"/>
         <PackageReference Include="EasyCaching.Redis"/>
         <PackageReference Include="EasyCaching.Serialization.MessagePack"/>
+        <PackageReference Include="ZiggyCreatures.FusionCache.Serialization.NewtonsoftJson"/>
     </ItemGroup>
     <ItemGroup>
         <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>

@@ -1,10 +1,13 @@
 using EFCoreSecondLevelCacheInterceptor;
 using Issue123WithMessagePack.DataLayer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
+using ZiggyCreatures.Caching.Fusion;
+using ZiggyCreatures.Caching.Fusion.Serialization.NewtonsoftJson;
 
 namespace Issue123WithMessagePack;
 
@@ -73,11 +76,49 @@ public static class EFServiceProvider
         });*/
 #pragma warning restore S125
 
+        var distributedCache = new RedisCache(new RedisCacheOptions
+        {
+            ConfigurationOptions = new ConfigurationOptions
+            {
+                EndPoints =
+                {
+                    "127.0.0.1:6379"
+                },
+                AllowAdmin = true,
+                ConnectTimeout = 10000
+            }
+        });
+
+        var jsonSerializer = new FusionCacheNewtonsoftJsonSerializer();
+
+        services.AddFusionCache()
+            .WithDistributedCache(distributedCache, jsonSerializer)
+            .WithNewtonsoftJsonSerializer()
+            .WithOptions(options =>
+            {
+                options.DefaultEntryOptions = new FusionCacheEntryOptions
+                {
+                    Duration = TimeSpan.FromMinutes(minutes: 30),
+                    IsFailSafeEnabled = true,
+                    FailSafeMaxDuration = TimeSpan.FromMinutes(minutes: 10),
+                    FailSafeThrottleDuration = TimeSpan.FromMinutes(minutes: 10),
+                    FactorySoftTimeout = TimeSpan.FromMilliseconds(milliseconds: 300),
+                    FactoryHardTimeout = TimeSpan.FromMilliseconds(milliseconds: 1000),
+                    DistributedCacheSoftTimeout = TimeSpan.FromMilliseconds(milliseconds: 500),
+                    DistributedCacheHardTimeout = TimeSpan.FromSeconds(seconds: 5),
+                    AllowBackgroundDistributedCacheOperations = true,
+                    JitterMaxDuration = TimeSpan.FromSeconds(seconds: 2)
+                };
+
+                options.DistributedCacheCircuitBreakerDuration = TimeSpan.FromSeconds(seconds: 5);
+            });
+
         services.AddEFSecondLevelCache(o =>
         {
             // o.UseEasyCachingCoreProvider(providerName).ConfigureLogging(enable: true) 
 
-            o.UseStackExchangeRedisCacheProvider(new ConfigurationOptions
+#pragma warning disable S125
+            /*o.UseStackExchangeRedisCacheProvider(new ConfigurationOptions
             {
                 EndPoints = new EndPointCollection
                 {
@@ -87,7 +128,10 @@ public static class EFServiceProvider
                 },
                 AllowAdmin = true,
                 ConnectTimeout = 10000
-            }, TimeSpan.FromMinutes(minutes: 5));
+            }, TimeSpan.FromMinutes(minutes: 5));*/
+#pragma warning restore S125
+
+            o.UseFusionCacheProvider();
 
             o.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 10));
             o.UseCacheKeyPrefix(prefix: "EF_");
