@@ -2,17 +2,17 @@
 
 [![EFCoreSecondLevelCacheInterceptor](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/workflows/.NET%20Core%20Build/badge.svg)](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor)
 
-Second level caching is a query cache. The results of EF commands will be stored in the cache, so that the same EF
-commands will retrieve their data from the cache rather than executing them against the database again.
+Second-level caching is a query cache. The results of Entity Framework (EF) commands are stored in the cache so that the same EF commands will retrieve their data from the cache rather than executing them against the database again.
 
-## How to upgrade to version 5
+-----
 
-To support more advanced caching providers, this library uses different assemblies and NuGet packages now.
-To upgrade to version 5, first remove the `EFCoreSecondLevelCacheInterceptor` dependency. It doesn't have any built-in
-caching provider anymore.
-But you can still use it to introduce your own custom caching provider by calling its
-`options.UseCustomCacheProvider<T>()` method (and you won't need the new packages).
-To install `EFCoreSecondLevelCacheInterceptor` as before, run the following command in the Package Manager Console:
+## How to Use
+
+Using the second-level cache involves three mandatory steps: installing a provider, registering it, and adding the interceptor to your `DbContext`.
+
+### 1\. Install a Preferred Cache Provider
+
+First, you need to add the main package:
 
 [![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor/)
 
@@ -20,785 +20,127 @@ To install `EFCoreSecondLevelCacheInterceptor` as before, run the following comm
 dotnet add package EFCoreSecondLevelCacheInterceptor
 ```
 
-But if you were using the built-in `In-Memory` cache provider, just install this new package:
+This library supports multiple caching providers, each available as a separate NuGet package. You must install at least one.
 
-[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.MemoryCache)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.MemoryCache/)
+  * **In-Memory (Built-in)**: A simple in-memory cache provider.
+    ```powershell
+    dotnet add package EFCoreSecondLevelCacheInterceptor.MemoryCache
+    ```
+  * **StackExchange.Redis**: Uses Redis with a preconfigured MessagePack serializer.
+    ```powershell
+    dotnet add package EFCoreSecondLevelCacheInterceptor.StackExchange.Redis
+    ```
+  * **FusionCache**: Implements [FusionCache](https://github.com/ZiggyCreatures/FusionCache) as a cache provider.
+    ```powershell
+    dotnet add package EFCoreSecondLevelCacheInterceptor.FusionCache
+    ```
+  * **HybridCache**: Implements [.NET's HybridCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/hybrid?view=aspnetcore-9.0).
+    ```powershell
+    dotnet add package EFCoreSecondLevelCacheInterceptor.HybridCache
+    ```
+  * **EasyCaching.Core**: A provider for the [EasyCaching.Core](https://github.com/dotnetcore/EasyCaching) library.
+    ```powershell
+    dotnet add package EFCoreSecondLevelCacheInterceptor.EasyCaching.Core
+    ```
+  * **CacheManager.Core**: A provider for the [CacheManager.Core](https://github.com/MichaCo/CacheManager) library.
+    ```powershell
+    dotnet add package EFCoreSecondLevelCacheInterceptor.CacheManager.Core
+    ```
+  * **Custom**: You can also implement your own provider.
 
-```powershell
-dotnet add package EFCoreSecondLevelCacheInterceptor.MemoryCache
-```
+### 2\. Register the Cache Provider and Interceptor
 
-Or if you were using the `EasyCaching.Core provider`, install the new
-`EFCoreSecondLevelCacheInterceptor.EasyCaching.Core` package:
+In your `Startup.cs` or `Program.cs`, you need to register the EF Core second-level cache services and configure your chosen provider.
 
-[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core/)
-
-```powershell
-dotnet add package EFCoreSecondLevelCacheInterceptor.EasyCaching.Core
-```
-
-Or if you were using the `CacheManager.Core provider`, install the new
-`EFCoreSecondLevelCacheInterceptor.CacheManager.Core` package:
-
-[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.CacheManager.Core)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.CacheManager.Core/)
-
-```powershell
-dotnet add package EFCoreSecondLevelCacheInterceptor.CacheManager.Core
-```
-
-Also there are 3 new caching providers available in V5:
-
-### 1- EFCoreSecondLevelCacheInterceptor.StackExchange.Redis
-
-This provider uses the StackExchange.Redis as a cache provider and it's preconfigured with a MessagePack serializer. To
-use it, first you should install its new NuGet package:
-
-[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis/)
-
-```powershell
-dotnet add package EFCoreSecondLevelCacheInterceptor.StackExchange.Redis
-```
-
-And then you need to register its required services:
+**Example: Using the Built-in In-Memory Provider**
 
 ```csharp
-var redisOptions = new ConfigurationOptions
-                   {
-                     EndPoints = new EndPointCollection
-                     {
+public void ConfigureServices(IServiceCollection services)
+{
+    // 1. Add EF Core Second Level Cache services
+    services.AddEFSecondLevelCache(options =>
+        options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
+               // Fallback on db if the caching provider fails.
+               .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
+    );
+
+    // 2. Add your DbContext
+    var connectionString = Configuration["ConnectionStrings:ApplicationDbContextConnection"];
+    services.AddConfiguredMsSqlDbContext(connectionString);
+
+    services.AddControllersWithViews();
+}
+```
+
+*(For detailed configuration examples of other providers, see the [Available Cache Providers](https://www.google.com/search?q=%23available-cache-providers) section below.)*
+
+### 3\. Add the Interceptor to Your DbContext
+
+Modify your `DbContext` registration to add the `SecondLevelCacheInterceptor`. This service is automatically registered and available via dependency injection.
+
+```csharp
+public static class MsSqlServiceCollectionExtensions
+{
+    public static IServiceCollection AddConfiguredMsSqlDbContext(this IServiceCollection services, string connectionString)
+    {
+        services.AddDbContextPool<ApplicationDbContext>((serviceProvider, optionsBuilder) =>
+                optionsBuilder
+                    .UseSqlServer(
+                        connectionString,
+                        sqlServerOptionsBuilder =>
                         {
-                            "127.0.0.1", 6379
-                        }
-                     },
-                     AllowAdmin = true,
-                     ConnectTimeout = 10000
-                   };
-				   
-services.AddEFSecondLevelCache(options
-                    => options.UseStackExchangeRedisCacheProvider(redisOptions, TimeSpan.FromMinutes(minutes: 5)));
-```
-
-### 2- EFCoreSecondLevelCacheInterceptor.FusionCache
-
-This provider uses the [FusionCache](https://github.com/ZiggyCreatures/FusionCache) as a cache provider. To use it,
-first you should install its new NuGet package:
-
-[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.FusionCache)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.FusionCache/)
-
-```powershell
-dotnet add package EFCoreSecondLevelCacheInterceptor.FusionCache
-```
-
-And then this is how you can register its required services:
-
-```csharp
-services.AddFusionCache()
-            .WithOptions(options =>
-            {
-                options.DefaultEntryOptions = new FusionCacheEntryOptions
-                {
-                    // CACHE DURATION
-                    Duration = TimeSpan.FromMinutes(minutes: 1),
-
-                    // FAIL-SAFE OPTIONS
-                    IsFailSafeEnabled = true,
-                    FailSafeMaxDuration = TimeSpan.FromHours(hours: 2),
-                    FailSafeThrottleDuration = TimeSpan.FromSeconds(seconds: 30),
-
-                    // FACTORY TIMEOUTS
-                    FactorySoftTimeout = TimeSpan.FromMilliseconds(milliseconds: 500),
-                    FactoryHardTimeout = TimeSpan.FromMilliseconds(milliseconds: 1500),
-
-                    // DISTRIBUTED CACHE
-                    DistributedCacheSoftTimeout = TimeSpan.FromSeconds(seconds: 10),
-                    DistributedCacheHardTimeout = TimeSpan.FromSeconds(seconds: 20),
-                    AllowBackgroundDistributedCacheOperations = true,
-
-                    // JITTERING
-                    JitterMaxDuration = TimeSpan.FromSeconds(seconds: 2)
-                };
-
-                // DISTIBUTED CACHE CIRCUIT-BREAKER
-                options.DistributedCacheCircuitBreakerDuration = TimeSpan.FromSeconds(seconds: 2);
-
-                // CUSTOM LOG LEVELS
-                options.FailSafeActivationLogLevel = LogLevel.Debug;
-                options.SerializationErrorsLogLevel = LogLevel.Warning;
-                options.DistributedCacheSyntheticTimeoutsLogLevel = LogLevel.Debug;
-                options.DistributedCacheErrorsLogLevel = LogLevel.Error;
-                options.FactorySyntheticTimeoutsLogLevel = LogLevel.Debug;
-                options.FactoryErrorsLogLevel = LogLevel.Error;
-            });
-			
-services.AddEFSecondLevelCache(options => options.UseFusionCacheProvider());
-```
-
-### 3- EFCoreSecondLevelCacheInterceptor.HybridCache
-
-This provider uses the [HybridCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/hybrid?view=aspnetcore-9.0) as a cache provider. To use it,
-first you should install its new NuGet package:
-
-[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor.HybridCache)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor.HybridCache/)
-
-```powershell
-dotnet add package EFCoreSecondLevelCacheInterceptor.HybridCache
-```
-
-And then this is how you can register its required services:
-
-```csharp			
-services.AddEFSecondLevelCache(options => options.UseHybridCacheProvider());
-```
-
-
-## Usage ([1](#1--register-a-preferred-cache-provider) & [2](#2--add-secondlevelcacheinterceptor-to-your-dbcontextoptionsbuilder-pipeline) are mandatory)
-
-### 1- [Register a preferred cache provider](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample/Startup.cs):
-
-You can use the following cache providers:
-
-- [Memory provider built in this library](#using-the-built-in-in-memory-cache-provider)
-- [EasyCaching.Core memory provider](#using-easycachingcore-as-the-cache-provider)
-- [EasyCaching.Core dynamic cache provider](#using-easycachingcore-as-a-dynamic-cache-provider)
-- [CacheManager.Core cache provider](#using-cachemanagercore-as-the-cache-provider-its-not-actively-maintained)
-- [A custom cache provider](#using-a-custom-cache-provider)
-
-#### Using the built-in In-Memory cache provider
-
-![performance](https://raw.githubusercontent.com/VahidN/EFCoreSecondLevelCacheInterceptor/master/src/Tests/EFCoreSecondLevelCacheInterceptor.PerformanceTests/int-pref.png)
-
-```csharp
-namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
-{
-    public class Startup
-    {
-        private readonly string _contentRootPath;
-
-        public Startup(IConfiguration configuration, IWebHostEnvironment env)
-        {
-            _contentRootPath = env.ContentRootPath;
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddEFSecondLevelCache(options =>
-                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-                       // Fallback on db if the caching provider fails.
-                       .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1)))
-
-            // Please use the `CacheManager.Core` or `EasyCaching.Redis` for the Redis cache provider.
-            );
-
-            var connectionString = Configuration["ConnectionStrings:ApplicationDbContextConnection"];
-            if (connectionString.Contains("%CONTENTROOTPATH%"))
-            {
-                connectionString = connectionString.Replace("%CONTENTROOTPATH%", _contentRootPath);
-            }
-            services.AddConfiguredMsSqlDbContext(connectionString);
-
-            services.AddControllersWithViews();
-        }
+                            sqlServerOptionsBuilder
+                                .CommandTimeout((int)TimeSpan.FromMinutes(3).TotalSeconds)
+                                .EnableRetryOnFailure()
+                                .MigrationsAssembly(typeof(MsSqlServiceCollectionExtensions).Assembly.FullName);
+                        })
+                    // Add the interceptor
+                    .AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>()));
+        return services;
     }
 }
 ```
 
-#### Using EasyCaching.Core as the cache provider
+### 4\. Make Queries Cacheable
 
-Here you can use the [EasyCaching.Core](https://github.com/dotnetcore/EasyCaching), as a highly configurable cache
-manager too.
-To use its in-memory caching mechanism, add this entry to the `.csproj` file:
-
-```xml
-  <ItemGroup>
-    <PackageReference Include="EasyCaching.InMemory" Version="1.6.1" />
-  </ItemGroup>
-```
-
-Then register its required services:
+To cache a query, use the `.Cacheable()` extension method. It can be placed anywhere in the LINQ query chain.
 
 ```csharp
-namespace EFSecondLevelCache.Core.AspNetCoreSample
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            const string providerName1 = "InMemory1";
-            services.AddEFSecondLevelCache(options =>
-                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-                           // Fallback on db if the caching provider fails.
-                           .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-            );
-
-            // Add an in-memory cache service provider
-            // More info: https://easycaching.readthedocs.io/en/latest/In-Memory/
-            services.AddEasyCaching(options =>
-            {
-                // use memory cache with your own configuration
-                options.UseInMemory(config =>
-                {
-                    config.DBConfig = new InMemoryCachingOptions
-                    {
-                        // scan time, default value is 60s
-                        ExpirationScanFrequency = 60,
-                        // total count of cache items, default value is 10000
-                        SizeLimit = 100,
-
-                        // enable deep clone when reading object from cache or not, default value is true.
-                        EnableReadDeepClone = false,
-                        // enable deep clone when writing object to cache or not, default value is false.
-                        EnableWriteDeepClone = false,
-                    };
-                    // the max random second will be added to cache's expiration, default value is 120
-                    config.MaxRdSecond = 120;
-                    // whether enable logging, default is false
-                    config.EnableLogging = false;
-                    // mutex key's alive time(ms), default is 5000
-                    config.LockMs = 5000;
-                    // when mutex key alive, it will sleep some time, default is 300
-                    config.SleepMs = 300;
-                }, providerName1);
-            });
-        }
-    }
-}
-```
-
-If you want to use the Redis as the preferred cache provider with `EasyCaching.Core`, first install the following
-package:
-
-```xml
-  <ItemGroup>
-    <PackageReference Include="EasyCaching.Redis" Version="1.6.1" />
-    <PackageReference Include="EasyCaching.Serialization.MessagePack" Version="1.6.1" />
-  </ItemGroup>
-```
-
-And then register its required services:
-
-```csharp
-namespace EFSecondLevelCache.Core.AspNetCoreSample
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            const string providerName1 = "Redis1";
-            services.AddEFSecondLevelCache(options =>
-                    options.UseEasyCachingCoreProvider(providerName1, isHybridCache: false).ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-                           // Fallback on db if the caching provider fails (for example, if Redis is down).
-                           .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-            );
-
-            // More info: https://easycaching.readthedocs.io/en/latest/Redis/
-            services.AddEasyCaching(option =>
-            {
-                option.UseRedis(config =>
-                {
-                    config.DBConfig.AllowAdmin = true;
-                    config.DBConfig.SyncTimeout = 10000;
-                    config.DBConfig.AsyncTimeout = 10000;
-                    config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("127.0.0.1", 6379));
-                    config.EnableLogging = true;
-                    config.SerializerName = "Pack";
-                    config.DBConfig.ConnectionTimeout = 10000;
-                }, providerName1)
-                .WithMessagePack(so =>
-                                      {
-                                         so.EnableCustomResolver = true;
-                                         so.CustomResolvers = CompositeResolver.Create(
-                                         new IMessagePackFormatter[]
-                                         {
-                                               DBNullFormatter.Instance, // This is necessary for the null values
-                                         },
-                                         new IFormatterResolver[]
-                                         {
-                                              NativeDateTimeResolver.Instance,
-                                              ContractlessStandardResolver.Instance,
-                                              StandardResolverAllowPrivate.Instance,
-                                         });
-                                       },
-                                       "Pack");
-            });
-        }
-    }
-}
-```
-
-[Here is a sample about it](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/Issues/Issue123WithMessagePack/EFServiceProvider.cs).
-
-#### Using EasyCaching.Core as a dynamic cache provider
-
-If you want to support multitenancy in your application and have a different Redis database per each tenant, first
-register multiple pre-configured providers with known `providerName`s and then select these `providerName`s based on the
-current tenant this way dynamically:
-
-```C#
-services.AddEFSecondLevelCache(options =>
-    options.UseEasyCachingCoreProvider(
-	   (serviceProvider, cacheKey) => "redis-db-" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"],
-	   isHybridCache: false)
-	// `Or` you can set the cache key prefix per tenant dynamically  
-	.UseCacheKeyPrefix(serviceProvider => "EF_" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"])
-	.ConfigureLogging(true)
-	.UseCacheKeyPrefix("EF_")
-        // Fallback on db if the caching provider fails.
-        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-);
-```
-
-#### Using CacheManager.Core as the cache provider
-
-Also here you can use the [CacheManager.Core](https://github.com/MichaCo/CacheManager), as a highly configurable cache
-manager too.
-To use its in-memory caching mechanism, add these entries to the `.csproj` file:
-
-```xml
-  <ItemGroup>
-    <PackageReference Include="CacheManager.Core" Version="2.0.0" />
-    <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="2.0.0" />
-    <PackageReference Include="CacheManager.Serialization.Json" Version="2.0.0" />
-  </ItemGroup>
-```
-
-Then register its required services:
-
-```csharp
-namespace EFSecondLevelCache.Core.AspNetCoreSample
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddEFSecondLevelCache(options =>
-                options.UseCacheManagerCoreProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-                       // Fallback on db if the caching provider fails.
-                       .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-            );
-
-            // Add an in-memory cache service provider
-            services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
-            services.AddSingleton(typeof(ICacheManagerConfiguration),
-                new CacheManager.Core.CacheConfigurationBuilder()
-                        .WithJsonSerializer()
-                        .WithMicrosoftMemoryCacheHandle(instanceName: "MemoryCache1")
-                        .Build());
-        }
-    }
-}
-```
-
-If you want to use the Redis as the preferred cache provider with `CacheManager.Core`, first install the
-`CacheManager.StackExchange.Redis` package and then register its required services:
-
-```csharp
-// Add Redis cache service provider
-var jss = new JsonSerializerSettings
-{
-    NullValueHandling = NullValueHandling.Ignore,
-    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-    TypeNameHandling = TypeNameHandling.Auto,
-    Converters = { new SpecialTypesConverter() }
-};
-
-const string redisConfigurationKey = "redis";
-services.AddSingleton(typeof(ICacheManagerConfiguration),
-    new CacheManager.Core.CacheConfigurationBuilder()
-        .WithJsonSerializer(serializationSettings: jss, deserializationSettings: jss)
-        .WithUpdateMode(CacheUpdateMode.Up)
-        .WithRedisConfiguration(redisConfigurationKey, config =>
-        {
-            config.WithAllowAdmin()
-                .WithDatabase(0)
-                .WithEndpoint("localhost", 6379)
-                // Enables keyspace notifications to react on eviction/expiration of items.
-                // Make sure that all servers are configured correctly and 'notify-keyspace-events' is at least set to 'Exe', otherwise CacheManager will not retrieve any events.
-                // You can try 'Egx' or 'eA' value for the `notify-keyspace-events` too.
-                // See https://redis.io/topics/notifications#configuration for configuration details.
-                .EnableKeyspaceEvents();
-        })
-        .WithMaxRetries(100)
-        .WithRetryTimeout(50)
-        .WithRedisCacheHandle(redisConfigurationKey)
-        .Build());
-services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
-
-services.AddEFSecondLevelCache(options =>
-    options.UseCacheManagerCoreProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-           // Fallback on db if the caching provider fails.
-           .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-);
-```
-
-[Here is](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/Settings/EFServiceProvider.cs#L21)
-the definition of the SpecialTypesConverter.
-
-#### Using a custom cache provider
-
-If you don't want to use the above cache providers, implement your custom `IEFCacheServiceProvider` and then introduce
-it using the `options.UseCustomCacheProvider<T>()` method.
-
-### 2- [Add SecondLevelCacheInterceptor](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/MsSqlServiceCollectionExtensions.cs) to your
-`DbContextOptionsBuilder` pipeline:
-
-```csharp
-    public static class MsSqlServiceCollectionExtensions
-    {
-        public static IServiceCollection AddConfiguredMsSqlDbContext(this IServiceCollection services, string connectionString)
-        {
-            services.AddDbContextPool<ApplicationDbContext>((serviceProvider, optionsBuilder) =>
-                    optionsBuilder
-                        .UseSqlServer(
-                            connectionString,
-                            sqlServerOptionsBuilder =>
-                            {
-                                sqlServerOptionsBuilder
-                                    .CommandTimeout((int)TimeSpan.FromMinutes(3).TotalSeconds)
-                                    .EnableRetryOnFailure()
-                                    .MigrationsAssembly(typeof(MsSqlServiceCollectionExtensions).Assembly.FullName);
-                            })
-                        .AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>()));
-            return services;
-        }
-    }
-```
-
-Note: Some database providers don't support special fields such as `DateTimeOffset`, `TimeSpan`, etc. For these
-scenarios you will
-need [the related converters](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/blob/masterhttps://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/Issues/Issue9SQLiteInt32/DataLayer/ApplicationDbContext.cs#L35).
-
-### 3- Setting up the cache invalidation:
-
-This library doesn't need any settings for the cache invalidation. It watches for all of the CRUD operations using its
-interceptor and then invalidates the related cache entries automatically.
-But if you want to invalidate the whole cache `manually`, inject the `IEFCacheServiceProvider` service and then call its
-`_cacheServiceProvider.ClearAllCachedEntries()` method or use it this way to specify the root cache keys which are a
-collection of a Prefix+TableName:
-
-```C#
-// Partial cache invalidation using the specified table names
-// This is useful when you are monitoring your DB's changes using the SqlTableDependency
-_cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>()
-{
-   "EF_TableName1", // "EF_" is the cache key's prefix
-   "EF_TableName2"
-}));
-```
-
-I you want to get notified about the cache-invalidation events and involved cache dependencies, use the
-`NotifyCacheInvalidation` method:
-
-```C#
-services.AddEFSecondLevelCache(options =>
-{
-   options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(value: 30))
-                .NotifyCacheInvalidation(invalidationInfo =>
-                {
-                    invalidationInfo.ServiceProvider.GetRequiredService<ILoggerFactory>()
-                        .CreateLogger(categoryName: "NotifyCacheInvalidation")
-                        .LogWarning(message: "{Message}",
-                            invalidationInfo.ClearAllCachedEntries
-                                ? "Invalidated all the cache entries!"
-                                : $"Invalidated [{string.Join(separator: ", ", invalidationInfo.CacheDependencies)}] dependencies.");
-                })
-```
-
-### 4- To cache the results of the normal queries like:
-
-```csharp
-var post1 = context.Posts
+var post = context.Posts
                    .Where(x => x.Id > 0)
                    .OrderBy(x => x.Id)
+                   .Cacheable() // Mark this query to be cached
+                   .FirstOrDefault();  // Async methods are also supported.
+```
+
+The `Cacheable()` method uses global settings by default, but you can override them for a specific query:
+
+```csharp
+var post = context.Posts
+                   .Where(x => x.Id > 0)
+                   .OrderBy(x => x.Id)
+                   // Override global settings for this query
+                   .Cacheable(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(5))
                    .FirstOrDefault();
 ```
 
-We can use the new `Cacheable()` extension method:
+-----
+
+## How to Verify It's Working
+
+To confirm that the interceptor is working, you should enable logging.
+
+**1. Enable Logging in the Configuration**
+Set `ConfigureLogging(true)` during service registration.
 
 ```csharp
-var post1 = context.Posts
-                   .Where(x => x.Id > 0)
-                   .OrderBy(x => x.Id)
-                   .Cacheable(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(5))
-                   .FirstOrDefault();  // Async methods are supported too.
-```
-
-NOTE: It doesn't matter where the `Cacheable` method is located in this expression
-tree. [It just adds](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/EFCoreSecondLevelCacheInterceptor/EFCachedQueryExtensions.cs)
-the standard `TagWith` method to mark this query as `Cacheable`. Later `SecondLevelCacheInterceptor` will use this tag
-to identify the `Cacheable` queries.
-
-Also it's possible to set the `Cacheable()` method's settings globally:
-
-```csharp
-services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).ConfigureLogging(true)
-                                          	 .UseCacheKeyPrefix("EF_")
-                                                 // Fallback on db if the caching provider fails.
-                                                 .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
+services.AddEFSecondLevelCache(options =>
+    options.UseMemoryCacheProvider().ConfigureLogging(true)
 );
 ```
 
-In this case the above query will become:
-
-```csharp
-var post1 = context.Posts
-                   .Where(x => x.Id > 0)
-                   .OrderBy(x => x.Id)
-                   .Cacheable()
-                   .FirstOrDefault();  // Async methods are supported too.
-```
-
-If you specify the settings of the `Cacheable()` method explicitly such as
-`Cacheable(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(5))`, its setting will override the global setting.
-
-## Caching all of the queries
-
-To cache all of the system's queries, just set the `CacheAllQueries()` method:
-
-```csharp
-namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddEFSecondLevelCache(options =>
-            {
-                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_");
-                options.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
-                // Fallback on db if the caching provider fails.
-                options.UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1));
-            });
-
-            // ...
-```
-
-This will put the whole system's queries in cache. In this case calling the `Cacheable()` methods won't be necessary. If
-you specify the `Cacheable()` method, its setting will override this global setting. If you want to exclude some of the
-queries from this global cache, apply the `NotCacheable()` method to them.
-
-## Caching some of the queries
-
-To cache some of the system's queries based on their entity-types or table-names, use `CacheQueriesContainingTypes` or
-`CacheQueriesContainingTableNames` methods:
-
-```csharp
-namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddEFSecondLevelCache(options =>
-            {
-                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-                       // Fallback on db if the caching provider fails.
-                       .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-                    /*.CacheQueriesContainingTypes(
-                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30), TableTypeComparison.Contains,
-                        typeof(Post), typeof(Product), typeof(User)
-                        )*/
-                    .CacheQueriesContainingTableNames(
-                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30), TableNameComparison.ContainsOnly,
-                        "posts", "products", "users"
-                        );
-            });
-
-            // ...
-```
-
-This will put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be
-necessary. If you specify the `Cacheable()` method, its setting will override this global setting. If you want to
-exclude some of the queries from this global cache, apply the `NotCacheable()` method to them.
-Also you can skip caching some of the defined DbContexts using `SkipCachingDbContexts()` method.
-
-## Skip caching of some of the queries
-
-To skip caching some of the system's queries based on their SQL commands, set the `SkipCachingCommands` predicate:
-
-```csharp
-namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddEFSecondLevelCache(options =>
-            {
-                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-                       // Fallback on db if the caching provider fails.
-                       .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-                        // How to skip caching specific commands
-                       .SkipCachingCommands(commandText =>
-                                commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase));
-            });
-            // ...
-```
-
-## Skip caching of some of the queries based on their results
-
-To skip caching some of the system's queries based on their results, set the `SkipCachingResults` predicate:
-
-```csharp
-namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddEFSecondLevelCache(options =>
-            {
-                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-                        // Fallback on db if the caching provider fails.
-                        .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-                        // Don't cache null values. Remove this optional setting if it's not necessary.
-                        .SkipCachingResults(result =>
-                                result.Value == null || (result.Value is EFTableRows rows && rows.RowsCount == 0));
-            });
-            // ...
-```
-
-## Skip caching some of the queries based on their table names
-
-To do not cache some of the system's queries based on their entity-types or table-names, use
-`CacheAllQueriesExceptContainingTypes` or `CacheAllQueriesExceptContainingTableNames` methods:
-
-```csharp
-namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddEFSecondLevelCache(options =>
-            {
-                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-                      // Fallback on db if the caching provider fails.
-                      .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-                    /*.CacheAllQueriesExceptContainingTypes(
-                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
-                        typeof(Post), typeof(Product), typeof(User)
-                        )*/
-                    .CacheAllQueriesExceptContainingTableNames(
-                        CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30),
-                        "posts", "products", "users"
-                        );
-            });
-
-            // ...
-```
-
-This will not put the the specified system's queries in cache. In this case calling the `Cacheable()` methods won't be
-necessary. If you specify the `Cacheable()` method, its setting will override this global setting.
-
-## Skip invalidating the related cache entries of a given query
-
-Sometimes you don't want to invalidate the cache immediately, such when you are updating a post's likes or views count.
-In this case to skip invalidating the related cache entries of a given CRUD command, set the
-`SkipCacheInvalidationCommands` predicate:
-
-```csharp
-namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddEFSecondLevelCache(options =>
-            {
-                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-                    // Fallback on db if the caching provider fails.
-                    .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-                    .SkipCacheInvalidationCommands(commandText =>
-                                // How to skip invalidating the related cache entries of this query
-                                commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase));
-            });
-            // ...
-```
-
-## Overriding the default cache-policy
-
-Use `OverrideCachePolicy()` method to override the default/calculated cache-policy of the currently executing query:
-
-```csharp
-namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddEFSecondLevelCache(options =>
-            {
-                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-                    // Fallback on db if the caching provider fails.
-                    .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-                    .OverrideCachePolicy(context =>
-					{
-						if (context.IsCrudCommand)
-						{
-							return null;
-						}
-
-						if (context.CommandTableNames.Contains(item: "posts"))
-						{
-							return new EFCachePolicy().ExpirationMode(CacheExpirationMode.NeverRemove);
-						}
-
-						return null; // Use the default/calculated EFCachePolicy 
-					});
-            });
-            // ...
-```
-
-## Using a different hash provider
-
-This library uses
-the [XxHash64Unsafe](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/EFCoreSecondLevelCacheInterceptor/XxHash64Unsafe.cs)
-class to calculate the hash of a query and its parameters to produce a corresponding cache-key.
-`xxHash` is an extremely fast `non-cryptographic` Hash algorithm. If you don't like it or you want to change it, just
-implement the `IEFHashProvider` interface and then introduce it this way:
-
-```csharp
-namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample
-{
-    public class Startup
-    {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddEFSecondLevelCache(options =>
-            {
-                options.UseCustomHashProvider<MyCustomHashProvider>();
-                // ...                
-            });
-
-            // ...
-```
-
-## Disabling the interceptor for a while
-
-If you want to disable this interceptor for a while, use the `.EnableCachingInterceptor(enable: false)` method. Its
-default value is true.
-
-## Providing options to control the serialization behavior
-
-The EFCacheKeyProvider class serializes parameter values of a DbCommand to JSON values. If it causes an exception in
-some cases, you can specify a custom JsonSerializerOptions for it using the `UseJsonSerializerOptions(options)` method.
-
-## Does it work?!
-
-You should enable the logging system to see the behind the scene of the caching interceptor.
-First set the `ConfigureLogging(true)`:
-
-```c#
- services.AddEFSecondLevelCache(options =>
-                options.UseMemoryCacheProvider().ConfigureLogging(true).UseCacheKeyPrefix("EF_")
-                       // Fallback on db if the caching provider fails.
-                      .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
-```
-
-And then change the log level to `Debug` in your `appsettings.json` file:
+**2. Set Log Level to Debug**
+In your `appsettings.json`, ensure the log level is set to `Debug`.
 
 ```json
 {
@@ -806,94 +148,423 @@ And then change the log level to `Debug` in your `appsettings.json` file:
     "LogLevel": {
       "Default": "Debug",
       "System": "Debug",
-      "Microsoft": "Debug",
-      "Microsoft.Hosting.Lifetime": "Debug"
+      "Microsoft": "Debug"
     }
   }
 }
 ```
 
-Or ... you can use the second optional parameter of the `ConfigureLogging` method to access the published events of this
-library more easily:
-
-```c#
- .ConfigureLogging(enable: environment.IsDevelopment(), cacheableEvent: args =>
-            {
-                    switch (args.EventId)
-                    {
-                        case CacheableLogEventId.CacheHit:
-                            break;
-                        case CacheableLogEventId.QueryResultCached:
-                            break;
-                        case CacheableLogEventId.QueryResultInvalidated:
-                            args.ServiceProvider.GetRequiredService<ILoggerFactory>()
-                                .CreateLogger(nameof(EFCoreSecondLevelCacheInterceptor))
-                                .LogWarning(message: "{EventId} -> {Message} -> {CommandText}", args.EventId,
-                                    args.Message, args.CommandText);
-                            break;
-                        case CacheableLogEventId.CachingSkipped:
-                            break;
-                        case CacheableLogEventId.InvalidationSkipped:
-                            break;
-                        case CacheableLogEventId.CachingSystemStarted:
-                            break;
-                        case CacheableLogEventId.CachingError:
-                            break;
-                        case CacheableLogEventId.QueryResultSuppressed:
-                            break;
-                        case CacheableLogEventId.CacheDependenciesCalculated:
-                            break;
-                        case CacheableLogEventId.CachePolicyCalculated:
-                            break;
-                    }
-            })
-```
-
-Now after running a query multiple times, you should have these logged lines:
+When you run a cacheable query for the first time, the data is fetched from the database and cached. On subsequent executions, you should see log messages indicating a cache hit:
 
 ```
 Suppressed result with a TableRows[ee20d2d7-ffc7-4ff9-9484-e8d4eecde53e] from the cache[KeyHash: EB153BD4, CacheDependencies: Page.].
 Using the TableRows[ee20d2d7-ffc7-4ff9-9484-e8d4eecde53e] from the cache.
 ```
 
-Notes:
+**Notes:**
 
-- Having the `Suppressed the result with the TableRows` message means the caching interceptor is working fine.
-- The next `Executed DbCommand` means nothing and it always will be logged by EF.
-- At the beginning there will be a lot of internal commands executed by the EF to run migrations, etc. Ignore these
-  commands, because you will see the `Suppressed the result with the TableRows` messages for the frequently running
-  queries.
-- Also you should verify it with a real DB profiler. It will log the 1st executed query and then on the 2nd run, you
-  won't see it anymore.
+  * The `Suppressed the result with the TableRows` message confirms the caching interceptor is working.
+  * You will still see an `Executed DbCommand` log message from EF Core, but this is expected behavior.
+  * You can also use a database profiler to verify that the query is only executed against the database on the first run.
+  * For more direct access to library events, you can pass an action to the `ConfigureLogging` method. See the [Logging Events](https://www.google.com/search?q=%23logging-events) section for more details.
 
-## Samples
+-----
 
-- [Console App Sample](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.ConsoleSample/)
-- [ASP.NET Core App Sample](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample/)
-- [Tests](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/)
+## Caching Strategies
 
-## Guidance
+You can control caching globally or on a per-query basis.
 
-### When to use
+### Global Caching
 
-Good candidates for query caching are global site settings and public data, such as infrequently changing articles or
-comments. It can also be beneficial to cache data specific to a user so long as the cache expires frequently enough
-relative to the size of the user base that memory consumption remains acceptable. Small, per-user data that frequently
-exceeds the cache's lifetime, such as a user's photo path, is better held in user claims, which are stored in cookies,
-than in this cache.
+Instead of marking individual queries with `.Cacheable()`, you can define a global caching policy.
+
+#### Caching All Queries
+
+To cache every query in the application, use `CacheAllQueries()`.
+
+```csharp
+services.AddEFSecondLevelCache(options =>
+{
+    options.UseMemoryCacheProvider().UseCacheKeyPrefix("EF_");
+    options.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
+});
+```
+
+  * If you use `CacheAllQueries()`, you don't need to call `.Cacheable()` on individual queries.
+  * A specific `.Cacheable()` call on a query will override the global setting.
+  * To exclude a specific query from global caching, use the `.NotCacheable()` method.
+
+#### Caching Queries by Type or Table Name
+
+To cache queries that involve specific entity types or database tables, use `CacheQueriesContainingTypes` or `CacheQueriesContainingTableNames`.
+
+```csharp
+services.AddEFSecondLevelCache(options =>
+{
+    options.UseMemoryCacheProvider()
+           .CacheQueriesContainingTableNames(
+               CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30), TableNameComparison.ContainsOnly,
+               "posts", "products", "users"
+            );
+});
+```
+
+  * You can also exclude specific types or table names from caching using `CacheAllQueriesExceptContainingTypes` or `CacheAllQueriesExceptContainingTableNames`.
+
+-----
+
+## Cache Invalidation
+
+This library automatically invalidates cache entries when it detects CRUD operations (via its interceptor).
+
+### Automatic Invalidation
+
+When you use `SaveChanges()` or `SaveChangesAsync()`, the interceptor identifies which tables have been modified and invalidates all cached queries that depend on those tables. No additional configuration is needed.
+
+**Limitation: `ExecuteUpdate` and `ExecuteDelete`**
+EF Core does not trigger interceptors for bulk operations like `ExecuteUpdate` and `ExecuteDelete` for performance reasons. These methods execute raw SQL directly, bypassing EF Core's change tracking and related events. Therefore, cache invalidation will **not** happen automatically for these operations. You must invalidate the cache manually.
+
+### Manual Invalidation
+
+You can manually invalidate the cache by injecting the `IEFCacheServiceProvider`.
+
+  * **Invalidate the entire cache:**
+
+    ```csharp
+    _cacheServiceProvider.ClearAllCachedEntries();
+    ```
+
+  * **Invalidate cache entries related to specific tables:**
+    This is useful if you are using an external tool like `SqlTableDependency` to monitor database changes.
+
+    ```csharp
+    // The prefix "EF_" should match your configured UseCacheKeyPrefix.
+    var tableNames = new HashSet<string> { "EF_TableName1", "EF_TableName2" };
+    _cacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(tableNames));
+    ```
+
+### Invalidation Notifications
+
+To receive notifications when cache entries are invalidated, use the `NotifyCacheInvalidation` method.
+
+```csharp
+services.AddEFSecondLevelCache(options =>
+{
+   options.UseMemoryCacheProvider()
+          .NotifyCacheInvalidation(invalidationInfo =>
+          {
+              var logger = invalidationInfo.ServiceProvider
+                                           .GetRequiredService<ILoggerFactory>()
+                                           .CreateLogger("NotifyCacheInvalidation");
+              var message = invalidationInfo.ClearAllCachedEntries
+                  ? "Invalidated all cache entries!"
+                  : $"Invalidated dependencies: [{string.Join(", ", invalidationInfo.CacheDependencies)}]";
+              logger.LogWarning(message);
+          });
+});
+```
+
+-----
+
+## Advanced Configuration
+
+### Skipping Caching
+
+You can define rules to skip caching for certain queries based on their command text or results.
+
+  * **Skip by Command Text:**
+    ```csharp
+    services.AddEFSecondLevelCache(options =>
+    {
+        options.SkipCachingCommands(commandText =>
+            commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase));
+    });
+    ```
+  * **Skip by Result:**
+    ```csharp
+    services.AddEFSecondLevelCache(options =>
+    {
+        // Don't cache null values or empty result sets.
+        options.SkipCachingResults(result =>
+            result.Value == null || (result.Value is EFTableRows rows && rows.RowsCount == 0));
+    });
+    ```
+
+### Skipping Invalidation
+
+In some cases, you may want to prevent a command from invalidating the cache, such as when updating a view counter.
+
+```csharp
+services.AddEFSecondLevelCache(options =>
+{
+    options.SkipCacheInvalidationCommands(commandText =>
+        // Assumes a command that only updates a post's view count contains this text.
+        commandText.Contains("UPDATE [Posts] SET [Views]", StringComparison.InvariantCultureIgnoreCase));
+});
+```
+
+### Overriding Cache Policy
+
+Use `OverrideCachePolicy()` to dynamically change the caching policy for a query at runtime.
+
+```csharp
+services.AddEFSecondLevelCache(options =>
+{
+    options.OverrideCachePolicy(context =>
+    {
+        // Don't cache any CRUD commands
+        if (context.IsCrudCommand)
+        {
+            return null;
+        }
+
+        // Use a "never remove" policy for queries on the 'posts' table
+        if (context.CommandTableNames.Contains("posts"))
+        {
+            return new EFCachePolicy().ExpirationMode(CacheExpirationMode.NeverRemove);
+        }
+
+        // Use the default calculated policy for all other queries
+        return null;
+    });
+});
+```
+
+### Logging Events
+
+You can subscribe to caching events directly instead of parsing log files.
+
+```csharp
+.ConfigureLogging(enable: environment.IsDevelopment(), cacheableEvent: args =>
+{
+    switch (args.EventId)
+    {
+        case CacheableLogEventId.CacheHit:
+            break;
+        case CacheableLogEventId.QueryResultCached:
+            break;
+        case CacheableLogEventId.QueryResultInvalidated:
+            // Example of logging a specific event
+            args.ServiceProvider.GetRequiredService<ILoggerFactory>()
+                .CreateLogger(nameof(EFCoreSecondLevelCacheInterceptor))
+                .LogWarning("{EventId} -> {Message} -> {CommandText}",
+                            args.EventId, args.Message, args.CommandText);
+            break;
+        // ... handle other events
+    }
+})
+```
+
+### Other Configurations
+
+  * **Custom Hash Provider**: Replace the default `xxHash` algorithm by implementing `IEFHashProvider` and registering it with `options.UseCustomHashProvider<T>()`.
+  * **Custom JsonSerializerOptions**: Control serialization behavior by passing `JsonSerializerOptions` to `options.UseJsonSerializerOptions(options)`.
+  * **Disable Interceptor**: Temporarily disable the interceptor via `options.EnableCachingInterceptor(false)`.
+  * **Skip DbContexts**: Exclude certain `DbContext` types from caching with `options.SkipCachingDbContexts()`.
+
+-----
+
+## Available Cache Providers
+
+Below are setup examples for the various supported cache providers.
+
+#### 1\. EFCoreSecondLevelCacheInterceptor.StackExchange.Redis
+
+This provider uses `StackExchange.Redis` and is preconfigured with a MessagePack serializer.
+
+```csharp
+var redisOptions = new ConfigurationOptions
+{
+     EndPoints = { { "127.0.0.1", 6379 } },
+     AllowAdmin = true,
+     ConnectTimeout = 10000
+};
+
+services.AddEFSecondLevelCache(options =>
+    options.UseStackExchangeRedisCacheProvider(redisOptions, TimeSpan.FromMinutes(5)));
+```
+
+#### 2\. EFCoreSecondLevelCacheInterceptor.FusionCache
+
+This provider uses [FusionCache](https://github.com/ZiggyCreatures/FusionCache).
+
+```csharp
+// 1. Add FusionCache services with desired options
+services.AddFusionCache()
+        .WithOptions(options =>
+        {
+            options.DefaultEntryOptions = new FusionCacheEntryOptions
+            {
+                Duration = TimeSpan.FromMinutes(1),
+                IsFailSafeEnabled = true,
+                FailSafeMaxDuration = TimeSpan.FromHours(2),
+                // ... other FusionCache options
+            };
+        });
+
+// 2. Add the EF Core Caching provider
+services.AddEFSecondLevelCache(options => options.UseFusionCacheProvider());
+```
+
+#### 3\. EFCoreSecondLevelCacheInterceptor.HybridCache
+
+This provider uses the new [.NET HybridCache](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/hybrid?view=aspnetcore-9.0).
+
+```csharp
+services.AddEFSecondLevelCache(options => options.UseHybridCacheProvider());
+```
+
+#### 4\. Using EasyCaching.Core
+
+This allows you to use `EasyCaching.Core` as a highly configurable cache manager.
+
+  * **In-Memory with EasyCaching.Core**:
+    ```csharp
+    const string providerName = "InMemory1";
+    services.AddEFSecondLevelCache(options =>
+        options.UseEasyCachingCoreProvider(providerName, isHybridCache: false)
+               .UseCacheKeyPrefix("EF_")
+    );
+
+    // Add EasyCaching.Core in-memory provider
+    services.AddEasyCaching(options =>
+    {
+        options.UseInMemory(config =>
+        {
+            config.DBConfig = new InMemoryCachingOptions { SizeLimit = 10000 };
+            config.MaxRdSecond = 120;
+        }, providerName);
+    });
+    ```
+  * **Redis with EasyCaching.Core**:
+    First, install the required packages: `EasyCaching.Redis` and `EasyCaching.Serialization.MessagePack`.
+    ```csharp
+    const string providerName = "Redis1";
+    services.AddEFSecondLevelCache(options =>
+        options.UseEasyCachingCoreProvider(providerName, isHybridCache: false)
+               .UseCacheKeyPrefix("EF_")
+    );
+
+    // Add EasyCaching.Core Redis provider
+    services.AddEasyCaching(option =>
+    {
+        option.UseRedis(config =>
+        {
+            config.DBConfig.Endpoints.Add(new EasyCaching.Core.Configurations.ServerEndPoint("127.0.0.1", 6379));
+            config.SerializerName = "Pack";
+        }, providerName)
+        .WithMessagePack("Pack"); // Configure MessagePack serializer
+    });
+    ```
+  * **Dynamic Provider with EasyCaching.Core for Multi-tenancy**:
+    You can dynamically select a cache provider based on the current context, such as a tenant ID from an HTTP request header.
+    ```csharp
+    services.AddEFSecondLevelCache(options =>
+        options.UseEasyCachingCoreProvider(
+           (serviceProvider, cacheKey) => "redis-db-" + serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext.Request.Headers["tenant-id"],
+           isHybridCache: false)
+    );
+    ```
+
+#### 5\. Using CacheManager.Core
+
+This allows you to use `CacheManager.Core` as a cache manager. Note: This library is not actively maintained.
+
+  * **In-Memory with CacheManager.Core**:
+    First, install: `CacheManager.Core`, `CacheManager.Microsoft.Extensions.Caching.Memory`, and `CacheManager.Serialization.Json`.
+    ```csharp
+    services.AddEFSecondLevelCache(options => options.UseCacheManagerCoreProvider());
+
+    // Add CacheManager.Core services
+    services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
+    services.AddSingleton(typeof(ICacheManagerConfiguration),
+        new CacheManager.Core.CacheConfigurationBuilder()
+                .WithJsonSerializer()
+                .WithMicrosoftMemoryCacheHandle("MemoryCache1")
+                .Build());
+    ```
+  * **Redis with CacheManager.Core**:
+    First, install the `CacheManager.StackExchange.Redis` package.
+    ```csharp
+    services.AddEFSecondLevelCache(options => options.UseCacheManagerCoreProvider());
+
+    // Add CacheManager.Core Redis services
+    const string redisConfigurationKey = "redis";
+    services.AddSingleton(typeof(ICacheManagerConfiguration),
+        new CacheManager.Core.CacheConfigurationBuilder()
+            .WithJsonSerializer()
+            .WithUpdateMode(CacheUpdateMode.Up)
+            .WithRedisConfiguration(redisConfigurationKey, config =>
+            {
+                config.WithAllowAdmin()
+                      .WithDatabase(0)
+                      .WithEndpoint("localhost", 6379)
+                      .EnableKeyspaceEvents();
+            })
+            .WithRedisCacheHandle(redisConfigurationKey)
+            .Build());
+    services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
+    ```
+
+#### 6\. Using a Custom Cache Provider
+
+If the provided cache providers don't meet your needs, you can implement the `IEFCacheServiceProvider` interface and then register it using the `options.UseCustomCacheProvider<T>()` method.
+
+-----
+
+## Guidance and Best Practices
+
+### When to Use
+
+Good candidates for query caching are global site settings and public data, such as infrequently changing articles or comments. It can also be beneficial to cache data specific to a user, so long as the cache expires frequently enough relative to the size of the user base that memory consumption remains acceptable. Small, per-user data that changes frequently is better held in other stores like user claims, which are stored in cookies, than in this cache.
 
 ### Scope
 
-This cache is scoped to the application, not the current user. It does not use session variables. Accordingly, when
-retrieving cached per-user data, be sure queries in include code such as `.Where(x => .... && x.UserId == id)`.
+This cache is scoped to the application, not the current user. It does not use session variables. Accordingly, when retrieving cached per-user data, be sure your queries include a filter for the user ID, such as `.Where(x => x.UserId == id)`.
 
 ### Invalidation
 
-This cache is updated when an entity is changed (insert, update, or delete) via a DbContext that uses this library. If
-the database is updated through some other means, such as a stored procedure or trigger, the cache becomes stale.
+The cache is updated when an entity is changed (inserted, updated, or deleted) via a `DbContext` that uses this interceptor. If the database is modified through other means, such as a stored procedure, a trigger, or another application, the cache will become stale.
 
 ### Transactions
 
-To avoid complications, all of the queries inside an `explicit` transaction (context.Database.BeginTransaction()) will
-not be cached. But the cache invalidations due to its CRUD operations will occur. You can use
-`.AllowCachingWithExplicitTransactions(true)` setting to disable it.
+To avoid complications, all queries inside an explicit transaction (`context.Database.BeginTransaction()`) will **not** be cached by default. However, cache invalidation for CRUD operations within the transaction will still occur. You can override this behavior and allow caching within explicit transactions by using the `.AllowCachingWithExplicitTransactions(true)` setting.
+
+### Database Provider Compatibility
+
+Some database providers do not natively support special data types such as `DateTimeOffset` or `TimeSpan`. For these scenarios, you will need to configure the appropriate [value converters](https://www.google.com/search?q=https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/blob/master/src/Tests/Issues/Issue9SQLiteInt32/DataLayer/ApplicationDbContext.cs%23L35) in your `DbContext`.
+
+-----
+
+## How to Upgrade to Version 5
+
+To support more advanced caching providers, this library was split into multiple assemblies and NuGet packages in version 5.
+
+1.  **Remove the old dependency**: `EFCoreSecondLevelCacheInterceptor`.
+2.  **Add the new main package**:
+    ```powershell
+    dotnet add package EFCoreSecondLevelCacheInterceptor
+    ```
+3.  **Add a provider package**: The main package no longer includes a built-in provider. You must install one of the new provider packages.
+      * For the previous built-in **In-Memory** cache, install:
+        ```powershell
+        dotnet add package EFCoreSecondLevelCacheInterceptor.MemoryCache
+        ```
+      * For the previous **EasyCaching.Core** provider, install:
+        ```powershell
+        dotnet add package EFCoreSecondLevelCacheInterceptor.EasyCaching.Core
+        ```
+      * For the previous **CacheManager.Core** provider, install:
+        ```powershell
+        dotnet add package EFCoreSecondLevelCacheInterceptor.CacheManager.Core
+        ```
+
+If you were using a custom cache provider via `options.UseCustomCacheProvider<T>()`, you do not need to install a new provider package.
+
+-----
+
+## Samples
+
+  * [Console App Sample](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.ConsoleSample/)
+  * [ASP.NET Core App Sample](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample/)
+  * [Project Tests](https://github.com/VahidN/EFCoreSecondLevelCacheInterceptor/tree/master/src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/)
