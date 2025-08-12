@@ -8,7 +8,7 @@ jobs:
     runs-on: windows-2022
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
