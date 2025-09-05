@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -8,10 +6,12 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// <remarks>
 ///     Using FusionCache as a cache service.
 /// </remarks>
-public class EFFusionCacheProvider : IEFCacheServiceProvider
+public sealed class EFFusionCacheProvider : IEFCacheServiceProvider, IDisposable
 {
     private readonly IFusionCache _fusionCache;
     private readonly IEFDebugLogger _logger;
+
+    private bool _disposed;
 
     /// <remarks>
     ///     Using FusionCache as a cache service.
@@ -30,6 +30,18 @@ public class EFFusionCacheProvider : IEFCacheServiceProvider
             : fusionCacheProvider.GetCache(options.NamedCache);
 
         _logger = logger;
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _fusionCache.Dispose();
+        _disposed = true;
     }
 
     /// <summary>

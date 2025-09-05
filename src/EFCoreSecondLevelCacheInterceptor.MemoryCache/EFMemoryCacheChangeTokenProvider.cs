@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Threading;
 using Microsoft.Extensions.Primitives;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -24,10 +22,13 @@ public class EFMemoryCacheChangeTokenProvider : IMemoryCacheChangeTokenProvider
     public IChangeToken GetChangeToken(string key)
         => _changeTokens.GetOrAdd(key, _ =>
             {
+                // We will dispose the CancellationTokenSource when you are done with it in the RemoveChangeToken method.
+#pragma warning disable IDISP001
                 var cancellationTokenSource = new CancellationTokenSource();
                 var changeToken = new CancellationChangeToken(cancellationTokenSource.Token);
 
                 return new ChangeTokenInfo(changeToken, cancellationTokenSource);
+#pragma warning restore IDISP001
             })
             .ChangeToken;
 
@@ -39,6 +40,11 @@ public class EFMemoryCacheChangeTokenProvider : IMemoryCacheChangeTokenProvider
         if (_changeTokens.TryRemove(key, out var changeTokenInfo))
         {
             changeTokenInfo.TokenSource.Cancel();
+
+            // Our current code (with disposal in RemoveChangeToken) is correct because we create the CancellationTokenSource with new inside our class. 
+#pragma warning disable IDISP007
+            changeTokenInfo.TokenSource.Dispose();
+#pragma warning restore IDISP007
         }
     }
 
