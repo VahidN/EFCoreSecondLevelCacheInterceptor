@@ -1,3 +1,5 @@
+using Assert = Xunit.Assert;
+
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
 // ReSharper disable once InconsistentNaming
@@ -7,7 +9,11 @@ public class EFTableRowTests
     public void Constructor_ShouldInitializeValues()
     {
         // Arrange
-        var values = new List<object> { 1, "test" };
+        var values = new List<object>
+        {
+            1,
+            "test"
+        };
 
         // Act
         var row = new EFTableRow(values);
@@ -20,7 +26,12 @@ public class EFTableRowTests
     public void GetValues_ShouldReturnExpectedValues()
     {
         // Arrange
-        var expected = new List<object> { 1, "test" };
+        var expected = new List<object>
+        {
+            1,
+            "test"
+        };
+
         var row = new EFTableRow(expected);
 
         // Act
@@ -35,8 +46,17 @@ public class EFTableRowTests
     {
         // Arrange
         const int expected = 1;
-        var values = new List<object> { 1, "test" };
-        var row = new EFTableRow(values) { Depth = expected };
+
+        var values = new List<object>
+        {
+            1,
+            "test"
+        };
+
+        var row = new EFTableRow(values)
+        {
+            Depth = expected
+        };
 
         // Act
         var actual = row.Depth;
@@ -49,7 +69,12 @@ public class EFTableRowTests
     public void GetFieldCount_ShouldReturnExpectedCount()
     {
         // Arrange
-        var values = new List<object> { 1, "test" };
+        var values = new List<object>
+        {
+            1,
+            "test"
+        };
+
         var row = new EFTableRow(values);
 
         // Act
@@ -64,11 +89,17 @@ public class EFTableRowTests
     {
         // Arrange
         var expected = Guid.NewGuid().ToString();
-        var values = new List<object> { 1, expected };
+
+        var values = new List<object>
+        {
+            1,
+            expected
+        };
+
         var row = new EFTableRow(values);
 
         // Act
-        var value = row[1];
+        var value = row[ordinal: 1];
 
         // Assert
         Assert.Equal(expected, value);

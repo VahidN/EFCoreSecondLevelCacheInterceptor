@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
@@ -31,7 +32,7 @@ public class TypeExtensionsTests
     public void IsNull_ShouldReturnFalse_WhenValueIsNotNullOrDBNull()
     {
         // Arrange
-        object value = new object();
+        var value = new object();
 
         // Act
         var actual = value.IsNull();

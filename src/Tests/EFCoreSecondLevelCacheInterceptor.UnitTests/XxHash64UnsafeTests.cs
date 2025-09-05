@@ -1,3 +1,5 @@
+using Assert = Xunit.Assert;
+
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
 public class XxHash64UnsafeTests
@@ -29,7 +31,7 @@ public class XxHash64UnsafeTests
         var hashProvider = new XxHash64Unsafe();
 
         // Act && Assert
-        Assert.Throws<ArgumentNullException>(() => hashProvider.ComputeHash(null!, 0, 0, 0));
+        Assert.Throws<ArgumentNullException>(() => hashProvider.ComputeHash(null!, offset: 0, len: 0, seed: 0));
     }
 
     [Fact]
@@ -70,8 +72,8 @@ public class XxHash64UnsafeTests
         var data = "test"u8.ToArray();
 
         // Act
-        var hash1 = hashProvider.ComputeHash(data, 0, data.Length, 0);
-        var hash2 = hashProvider.ComputeHash(data, 0, data.Length, 0);
+        var hash1 = hashProvider.ComputeHash(data, offset: 0, data.Length, seed: 0);
+        var hash2 = hashProvider.ComputeHash(data, offset: 0, data.Length, seed: 0);
 
         // Act && Assert
         Assert.Equal(hash1, hash2);
@@ -84,8 +86,8 @@ public class XxHash64UnsafeTests
         var hashProvider = new XxHash64Unsafe();
 
         // Act
-        var hash1 = hashProvider.ComputeHash("test1");
-        var hash2 = hashProvider.ComputeHash("test2");
+        var hash1 = hashProvider.ComputeHash(data: "test1");
+        var hash2 = hashProvider.ComputeHash(data: "test2");
 
         // Act && Assert
         Assert.NotEqual(hash1, hash2);
@@ -116,8 +118,8 @@ public class XxHash64UnsafeTests
         var data2 = "test2"u8.ToArray();
 
         // Act
-        var hash1 = hashProvider.ComputeHash(data1, 0, data1.Length, 0);
-        var hash2 = hashProvider.ComputeHash(data2, 0, data2.Length, 0);
+        var hash1 = hashProvider.ComputeHash(data1, offset: 0, data1.Length, seed: 0);
+        var hash2 = hashProvider.ComputeHash(data2, offset: 0, data2.Length, seed: 0);
 
         // Act && Assert
         Assert.NotEqual(hash1, hash2);

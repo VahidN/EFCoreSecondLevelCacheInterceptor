@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
@@ -28,7 +29,7 @@ public class EFServiceCollectionExtensionsTests
         services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider());
 
         // Assert
-        var serviceProvider = services.BuildServiceProvider();
+        using var serviceProvider = services.BuildServiceProvider();
 
         Assert.NotNull(serviceProvider.GetService<IEFDebugLogger>());
         Assert.NotNull(serviceProvider.GetService<IEFCacheServiceCheck>());
@@ -57,7 +58,7 @@ public class EFServiceCollectionExtensionsTests
         });
 
         // Assert
-        var serviceProvider = services.BuildServiceProvider();
+        using var serviceProvider = services.BuildServiceProvider();
 
         Assert.IsType<XxHash64Unsafe>(serviceProvider.GetService<IEFHashProvider>());
     }
@@ -76,7 +77,7 @@ public class EFServiceCollectionExtensionsTests
         });
 
         // Assert
-        var serviceProvider = services.BuildServiceProvider();
+        using var serviceProvider = services.BuildServiceProvider();
 
         Assert.IsType<CustomHashProvider>(serviceProvider.GetService<IEFHashProvider>());
     }
@@ -102,7 +103,7 @@ public class EFServiceCollectionExtensionsTests
         services.AddEFSecondLevelCache(options => { options.Settings.CacheProvider = typeof(CustomCacheProvider); });
 
         // Assert
-        var serviceProvider = services.BuildServiceProvider();
+        using var serviceProvider = services.BuildServiceProvider();
 
         Assert.IsType<CustomCacheProvider>(serviceProvider.GetService<IEFCacheServiceProvider>());
     }

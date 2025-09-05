@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
+using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
@@ -192,7 +193,8 @@ public class EFCacheKeyProviderTests
             .SetupGet<DbParameterCollection>(propertyName: "DbParameterCollection")
             .Returns(dbParameterCollectionMock.Object);
 
-        dbParameterCollectionMock.Setup(x => x.GetEnumerator()).Returns(parameters.GetEnumerator());
+        using var enumerator = parameters.GetEnumerator();
+        dbParameterCollectionMock.Setup(x => x.GetEnumerator()).Returns(enumerator);
 
         _cacheDependenciesProcessorMock.Setup(x => x.GetCacheDependencies(commandMock.Object, context, cachePolicy))
             .Returns(expected.CacheDependencies as SortedSet<string>);
@@ -246,7 +248,8 @@ public class EFCacheKeyProviderTests
             .SetupGet<DbParameterCollection>(propertyName: "DbParameterCollection")
             .Returns(dbParameterCollectionMock.Object);
 
-        dbParameterCollectionMock.Setup(x => x.GetEnumerator()).Returns(parameters.GetEnumerator());
+        using var enumerator = parameters.GetEnumerator();
+        dbParameterCollectionMock.Setup(x => x.GetEnumerator()).Returns(enumerator);
 
         _cacheDependenciesProcessorMock.Setup(x => x.GetCacheDependencies(commandMock.Object, context, cachePolicy))
             .Returns(expected.CacheDependencies as SortedSet<string>);

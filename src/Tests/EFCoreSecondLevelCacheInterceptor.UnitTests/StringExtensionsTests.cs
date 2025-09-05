@@ -1,3 +1,5 @@
+using Assert = Xunit.Assert;
+
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
 public class StringExtensionsTests
@@ -6,10 +8,14 @@ public class StringExtensionsTests
     public void EndsWith_ReturnsFalse_WhenValueIsNull()
     {
         // Arrange
-        var collection = new List<string> { "testValue", "anotherValue" };
+        var collection = new List<string>
+        {
+            "testValue",
+            "anotherValue"
+        };
 
         // Act
-        var actual = collection.EndsWith(null, StringComparison.OrdinalIgnoreCase);
+        var actual = collection.EndsWith(value: null, StringComparison.OrdinalIgnoreCase);
 
         // Assert
         Assert.False(actual);
@@ -19,10 +25,14 @@ public class StringExtensionsTests
     public void EndsWith_ReturnsTrue_WhenCollectionContainsItemEndingWithValue()
     {
         // Arrange
-        var collection = new List<string> { "testValue", "anotherValue" };
+        var collection = new List<string>
+        {
+            "testValue",
+            "anotherValue"
+        };
 
         // Act
-        var actual = collection.EndsWith("Value", StringComparison.OrdinalIgnoreCase);
+        var actual = collection.EndsWith(value: "Value", StringComparison.OrdinalIgnoreCase);
 
         // Assert
         Assert.True(actual);
@@ -32,10 +42,14 @@ public class StringExtensionsTests
     public void EndsWith_ReturnsFalse_WhenCollectionDoesNotContainItemEndingWithValue()
     {
         // Arrange
-        var collection = new List<string> { "testValue", "anotherValue" };
+        var collection = new List<string>
+        {
+            "testValue",
+            "anotherValue"
+        };
 
         // Act
-        var actual = collection.EndsWith("NotExist", StringComparison.OrdinalIgnoreCase);
+        var actual = collection.EndsWith(value: "NotExist", StringComparison.OrdinalIgnoreCase);
 
         // Assert
         Assert.False(actual);
@@ -45,10 +59,14 @@ public class StringExtensionsTests
     public void StartsWith_ReturnsFalse_WhenValueIsNull()
     {
         // Arrange
-        var collection = new List<string> { "ValueTest", "ValueAnother" };
+        var collection = new List<string>
+        {
+            "ValueTest",
+            "ValueAnother"
+        };
 
         // Act
-        var actual = collection.StartsWith(null, StringComparison.OrdinalIgnoreCase);
+        var actual = collection.StartsWith(value: null, StringComparison.OrdinalIgnoreCase);
 
         // Assert
         Assert.False(actual);
@@ -58,10 +76,14 @@ public class StringExtensionsTests
     public void StartsWith_ReturnsTrue_WhenCollectionContainsItemStartingWithValue()
     {
         // Arrange
-        var collection = new List<string> { "ValueTest", "ValueAnother" };
+        var collection = new List<string>
+        {
+            "ValueTest",
+            "ValueAnother"
+        };
 
         // Act
-        var actual = collection.StartsWith("Value", StringComparison.OrdinalIgnoreCase);
+        var actual = collection.StartsWith(value: "Value", StringComparison.OrdinalIgnoreCase);
 
         // Assert
         Assert.True(actual);
@@ -71,10 +93,14 @@ public class StringExtensionsTests
     public void StartsWith_ReturnsFalse_WhenCollectionDoesNotContainItemStartingWithValue()
     {
         // Arrange
-        var collection = new List<string> { "ValueTest", "ValueAnother" };
+        var collection = new List<string>
+        {
+            "ValueTest",
+            "ValueAnother"
+        };
 
         // Act
-        var actual = collection.StartsWith("NotExist", StringComparison.OrdinalIgnoreCase);
+        var actual = collection.StartsWith(value: "NotExist", StringComparison.OrdinalIgnoreCase);
 
         // Assert
         Assert.False(actual);
@@ -84,10 +110,15 @@ public class StringExtensionsTests
     public void ContainsEvery_ReturnsFalse_WhenCollectionIsNull()
     {
         // Arrange
-        var source = new List<string> { "item1", "item2", "item3" };
+        var source = new List<string>
+        {
+            "item1",
+            "item2",
+            "item3"
+        };
 
         // Act
-        var actual = source.ContainsEvery(null, StringComparer.OrdinalIgnoreCase);
+        var actual = source.ContainsEvery(collection: null, StringComparer.OrdinalIgnoreCase);
 
         // Assert
         Assert.False(actual);
@@ -97,8 +128,19 @@ public class StringExtensionsTests
     public void ContainsEvery_ReturnsTrue_WhenSourceContainsEveryItemInCollection()
     {
         // Arrange
-        var source = new List<string> { "item1", "item2", "item3" };
-        var collection = new List<string> { "item1", "item2", "item3" };
+        var source = new List<string>
+        {
+            "item1",
+            "item2",
+            "item3"
+        };
+
+        var collection = new List<string>
+        {
+            "item1",
+            "item2",
+            "item3"
+        };
 
         // Act
         var actual = source.ContainsEvery(collection, StringComparer.OrdinalIgnoreCase);
@@ -111,8 +153,18 @@ public class StringExtensionsTests
     public void ContainsEvery_ReturnsFalse_WhenSourceDoesNotContainEveryItemInCollection()
     {
         // Arrange
-        var source = new List<string> { "item1", "item2" };
-        var collection = new List<string> { "item1", "item2", "item3" };
+        var source = new List<string>
+        {
+            "item1",
+            "item2"
+        };
+
+        var collection = new List<string>
+        {
+            "item1",
+            "item2",
+            "item3"
+        };
 
         // Act
         var actual = source.ContainsEvery(collection, StringComparer.OrdinalIgnoreCase);
@@ -125,10 +177,14 @@ public class StringExtensionsTests
     public void ContainsOnly_ReturnsFalse_WhenCollectionIsNull()
     {
         // Arrange
-        var source = new List<string> { "item1", "item2" };
+        var source = new List<string>
+        {
+            "item1",
+            "item2"
+        };
 
         // Act
-        var actual = source.ContainsOnly(null, StringComparer.OrdinalIgnoreCase);
+        var actual = source.ContainsOnly(collection: null, StringComparer.OrdinalIgnoreCase);
 
         // Assert
         Assert.False(actual);
@@ -138,8 +194,18 @@ public class StringExtensionsTests
     public void ContainsOnly_ReturnsTrue_WhenSourceContainsOnlyItemsInCollection()
     {
         // Arrange
-        var source = new List<string> { "item1", "item2" };
-        var collection = new List<string> { "item1", "item2", "item3" };
+        var source = new List<string>
+        {
+            "item1",
+            "item2"
+        };
+
+        var collection = new List<string>
+        {
+            "item1",
+            "item2",
+            "item3"
+        };
 
         // Act
         var actual = source.ContainsOnly(collection, StringComparer.OrdinalIgnoreCase);
@@ -152,8 +218,18 @@ public class StringExtensionsTests
     public void ContainsOnly_ReturnsFalse_WhenSourceContainsItemsNotInCollection()
     {
         // Arrange
-        var source = new List<string> { "item1", "item4" };
-        var collection = new List<string> { "item1", "item2", "item3" };
+        var source = new List<string>
+        {
+            "item1",
+            "item4"
+        };
+
+        var collection = new List<string>
+        {
+            "item1",
+            "item2",
+            "item3"
+        };
 
         // Act
         var actual = source.ContainsOnly(collection, StringComparer.OrdinalIgnoreCase);

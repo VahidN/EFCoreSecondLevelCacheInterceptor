@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.Common;
 using System.Reflection;
 using Moq;
+using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
@@ -17,7 +18,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.HasRows).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.HasRows;
@@ -34,7 +35,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.HasRows).Returns(value: false);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.HasRows;
@@ -51,7 +52,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.RecordsAffected).Returns(value: 5);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.RecordsAffected;
@@ -68,7 +69,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.RecordsAffected).Returns(value: 0);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.RecordsAffected;
@@ -85,7 +86,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.IsClosed).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.IsClosed;
@@ -102,7 +103,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.IsClosed).Returns(value: false);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.IsClosed;
@@ -119,7 +120,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.Depth).Returns(value: 3);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.Depth;
@@ -136,7 +137,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.Depth).Returns(value: 0);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.Depth;
@@ -153,7 +154,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.FieldCount).Returns(value: 10);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.FieldCount;
@@ -170,7 +171,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.FieldCount).Returns(value: 0);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.FieldCount;
@@ -187,7 +188,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.VisibleFieldCount).Returns(value: 7);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.VisibleFieldCount;
@@ -204,7 +205,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.VisibleFieldCount).Returns(value: 0);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.VisibleFieldCount;
@@ -224,7 +225,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "Value");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -243,7 +244,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetOrdinal("InvalidColumn")).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader[name: "InvalidColumn"]);
@@ -259,7 +260,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "Value");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -278,7 +279,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader[ordinal: 100]);
@@ -292,7 +293,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetDataTypeName(1)).Returns(value: "Int32");
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.GetDataTypeName(ordinal: 1);
@@ -309,7 +310,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetDataTypeName(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetDataTypeName(ordinal: 100));
@@ -323,7 +324,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetFieldType(1)).Returns(typeof(int));
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.GetFieldType(ordinal: 1);
@@ -340,7 +341,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetFieldType(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetFieldType(ordinal: 100));
@@ -354,7 +355,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetName(1)).Returns(value: "ColumnName");
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.GetName(ordinal: 1);
@@ -371,7 +372,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetName(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetName(ordinal: 100));
@@ -385,7 +386,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetOrdinal("ColumnName")).Returns(value: 1);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.GetOrdinal(name: "ColumnName");
@@ -402,7 +403,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetOrdinal("InvalidColumn")).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetOrdinal(name: "InvalidColumn"));
@@ -413,14 +414,14 @@ public class EFDataReaderLoaderTests
     {
         // Arrange
         var dbReaderMock = new Mock<DbDataReader>();
-        var schemaTable = new DataTable();
+        using var schemaTable = new DataTable();
 
         dbReaderMock.Setup(r => r.GetSchemaTable()).Returns(schemaTable);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
-        var actual = loader.GetSchemaTable();
+        using var actual = loader.GetSchemaTable();
 
         // Assert
         Assert.Equal(schemaTable, actual);
@@ -434,10 +435,10 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetSchemaTable()).Returns((DataTable?)null);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
-        var actual = loader.GetSchemaTable();
+        using var actual = loader.GetSchemaTable();
 
         // Assert
         Assert.Null(actual);
@@ -453,7 +454,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: true);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -475,7 +476,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: 0);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -491,7 +492,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetBoolean(ordinal: 100));
@@ -507,7 +508,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns((byte)123);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -528,7 +529,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "NotAByte");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -544,7 +545,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetByte(ordinal: 100));
@@ -555,7 +556,7 @@ public class EFDataReaderLoaderTests
     {
         // Arrange
         var dbReaderMock = new Mock<DbDataReader>();
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.GetBytes(ordinal: 1, dataOffset: 0, buffer: null, bufferOffset: 0, length: 0);
@@ -575,7 +576,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(buffer);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -596,7 +597,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: 'A');
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -617,7 +618,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "NotAChar");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -633,7 +634,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetChar(ordinal: 100));
@@ -644,7 +645,7 @@ public class EFDataReaderLoaderTests
     {
         // Arrange
         var dbReaderMock = new Mock<DbDataReader>();
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.GetChars(ordinal: 0, dataOffset: 0, buffer: null, bufferOffset: 0, length: 0);
@@ -658,7 +659,7 @@ public class EFDataReaderLoaderTests
     {
         // Arrange
         var dbReaderMock = new Mock<DbDataReader>();
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
         var buffer = new char[10];
 
         loader.Read();
@@ -680,7 +681,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(new DateTime(year: 2023, month: 10, day: 1));
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -701,7 +702,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "NotADateTime");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -717,7 +718,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetDateTime(ordinal: 100));
@@ -733,7 +734,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: 123.45m);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -754,7 +755,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "NotADecimal");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -770,7 +771,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetDecimal(ordinal: 100));
@@ -786,7 +787,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: 123.45);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -807,7 +808,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "NotADouble");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -823,7 +824,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetDouble(ordinal: 100));
@@ -834,7 +835,7 @@ public class EFDataReaderLoaderTests
     {
         // Arrange
         var dbReaderMock = new Mock<DbDataReader>();
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<NotSupportedException>(() => loader.GetEnumerator());
@@ -850,7 +851,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: 123.45f);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -871,7 +872,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "NotAFloat");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -887,7 +888,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetFloat(ordinal: 100));
@@ -903,7 +904,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(new Guid(g: "12345678-1234-1234-1234-1234567890ab"));
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -924,7 +925,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "NotAGuid");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         loader.Read();
@@ -941,7 +942,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetGuid(ordinal: 100));
@@ -957,7 +958,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns((short)123);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -977,7 +978,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "NotAnInt16");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -993,7 +994,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetInt16(ordinal: 100));
@@ -1008,7 +1009,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: 123);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1029,7 +1030,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "NotAnInt32");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1045,7 +1046,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // ACt && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetInt32(ordinal: 100));
@@ -1061,7 +1062,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: 123L);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1082,7 +1083,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "NotAnInt64");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1098,7 +1099,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetInt64(ordinal: 100));
@@ -1114,7 +1115,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "TestString");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1135,7 +1136,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: 123);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1151,7 +1152,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.GetValue(It.IsAny<int>())).Throws<IndexOutOfRangeException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetString(ordinal: 100));
@@ -1166,7 +1167,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.FieldCount).Returns(value: 3);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1191,7 +1192,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(2)).Returns(value: true);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1211,7 +1212,7 @@ public class EFDataReaderLoaderTests
     {
         // Arrange
         var dbReaderMock = new Mock<DbDataReader>();
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1228,7 +1229,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.FieldCount).Returns(value: 3);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1246,7 +1247,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.NextResult()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.NextResult();
@@ -1263,7 +1264,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.NextResult()).Returns(value: false);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.NextResult();
@@ -1280,7 +1281,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.Setup(r => r.NextResult()).Throws<InvalidOperationException>();
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act && Assert
         Assert.Throws<InvalidOperationException>(() => loader.NextResult());
@@ -1299,7 +1300,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.FieldCount).Returns(value: 1);
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "value");
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         var actual = loader.Load();
@@ -1317,7 +1318,7 @@ public class EFDataReaderLoaderTests
 
         dbReaderMock.SetupSequence(r => r.Read()).Returns(value: true).Returns(value: false);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1338,7 +1339,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "value");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1363,9 +1364,10 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.FieldCount).Returns(value: 1);
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(value: "value");
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
-        dbReaderMock.Setup(r => r.GetStream(0)).Returns(new MemoryStream(expected));
+        using var memoryStream = new MemoryStream(expected);
+        dbReaderMock.Setup(r => r.GetStream(0)).Returns(memoryStream);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         var tableRows = loader
             .GetType()
@@ -1393,7 +1395,7 @@ public class EFDataReaderLoaderTests
         dbReaderMock.Setup(r => r.GetValue(0)).Returns(DBNull.Value);
         dbReaderMock.Setup(r => r.Read()).Returns(value: true);
 
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         loader.Read();
 
@@ -1409,7 +1411,7 @@ public class EFDataReaderLoaderTests
     {
         // Arrange
         var dbReaderMock = new Mock<DbDataReader>();
-        var loader = new EFDataReaderLoader(dbReaderMock.Object);
+        using var loader = new EFDataReaderLoader(dbReaderMock.Object);
 
         // Act
         loader.Close();

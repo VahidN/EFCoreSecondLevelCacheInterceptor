@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json;
+using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
@@ -313,7 +314,7 @@ public class EFTableRowsDataReaderTests
             FieldCount = 1
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.FieldCount;
@@ -341,7 +342,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.HasRows;
@@ -355,7 +356,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.HasRows;
@@ -369,7 +370,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         dataReader.Close();
@@ -385,7 +386,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.IsClosed;
@@ -416,7 +417,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.Depth;
@@ -430,7 +431,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.RecordsAffected;
@@ -448,7 +449,7 @@ public class EFTableRowsDataReaderTests
             TableName = "TestTable"
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.TableName;
@@ -462,7 +463,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = Guid.TryParse(dataReader.TableName, out _);
@@ -502,7 +503,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -534,7 +535,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         dataReader.Read();
@@ -572,7 +573,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -604,7 +605,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -636,7 +637,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -663,7 +664,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -691,7 +692,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.GetDataTypeName(ordinal: 0);
@@ -705,7 +706,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Assert
         Assert.Throws<KeyNotFoundException>(() => dataReader.GetDataTypeName(ordinal: 5));
@@ -728,7 +729,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.GetDataTypeName(ordinal: 0);
@@ -754,7 +755,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.GetFieldType(ordinal: 0);
@@ -768,7 +769,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act && Assert
         Assert.Throws<KeyNotFoundException>(() => dataReader.GetFieldType(ordinal: 5));
@@ -791,7 +792,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.GetFieldType(ordinal: 0);
@@ -819,7 +820,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.GetName(ordinal: 0);
@@ -833,7 +834,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Assert
         Assert.Throws<KeyNotFoundException>(() => dataReader.GetName(ordinal: 5));
@@ -856,7 +857,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.GetName(ordinal: 0);
@@ -870,10 +871,13 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act && Assert
-        Assert.Throws<InvalidOperationException>(() => dataReader.GetSchemaTable());
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            using var data = dataReader.GetSchemaTable();
+        });
     }
 
     [Fact]
@@ -881,7 +885,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.NextResult();
@@ -895,7 +899,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         dataReader.Close();
@@ -925,7 +929,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.Read();
@@ -939,7 +943,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.Read();
@@ -969,7 +973,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         dataReader.Read();
@@ -1008,7 +1012,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1039,7 +1043,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1069,7 +1073,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1096,7 +1100,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1109,7 +1113,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.GetBytes(ordinal: 0, dataOffset: 0, buffer: null, bufferOffset: 0, length: 0);
@@ -1123,7 +1127,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
         var buffer = new byte[10];
 
         // Act
@@ -1138,7 +1142,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
         var buffer = new byte[10];
 
         // Act
@@ -1174,7 +1178,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1190,7 +1194,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act
         var actual = dataReader.GetChars(ordinal: 0, dataOffset: 0, buffer: null, bufferOffset: 0, length: 0);
@@ -1204,7 +1208,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
         var buffer = new char[10];
 
         // Act
@@ -1219,7 +1223,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
         var buffer = new char[10];
 
         // Act
@@ -1234,7 +1238,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
         var buffer = new char[10];
 
         // Act
@@ -1249,7 +1253,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
         var buffer = new char[10];
 
         // Act
@@ -1279,7 +1283,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1310,7 +1314,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1341,7 +1345,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1371,7 +1375,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1398,7 +1402,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1411,7 +1415,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         // Act && Assert
         Assert.Throws<NotSupportedException>(() => dataReader.GetEnumerator());
@@ -1437,7 +1441,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1467,7 +1471,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1494,7 +1498,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1522,7 +1526,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1552,7 +1556,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1582,7 +1586,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1612,7 +1616,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1643,7 +1647,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1674,7 +1678,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1705,7 +1709,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1736,7 +1740,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1766,7 +1770,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1798,7 +1802,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1830,7 +1834,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1857,7 +1861,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1887,7 +1891,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1917,7 +1921,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1949,7 +1953,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -1979,7 +1983,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2009,7 +2013,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2039,7 +2043,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2078,7 +2082,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2108,7 +2112,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2138,7 +2142,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2168,7 +2172,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2198,7 +2202,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2239,7 +2243,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2279,7 +2283,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2320,7 +2324,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2361,7 +2365,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2393,7 +2397,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2426,7 +2430,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2462,7 +2466,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2507,7 +2511,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2547,7 +2551,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2587,7 +2591,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2627,7 +2631,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2667,7 +2671,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2707,7 +2711,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2747,7 +2751,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2787,7 +2791,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2819,7 +2823,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2853,7 +2857,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2869,7 +2873,7 @@ public class EFTableRowsDataReaderTests
     {
         // Arrange
         var tableRows = new EFTableRows();
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2903,7 +2907,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2935,7 +2939,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 
@@ -2967,7 +2971,7 @@ public class EFTableRowsDataReaderTests
             }
         };
 
-        var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
+        using var dataReader = new EFTableRowsDataReader(tableRows, new EFCoreSecondLevelCacheSettings());
 
         dataReader.Read();
 

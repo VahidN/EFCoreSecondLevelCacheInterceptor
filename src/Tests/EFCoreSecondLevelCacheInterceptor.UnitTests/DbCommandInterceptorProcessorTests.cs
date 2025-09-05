@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
+using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
@@ -348,7 +349,7 @@ public class DbCommandInterceptorProcessorTests
     public void ProcessExecutedCommands_ReturnsCachedTableRows()
     {
         // Arrange
-        var expected = new EFTableRowsDataReader(new EFTableRows(), new EFCoreSecondLevelCacheSettings());
+        using var expected = new EFTableRowsDataReader(new EFTableRows(), new EFCoreSecondLevelCacheSettings());
         var commandMock = new Mock<DbCommand>();
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
@@ -374,7 +375,7 @@ public class DbCommandInterceptorProcessorTests
     public void ProcessExecutedCommands_NotifiesCacheHitEvent_WhenReturningCachedTableRows()
     {
         // Arrange
-        var result = new EFTableRowsDataReader(new EFTableRows
+        using var result = new EFTableRowsDataReader(new EFTableRows
         {
             TableName = string.Empty
         }, new EFCoreSecondLevelCacheSettings());

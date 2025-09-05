@@ -1,3 +1,5 @@
+using Assert = Xunit.Assert;
+
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
 public class TableEntityInfoTests
@@ -16,7 +18,7 @@ public class TableEntityInfoTests
         var actual = entityInfo.ToString();
 
         // Assert
-        Assert.Equal("System.String::TestTable", actual);
+        Assert.Equal(expected: "System.String::TestTable", actual);
     }
 
     [Fact]
@@ -33,7 +35,7 @@ public class TableEntityInfoTests
         var actual = entityInfo.ToString();
 
         // Assert
-        Assert.Equal("::TestTable", actual);
+        Assert.Equal(expected: "::TestTable", actual);
     }
 
     [Fact]
@@ -50,7 +52,7 @@ public class TableEntityInfoTests
         var actual = entityInfo.ToString();
 
         // Assert
-        Assert.Equal("System.String::", actual);
+        Assert.Equal(expected: "System.String::", actual);
     }
 
     [Fact]
@@ -67,6 +69,6 @@ public class TableEntityInfoTests
         var actual = entityInfo.ToString();
 
         // Assert
-        Assert.Equal("::", actual);
+        Assert.Equal(expected: "::", actual);
     }
 }

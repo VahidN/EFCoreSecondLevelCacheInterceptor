@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
@@ -9,7 +10,7 @@ public class EFCacheServiceProviderTests
     [Fact]
     public void TestCacheInvalidationWithTwoRoots()
     {
-        var efCacheServiceProvider = CreateMemoryCacheServiceProvider();
+        var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
         var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(value: 10))
             .ExpirationMode(CacheExpirationMode.Absolute);
@@ -66,7 +67,7 @@ public class EFCacheServiceProviderTests
     [Fact]
     public void TestCacheInvalidationWithOneRoot()
     {
-        var efCacheServiceProvider = CreateMemoryCacheServiceProvider();
+        var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
         var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(value: 10))
             .ExpirationMode(CacheExpirationMode.Absolute);
@@ -121,7 +122,7 @@ public class EFCacheServiceProviderTests
     [Fact]
     public void TestObjectCacheInvalidationWithOneRoot()
     {
-        var efCacheServiceProvider = CreateMemoryCacheServiceProvider();
+        var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
         var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(value: 10))
             .ExpirationMode(CacheExpirationMode.Absolute);
@@ -186,7 +187,7 @@ public class EFCacheServiceProviderTests
     [Fact]
     public void TestCacheInvalidationWithSimilarRoots()
     {
-        var efCacheServiceProvider = CreateMemoryCacheServiceProvider();
+        var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
         var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(value: 10))
             .ExpirationMode(CacheExpirationMode.Absolute);
@@ -242,7 +243,7 @@ public class EFCacheServiceProviderTests
     [Fact]
     public void TestInsertingNullValues()
     {
-        var efCacheServiceProvider = CreateMemoryCacheServiceProvider();
+        var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
         var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(value: 10))
             .ExpirationMode(CacheExpirationMode.Absolute);
@@ -266,7 +267,7 @@ public class EFCacheServiceProviderTests
     public async Task TestConcurrentCacheInsertAndInvalidation()
     {
         const string rootKey = "entity1";
-        var efCacheServiceProvider = CreateMemoryCacheServiceProvider();
+        var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
         var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(value: 10))
             .ExpirationMode(CacheExpirationMode.Absolute);
@@ -318,7 +319,7 @@ public class EFCacheServiceProviderTests
     public void TestParallelCacheInsertAndInvalidation()
     {
         const string rootKey = "entity1";
-        var efCacheServiceProvider = CreateMemoryCacheServiceProvider();
+        var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
         var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(value: 10))
             .ExpirationMode(CacheExpirationMode.Absolute);
@@ -367,7 +368,7 @@ public class EFCacheServiceProviderTests
     [Fact]
     public void TestParallelInsertsAndRemoves()
     {
-        var efCacheServiceProvider = CreateMemoryCacheServiceProvider();
+        var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
 
         var efCachePolicy = new EFCachePolicy().Timeout(TimeSpan.FromMinutes(value: 10))
             .ExpirationMode(CacheExpirationMode.Absolute);
@@ -431,17 +432,18 @@ public class EFCacheServiceProviderTests
         Assert.Null(value1);
     }
 
-    private static IEFCacheServiceProvider CreateMemoryCacheServiceProvider()
+    private static (IEFCacheServiceProvider, ServiceProvider) CreateMemoryCacheServiceProvider()
     {
         var services = new ServiceCollection();
         services.AddMemoryCache();
         services.AddSingleton<IMemoryCacheChangeTokenProvider, EFMemoryCacheChangeTokenProvider>();
         services.AddSingleton<IEFDebugLogger, EFDebugLogger>();
-        var serviceProvider = services.BuildServiceProvider();
 
+        var serviceProvider = services.BuildServiceProvider();
+        var memoryCache = serviceProvider.GetRequiredService<IMemoryCache>();
+        var changeTokenProvider = serviceProvider.GetRequiredService<IMemoryCacheChangeTokenProvider>();
         var loggerMock = new Mock<IEFDebugLogger>();
 
-        return new EFMemoryCacheServiceProvider(serviceProvider.GetRequiredService<IMemoryCache>(),
-            serviceProvider.GetRequiredService<IMemoryCacheChangeTokenProvider>(), loggerMock.Object);
+        return (new EFMemoryCacheServiceProvider(memoryCache, changeTokenProvider, loggerMock.Object), serviceProvider);
     }
 }

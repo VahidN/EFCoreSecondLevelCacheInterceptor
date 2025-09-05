@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Moq;
+using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
@@ -16,7 +17,7 @@ public class EFCacheKeyPrefixProviderTests
         void Act() => new EFCacheKeyPrefixProvider(serviceProvider, null!);
 
         // Act && Assert
-        Assert.Throws<ArgumentNullException>("cacheSettings", Act);
+        Assert.Throws<ArgumentNullException>(paramName: "cacheSettings", Act);
     }
 
     [Fact]
@@ -24,6 +25,7 @@ public class EFCacheKeyPrefixProviderTests
     {
         // Arrange
         var serviceProvider = new Mock<IServiceProvider>().Object;
+
         var cacheSettings = Options.Create(new EFCoreSecondLevelCacheSettings
         {
             CacheKeyPrefixSelector = _ => "CustomPrefix"
@@ -35,7 +37,7 @@ public class EFCacheKeyPrefixProviderTests
         var actual = provider.GetCacheKeyPrefix();
 
         // Assert
-        Assert.Equal("CustomPrefix", actual);
+        Assert.Equal(expected: "CustomPrefix", actual);
     }
 
     [Fact]
@@ -43,6 +45,7 @@ public class EFCacheKeyPrefixProviderTests
     {
         // Arrange
         var serviceProvider = new Mock<IServiceProvider>().Object;
+
         var cacheSettings = Options.Create(new EFCoreSecondLevelCacheSettings
         {
             CacheKeyPrefix = "DefaultPrefix",
@@ -55,6 +58,6 @@ public class EFCacheKeyPrefixProviderTests
         var actual = provider.GetCacheKeyPrefix();
 
         // Assert
-        Assert.Equal("DefaultPrefix", actual);
+        Assert.Equal(expected: "DefaultPrefix", actual);
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
@@ -10,13 +11,19 @@ public class EFCacheKeyTests
     public void Equals_ReturnsTrue_WhenKeyHashAndDbContextAreEqual()
     {
         // Arrange
-        var cacheKey1 = new EFCacheKey(new HashSet<string> { "Entity1" })
+        var cacheKey1 = new EFCacheKey(new HashSet<string>
+        {
+            "Entity1"
+        })
         {
             KeyHash = "hash1",
             DbContext = typeof(DbContext)
         };
 
-        var cacheKey2 = new EFCacheKey(new HashSet<string> { "Entity2" })
+        var cacheKey2 = new EFCacheKey(new HashSet<string>
+        {
+            "Entity2"
+        })
         {
             KeyHash = "hash1",
             DbContext = typeof(DbContext)
@@ -33,12 +40,15 @@ public class EFCacheKeyTests
     public void Equals_ReturnsFalse_WhenObjIsNotEFCacheKey()
     {
         // Arrange
-        var cacheKey1 = new EFCacheKey(new HashSet<string> { "Entity1" })
+        var cacheKey1 = new EFCacheKey(new HashSet<string>
+        {
+            "Entity1"
+        })
         {
             KeyHash = "hash1",
             DbContext = typeof(DbContext)
         };
-        
+
         var obj = new object();
 
         // Act
@@ -52,13 +62,19 @@ public class EFCacheKeyTests
     public void Equals_ReturnsFalse_WhenKeyHashIsDifferent()
     {
         // Arrange
-        var cacheKey1 = new EFCacheKey(new HashSet<string> { "Entity1" })
+        var cacheKey1 = new EFCacheKey(new HashSet<string>
+        {
+            "Entity1"
+        })
         {
             KeyHash = "hash1",
             DbContext = typeof(DbContext)
         };
-        
-        var cacheKey2 = new EFCacheKey(new HashSet<string> { "Entity2" })
+
+        var cacheKey2 = new EFCacheKey(new HashSet<string>
+        {
+            "Entity2"
+        })
         {
             KeyHash = "hash2",
             DbContext = typeof(DbContext)
@@ -75,13 +91,19 @@ public class EFCacheKeyTests
     public void Equals_ReturnsFalse_WhenDbContextIsDifferent()
     {
         // Arrange
-        var cacheKey1 = new EFCacheKey(new HashSet<string> { "Entity1" })
+        var cacheKey1 = new EFCacheKey(new HashSet<string>
+        {
+            "Entity1"
+        })
         {
             KeyHash = "hash1",
             DbContext = typeof(DbContext)
         };
 
-        var cacheKey2 = new EFCacheKey(new HashSet<string> { "Entity2" })
+        var cacheKey2 = new EFCacheKey(new HashSet<string>
+        {
+            "Entity2"
+        })
         {
             KeyHash = "hash1",
             DbContext = Mock.Of<DbContext>().GetType()
@@ -98,13 +120,19 @@ public class EFCacheKeyTests
     public void GetHashCode_ReturnsSameHashCode_ForEqualObjects()
     {
         // Arrange
-        var cacheKey1 = new EFCacheKey(new HashSet<string> { "Entity1" })
+        var cacheKey1 = new EFCacheKey(new HashSet<string>
         {
-            KeyHash = "hash1", 
+            "Entity1"
+        })
+        {
+            KeyHash = "hash1",
             DbContext = typeof(DbContext)
         };
 
-        var cacheKey2 = new EFCacheKey(new HashSet<string> { "Entity2" })
+        var cacheKey2 = new EFCacheKey(new HashSet<string>
+        {
+            "Entity2"
+        })
         {
             KeyHash = "hash1",
             DbContext = typeof(DbContext)
@@ -122,13 +150,19 @@ public class EFCacheKeyTests
     public void GetHashCode_ReturnsDifferentHashCode_ForDifferentObjects()
     {
         // Arrange
-        var cacheKey1 = new EFCacheKey(new HashSet<string> { "Entity1" })
+        var cacheKey1 = new EFCacheKey(new HashSet<string>
+        {
+            "Entity1"
+        })
         {
             KeyHash = "hash1",
             DbContext = typeof(DbContext)
         };
 
-        var cacheKey2 = new EFCacheKey(new HashSet<string> { "Entity2" })
+        var cacheKey2 = new EFCacheKey(new HashSet<string>
+        {
+            "Entity2"
+        })
         {
             KeyHash = "hash2",
             DbContext = typeof(DbContext)
@@ -146,7 +180,11 @@ public class EFCacheKeyTests
     public void ToString_ReturnsExpectedFormat()
     {
         // Arrange
-        var cacheKey = new EFCacheKey(new HashSet<string> { "Entity1", "Entity2" })
+        var cacheKey = new EFCacheKey(new HashSet<string>
+        {
+            "Entity1",
+            "Entity2"
+        })
         {
             KeyHash = "hash1",
             DbContext = typeof(DbContext)
@@ -156,6 +194,6 @@ public class EFCacheKeyTests
         var actual = cacheKey.ToString();
 
         // Assert
-        Assert.Equal("KeyHash: hash1, DbContext: DbContext, CacheDependencies: Entity1, Entity2.", actual);
+        Assert.Equal(expected: "KeyHash: hash1, DbContext: DbContext, CacheDependencies: Entity1, Entity2.", actual);
     }
 }

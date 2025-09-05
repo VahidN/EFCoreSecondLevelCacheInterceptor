@@ -1,5 +1,6 @@
 using System.Data.Common;
 using Moq;
+using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
@@ -14,7 +15,7 @@ public class EFTableRowsTests
 
         // Act & Assert
         // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>("reader", () => new EFTableRows(reader));
+        Assert.Throws<ArgumentNullException>(paramName: "reader", () => new EFTableRows(reader));
     }
 
     [Fact]
@@ -23,11 +24,11 @@ public class EFTableRowsTests
         // Arrange
         var readerMock = new Mock<DbDataReader>();
 
-        readerMock.Setup(r => r.FieldCount).Returns(2);
-        readerMock.Setup(r => r.GetName(0)).Returns("Column1");
-        readerMock.Setup(r => r.GetName(1)).Returns("Column2");
-        readerMock.Setup(r => r.GetDataTypeName(0)).Returns("int");
-        readerMock.Setup(r => r.GetDataTypeName(1)).Returns("string");
+        readerMock.Setup(r => r.FieldCount).Returns(value: 2);
+        readerMock.Setup(r => r.GetName(0)).Returns(value: "Column1");
+        readerMock.Setup(r => r.GetName(1)).Returns(value: "Column2");
+        readerMock.Setup(r => r.GetDataTypeName(0)).Returns(value: "int");
+        readerMock.Setup(r => r.GetDataTypeName(1)).Returns(value: "string");
         readerMock.Setup(r => r.GetFieldType(0)).Returns(typeof(int));
         readerMock.Setup(r => r.GetFieldType(1)).Returns(typeof(string));
 
@@ -35,13 +36,13 @@ public class EFTableRowsTests
         var tableRows = new EFTableRows(readerMock.Object);
 
         // Assert
-        Assert.Equal(2, tableRows.ColumnsInfo.Count);
-        Assert.Equal("Column1", tableRows.ColumnsInfo[0].Name);
-        Assert.Equal("Column2", tableRows.ColumnsInfo[1].Name);
-        Assert.Equal("int", tableRows.ColumnsInfo[0].DbTypeName);
-        Assert.Equal("string", tableRows.ColumnsInfo[1].DbTypeName);
-        Assert.Equal(typeof(int).ToString(), tableRows.ColumnsInfo[0].TypeName);
-        Assert.Equal(typeof(string).ToString(), tableRows.ColumnsInfo[1].TypeName);
+        Assert.Equal(expected: 2, tableRows.ColumnsInfo.Count);
+        Assert.Equal(expected: "Column1", tableRows.ColumnsInfo[key: 0].Name);
+        Assert.Equal(expected: "Column2", tableRows.ColumnsInfo[key: 1].Name);
+        Assert.Equal(expected: "int", tableRows.ColumnsInfo[key: 0].DbTypeName);
+        Assert.Equal(expected: "string", tableRows.ColumnsInfo[key: 1].DbTypeName);
+        Assert.Equal(typeof(int).ToString(), tableRows.ColumnsInfo[key: 0].TypeName);
+        Assert.Equal(typeof(string).ToString(), tableRows.ColumnsInfo[key: 1].TypeName);
     }
 
     [Fact]
@@ -50,8 +51,8 @@ public class EFTableRowsTests
         // Arrange
         var readerMock = new Mock<DbDataReader>();
 
-        readerMock.Setup(r => r.FieldCount).Returns(1);
-        readerMock.Setup(r => r.GetName(0)).Returns("Column1");
+        readerMock.Setup(r => r.FieldCount).Returns(value: 1);
+        readerMock.Setup(r => r.GetName(0)).Returns(value: "Column1");
         readerMock.Setup(r => r.GetDataTypeName(0)).Returns((string)null);
         readerMock.Setup(r => r.GetFieldType(0)).Returns((Type)null);
 
@@ -59,8 +60,8 @@ public class EFTableRowsTests
         var tableRows = new EFTableRows(readerMock.Object);
 
         // Assert
-        Assert.Equal(typeof(string).ToString(), tableRows.ColumnsInfo[0].DbTypeName);
-        Assert.Equal(typeof(string).ToString(), tableRows.ColumnsInfo[0].TypeName);
+        Assert.Equal(typeof(string).ToString(), tableRows.ColumnsInfo[key: 0].DbTypeName);
+        Assert.Equal(typeof(string).ToString(), tableRows.ColumnsInfo[key: 0].TypeName);
     }
 
     [Fact]
@@ -82,17 +83,26 @@ public class EFTableRowsTests
         // Arrange
         var rows = new List<EFTableRow>
         {
-            new(new List<object> { 1 }),
-            new(new List<object> { 2 })
+            new(new List<object>
+            {
+                1
+            }),
+            new(new List<object>
+            {
+                2
+            })
         };
 
-        var tableRows = new EFTableRows { Rows = rows };
+        var tableRows = new EFTableRows
+        {
+            Rows = rows
+        };
 
         // Act
-        var actual = tableRows[1];
+        var actual = tableRows[index: 1];
 
         // Assert
-        Assert.Equal(2, actual.Values[0]);
+        Assert.Equal(expected: 2, actual.Values[index: 0]);
     }
 
     [Fact]
@@ -101,19 +111,31 @@ public class EFTableRowsTests
         // Arrange
         var rows = new List<EFTableRow>
         {
-            new(new List<object> { 1 }),
-            new(new List<object> { 2 })
+            new(new List<object>
+            {
+                1
+            }),
+            new(new List<object>
+            {
+                2
+            })
         };
 
-        var tableRows = new EFTableRows { Rows = rows };
+        var tableRows = new EFTableRows
+        {
+            Rows = rows
+        };
 
-        var newRow = new EFTableRow(new List<object> { 3 });
+        var newRow = new EFTableRow(new List<object>
+        {
+            3
+        });
 
         // Act
-        tableRows[1] = newRow;
+        tableRows[index: 1] = newRow;
 
         // Assert
-        Assert.Equal(3, tableRows[1].Values[0]);
+        Assert.Equal(expected: 3, tableRows[index: 1].Values[index: 0]);
     }
 
     [Fact]
@@ -122,13 +144,19 @@ public class EFTableRowsTests
         // Arrange
         var rows = new List<EFTableRow>
         {
-            new(new List<object> { 1 })
+            new(new List<object>
+            {
+                1
+            })
         };
 
-        var tableRows = new EFTableRows { Rows = rows };
+        var tableRows = new EFTableRows
+        {
+            Rows = rows
+        };
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => tableRows[1]);
+        Assert.Throws<ArgumentOutOfRangeException>(() => tableRows[index: 1]);
     }
 
     [Fact]
@@ -137,14 +165,24 @@ public class EFTableRowsTests
         // Arrange
         var rows = new List<EFTableRow>
         {
-            new(new List<object> { 1 })
+            new(new List<object>
+            {
+                1
+            })
         };
 
-        var tableRows = new EFTableRows { Rows = rows };
-        var newRow = new EFTableRow(new List<object> { 2 });
+        var tableRows = new EFTableRows
+        {
+            Rows = rows
+        };
+
+        var newRow = new EFTableRow(new List<object>
+        {
+            2
+        });
 
         // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => tableRows[1] = newRow);
+        Assert.Throws<ArgumentOutOfRangeException>(() => tableRows[index: 1] = newRow);
     }
 
     [Fact]
@@ -171,7 +209,7 @@ public class EFTableRowsTests
         tableRows.Add(row);
 
         // Act
-        var actual = tableRows.Get(0);
+        var actual = tableRows.Get(index: 0);
 
         // Assert
         Assert.Equal(row, actual);
@@ -181,38 +219,48 @@ public class EFTableRowsTests
     public void GetOrdinal_ShouldReturnExpectedOrdinal()
     {
         // Arrange
-        var tableRows = new EFTableRows()
+        var tableRows = new EFTableRows
         {
             ColumnsInfo = new Dictionary<int, EFTableColumnInfo>
             {
-                { 0, new EFTableColumnInfo { Name = "Column1" } }
+                {
+                    0, new EFTableColumnInfo
+                    {
+                        Name = "Column1"
+                    }
+                }
             }
         };
 
         // Act
-        var ordinal = tableRows.GetOrdinal("Column1");
+        var ordinal = tableRows.GetOrdinal(name: "Column1");
 
         // Assert
-        Assert.Equal(0, ordinal);
+        Assert.Equal(expected: 0, ordinal);
     }
 
     [Fact]
     public void GetName_ShouldReturnExpectedName()
     {
         // Arrange
-        var tableRows = new EFTableRows()
+        var tableRows = new EFTableRows
         {
             ColumnsInfo = new Dictionary<int, EFTableColumnInfo>
             {
-                { 0, new EFTableColumnInfo { Name = "Column1" } }
+                {
+                    0, new EFTableColumnInfo
+                    {
+                        Name = "Column1"
+                    }
+                }
             }
         };
 
         // Act
-        var name = tableRows.GetName(0);
+        var name = tableRows.GetName(ordinal: 0);
 
         // Assert
-        Assert.Equal("Column1", name);
+        Assert.Equal(expected: "Column1", name);
     }
 
     [Fact]
@@ -238,17 +286,20 @@ public class EFTableRowsTests
         var tableRows = new EFTableRows();
 
         // Act && Assert
-        Assert.Equal(-1, tableRows.RecordsAffected);
+        Assert.Equal(expected: -1, tableRows.RecordsAffected);
     }
 
     [Fact]
     public void VisibleFieldCount_ReturnsExpectedValue_WhenSet()
     {
         // Arrange
-        var tableRows = new EFTableRows { VisibleFieldCount = 5 };
+        var tableRows = new EFTableRows
+        {
+            VisibleFieldCount = 5
+        };
 
         // Act && Assert
-        Assert.Equal(5, tableRows.VisibleFieldCount);
+        Assert.Equal(expected: 5, tableRows.VisibleFieldCount);
     }
 
     [Fact]
@@ -256,7 +307,7 @@ public class EFTableRowsTests
     {
         var tableRows = new EFTableRows();
 
-        Assert.Equal(0, tableRows.VisibleFieldCount);
+        Assert.Equal(expected: 0, tableRows.VisibleFieldCount);
     }
 
     [Fact]
@@ -265,15 +316,24 @@ public class EFTableRowsTests
         // Arrange
         var columnsInfo = new Dictionary<int, EFTableColumnInfo>
         {
-            { 0, new EFTableColumnInfo { Ordinal = 0, TypeName = "System.String" } }
+            {
+                0, new EFTableColumnInfo
+                {
+                    Ordinal = 0,
+                    TypeName = "System.String"
+                }
+            }
         };
 
-        var tableRows = new EFTableRows { ColumnsInfo = columnsInfo };
+        var tableRows = new EFTableRows
+        {
+            ColumnsInfo = columnsInfo
+        };
 
         // Act
-        var actual = tableRows.GetFieldTypeName(0);
+        var actual = tableRows.GetFieldTypeName(ordinal: 0);
 
-        Assert.Equal("System.String", actual);
+        Assert.Equal(expected: "System.String", actual);
     }
 
     [Fact]
@@ -282,15 +342,20 @@ public class EFTableRowsTests
         // Arrange
         var columnsInfo = new Dictionary<int, EFTableColumnInfo>
         {
-            { 0, null }
+            {
+                0, null
+            }
         };
 
-        var tableRows = new EFTableRows { ColumnsInfo = columnsInfo };
+        var tableRows = new EFTableRows
+        {
+            ColumnsInfo = columnsInfo
+        };
 
         // Act
-        var actual = Assert.Throws<ArgumentOutOfRangeException>(() => tableRows.GetFieldTypeName(0));
+        var actual = Assert.Throws<ArgumentOutOfRangeException>(() => tableRows.GetFieldTypeName(ordinal: 0));
 
         // Assert
-        Assert.Equal("Index[0] was outside of array's bounds. (Parameter 'ordinal')", actual.Message);
+        Assert.Equal(expected: "Index[0] was outside of array's bounds. (Parameter 'ordinal')", actual.Message);
     }
 }
