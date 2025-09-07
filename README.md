@@ -290,6 +290,38 @@ You can define rules to skip caching for certain queries based on their command 
     });
     ```
 
+Or if you don't want to use the **`NotCacheable()`** extension method, you can use **query tags** to attach comments to your SQL queries directly from your EF Core code. These tags are then included in the generated SQL, allowing you to create custom rules for caching behavior.
+
+To add a query tag, use the **`.TagWith()`** extension method on your EF Core query:
+
+```csharp
+var blogs = await context.Blogs
+    .TagWith("Fetching data")
+    .Where(b => b.IsActive)
+    .ToListAsync();
+```
+
+The tag, prepended with `--`, will be included in the generated SQL query:
+
+```sql
+-- Fetching data
+SELECT * FROM Blogs WHERE IsActive = 1;
+```
+
+Now you can use query tags to define rules for when to skip caching. This is done by configuring your cache service to check for specific text in the command.
+
+In your `Startup.cs` or `Program.cs` file, configure the cache to skip commands that contain your tag. The `SkipCachingCommands` method accepts a predicate that evaluates the command text.
+
+```csharp
+services.AddEFSecondLevelCache(options =>
+{
+    options.SkipCachingCommands(commandText =>
+        commandText.Contains("-- Fetching data", StringComparison.InvariantCultureIgnoreCase));
+});
+```
+
+With this configuration, any query tagged with `"Fetching data"` will not be cached, giving you granular control over your caching strategy.
+
 ### Skipping Invalidation
 
 In some cases, you may want to prevent a command from invalidating the cache, such as when updating a view counter.
