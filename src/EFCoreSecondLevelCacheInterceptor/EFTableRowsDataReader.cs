@@ -5,7 +5,7 @@ using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
 using System.Text.Json;
 #endif
 
@@ -18,7 +18,7 @@ public class EFTableRowsDataReader : DbDataReader
 {
     private readonly int _rowsCount;
 
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
     private readonly EFCoreSecondLevelCacheSettings _settings;
 #endif
 
@@ -32,7 +32,7 @@ public class EFTableRowsDataReader : DbDataReader
     ///     Converts an EFTableRows to a DbDataReader.
     /// </summary>
     public EFTableRowsDataReader(EFTableRows tableRows
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
         ,
         EFCoreSecondLevelCacheSettings settings
 #endif
@@ -41,7 +41,7 @@ public class EFTableRowsDataReader : DbDataReader
         _tableRows = tableRows;
         _rowsCount = _tableRows.RowsCount;
         _valueTypes = new Dictionary<int, Type>(_tableRows.FieldCount);
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
         _settings = settings;
 #endif
     }
@@ -560,7 +560,7 @@ public class EFTableRowsDataReader : DbDataReader
             return ProcessPostgresArrayOrList<T>(expectedValueType, enumerable);
         }
 
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
         var dbTypeName = GetDataTypeName(ordinal);
 
         if (actualValueType == TypeExtensions.StringType &&
@@ -572,7 +572,7 @@ public class EFTableRowsDataReader : DbDataReader
         }
 #endif
 
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
         if (expectedValueType == TypeExtensions.DateOnlyType && actualValueType == TypeExtensions.DateTimeType)
         {
             return (T)(object)DateOnly.FromDateTime((DateTime)value);

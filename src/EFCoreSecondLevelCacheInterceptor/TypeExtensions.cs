@@ -124,7 +124,7 @@ public static class TypeExtensions
            type == ShortType || type == SByteType || type == ByteType || type == FloatType || type == DoubleType ||
            type == DecimalType || type == CharType;
 
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
     /// <summary>
     ///     Cached version of typeof(DateOnly)
     /// </summary>

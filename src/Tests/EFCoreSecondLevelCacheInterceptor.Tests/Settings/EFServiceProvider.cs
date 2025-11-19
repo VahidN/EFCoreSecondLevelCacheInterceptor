@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using AsyncKeyedLock;
+﻿using AsyncKeyedLock;
 using CacheManager.Core;
 using EasyCaching.Core.Configurations;
 using EasyCaching.InMemory;
@@ -18,43 +15,6 @@ using ZiggyCreatures.Caching.Fusion;
 using ConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBuilder;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests;
-
-public enum TestCacheProvider
-{
-    BuiltInInMemory,
-    CacheManagerCoreInMemory,
-    CacheManagerCoreRedis,
-    EasyCachingCoreInMemory,
-    EasyCachingCoreRedis,
-    EasyCachingCoreHybrid,
-    FusionCache,
-    StackExchangeRedis
-}
-
-public class SpecialTypesConverter : JsonConverter
-{
-    public override bool CanRead => true;
-
-    public override bool CanWrite => true;
-
-    public override bool CanConvert(Type objectType)
-        => objectType == typeof(TimeSpan) || objectType == typeof(TimeSpan?) || objectType == typeof(DateTime) ||
-           objectType == typeof(DateTime?) || objectType == typeof(DateTimeOffset) ||
-           objectType == typeof(DateTimeOffset?);
-
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        => reader.Value;
-
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-    {
-        writer.WriteStartObject();
-        writer.WritePropertyName(name: "$type"); // Deserializer helper
-        writer.WriteValue(value.GetType().FullName);
-        writer.WritePropertyName(name: "$value");
-        writer.WriteValue(value);
-        writer.WriteEndObject();
-    }
-}
 
 public static class EFServiceProvider
 {
@@ -159,7 +119,7 @@ public static class EFServiceProvider
                 throw new ArgumentOutOfRangeException(nameof(provider), provider, message: null);
         }
 
-        var serviceProvider = services.BuildServiceProvider();
+        using var serviceProvider = services.BuildServiceProvider();
         var cacheProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
 
         try
@@ -214,6 +174,7 @@ public static class EFServiceProvider
             });
 
     public static T GetRequiredService<T>()
+        where T : notnull
     {
         var services = new ServiceCollection();
         services.AddOptions();
@@ -224,7 +185,7 @@ public static class EFServiceProvider
                 .ConfigureLogging(enable: true)
                 .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
 
-        var serviceProvider = services.BuildServiceProvider();
+        using var serviceProvider = services.BuildServiceProvider();
 
         return serviceProvider.GetRequiredService<T>();
     }
@@ -244,7 +205,9 @@ public static class EFServiceProvider
 
         services.AddSingleton(_ => configuration);
 
+#pragma warning disable IDISP001
         var loggerProvider = new DebugLoggerProvider();
+#pragma warning restore IDISP001
         services.AddLogging(cfg => cfg.AddConsole().AddDebug().AddProvider(loggerProvider).SetMinimumLevel(logLevel));
 
         services.AddEFSecondLevelCache(options =>
@@ -307,7 +270,7 @@ public static class EFServiceProvider
 
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(cacheProvider), cacheProvider, message: null);
+                    throw new InvalidOperationException();
             }
 
             if (cacheAllQueries)
@@ -318,7 +281,9 @@ public static class EFServiceProvider
 
         services.AddConfiguredMsSqlDbContext(GetConnectionString(basePath, configuration));
 
+#pragma warning disable IDISP005
         return services.BuildServiceProvider();
+#pragma warning restore IDISP005
     }
 
     private static void addEasyCachingCoreHybrid(ServiceCollection services, string hybridProviderName)
@@ -389,8 +354,6 @@ public static class EFServiceProvider
                 .WithRedisBus(busConf =>
                 {
                     busConf.Endpoints.Add(new ServerEndPoint(host: "127.0.0.1", port: 6379));
-
-                    // busConf.Database = 2;
                     busConf.AllowAdmin = true;
                 });
         });
@@ -423,8 +386,6 @@ public static class EFServiceProvider
                             StandardResolverAllowPrivate.Instance
                         });
                     }, name: "MySerializer");
-
-                //.WithSystemTextJson("MySerializer");
             });
 
     private static void addEasyCachingCoreInMemory(ServiceCollection services, string providerName)
@@ -472,7 +433,9 @@ public static class EFServiceProvider
         {
             NullValueHandling = NullValueHandling.Ignore,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+#pragma warning disable CA2326
             TypeNameHandling = TypeNameHandling.Auto,
+#pragma warning restore CA2326
             Converters =
             {
                 new SpecialTypesConverter()
@@ -481,8 +444,7 @@ public static class EFServiceProvider
 
         const string redisConfigurationKey = "redis";
 
-        services.AddSingleton(typeof(ICacheManagerConfiguration), new CacheConfigurationBuilder()
-            .WithJsonSerializer(jss, jss)
+        services.AddSingleton(new CacheConfigurationBuilder().WithJsonSerializer(jss, jss)
             .WithUpdateMode(CacheUpdateMode.Up)
             .WithRedisConfiguration(redisConfigurationKey, config =>
             {
@@ -506,11 +468,10 @@ public static class EFServiceProvider
 
     private static void addCacheManagerCoreInMemory(ServiceCollection services)
     {
-        services.AddSingleton(typeof(ICacheManagerConfiguration),
-            new CacheConfigurationBuilder().WithJsonSerializer()
-                .WithMicrosoftMemoryCacheHandle(instanceName: "MemoryCache1")
-                .DisableStatistics()
-                .Build());
+        services.AddSingleton(new CacheConfigurationBuilder().WithJsonSerializer()
+            .WithMicrosoftMemoryCacheHandle(instanceName: "MemoryCache1")
+            .DisableStatistics()
+            .Build());
 
         services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
     }
@@ -527,9 +488,15 @@ public static class EFServiceProvider
 
         var connectionString = configuration[key: "ConnectionStrings:ApplicationDbContextConnection"];
 
-        if (connectionString.Contains(value: "%CONTENTROOTPATH%"))
+        if (connectionString is null)
         {
-            connectionString = connectionString.Replace(oldValue: "%CONTENTROOTPATH%", contentRootPath);
+            throw new InvalidOperationException(message: "connectionString is null");
+        }
+
+        if (connectionString.Contains(value: "%CONTENTROOTPATH%", StringComparison.Ordinal))
+        {
+            connectionString =
+                connectionString.Replace(oldValue: "%CONTENTROOTPATH%", contentRootPath, StringComparison.Ordinal);
         }
 
         Console.WriteLine($"Using {connectionString}");
@@ -544,7 +511,9 @@ public static class EFServiceProvider
     {
         using (_locker.Lock())
         {
+#pragma warning disable IDISP001
             var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
+#pragma warning restore IDISP001
 
             try
             {
@@ -576,7 +545,9 @@ public static class EFServiceProvider
     {
         using (await _locker.LockAsync())
         {
+#pragma warning disable IDISP001
             var serviceProvider = GetConfiguredContextServiceProvider(cacheProvider, logLevel, cacheAllQueries);
+#pragma warning restore IDISP001
             var cacheServiceProvider = serviceProvider.GetRequiredService<IEFCacheServiceProvider>();
             cacheServiceProvider.ClearAllCachedEntries();
 

@@ -1,35 +1,37 @@
-﻿using System;
-using System.Linq;
-using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities;
+﻿using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EFCoreSecondLevelCacheInterceptor.ConsoleSample
+namespace EFCoreSecondLevelCacheInterceptor.ConsoleSample;
+
+internal static class Program
 {
-    class Program
+    private static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            initDb();
+        initDb();
 
-            EFServiceProvider.RunInContext(context =>
+        EFServiceProvider.RunInContext(context =>
+        {
+            context.Posts.Add(new Post
             {
-                context.Posts.Add(new Post { Title = "Title 1", UserId = 1 });
-                context.SaveChanges();
-
-                var posts = context.Posts.Cacheable().ToList();
-                Console.WriteLine($"Title From DB: {posts.First().Title}");
-
-                posts = context.Posts.Cacheable().ToList();
-                Console.WriteLine($"Title From Cache: {posts.First().Title}");
+                Title = "Title 1",
+                UserId = 1
             });
-        }
 
-        private static void initDb()
-        {
-            var serviceScope = EFServiceProvider.GetRequiredService<IServiceScopeFactory>();
-            serviceScope.Initialize();
-            serviceScope.SeedData();
-        }
+            context.SaveChanges();
+
+            var posts = context.Posts.Cacheable().ToList();
+            Console.WriteLine($"Title From DB: {posts[index: 0].Title}");
+
+            posts = context.Posts.Cacheable().ToList();
+            Console.WriteLine($"Title From Cache: {posts[index: 0].Title}");
+        });
+    }
+
+    private static void initDb()
+    {
+        var serviceScope = EFServiceProvider.GetRequiredService<IServiceScopeFactory>();
+        serviceScope.Initialize();
+        serviceScope.SeedData();
     }
 }

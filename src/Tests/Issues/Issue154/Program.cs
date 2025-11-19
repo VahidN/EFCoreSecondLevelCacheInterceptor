@@ -1,68 +1,76 @@
-﻿using System.Linq;
-using EFCoreSecondLevelCacheInterceptor;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using EFCoreSecondLevelCacheInterceptor;
 using Issue154.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace Issue154
+namespace Issue154;
+
+internal static class Program
 {
-    class Program
+    private static void Main(string[] args)
     {
-        static void Main(string[] args)
+        initDb();
+
+        EFServiceProvider.RunInContext(context =>
         {
-            initDb();
+            Console.WriteLine(
+                value:
+                "Not using the `Cacheable()` method with options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).");
 
-            EFServiceProvider.RunInContext(context =>
+            var people = context.People.ToList();
+            people = context.People.ToList();
+            people = context.People.ToList();
+
+            foreach (var person in people)
             {
-                Console.WriteLine("Not using the `Cacheable()` method with options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).");
-                var people = context.People.ToList();
-                people = context.People.ToList();
-                people = context.People.ToList();
-                foreach (var person in people)
-                {
-                    Console.WriteLine($"{person.Id}, {person.Name}");
-                }
+                Console.WriteLine($"{person.Id}, {person.Name}");
+            }
 
-                Console.WriteLine("Not using the `Cacheable()` method with options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).");
-                people = context.People.ToList();
-                people = context.People.ToList();
-                foreach (var person in people)
-                {
-                    Console.WriteLine($"{person.Id}, {person.Name}");
-                }
+            Console.WriteLine(
+                value:
+                "Not using the `Cacheable()` method with options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).");
 
-                Console.WriteLine("Using the `Cacheable()` method.");
-                var cachedPeople = context.People.Cacheable().ToList();
-                cachedPeople = context.People.Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(1)).ToList();
-                cachedPeople = context.People.Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(1)).ToList();
-                foreach (var person in cachedPeople)
-                {
-                    Console.WriteLine($"{person.Id}, {person.Name}");
-                }
-            });
-        }
+            people = context.People.ToList();
+            people = context.People.ToList();
 
-        private static void initDb()
-        {
-            EFServiceProvider.RunInContext(context =>
+            foreach (var person in people)
             {
-                context.Database.Migrate();
+                Console.WriteLine($"{person.Id}, {person.Name}");
+            }
 
-                if (!context.People.Any())
-                {
-                    context.People.Add(new Person
-                    {
-                        Name = "Bill",
-                    });
+            Console.WriteLine(value: "Using the `Cacheable()` method.");
+            var cachedPeople = context.People.Cacheable().ToList();
 
-                    context.People.Add(new Person
-                    {
-                        Name = "Vahid",
-                    });
+            cachedPeople = context.People.Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 1))
+                .ToList();
 
-                    context.SaveChanges();
-                }
-            });
-        }
+            cachedPeople = context.People.Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 1))
+                .ToList();
+
+            foreach (var person in cachedPeople)
+            {
+                Console.WriteLine($"{person.Id}, {person.Name}");
+            }
+        });
     }
+
+    private static void initDb()
+        => EFServiceProvider.RunInContext(context =>
+        {
+            context.Database.Migrate();
+
+            if (!context.People.Any())
+            {
+                context.People.Add(new Person
+                {
+                    Name = "Bill"
+                });
+
+                context.People.Add(new Person
+                {
+                    Name = "Vahid"
+                });
+
+                context.SaveChanges();
+            }
+        });
 }

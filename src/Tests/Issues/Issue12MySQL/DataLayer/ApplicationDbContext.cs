@@ -1,96 +1,64 @@
-using System;
-using System.Linq;
 using Issue12MySQL.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Microsoft.Extensions.Logging;
 
-namespace Issue12MySQL.DataLayer
+namespace Issue12MySQL.DataLayer;
+
+public class ApplicationDbContext : DbContext
 {
-    public class ApplicationDbContext : DbContext
+    public ApplicationDbContext(DbContextOptions options) : base(options)
     {
-        public ApplicationDbContext(DbContextOptions options)
-            : base(options)
+    }
+
+    public DbSet<Person> People { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // MySQL does not support DateTimeOffset
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
+                     .SelectMany(t => t.GetProperties())
+                     .Where(p => p.ClrType == typeof(DateTimeOffset)))
         {
+            property.SetValueConverter(new ValueConverter<DateTimeOffset, DateTime>(
+                dateTimeOffset => dateTimeOffset.UtcDateTime, dateTime => new DateTimeOffset(dateTime)));
         }
 
-        public DbSet<Person> People { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
+                     .SelectMany(t => t.GetProperties())
+                     .Where(p => p.ClrType == typeof(DateTimeOffset?)))
         {
-            optionsBuilder
-                .UseLoggerFactory(LoggerFactory.Create(x => x
-                    .AddConsole()
-                    .AddFilter(y => y >= LogLevel.Debug)))
-                .EnableSensitiveDataLogging()
-                .EnableDetailedErrors();
-
-            base.OnConfiguring(optionsBuilder);
+            property.SetValueConverter(new ValueConverter<DateTimeOffset?, DateTime>(
+                dateTimeOffset => dateTimeOffset == null ? DateTime.MinValue : dateTimeOffset.Value.UtcDateTime,
+                dateTime => new DateTimeOffset(dateTime)));
         }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        // To solve: Unable to cast object of type 'System.Char' to type 'System.Int32'.
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
+                     .SelectMany(t => t.GetProperties())
+                     .Where(p => p.ClrType == typeof(char)))
         {
-            base.OnModelCreating(builder);
+            property.SetValueConverter(
+                new ValueConverter<char, int>(charValue => charValue, intValue => (char)intValue));
+        }
 
-            // MySQL does not support DateTimeOffset
-            foreach (var property in builder.Model.GetEntityTypes()
-                                                .SelectMany(t => t.GetProperties())
-                                                .Where(p => p.ClrType == typeof(DateTimeOffset)))
-            {
-                property.SetValueConverter(
-                    new ValueConverter<DateTimeOffset, DateTime>(
-                        convertToProviderExpression: dateTimeOffset => dateTimeOffset.UtcDateTime,
-                        convertFromProviderExpression: dateTime => new DateTimeOffset(dateTime)
-                    ));
-            }
+        //To solve: Unable to cast object of type 'System.UInt32' to type 'System.Int32'
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
+                     .SelectMany(t => t.GetProperties())
+                     .Where(p => p.ClrType == typeof(uint)))
+        {
+            property.SetValueConverter(new ValueConverter<uint, int>(uintValue => (int)uintValue,
+                intValue => (uint)intValue));
+        }
 
-            foreach (var property in builder.Model.GetEntityTypes()
-                                                .SelectMany(t => t.GetProperties())
-                                                .Where(p => p.ClrType == typeof(DateTimeOffset?)))
-            {
-                property.SetValueConverter(
-                    new ValueConverter<DateTimeOffset?, DateTime>(
-                        convertToProviderExpression: dateTimeOffset => dateTimeOffset.Value.UtcDateTime,
-                        convertFromProviderExpression: dateTime => new DateTimeOffset(dateTime)
-                    ));
-            }
-
-            // To solve: Unable to cast object of type 'System.Char' to type 'System.Int32'.
-            foreach (var property in builder.Model.GetEntityTypes()
-                                                .SelectMany(t => t.GetProperties())
-                                                .Where(p => p.ClrType == typeof(char)))
-            {
-                property.SetValueConverter(
-                    new ValueConverter<char, int>(
-                        convertToProviderExpression: charValue => charValue,
-                        convertFromProviderExpression: intValue => (char)intValue
-                    ));
-            }
-
-            //To solve: Unable to cast object of type 'System.UInt32' to type 'System.Int32'
-            foreach (var property in builder.Model.GetEntityTypes()
-                                                .SelectMany(t => t.GetProperties())
-                                                .Where(p => p.ClrType == typeof(uint)))
-            {
-                property.SetValueConverter(
-                    new ValueConverter<uint, int>(
-                        convertToProviderExpression: uintValue => (int)uintValue,
-                        convertFromProviderExpression: intValue => (uint)intValue
-                    ));
-            }
-
-            //To solve: Unable to cast object of type 'System.UInt64' to type 'System.Int64'
-            foreach (var property in builder.Model.GetEntityTypes()
-                                                .SelectMany(t => t.GetProperties())
-                                                .Where(p => p.ClrType == typeof(ulong)))
-            {
-                property.SetValueConverter(
-                    new ValueConverter<ulong, long>(
-                        convertToProviderExpression: ulongValue => (long)ulongValue,
-                        convertFromProviderExpression: longValue => (ulong)longValue
-                    ));
-            }
-
+        //To solve: Unable to cast object of type 'System.UInt64' to type 'System.Int64'
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
+                     .SelectMany(t => t.GetProperties())
+                     .Where(p => p.ClrType == typeof(ulong)))
+        {
+            property.SetValueConverter(new ValueConverter<ulong, long>(ulongValue => (long)ulongValue,
+                longValue => (ulong)longValue));
         }
     }
 }

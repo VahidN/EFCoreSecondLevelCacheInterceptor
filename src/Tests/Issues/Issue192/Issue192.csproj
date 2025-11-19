@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.MemoryCache\EFCoreSecondLevelCacheInterceptor.MemoryCache.csproj"/>
@@ -23,6 +23,7 @@
         <PackageReference Include="EasyCaching.Redis" />
         <PackageReference Include="EasyCaching.Serialization.MessagePack" />
         <PackageReference Include="EFCore.BulkExtensions" />
+        <PackageReference Include="MessagePack" />
     </ItemGroup>
     <ItemGroup>
         <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>

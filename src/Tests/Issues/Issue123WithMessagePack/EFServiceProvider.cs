@@ -76,7 +76,7 @@ public static class EFServiceProvider
         });*/
 #pragma warning restore S125
 
-        var distributedCache = new RedisCache(new RedisCacheOptions
+        using var distributedCache = new RedisCache(new RedisCacheOptions
         {
             ConfigurationOptions = new ConfigurationOptions
             {

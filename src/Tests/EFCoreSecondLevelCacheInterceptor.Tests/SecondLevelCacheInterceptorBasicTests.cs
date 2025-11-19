@@ -1,13 +1,9 @@
-using System;
-using System.IO;
-using System.Linq;
 using CacheManager.Serialization.Json;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests;
@@ -15,7 +11,7 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests;
 [TestClass]
 public class SecondLevelCacheInterceptorBasicTests
 {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -42,7 +38,7 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.AreEqual(expected: 0, loggerProvider.GetCacheHitCount());
             });
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -90,7 +86,7 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.AreEqual(expected: 1, loggerProvider.GetCacheHitCount());
             });
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -123,7 +119,7 @@ public class SecondLevelCacheInterceptorBasicTests
         });
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -142,7 +138,7 @@ public class SecondLevelCacheInterceptorBasicTests
                     .Count();
 
                 Assert.AreEqual(expected: 0, loggerProvider.GetCacheHitCount());
-                Assert.IsTrue(count > 0);
+                Assert.IsGreaterThan(lowerBound: 0, count);
 
                 var list1 = context.Products.OrderBy(product => product.ProductNumber)
                     .Where(product => product.IsActive == isActive && product.ProductName == name)
@@ -158,7 +154,7 @@ public class SecondLevelCacheInterceptorBasicTests
                     .FirstOrDefault();
 
                 Assert.AreEqual(expected: 0, loggerProvider.GetCacheHitCount());
-                Assert.IsTrue(product1 != null);
+                Assert.IsNotNull(product1);
 
                 var any = context.Products.OrderBy(product => product.ProductNumber)
                     .Where(product => product.IsActive == isActive && product.ProductName == "Product2")
@@ -174,10 +170,10 @@ public class SecondLevelCacheInterceptorBasicTests
                     .Sum(x => x.ProductId);
 
                 Assert.AreEqual(expected: 0, loggerProvider.GetCacheHitCount());
-                Assert.IsTrue(sum > 0);
+                Assert.IsGreaterThan(lowerBound: 0, sum);
             });
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -196,7 +192,7 @@ public class SecondLevelCacheInterceptorBasicTests
                     .Count();
 
                 Assert.AreEqual(expected: 0, loggerProvider.GetCacheHitCount(), $"cacheProvider: {cacheProvider}");
-                Assert.IsTrue(count > 0);
+                Assert.IsGreaterThan(lowerBound: 0, count);
 
                 count = context.Products.OrderBy(product => product.ProductNumber)
                     .Where(product => product.IsActive == isActive && product.ProductName == name)
@@ -204,10 +200,10 @@ public class SecondLevelCacheInterceptorBasicTests
                     .Count();
 
                 Assert.AreEqual(expected: 1, loggerProvider.GetCacheHitCount());
-                Assert.IsTrue(count > 0);
+                Assert.IsGreaterThan(lowerBound: 0, count);
             });
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -239,7 +235,7 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.IsTrue(list2.Any());
             });
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -318,7 +314,7 @@ public class SecondLevelCacheInterceptorBasicTests
         });
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -345,7 +341,7 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.IsNull(item2);
             });
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -356,7 +352,8 @@ public class SecondLevelCacheInterceptorBasicTests
             (context, loggerProvider) =>
             {
                 var item1 = context.Products
-                    .Where(product => product.ProductId == 2 && product.ProductName.Equals("Product1"))
+                    .Where(product
+                        => product.ProductId == 2 && product.ProductName.Equals("Product1", StringComparison.Ordinal))
                     .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
                     .FirstOrDefault();
 
@@ -364,7 +361,8 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.IsNotNull(item1);
 
                 var item2 = context.Products
-                    .Where(product => product.ProductId == 2 && product.ProductName.Equals("Product1"))
+                    .Where(product
+                        => product.ProductId == 2 && product.ProductName.Equals("Product1", StringComparison.Ordinal))
                     .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
                     .FirstOrDefault();
 
@@ -372,7 +370,8 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.IsNotNull(item2);
 
                 var item3 = context.Products
-                    .Where(product => product.ProductId == 1 && product.ProductName.Equals("Product1"))
+                    .Where(product
+                        => product.ProductId == 1 && product.ProductName.Equals("Product1", StringComparison.Ordinal))
                     .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
                     .FirstOrDefault();
 
@@ -380,7 +379,7 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.IsNull(item3);
             });
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -421,7 +420,7 @@ public class SecondLevelCacheInterceptorBasicTests
         var rnd = new Random();
         var utcNow = DateTimeOffset.UtcNow;
 
-        var userInfo = new object[] // EFTableRow -> public object[] Values { get; set; }
+        var userInfo = new object?[]
         {
             $"User {rnd.Next(minValue: 1, maxValue: 100000)}", DateTime.UtcNow, null, 1000, true, 1, 'C', utcNow, 1.1M,
             1.3, 1.2f, Guid.NewGuid(), TimeSpan.FromMinutes(minutes: 1), 2, new byte[]
@@ -435,7 +434,9 @@ public class SecondLevelCacheInterceptorBasicTests
         {
             NullValueHandling = NullValueHandling.Ignore,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+#pragma warning disable CA2326
             TypeNameHandling = TypeNameHandling.Auto,
+#pragma warning restore CA2326
             Converters =
             {
                 new SpecialTypesConverter()
@@ -449,7 +450,7 @@ public class SecondLevelCacheInterceptorBasicTests
         Assert.AreEqual(utcNow, userData[7]);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -472,7 +473,7 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.IsNotNull(items2);
             });
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -489,7 +490,7 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.AreEqual(expected: 0, loggerProvider.GetCacheHitCount());
                 Assert.IsNotNull(items1);
 
-                Assert.IsTrue(items1.First().UpdateDate.Millisecond > 0);
+                Assert.IsGreaterThan(lowerBound: 0, items1[index: 0].UpdateDate.Millisecond);
 
                 var items2 = context.DateTypes
                     .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
@@ -498,10 +499,10 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.AreEqual(expected: 1, loggerProvider.GetCacheHitCount());
                 Assert.IsNotNull(items2);
 
-                Assert.IsTrue(items2.First().UpdateDate.Millisecond > 0);
+                Assert.IsGreaterThan(lowerBound: 0, items2[index: 0].UpdateDate.Millisecond);
             });
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(TestCacheProvider.BuiltInInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreInMemory)]
     [DataRow(TestCacheProvider.CacheManagerCoreRedis)]
@@ -533,7 +534,7 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.AreEqual(expected: 1, loggerProvider.GetCacheHitCount());
             });
 
-    [DataTestMethod]
+    [TestMethod]
     public void TestInstantiatingContextWithoutDI()
     {
         var services = new ServiceCollection();
@@ -547,7 +548,7 @@ public class SecondLevelCacheInterceptorBasicTests
 
         services.AddSingleton(_ => configuration);
 
-        var loggerProvider = new DebugLoggerProvider();
+        using var loggerProvider = new DebugLoggerProvider();
 
         services.AddLogging(cfg
             => cfg.AddConsole().AddDebug().AddProvider(loggerProvider).SetMinimumLevel(LogLevel.Debug));
@@ -555,9 +556,9 @@ public class SecondLevelCacheInterceptorBasicTests
         services.AddEFSecondLevelCache(options
             => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 50)));
 
-        var serviceProvider = services.BuildServiceProvider();
+        using var serviceProvider = services.BuildServiceProvider();
 
-        var loggerFactory = new LoggerFactory(new[]
+        using var loggerFactory = new LoggerFactory(new[]
         {
             loggerProvider
         });

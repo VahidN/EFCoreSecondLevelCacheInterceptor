@@ -2,7 +2,7 @@
     <PropertyGroup>
         <Description>Entity Framework Core Second Level Caching Library.</Description>
         <Authors>Vahid Nasiri</Authors>
-        <TargetFrameworks>net9.0;net8.0;net7.0;net6.0;net5.0;netstandard2.1;netstandard2.0;net462;netcoreapp3.1;</TargetFrameworks>
+        <TargetFrameworks>net10.0;net9.0;net8.0;net7.0;net6.0;net5.0;netstandard2.1;netstandard2.0;net462;netcoreapp3.1;</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>EFCoreSecondLevelCacheInterceptor.StackExchange.Redis</AssemblyName>
         <PackageId>EFCoreSecondLevelCacheInterceptor.StackExchange.Redis</PackageId>

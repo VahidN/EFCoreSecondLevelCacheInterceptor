@@ -47,7 +47,7 @@ public class EFCacheKeyProviderTests
         var loggerMock = new Mock<IEFDebugLogger>();
         var keyProviderLoggerMock = new Mock<ILogger<EFCacheKeyProvider>>();
         var cacheKeyPrefixProviderMock = new Mock<IEFCacheKeyPrefixProvider>();
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
         var cacheSettingsMock = new Mock<IOptions<EFCoreSecondLevelCacheSettings>>();
 #endif
 
@@ -57,7 +57,7 @@ public class EFCacheKeyProviderTests
 
             // ReSharper disable once AssignNullToNotNullAttribute
             hashProvider: null, cacheKeyPrefixProviderMock.Object
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
             , cacheSettingsMock.Object
 #endif
         ));
@@ -67,7 +67,7 @@ public class EFCacheKeyProviderTests
     public void EFCacheKeyProvider_ThrowsArgumentNullException_WhenCacheSettingsIsNull()
     {
         // Arrange
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
         var cacheDependenciesProcessorMock = new Mock<IEFCacheDependenciesProcessor>();
         var cachePolicyParserMock = new Mock<IEFCachePolicyParser>();
         var loggerMock = new Mock<IEFDebugLogger>();
@@ -95,7 +95,7 @@ public class EFCacheKeyProviderTests
         var keyProviderLoggerMock = new Mock<ILogger<EFCacheKeyProvider>>();
         var hashProviderMock = new Mock<IEFHashProvider>();
         var cacheKeyPrefixProviderMock = new Mock<IEFCacheKeyPrefixProvider>();
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
         var cacheSettingsMock = new Mock<IOptions<EFCoreSecondLevelCacheSettings>>();
         cacheSettingsMock.Setup(c => c.Value).Returns(new EFCoreSecondLevelCacheSettings());
 #endif
@@ -103,7 +103,7 @@ public class EFCacheKeyProviderTests
         // Act
         var provider = new EFCacheKeyProvider(cacheDependenciesProcessorMock.Object, cachePolicyParserMock.Object,
             loggerMock.Object, keyProviderLoggerMock.Object, hashProviderMock.Object, cacheKeyPrefixProviderMock.Object
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
             , cacheSettingsMock.Object
 #endif
         );

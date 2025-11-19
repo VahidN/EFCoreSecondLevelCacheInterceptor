@@ -1,28 +1,14 @@
-using System;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Utils;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace EFCoreSecondLevelCacheInterceptor.AspNetCoreSample;
 
-public class Startup
+public class Startup(IConfiguration configuration, IWebHostEnvironment env)
 {
-    private readonly string _contentRootPath;
-    private readonly IWebHostEnvironment _env;
+    private const string Pattern = "{controller=Home}/{action=Index}/{id?}";
+    private readonly string _contentRootPath = env.ContentRootPath;
 
-    public Startup(IConfiguration configuration, IWebHostEnvironment env)
-    {
-        _env = env;
-        _contentRootPath = env.ContentRootPath;
-        Configuration = configuration;
-    }
-
-    public IConfiguration Configuration { get; }
+    public IConfiguration Configuration { get; } = configuration;
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -38,7 +24,7 @@ public class Startup
                                 ? "Invalidated all the cache entries!"
                                 : $"Invalidated [{string.Join(separator: ", ", invalidationInfo.CacheDependencies)}] dependencies.");
                 })
-                .ConfigureLogging(_env.IsDevelopment(), args =>
+                .ConfigureLogging(env.IsDevelopment(), args =>
                 {
                     switch (args.EventId)
                     {
@@ -69,8 +55,6 @@ public class Startup
                             break;
                         case CacheableLogEventId.CachePolicyCalculated:
                             break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
                     }
                 })
 
@@ -111,9 +95,15 @@ public class Startup
 
         var connectionString = Configuration[key: "ConnectionStrings:ApplicationDbContextConnection"];
 
-        if (connectionString.Contains(value: "%CONTENTROOTPATH%"))
+        if (connectionString is null)
         {
-            connectionString = connectionString.Replace(oldValue: "%CONTENTROOTPATH%", _contentRootPath);
+            throw new InvalidOperationException(message: "connectionString is null");
+        }
+
+        if (connectionString.Contains(value: "%CONTENTROOTPATH%", StringComparison.Ordinal))
+        {
+            connectionString = connectionString.Replace(oldValue: "%CONTENTROOTPATH%", _contentRootPath,
+                StringComparison.Ordinal);
         }
 
         services.AddConfiguredMsSqlDbContext(connectionString);
@@ -121,7 +111,9 @@ public class Startup
         services.AddControllersWithViews();
     }
 
+#pragma warning disable S2325
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceScopeFactory scopeFactory)
+#pragma warning restore S2325
     {
         scopeFactory.Initialize();
         scopeFactory.SeedData();
@@ -143,9 +135,6 @@ public class Startup
 
         app.UseAuthorization();
 
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
-        });
+        app.UseEndpoints(endpoints => { endpoints.MapControllerRoute(name: "default", Pattern); });
     }
 }

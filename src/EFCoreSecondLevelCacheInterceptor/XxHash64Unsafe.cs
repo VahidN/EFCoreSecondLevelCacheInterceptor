@@ -1,4 +1,4 @@
-#if NET9_0 || NET8_0
+#if NET10_0 || NET9_0 || NET8_0
 using System;
 using System.IO.Hashing;
 using System.Text;

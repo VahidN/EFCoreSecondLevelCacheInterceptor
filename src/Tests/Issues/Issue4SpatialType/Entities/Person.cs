@@ -1,8 +1,8 @@
-namespace Issue4SpatialType.Entities
+namespace Issue4SpatialType.Entities;
+
+public class Person
 {
-    public class Person
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+    public int Id { get; set; }
+
+    public required string Name { get; set; }
 }

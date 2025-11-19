@@ -1,63 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities;
 
-namespace EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Entities
+public class User
 {
-    public class User
-    {
-        public User()
-        {
-            Posts = new HashSet<Post>();
-            Products = new HashSet<Product>();
-        }
+    public int Id { get; set; }
 
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public UserStatus UserStatus { get; set; }
+    public required string Name { get; set; }
 
-        public byte[] ImageData { get; set; }
+    public UserStatus UserStatus { get; set; }
 
-        public DateTime? AddDate { get; set; }
+#pragma warning disable CA1819
+    public required byte[] ImageData { get; set; }
+#pragma warning restore CA1819
 
-        public DateTime? UpdateDate { get; set; }
+    public DateTime? AddDate { get; set; }
 
-        public long Points { get; set; }
+    public DateTime? UpdateDate { get; set; }
 
-        public bool IsActive { get; set; }
+    public long Points { get; set; }
 
-        public byte ByteValue { get; set; }
+    public bool IsActive { get; set; }
 
-        public char CharValue { get; set; }
+    public byte ByteValue { get; set; }
 
-        public DateTimeOffset? DateTimeOffsetValue { get; set; }
+    public char CharValue { get; set; }
 
-        public decimal DecimalValue { get; set; }
+    public DateTimeOffset? DateTimeOffsetValue { get; set; }
 
-        public double DoubleValue { set; get; }
+    public decimal DecimalValue { get; set; }
 
-        public float FloatValue { set; get; }
+    public double DoubleValue { set; get; }
 
-        public Guid GuidValue { set; get; }
+    public float FloatValue { set; get; }
 
-        public TimeSpan? TimeSpanValue { set; get; }
+    public Guid GuidValue { set; get; }
 
-        public short ShortValue { set; get; }
+    public TimeSpan? TimeSpanValue { set; get; }
 
-        public byte[] ByteArrayValue { get; set; }
+    public short ShortValue { set; get; }
 
-        public uint UintValue { set; get; }
+#pragma warning disable CA1819
+    public required byte[] ByteArrayValue { get; set; }
+#pragma warning restore CA1819
 
-        public ulong UlongValue { set; get; }
+    public uint UintValue { set; get; }
 
-        public ulong UshortValue { set; get; }
+    public ulong UlongValue { set; get; }
 
-        public virtual ICollection<Post> Posts { get; set; }
-        public virtual ICollection<Product> Products { get; set; }
-    }
+    public ulong UshortValue { set; get; }
 
-    public enum UserStatus
-    {
-        Active,
-        Disabled
-    }
+    public virtual ICollection<Post> Posts { get; set; } = new HashSet<Post>();
+
+    public virtual ICollection<Product> Products { get; set; } = new HashSet<Product>();
 }

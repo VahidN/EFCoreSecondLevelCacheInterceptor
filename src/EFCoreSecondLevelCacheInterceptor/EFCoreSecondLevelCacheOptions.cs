@@ -1,5 +1,5 @@
 using System;
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
 using System.Text.Json;
 #endif
 
@@ -15,7 +15,7 @@ public class EFCoreSecondLevelCacheOptions
     /// </summary>
     public EFCoreSecondLevelCacheSettings Settings { get; } = new();
 
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
     /// <summary>
     ///     Provides options to control the serialization behavior.
     ///     EFCacheKeyProvider uses these options to serialize the parameter values.

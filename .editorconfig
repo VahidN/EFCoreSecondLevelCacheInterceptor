@@ -4,6 +4,8 @@ charset = utf-8-bom
 
 [*.cs]
 
+dotnet_diagnostic.IDISP005.severity = suggestion
+dotnet_diagnostic.S1481.severity = suggestion
 dotnet_diagnostic.MA0025.severity = suggestion
 dotnet_diagnostic.S3878.severity = suggestion
 dotnet_diagnostic.S127.severity = suggestion
@@ -44,7 +46,7 @@ dotnet_diagnostic.IDISP001.severity = error
 dotnet_diagnostic.IDISP002.severity = error
 dotnet_diagnostic.IDISP003.severity = error
 dotnet_diagnostic.IDISP004.severity = error
-dotnet_diagnostic.IDISP005.severity = error
+dotnet_diagnostic.IDISP005.severity = suggestion
 dotnet_diagnostic.IDISP006.severity = error
 dotnet_diagnostic.IDISP007.severity = error
 dotnet_diagnostic.IDISP008.severity = error

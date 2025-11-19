@@ -1,37 +1,26 @@
-using System;
-using System.Linq;
 using BenchmarkDotNet.Attributes;
 
-namespace EFCoreSecondLevelCacheInterceptor.PerformanceTests
+namespace EFCoreSecondLevelCacheInterceptor.PerformanceTests;
+
+public class BenchmarkTests
 {
-    public class BenchmarkTests
-    {
-        private int _count;
+    private int _count;
 
-        [Benchmark(Baseline = true)]
-        public void RunQueryDirectly()
+    [Benchmark(Baseline = true)]
+    public void RunQueryDirectly()
+        => EFServiceProvider.RunInContext(db =>
         {
-            EFServiceProvider.RunInContext(db =>
-            {
-                var products = db.Products.Where(x => x.ProductId > 0).ToList();
-                _count = products.Count;
-            });
-        }
+            var products = db.Products.Where(x => x.ProductId > 0).ToList();
+            _count = products.Count;
+        });
 
-        [Benchmark]
-        public void RunCacheableQueryWithMicrosoftMemoryCache()
+    [Benchmark]
+    public void RunCacheableQueryWithMicrosoftMemoryCache()
+        => EFServiceProvider.RunInContext(db =>
         {
-            EFServiceProvider.RunInContext(db =>
-            {
-                var products = db.Products.Where(x => x.ProductId > 0).Cacheable().ToList();
-                _count = products.Count;
-            });
-        }
+            var products = db.Products.Where(x => x.ProductId > 0).Cacheable().ToList();
+            _count = products.Count;
+        });
 
-        [GlobalCleanup]
-        public void GlobalCleanup()
-        {
-            Console.WriteLine($"_count: {_count}");
-        }
-    }
+    [GlobalCleanup] public void GlobalCleanup() => Console.WriteLine($"_count: {_count}");
 }

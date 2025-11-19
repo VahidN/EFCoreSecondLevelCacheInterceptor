@@ -2,7 +2,7 @@
     <PropertyGroup>
         <Description>Entity Framework Core Second Level Caching Library.</Description>
         <Authors>Vahid Nasiri</Authors>
-        <TargetFrameworks>net9.0;net8.0;</TargetFrameworks>
+        <TargetFrameworks>net10.0;net9.0;net8.0;</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>EFCoreSecondLevelCacheInterceptor.FusionCache</AssemblyName>
         <PackageId>EFCoreSecondLevelCacheInterceptor.FusionCache</PackageId>

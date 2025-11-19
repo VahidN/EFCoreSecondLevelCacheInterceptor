@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using EasyCaching.Core.Configurations;
 using EFCoreSecondLevelCacheInterceptor;
 using Issue125EF5x.DataLayer;
@@ -23,6 +19,7 @@ public static class EFServiceProvider
     public static IServiceProvider Instance { get; } = _serviceProviderBuilder.Value;
 
     public static T GetRequiredService<T>()
+        where T : notnull
         => Instance.GetRequiredService<T>();
 
     public static void RunInContext(Action<ApplicationDbContext> action)
@@ -53,42 +50,34 @@ public static class EFServiceProvider
             o.UseRedis(cfg =>
             {
                 cfg.SerializerName = "Pack";
-                cfg.DBConfig.Endpoints.Add(new ServerEndPoint("127.0.0.1", 6379));
+                cfg.DBConfig.Endpoints.Add(new ServerEndPoint(host: "127.0.0.1", port: 6379));
                 cfg.DBConfig.AllowAdmin = true;
                 cfg.DBConfig.ConnectionTimeout = 10000;
             }, providerName);
 
-            o.WithMessagePack( /*so =>
-{
-so.EnableCustomResolver = true;
-so.CustomResolvers = CompositeResolver.Create(new MessagePack.IFormatterResolver[]
-{
-    NativeDateTimeResolver.Instance,
-    ContractlessStandardResolver.Instance,
-    StandardResolverAllowPrivate.Instance
-});
-},*/
-                "Pack");
+            o.WithMessagePack(name: "Pack");
         });
 
         services.AddEFSecondLevelCache(o =>
         {
-            o.UseEasyCachingCoreProvider(providerName).ConfigureLogging(true);
-            o.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(10));
+            o.UseEasyCachingCoreProvider(providerName).ConfigureLogging(enable: true);
+            o.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 10));
         });
 
         var basePath = Directory.GetCurrentDirectory();
         Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
 
         var configuration = new ConfigurationBuilder().SetBasePath(basePath)
-            .AddJsonFile("appsettings.json", false, true).Build();
+            .AddJsonFile(path: "appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
 
         services.AddSingleton(_ => configuration);
 
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
             options.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())
-                .UseSqlServer(GetConnectionString(basePath, configuration)).LogTo(sql => Console.WriteLine(sql));
+                .UseSqlServer(GetConnectionString(basePath, configuration))
+                .LogTo(sql => Console.WriteLine(sql));
         });
 
         return services.BuildServiceProvider();
@@ -101,12 +90,18 @@ so.CustomResolvers = CompositeResolver.Create(new MessagePack.IFormatterResolver
             "\\Issues\\"
         }, StringSplitOptions.RemoveEmptyEntries)[0];
 
-        var contentRootPath = Path.Combine(testsFolder, "Issues", "Issue125EF5x");
-        var connectionString = configuration["ConnectionStrings:ApplicationDbContextConnection"];
+        var contentRootPath = Path.Combine(testsFolder, path2: "Issues", path3: "Issue125EF5x");
+        var connectionString = configuration[key: "ConnectionStrings:ApplicationDbContextConnection"];
 
-        if (connectionString.Contains("%CONTENTROOTPATH%"))
+        if (connectionString is null)
         {
-            connectionString = connectionString.Replace("%CONTENTROOTPATH%", contentRootPath);
+            throw new InvalidOperationException(message: "connectionString is null");
+        }
+
+        if (connectionString.Contains(value: "%CONTENTROOTPATH%", StringComparison.Ordinal))
+        {
+            connectionString =
+                connectionString.Replace(oldValue: "%CONTENTROOTPATH%", contentRootPath, StringComparison.Ordinal);
         }
 
         Console.WriteLine($"Using {connectionString}");

@@ -158,7 +158,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                 }
 
                 return (T)(object)new EFTableRowsDataReader(tableRows
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
                     , _cacheSettings
 #endif
                 );
@@ -274,7 +274,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                     }
 
                     using var rows = new EFTableRowsDataReader(new EFTableRows()
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
                         , _cacheSettings
 #endif
                     );
@@ -295,7 +295,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
                 }
 
                 using var dataRows = new EFTableRowsDataReader(cacheResult.TableRows
-#if NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
                     , _cacheSettings
 #endif
                 );

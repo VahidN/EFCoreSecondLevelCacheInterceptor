@@ -1,10 +1,9 @@
-﻿using System;
-using MessagePack;
+﻿using MessagePack;
 using MessagePack.Formatters;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests;
 
-public class DBNullFormatter : IMessagePackFormatter<DBNull>
+public class DBNullFormatter : IMessagePackFormatter<DBNull?>
 {
     public static readonly DBNullFormatter Instance = new();
 
@@ -12,7 +11,7 @@ public class DBNullFormatter : IMessagePackFormatter<DBNull>
     {
     }
 
-    public void Serialize(ref MessagePackWriter writer, DBNull value, MessagePackSerializerOptions options)
+    public void Serialize(ref MessagePackWriter writer, DBNull? value, MessagePackSerializerOptions options)
         => writer.WriteNil();
 
     public DBNull Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) => DBNull.Value;

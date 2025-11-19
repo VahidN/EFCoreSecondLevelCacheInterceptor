@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using EFCoreSecondLevelCacheInterceptor;
 using Issue154.DataLayer;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +18,7 @@ public static class EFServiceProvider
     public static IServiceProvider Instance { get; } = _serviceProviderBuilder.Value;
 
     public static T GetRequiredService<T>()
+        where T : notnull
         => Instance.GetRequiredService<T>();
 
     public static void RunInContext(Action<ApplicationDbContext> action)
@@ -50,13 +47,14 @@ public static class EFServiceProvider
         Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
 
         var configuration = new ConfigurationBuilder().SetBasePath(basePath)
-            .AddJsonFile("appsettings.json", false, true).Build();
+            .AddJsonFile(path: "appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
 
         services.AddSingleton(_ => configuration);
 
         services.AddEFSecondLevelCache(options
-            => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5))
-                .ConfigureLogging(true));
+            => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 5))
+                .ConfigureLogging(enable: true));
 
         services.AddDbContext<ApplicationDbContext>((serviceProvider, optionsBuilder) =>
         {
@@ -74,12 +72,18 @@ public static class EFServiceProvider
             "\\Issues\\"
         }, StringSplitOptions.RemoveEmptyEntries)[0];
 
-        var contentRootPath = Path.Combine(testsFolder, "Issues", "Issue154");
-        var connectionString = configuration["ConnectionStrings:ApplicationDbContextConnection"];
+        var contentRootPath = Path.Combine(testsFolder, path2: "Issues", path3: "Issue154");
+        var connectionString = configuration[key: "ConnectionStrings:ApplicationDbContextConnection"];
 
-        if (connectionString.Contains("%CONTENTROOTPATH%"))
+        if (connectionString is null)
         {
-            connectionString = connectionString.Replace("%CONTENTROOTPATH%", contentRootPath);
+            throw new InvalidOperationException(message: "connectionString is null");
+        }
+
+        if (connectionString.Contains(value: "%CONTENTROOTPATH%", StringComparison.Ordinal))
+        {
+            connectionString =
+                connectionString.Replace(oldValue: "%CONTENTROOTPATH%", contentRootPath, StringComparison.Ordinal);
         }
 
         Console.WriteLine($"Using {connectionString}");

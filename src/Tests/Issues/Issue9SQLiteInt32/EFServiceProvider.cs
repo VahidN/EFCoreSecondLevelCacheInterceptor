@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using CacheManager.Core;
 using EFCoreSecondLevelCacheInterceptor;
 using Issue9SQLiteInt32.DataLayer;
@@ -24,7 +20,9 @@ public static class EFServiceProvider
     /// </summary>
     public static IServiceProvider Instance { get; } = _serviceProviderBuilder.Value;
 
-    public static T GetRequiredService<T>() => Instance.GetRequiredService<T>();
+    public static T GetRequiredService<T>()
+        where T : notnull
+        => Instance.GetRequiredService<T>();
 
     public static void RunInContext(Action<ApplicationDbContext> action)
     {
@@ -84,9 +82,15 @@ public static class EFServiceProvider
         var contentRootPath = Path.Combine(testsFolder, path2: "Issues", path3: "Issue9SQLiteInt32");
         var connectionString = configuration[key: "ConnectionStrings:ApplicationDbContextConnection"];
 
-        if (connectionString.Contains(value: "%CONTENTROOTPATH%"))
+        if (connectionString is null)
         {
-            connectionString = connectionString.Replace(oldValue: "%CONTENTROOTPATH%", contentRootPath);
+            throw new InvalidOperationException(message: "connectionString is null");
+        }
+
+        if (connectionString.Contains(value: "%CONTENTROOTPATH%", StringComparison.Ordinal))
+        {
+            connectionString =
+                connectionString.Replace(oldValue: "%CONTENTROOTPATH%", contentRootPath, StringComparison.Ordinal);
         }
 
         Console.WriteLine($"Using {connectionString}");
@@ -100,13 +104,14 @@ public static class EFServiceProvider
         {
             NullValueHandling = NullValueHandling.Ignore,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+#pragma warning disable CA2326
             TypeNameHandling = TypeNameHandling.Auto
+#pragma warning restore CA2326
         };
 
         const string redisConfigurationKey = "redis";
 
-        services.AddSingleton(typeof(ICacheManagerConfiguration), new CacheConfigurationBuilder()
-            .WithJsonSerializer(jss, jss)
+        services.AddSingleton(new CacheConfigurationBuilder().WithJsonSerializer(jss, jss)
             .WithUpdateMode(CacheUpdateMode.Up)
             .WithRedisConfiguration(redisConfigurationKey, config =>
             {

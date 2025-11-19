@@ -1,16 +1,12 @@
-using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+namespace EFCoreSecondLevelCacheInterceptor.Tests;
 
-namespace EFCoreSecondLevelCacheInterceptor.Tests
+[TestClass]
+public class EFCachePolicyParserTests
 {
-    [TestClass]
-    public class EFCachePolicyParserTests
+    [TestMethod]
+    public void TestGetEFCachePolicyWith2Parts()
     {
-        [TestMethod]
-        public void TestGetEFCachePolicyWith2Parts()
-        {
-            const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
+        const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
 
       SELECT TOP(1) [p].[Id], [p].[Title], [p].[UserId], [p].[post_type], [u].[Id], [u].[Name], [u].[UserStatus]
       FROM [Posts] AS [p]
@@ -18,60 +14,18 @@ namespace EFCoreSecondLevelCacheInterceptor.Tests
       WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0)
       ORDER BY [p].[Id]";
 
-            var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
-            var cachePolicy = cachePolicyParser.GetEFCachePolicy(commandText, null);
+        var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
+        var (cachePolicy, _) = cachePolicyParser.GetEFCachePolicy(commandText, []);
 
-            Assert.AreEqual(expected: CacheExpirationMode.Absolute, actual: cachePolicy.CacheExpirationMode);
-            Assert.AreEqual(expected: TimeSpan.FromMinutes(45), actual: cachePolicy.CacheTimeout);
-        }
+        Assert.IsNotNull(cachePolicy);
+        Assert.AreEqual(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
+        Assert.AreEqual(TimeSpan.FromMinutes(minutes: 45), cachePolicy.CacheTimeout);
+    }
 
-        [TestMethod]
-        public void TestGetEFCachePolicyWithAdditionalTagComments()
-        {
-            const string commandText =
-@"-- CustomTagAbove
-
--- EFCachePolicy[Index(27)] --> Absolute|00:45:00
-
--- CustomTagBelow
-
-SELECT TOP(1) [p].[Id], [p].[Title], [p].[UserId], [p].[post_type], [u].[Id], [u].[Name], [u].[UserStatus]
-FROM [Posts] AS [p]
-INNER JOIN [Users] AS [u] ON [p].[UserId] = [u].[Id]
-WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0)
-ORDER BY [p].[Id]";
-
-            var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
-            var cachePolicy = cachePolicyParser.GetEFCachePolicy(commandText, null);
-
-            Assert.AreEqual(expected: CacheExpirationMode.Absolute, actual: cachePolicy.CacheExpirationMode);
-            Assert.AreEqual(expected: TimeSpan.FromMinutes(45), actual: cachePolicy.CacheTimeout);
-        }
-
-        [TestMethod]
-        public void TestGetEFCachePolicyWithAllParts()
-        {
-            string commandText = "-- " + EFCachePolicy.Configure(options =>
-                    options.ExpirationMode(CacheExpirationMode.Absolute)
-                    .Timeout(TimeSpan.FromMinutes(45))
-                    .SaltKey("saltKey")
-                    .CacheDependencies("item 1", "item 2"));
-
-            var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
-            var cachePolicy = cachePolicyParser.GetEFCachePolicy(commandText, null);
-
-            Assert.IsNotNull(cachePolicy);
-            Assert.AreEqual(expected: CacheExpirationMode.Absolute, actual: cachePolicy.CacheExpirationMode);
-            Assert.AreEqual(expected: TimeSpan.FromMinutes(45), actual: cachePolicy.CacheTimeout);
-            Assert.AreEqual(expected: "saltKey", actual: cachePolicy.CacheSaltKey);
-            CollectionAssert.AreEqual(expected: new SortedSet<string> { "item 1", "item 2" }, actual: cachePolicy.CacheItemsDependencies as SortedSet<string>);
-        }
-
-        [TestMethod]
-        public void TestRemoveEFCachePolicyTagWithAdditionalTagComments()
-        {
-            const string commandText =
-@"-- CustomTagAbove
+    [TestMethod]
+    public void TestGetEFCachePolicyWithAdditionalTagComments()
+    {
+        const string commandText = @"-- CustomTagAbove
 
 -- EFCachePolicy[Index(27)] --> Absolute|00:45:00
 
@@ -83,11 +37,44 @@ INNER JOIN [Users] AS [u] ON [p].[UserId] = [u].[Id]
 WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0)
 ORDER BY [p].[Id]";
 
-            var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
-            var commandTextWithCachePolicyTagRemoved = cachePolicyParser.RemoveEFCachePolicyTag(commandText);
+        var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
+        var (cachePolicy, _) = cachePolicyParser.GetEFCachePolicy(commandText, []);
 
-            var expectedResult =
-@"-- CustomTagAbove
+        Assert.IsNotNull(cachePolicy);
+        Assert.AreEqual(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
+        Assert.AreEqual(TimeSpan.FromMinutes(minutes: 45), cachePolicy.CacheTimeout);
+    }
+
+    [TestMethod]
+    public void TestGetEFCachePolicyWithAllParts()
+    {
+        var commandText = "-- " + EFCachePolicy.Configure(options
+            => options.ExpirationMode(CacheExpirationMode.Absolute)
+                .Timeout(TimeSpan.FromMinutes(minutes: 45))
+                .SaltKey(saltKey: "saltKey")
+                .CacheDependencies("item 1", "item 2"));
+
+        var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
+        var (cachePolicy, _) = cachePolicyParser.GetEFCachePolicy(commandText, []);
+
+        Assert.IsNotNull(cachePolicy);
+        Assert.AreEqual(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
+        Assert.AreEqual(TimeSpan.FromMinutes(minutes: 45), cachePolicy.CacheTimeout);
+        Assert.AreEqual(expected: "saltKey", cachePolicy.CacheSaltKey);
+
+        CollectionAssert.AreEqual(new SortedSet<string>
+        {
+            "item 1",
+            "item 2"
+        }, cachePolicy.CacheItemsDependencies as SortedSet<string>);
+    }
+
+    [TestMethod]
+    public void TestRemoveEFCachePolicyTagWithAdditionalTagComments()
+    {
+        const string commandText = @"-- CustomTagAbove
+
+-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
 
 -- CustomTagBelow
 
@@ -97,7 +84,19 @@ INNER JOIN [Users] AS [u] ON [p].[UserId] = [u].[Id]
 WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0)
 ORDER BY [p].[Id]";
 
-            Assert.AreEqual(expected: expectedResult, actual: commandTextWithCachePolicyTagRemoved);
-        }
+        var cachePolicyParser = EFServiceProvider.GetRequiredService<IEFCachePolicyParser>();
+        var commandTextWithCachePolicyTagRemoved = cachePolicyParser.RemoveEFCachePolicyTag(commandText);
+
+        var expectedResult = @"-- CustomTagAbove
+
+-- CustomTagBelow
+
+SELECT TOP(1) [p].[Id], [p].[Title], [p].[UserId], [p].[post_type], [u].[Id], [u].[Name], [u].[UserStatus]
+FROM [Posts] AS [p]
+INNER JOIN [Users] AS [u] ON [p].[UserId] = [u].[Id]
+WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0)
+ORDER BY [p].[Id]";
+
+        Assert.AreEqual(expectedResult, commandTextWithCachePolicyTagRemoved);
     }
 }

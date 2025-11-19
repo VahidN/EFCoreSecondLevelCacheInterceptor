@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <UserSecretsId>dotnet-EFCoreSecondLevelCacheInterceptor.WorkerServiceWithLamar-7BDED8C3-74B4-4CA0-82AA-E5452A3AF4A7</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>

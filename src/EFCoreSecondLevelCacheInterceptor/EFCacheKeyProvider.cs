@@ -3,7 +3,7 @@ using System.Data.Common;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 
@@ -19,7 +19,7 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public class EFCacheKeyProvider : IEFCacheKeyProvider
 {
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
     private readonly EFCoreSecondLevelCacheSettings _settings;
 #endif
 
@@ -40,7 +40,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         ILogger<EFCacheKeyProvider> keyProviderLogger,
         IEFHashProvider hashProvider,
         IEFCacheKeyPrefixProvider cacheKeyPrefixProvider
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
         ,
         IOptions<EFCoreSecondLevelCacheSettings> cacheSettings
 #endif
@@ -52,7 +52,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         _cachePolicyParser = cachePolicyParser;
         _hashProvider = hashProvider ?? throw new ArgumentNullException(nameof(hashProvider));
         _cacheKeyPrefixProvider = cacheKeyPrefixProvider;
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
         _settings = cacheSettings?.Value ?? throw new ArgumentNullException(nameof(cacheSettings));
 #endif
     }
@@ -146,7 +146,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         return cacheKey.ToString().Trim();
     }
 
-#if NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
     private string? GetParameterValue(DbParameter parameter)
         => _settings.JsonSerializerOptions is null
             ? JsonSerializer.Serialize(parameter.Value)

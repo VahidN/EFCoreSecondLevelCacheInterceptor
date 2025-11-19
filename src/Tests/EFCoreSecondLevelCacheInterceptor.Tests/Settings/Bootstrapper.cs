@@ -1,13 +1,11 @@
-using System;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EFCoreSecondLevelCacheInterceptor.Tests;
 
 [TestClass]
-public class Bootstrapper
+public static class Bootstrapper
 {
     [AssemblyInitialize]
     public static void Initialize(TestContext context)
@@ -19,6 +17,7 @@ public class Bootstrapper
     [AssemblyCleanup]
     public static void AssemblyCleanup()
     {
+        // Method intentionally left empty.
     }
 
     private static void clearAllCachedEntries()
@@ -35,8 +34,10 @@ public class Bootstrapper
 
     private static void startDb()
     {
+#pragma warning disable IDISP001
         var serviceProvider = EFServiceProvider.GetConfiguredContextServiceProvider(TestCacheProvider.BuiltInInMemory,
             LogLevel.Debug, cacheAllQueries: false);
+#pragma warning restore IDISP001
 
         var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>();
         serviceScope.Initialize();

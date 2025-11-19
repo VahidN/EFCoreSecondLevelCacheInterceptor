@@ -1,0 +1,36 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/EFCoreSecondLevelCacheInterceptor.CacheManager.Core/EFCoreSecondLevelCacheInterceptor.CacheManager.Core.csproj" />
+    <Project Path="src/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core/EFCoreSecondLevelCacheInterceptor.EasyCaching.Core.csproj" />
+    <Project Path="src/EFCoreSecondLevelCacheInterceptor.FusionCache/EFCoreSecondLevelCacheInterceptor.FusionCache.csproj" />
+    <Project Path="src/EFCoreSecondLevelCacheInterceptor.HybridCache/EFCoreSecondLevelCacheInterceptor.HybridCache.csproj" />
+    <Project Path="src/EFCoreSecondLevelCacheInterceptor.MemoryCache/EFCoreSecondLevelCacheInterceptor.MemoryCache.csproj" />
+    <Project Path="src/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis/EFCoreSecondLevelCacheInterceptor.StackExchange.Redis.csproj" />
+    <Project Path="src/EFCoreSecondLevelCacheInterceptor/EFCoreSecondLevelCacheInterceptor.csproj" />
+  </Folder>
+  <Folder Name="/src/Tests/">
+    <Project Path="src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample/EFCoreSecondLevelCacheInterceptor.AspNetCoreSample.csproj" />
+    <Project Path="src/Tests/EFCoreSecondLevelCacheInterceptor.AspNetCoreSampleWithLamar/EFCoreSecondLevelCacheInterceptor.AspNetCoreSampleWithLamar.csproj" />
+    <Project Path="src/Tests/EFCoreSecondLevelCacheInterceptor.ConsoleSample/EFCoreSecondLevelCacheInterceptor.ConsoleSample.csproj" />
+    <Project Path="src/Tests/EFCoreSecondLevelCacheInterceptor.PerformanceTests/EFCoreSecondLevelCacheInterceptor.PerformanceTests.csproj" />
+    <Project Path="src/Tests/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer/EFCoreSecondLevelCacheInterceptor.Tests.DataLayer.csproj" />
+    <Project Path="src/Tests/EFCoreSecondLevelCacheInterceptor.Tests/EFCoreSecondLevelCacheInterceptor.Tests.csproj" />
+    <Project Path="src/Tests/EFCoreSecondLevelCacheInterceptor.UnitTests/EFCoreSecondLevelCacheInterceptor.UnitTests.csproj" />
+    <Project Path="src/Tests/EFCoreSecondLevelCacheInterceptor.WorkerServiceWithLamar/EFCoreSecondLevelCacheInterceptor.WorkerServiceWithLamar.csproj" />
+  </Folder>
+  <Folder Name="/src/Tests/Issues/">
+    <Project Path="src/Tests/Issues/Issue123WithMessagePack/Issue123WithMessagePack.csproj" />
+    <Project Path="src/Tests/Issues/Issue125EF5x/Issue125EF5x.csproj" />
+    <Project Path="src/Tests/Issues/Issue12MySQL/Issue12MySQL.csproj" />
+    <!--<Project Path="src/Tests/Issues/Issue12PostgreSql/Issue12PostgreSql.csproj" />-->
+    <Project Path="src/Tests/Issues/Issue154/Issue154.csproj" />
+    <!--<Project Path="src/Tests/Issues/Issue192/Issue192.csproj" />-->
+    <Project Path="src/Tests/Issues/Issue4SpatialType/Issue4SpatialType.csproj" />
+    <Project Path="src/Tests/Issues/Issue9SQLiteInt32/Issue9SQLiteInt32.csproj" />
+  </Folder>
+</Solution>

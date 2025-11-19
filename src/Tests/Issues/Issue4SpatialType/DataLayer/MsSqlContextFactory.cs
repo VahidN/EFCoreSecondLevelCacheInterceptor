@@ -1,30 +1,30 @@
-using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Issue4SpatialType.DataLayer
+namespace Issue4SpatialType.DataLayer;
+
+public class MsSqlContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
 {
-    public class MsSqlContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+    public ApplicationDbContext CreateDbContext(string[] args)
     {
-        public ApplicationDbContext CreateDbContext(string[] args)
-        {
-            var services = new ServiceCollection();
+        var services = new ServiceCollection();
 
-            var basePath = Directory.GetCurrentDirectory();
-            Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
-            var configuration = new ConfigurationBuilder()
-                                .SetBasePath(basePath)
-                                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                                .Build();
-            services.AddSingleton(_ => configuration);
+        var basePath = Directory.GetCurrentDirectory();
+        Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
 
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseSqlServer(EFServiceProvider.GetConnectionString(basePath, configuration),
-                            builder => builder.UseNetTopologySuite());
-            return new ApplicationDbContext(optionsBuilder.Options);
-        }
+        var configuration = new ConfigurationBuilder().SetBasePath(basePath)
+            .AddJsonFile(path: "appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+        services.AddSingleton(_ => configuration);
+
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+
+        optionsBuilder.UseSqlServer(EFServiceProvider.GetConnectionString(basePath, configuration),
+            builder => builder.UseNetTopologySuite());
+
+        return new ApplicationDbContext(optionsBuilder.Options);
     }
 }
