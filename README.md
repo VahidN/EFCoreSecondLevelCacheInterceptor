@@ -14,7 +14,7 @@ Using the second-level cache involves three mandatory steps: installing a provid
 
 First, you need to add the main package:
 
-[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor/)
+[![Nuget](https://img.shields.io/nuget/v/EFCoreSecondLevelCacheInterceptor)](http://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor/) [![NuGet](https://img.shields.io/nuget/dt/EFCoreSecondLevelCacheInterceptor?logo=nuget&style=flat)](https://www.nuget.org/packages/EFCoreSecondLevelCacheInterceptor)
 
 ```powershell
 dotnet add package EFCoreSecondLevelCacheInterceptor
