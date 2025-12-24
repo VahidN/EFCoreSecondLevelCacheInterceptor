@@ -60,6 +60,7 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
         }
 
         EFCacheKey? efCacheKey = null;
+        EFTableRows? tableRows = null;
 
         try
         {
@@ -133,8 +134,6 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 
             if (result is DbDataReader dataReader)
             {
-                EFTableRows tableRows;
-
                 using (var dbReaderLoader = new EFDataReaderLoader(dataReader))
                 {
                     tableRows = dbReaderLoader.Load();
@@ -201,6 +200,14 @@ public class DbCommandInterceptorProcessor : IDbCommandInterceptorProcessor
 
                 _logger.NotifyCacheableEvent(CacheableLogEventId.CachingError, ex.ToString(), command.CommandText,
                     efCacheKey);
+            }
+
+            if(tableRows != null){
+                return (T)(object)new EFTableRowsDataReader(tableRows
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+                    , _cacheSettings
+#endif
+                );
             }
 
             return result;
