@@ -5,25 +5,27 @@
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.MemoryCache\EFCoreSecondLevelCacheInterceptor.MemoryCache.csproj"/>
+        <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.HybridCache\EFCoreSecondLevelCacheInterceptor.HybridCache.csproj"/>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor\EFCoreSecondLevelCacheInterceptor.csproj"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" />
-        <PackageReference Include="Microsoft.Extensions.Logging" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+        <PackageReference Include="MessagePack"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+        <PackageReference Include="Microsoft.Extensions.Logging"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Console"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" />
-        <PackageReference Include="CacheManager.StackExchange.Redis" />
-        <PackageReference Include="CacheManager.Core" />
-        <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" />
-        <PackageReference Include="CacheManager.Serialization.Json" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core"/>
+        <PackageReference Include="CacheManager.StackExchange.Redis"/>
+        <PackageReference Include="CacheManager.Core"/>
+        <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory"/>
+        <PackageReference Include="CacheManager.Serialization.Json"/>
     </ItemGroup>
 
     <ItemGroup>

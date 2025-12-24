@@ -1,5 +1,6 @@
-using System;
-using System.Collections.Generic;
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+using System.Text.Json;
+#endif
 
 namespace EFCoreSecondLevelCacheInterceptor;
 
@@ -8,6 +9,13 @@ namespace EFCoreSecondLevelCacheInterceptor;
 /// </summary>
 public static class TypeExtensions
 {
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+    /// <summary>
+    ///     Cached version of typeof(JsonElement)
+    /// </summary>
+    public static readonly Type JsonElement = typeof(JsonElement);
+#endif
+
     /// <summary>
     ///     Cached version of typeof(long)
     /// </summary>

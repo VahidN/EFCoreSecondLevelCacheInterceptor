@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
-using System.Linq;
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
 using System.Text.Json;
 #endif
@@ -452,6 +449,13 @@ public class EFTableRowsDataReader : DbDataReader
         {
             return (int)(long)value;
         }
+
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetInt32();
+        }
+#endif
 
         if (valueType != TypeExtensions.IntType)
         {

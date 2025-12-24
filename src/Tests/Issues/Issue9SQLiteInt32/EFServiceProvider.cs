@@ -2,6 +2,7 @@ using CacheManager.Core;
 using EFCoreSecondLevelCacheInterceptor;
 using Issue9SQLiteInt32.DataLayer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -54,12 +55,24 @@ public static class EFServiceProvider
 
         services.AddSingleton(_ => configuration);
 
-        services.AddEFSecondLevelCache(options
-                => options.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 5))
-                    .ConfigureLogging(enable: true)
+        services.AddEFSecondLevelCache(options => options
 
-            //options.UseCacheManagerCoreProvider()
-        );
+            //.UseMemoryCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 5))
+            //.UseCacheManagerCoreProvider()
+            .UseHybridCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromHours(hours: 1))
+            .ConfigureLogging(enable: true)
+            .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1)));
+
+        services.AddHybridCache(options =>
+        {
+            options.DefaultEntryOptions = new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromHours(hours: 1),
+                LocalCacheExpiration = TimeSpan.FromHours(hours: 1)
+            };
+        });
+
+        //.AddSerializerFactory<MessagePackSerializerFactory>()
 
         addCacheManagerCoreRedis(services);
 
