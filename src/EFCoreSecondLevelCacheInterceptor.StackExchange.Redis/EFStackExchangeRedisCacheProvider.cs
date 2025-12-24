@@ -59,7 +59,7 @@ public class EFStackExchangeRedisCacheProvider(
 
         var data = dataSerializer.Serialize(value);
 
-        redisDb.StringSet(keyHash, data, cachePolicy.CacheTimeout);
+        redisDb.StringSet(keyHash, data, cachePolicy.CacheTimeout, When.Always);
     }
 
     /// <inheritdoc />
