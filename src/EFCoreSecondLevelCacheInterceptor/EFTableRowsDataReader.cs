@@ -587,6 +587,11 @@ public class EFTableRowsDataReader : DbDataReader
             return (T)(object)DateOnly.Parse((string)value, CultureInfo.InvariantCulture);
         }
 
+        if (expectedValueType == TypeExtensions.DateOnlyType && isActualValueTypeNumber)
+        {
+            return (T)(object)DateOnly.FromDateTime(new DateTime(Convert.ToInt64(value, CultureInfo.InvariantCulture)));
+        }
+
         if (expectedValueType == TypeExtensions.TimeOnlyType && actualValueType == TypeExtensions.TimeSpanType)
         {
             return (T)(object)TimeOnly.FromTimeSpan((TimeSpan)value);

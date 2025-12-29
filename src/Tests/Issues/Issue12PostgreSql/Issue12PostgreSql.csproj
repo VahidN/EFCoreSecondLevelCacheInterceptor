@@ -6,6 +6,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.EasyCaching.Core\EFCoreSecondLevelCacheInterceptor.EasyCaching.Core.csproj"/>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.MemoryCache\EFCoreSecondLevelCacheInterceptor.MemoryCache.csproj"/>
+		<ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.HybridCache\EFCoreSecondLevelCacheInterceptor.HybridCache.csproj"/>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor\EFCoreSecondLevelCacheInterceptor.csproj"/>
     </ItemGroup>
     <ItemGroup>

@@ -29,7 +29,7 @@
     <PackageVersion Include="IDisposableAnalyzers" Version="4.0.8" />
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="Meziantou.Analyzer" Version="2.0.264" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="2.0.266" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.17.0.131074" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Analyzers" Version="10.0.0" />
   </ItemGroup>

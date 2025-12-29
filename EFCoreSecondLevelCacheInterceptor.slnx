@@ -27,7 +27,7 @@
     <Project Path="src/Tests/Issues/Issue123WithMessagePack/Issue123WithMessagePack.csproj" />
     <Project Path="src/Tests/Issues/Issue125EF5x/Issue125EF5x.csproj" />
     <Project Path="src/Tests/Issues/Issue12MySQL/Issue12MySQL.csproj" />
-    <!--<Project Path="src/Tests/Issues/Issue12PostgreSql/Issue12PostgreSql.csproj" />-->
+    <Project Path="src/Tests/Issues/Issue12PostgreSql/Issue12PostgreSql.csproj" />
     <Project Path="src/Tests/Issues/Issue154/Issue154.csproj" />
     <!--<Project Path="src/Tests/Issues/Issue192/Issue192.csproj" />-->
     <Project Path="src/Tests/Issues/Issue4SpatialType/Issue4SpatialType.csproj" />

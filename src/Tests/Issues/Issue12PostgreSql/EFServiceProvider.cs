@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using EasyCaching.Core.Configurations;
 using EFCoreSecondLevelCacheInterceptor;
 using Issue12PostgreSql.DataLayer;
@@ -9,9 +5,11 @@ using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace Issue12PostgreSql;
 
@@ -26,6 +24,7 @@ public static class EFServiceProvider
     public static IServiceProvider Instance { get; } = _serviceProviderBuilder.Value;
 
     public static T GetRequiredService<T>()
+        where T : notnull
         => Instance.GetRequiredService<T>();
 
     public static void RunInContext(Action<ApplicationDbContext> action)
@@ -53,7 +52,8 @@ public static class EFServiceProvider
         Console.WriteLine($"Using `{basePath}` as the ContentRootPath");
 
         var configuration = new ConfigurationBuilder().SetBasePath(basePath)
-            .AddJsonFile("appsettings.json", false, true).Build();
+            .AddJsonFile(path: "appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
 
         services.AddSingleton(_ => configuration);
 
@@ -64,7 +64,7 @@ public static class EFServiceProvider
             o.UseRedis(cfg =>
             {
                 cfg.SerializerName = "Pack";
-                cfg.DBConfig.Endpoints.Add(new ServerEndPoint("127.0.0.1", 6379));
+                cfg.DBConfig.Endpoints.Add(new ServerEndPoint(host: "127.0.0.1", port: 6379));
                 cfg.DBConfig.AllowAdmin = true;
                 cfg.DBConfig.ConnectionTimeout = 10000;
             }, providerName);
@@ -82,41 +82,44 @@ public static class EFServiceProvider
                     StandardResolverAllowPrivate.Instance, TypelessContractlessStandardResolver.Instance,
                     DynamicGenericResolver.Instance
                 });
-            }, "Pack");
+            }, name: "Pack");
+        });
+
+        services.AddHybridCache(options =>
+        {
+            options.DefaultEntryOptions = new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromHours(hours: 1),
+                LocalCacheExpiration = TimeSpan.FromHours(hours: 1)
+            };
         });
 
         services.AddEFSecondLevelCache(o =>
         {
-            o.UseEasyCachingCoreProvider(providerName).ConfigureLogging(true);
-            o.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(10));
-            o.UseCacheKeyPrefix("EF_");
+            o.UseHybridCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromHours(hours: 1))
 
-            // Fallback on db if the caching provider (redis) is down.
-            o.UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1));
+                //.UseMemoryCacheProvider()
+                //.UseEasyCachingCoreProvider(providerName).ConfigureLogging(enable: true)
+                .CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 10))
+                .UseCacheKeyPrefix(prefix: "EF_")
+
+                // Fallback on db if the caching provider (redis) is down.
+                .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1));
         });
+
+#pragma warning disable IDISP001
+        var dataSource =
+            new NpgsqlDataSourceBuilder(configuration[key: "ConnectionStrings:ApplicationDbContextConnection"])
+                .EnableDynamicJson()
+                .Build();
+#pragma warning restore IDISP001
 
         services.AddDbContext<ApplicationDbContext>((serviceProvider, optionsBuilder) =>
         {
             optionsBuilder.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())
-                .UseNpgsql(configuration["ConnectionStrings:ApplicationDbContextConnection"])
-                .LogTo(sql => Console.WriteLine(sql));
+                .UseNpgsql(dataSource);
         });
 
         return services.BuildServiceProvider();
     }
-}
-
-public class DBNullFormatter : IMessagePackFormatter<DBNull>
-{
-    public static DBNullFormatter Instance = new();
-
-    private DBNullFormatter()
-    {
-    }
-
-    public void Serialize(ref MessagePackWriter writer, DBNull value, MessagePackSerializerOptions options)
-        => writer.WriteNil();
-
-    public DBNull Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
-        => DBNull.Value;
 }

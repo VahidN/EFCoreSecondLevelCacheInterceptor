@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Issue12PostgreSql.Migrations
 {
     /// <inheritdoc />
-    public partial class V202310171929 : Migration
+    public partial class V2025_12_29_2301 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,7 +34,7 @@ namespace Issue12PostgreSql.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: false),
                     AddDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdateDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Points = table.Column<long>(type: "bigint", nullable: false),
@@ -48,11 +48,12 @@ namespace Issue12PostgreSql.Migrations
                     GuidValue = table.Column<Guid>(type: "uuid", nullable: false),
                     TimeSpanValue = table.Column<TimeSpan>(type: "interval", nullable: false),
                     ShortValue = table.Column<short>(type: "smallint", nullable: false),
-                    ByteArrayValue = table.Column<byte[]>(type: "bytea", nullable: true),
+                    ByteArrayValue = table.Column<byte[]>(type: "bytea", nullable: false),
                     UintValue = table.Column<long>(type: "bigint", nullable: false),
                     UlongValue = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     UshortValue = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
-                    OptionDefinitions = table.Column<List<BlogOption>>(type: "jsonb", nullable: true),
+                    OptionDefinitions = table.Column<List<BlogOption>>(type: "jsonb", nullable: false),
+                    CustomFieldDefinitionMetadata = table.Column<CustomFieldDefinitionMetadata>(type: "jsonb", nullable: true),
                     Date1 = table.Column<DateOnly>(type: "date", nullable: false),
                     Time1 = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
                     Date2 = table.Column<DateOnly>(type: "date", nullable: true),
@@ -69,7 +70,7 @@ namespace Issue12PostgreSql.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: false),
                     PersonId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -89,7 +90,7 @@ namespace Issue12PostgreSql.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: false),
                     PersonId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>

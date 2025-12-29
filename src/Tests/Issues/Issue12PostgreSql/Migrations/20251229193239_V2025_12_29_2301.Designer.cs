@@ -14,15 +14,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Issue12PostgreSql.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231017160021_V2023_10_17_1929")]
-    partial class V202310171929
+    [Migration("20251229193239_V2025_12_29_2301")]
+    partial class V2025_12_29_2301
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.0")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -36,6 +36,7 @@ namespace Issue12PostgreSql.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("PersonId")
@@ -57,6 +58,7 @@ namespace Issue12PostgreSql.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("PersonId")
@@ -77,10 +79,10 @@ namespace Issue12PostgreSql.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<int[]>("Array")
+                    b.PrimitiveCollection<int[]>("Array")
                         .HasColumnType("integer[]");
 
-                    b.Property<List<string>>("List")
+                    b.PrimitiveCollection<List<string>>("List")
                         .HasColumnType("text[]");
 
                     b.HasKey("Id");
@@ -100,6 +102,7 @@ namespace Issue12PostgreSql.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<byte[]>("ByteArrayValue")
+                        .IsRequired()
                         .HasColumnType("bytea");
 
                     b.Property<byte>("ByteValue")
@@ -107,6 +110,9 @@ namespace Issue12PostgreSql.Migrations
 
                     b.Property<char>("CharValue")
                         .HasColumnType("character(1)");
+
+                    b.Property<CustomFieldDefinitionMetadata>("CustomFieldDefinitionMetadata")
+                        .HasColumnType("jsonb");
 
                     b.Property<DateOnly>("Date1")
                         .HasColumnType("date");
@@ -133,9 +139,11 @@ namespace Issue12PostgreSql.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<List<BlogOption>>("OptionDefinitions")
+                        .IsRequired()
                         .HasColumnType("jsonb");
 
                     b.Property<long>("Points")
