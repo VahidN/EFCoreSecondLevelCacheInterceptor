@@ -142,7 +142,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (value.IsNull())
         {
-            return default;
+            return false;
         }
 
         var valueType = GetOrdinalValueType(ordinal, value);
@@ -187,7 +187,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (value.IsNull())
         {
-            return default;
+            return 0;
         }
 
         var valueType = GetOrdinalValueType(ordinal, value);
@@ -225,7 +225,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (value.IsNull())
         {
-            return default;
+            return '\0';
         }
 
         var valueType = GetOrdinalValueType(ordinal, value);
@@ -236,7 +236,7 @@ public class EFTableRowsDataReader : DbDataReader
 
             if (string.IsNullOrWhiteSpace(val))
             {
-                return default;
+                return '\0';
             }
 
             if (val.Length == 1)
@@ -289,7 +289,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (value.IsNull())
         {
-            return default;
+            return 0;
         }
 
         var valueType = GetOrdinalValueType(ordinal, value);
@@ -299,7 +299,7 @@ public class EFTableRowsDataReader : DbDataReader
             var s = value.ToString();
 
             return string.IsNullOrWhiteSpace(s)
-                ? default
+                ? 0
                 : decimal.Parse(s, NumberStyles.Number | NumberStyles.AllowExponent, CultureInfo.InvariantCulture);
         }
 
@@ -320,7 +320,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (value.IsNull())
         {
-            return default;
+            return 0;
         }
 
         var valueType = GetOrdinalValueType(ordinal, value);
@@ -347,7 +347,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (value.IsNull())
         {
-            return default;
+            return 0;
         }
 
         var valueType = GetOrdinalValueType(ordinal, value);
@@ -403,7 +403,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (value.IsNull())
         {
-            return default;
+            return 0;
         }
 
         var valueType = GetOrdinalValueType(ordinal, value);
@@ -435,7 +435,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (value.IsNull())
         {
-            return default;
+            return 0;
         }
 
         var valueType = GetOrdinalValueType(ordinal, value);
@@ -474,7 +474,7 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (value.IsNull())
         {
-            return default;
+            return 0;
         }
 
         var valueType = GetOrdinalValueType(ordinal, value);
@@ -521,7 +521,23 @@ public class EFTableRowsDataReader : DbDataReader
 
         if (expectedValueType == TypeExtensions.DateTimeOffsetType && actualValueType == TypeExtensions.DateTimeType)
         {
-            return (T)(object)new DateTimeOffset((DateTime)value);
+            if (value is not DateTime dateTime)
+            {
+                throw new InvalidCastException(
+                    $"Failed to convert `{value}` to DateTime for DateTimeOffset conversion");
+            }
+
+            if (dateTime < DateTimeOffset.MinValue.DateTime)
+            {
+                return (T)(object)DateTimeOffset.MinValue;
+            }
+
+            if (dateTime > DateTimeOffset.MaxValue.DateTime)
+            {
+                return (T)(object)DateTimeOffset.MaxValue;
+            }
+
+            return (T)(object)new DateTimeOffset(dateTime);
         }
 
         if (expectedValueType == TypeExtensions.DateTimeOffsetType && actualValueType == TypeExtensions.StringType)
