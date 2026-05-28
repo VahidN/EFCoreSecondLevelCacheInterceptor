@@ -40,7 +40,7 @@ public class MsSqlContextFactory : IDesignTimeDbContextFactory<ApplicationDbCont
 
         services.AddConfiguredMsSqlDbContext(connectionString);
 
-        using var buildServiceProvider = services.BuildServiceProvider();
+        var buildServiceProvider = services.BuildServiceProvider();
 
         return buildServiceProvider.GetRequiredService<ApplicationDbContext>();
     }
