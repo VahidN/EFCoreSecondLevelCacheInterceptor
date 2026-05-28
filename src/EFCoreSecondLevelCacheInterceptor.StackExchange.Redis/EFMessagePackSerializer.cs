@@ -23,7 +23,6 @@ public class EFMessagePackSerializer : IEFDataSerializer
         ]);
 
     private readonly bool _enableCompression;
-    private MessagePackSerializerOptions? _messagePackSerializerOptions;
 
     /// <summary>
     ///     High-Level API of MessagePack for C#.
@@ -37,8 +36,7 @@ public class EFMessagePackSerializer : IEFDataSerializer
         _enableCompression = options.EnableCompression;
     }
 
-    private MessagePackSerializerOptions EfMessagePackSerializerOptions
-        => _messagePackSerializerOptions ??= GetSerializerOptions();
+    private MessagePackSerializerOptions EfMessagePackSerializerOptions => field ??= GetSerializerOptions();
 
     /// <summary>
     ///     Serializes a given value with the specified buffer writer.
