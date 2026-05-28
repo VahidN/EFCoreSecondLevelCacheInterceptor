@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -44,7 +42,7 @@ public class EFCacheServiceCheck : IEFCacheServiceCheck
     {
         if (!_cacheSettings.IsCachingInterceptorEnabled)
         {
-            if (_logger.IsLoggerEnabled)
+            if (_logger.IsLoggerEnabled && _cacheServiceCheckLogger.IsEnabled(LogLevel.Debug))
             {
                 _cacheServiceCheckLogger.LogDebug(message: "The caching interceptor is disabled.");
             }
@@ -54,7 +52,7 @@ public class EFCacheServiceCheck : IEFCacheServiceCheck
 
         if (!_cacheSettings.UseDbCallsIfCachingProviderIsDown)
         {
-            if (_logger.IsLoggerEnabled)
+            if (_logger.IsLoggerEnabled && _cacheServiceCheckLogger.IsEnabled(LogLevel.Debug))
             {
                 _cacheServiceCheckLogger.LogDebug(
                     message:
@@ -65,7 +63,7 @@ public class EFCacheServiceCheck : IEFCacheServiceCheck
             return true;
         }
 
-        if (_logger.IsLoggerEnabled)
+        if (_logger.IsLoggerEnabled && _cacheServiceCheckLogger.IsEnabled(LogLevel.Debug))
         {
             _cacheServiceCheckLogger.LogDebug(
                 message: "The caching interceptor is set to fallback on db if the caching provider ({Type}) is down.",
@@ -94,7 +92,7 @@ public class EFCacheServiceCheck : IEFCacheServiceCheck
 
             _isCacheServerAvailable = true;
 
-            if (_logger.IsLoggerEnabled)
+            if (_logger.IsLoggerEnabled && _cacheServiceCheckLogger.IsEnabled(LogLevel.Debug))
             {
                 _cacheServiceCheckLogger.LogDebug(message: "The cache service is available.");
             }
@@ -103,7 +101,7 @@ public class EFCacheServiceCheck : IEFCacheServiceCheck
         {
             _isCacheServerAvailable = false;
 
-            if (_logger.IsLoggerEnabled)
+            if (_logger.IsLoggerEnabled && _cacheServiceCheckLogger.IsEnabled(LogLevel.Debug))
             {
                 _cacheServiceCheckLogger.LogDebug(ex, message: "The cache service({Type}) isn't available.",
                     _cacheServiceProvider.GetType());

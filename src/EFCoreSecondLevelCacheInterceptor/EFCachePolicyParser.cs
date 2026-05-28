@@ -125,7 +125,11 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         if (efCachePolicy != null && _logger.IsLoggerEnabled)
         {
             var message = $"Using EFCachePolicy: {efCachePolicy}.";
-            _policyParserLogger.LogDebug(message: "Using EFCachePolicy: {EfCachePolicy}.", efCachePolicy);
+
+            if (_policyParserLogger.IsEnabled(LogLevel.Debug))
+            {
+                _policyParserLogger.LogDebug(message: "Using EFCachePolicy: {EfCachePolicy}.", efCachePolicy);
+            }
 
             _logger.NotifyCacheableEvent(CacheableLogEventId.CachePolicyCalculated, message, commandText,
                 efCacheKey: null);
@@ -167,7 +171,12 @@ public class EFCachePolicyParser : IEFCachePolicyParser
         if (result && _logger.IsLoggerEnabled)
         {
             var message = $"Skipped caching of this command[{commandText}] based on the provided predicate.";
-            _policyParserLogger.LogDebug(message);
+
+            if (_policyParserLogger.IsEnabled(LogLevel.Debug))
+            {
+                _policyParserLogger.LogDebug(message);
+            }
+
             _logger.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, message, commandText, efCacheKey: null);
         }
 
@@ -470,7 +479,11 @@ public class EFCachePolicyParser : IEFCachePolicyParser
             if (hasFn && _logger.IsLoggerEnabled)
             {
                 var message = $"Skipped caching because of the non-deterministic function -> `{item}`.";
-                _policyParserLogger.LogDebug(message);
+
+                if (_policyParserLogger.IsEnabled(LogLevel.Debug))
+                {
+                    _policyParserLogger.LogDebug(message);
+                }
 
                 _logger.NotifyCacheableEvent(CacheableLogEventId.CachingSkipped, message, commandText,
                     efCacheKey: null);

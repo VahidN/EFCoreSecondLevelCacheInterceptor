@@ -1,16 +1,14 @@
-﻿using System;
-using System.Data.Common;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
+﻿#if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
 using System.Text.Json;
 using Microsoft.Extensions.Options;
-
 #else
 using System.Collections;
 using System.Globalization;
 #endif
+using System.Data.Common;
+using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace EFCoreSecondLevelCacheInterceptor;
 
@@ -91,7 +89,7 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
         var cacheDbContextType = context.GetType();
         var cacheDependencies = _cacheDependenciesProcessor.GetCacheDependencies(command, context, cachePolicy);
 
-        if (_logger.IsLoggerEnabled)
+        if (_logger.IsLoggerEnabled && _keyProviderLogger.IsEnabled(LogLevel.Debug))
         {
             _keyProviderLogger.LogDebug(
                 message: "KeyHash: {CacheKeyHash}, DbContext: {Name}, CacheDependencies: {Dependencies}.", cacheKeyHash,
@@ -153,24 +151,23 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
             : JsonSerializer.Serialize(parameter.Value, _settings.JsonSerializerOptions);
 #else
     private static string? GetParameterValue(DbParameter parameter)
-    {
-        return parameter.Value switch
-               {
-                   DBNull => "null",
-                   null => "null",
-                   byte[] buffer => BytesToHex(buffer),
-                   Array array => EnumerableToString(array),
-                   IEnumerable enumerable => EnumerableToString(enumerable),
-                   _ => Convert.ToString(parameter.Value, CultureInfo.InvariantCulture),
-               };
-    }
+        => parameter.Value switch
+        {
+            DBNull => "null",
+            null => "null",
+            byte[] buffer => BytesToHex(buffer),
+            Array array => EnumerableToString(array),
+            IEnumerable enumerable => EnumerableToString(enumerable),
+            _ => Convert.ToString(parameter.Value, CultureInfo.InvariantCulture)
+        };
 
     private static string EnumerableToString(IEnumerable array)
     {
         var sb = new StringBuilder();
+
         foreach (var item in array)
         {
-            sb.Append(item).Append(' ');
+            sb.Append(item).Append(value: ' ');
         }
 
         return sb.ToString();
@@ -179,9 +176,10 @@ public class EFCacheKeyProvider : IEFCacheKeyProvider
     private static string BytesToHex(byte[] buffer)
     {
         var sb = new StringBuilder(buffer.Length * 2);
+
         foreach (var @byte in buffer)
         {
-            sb.Append(@byte.ToString("X2", CultureInfo.InvariantCulture));
+            sb.Append(@byte.ToString(format: "X2", CultureInfo.InvariantCulture));
         }
 
         return sb.ToString();
