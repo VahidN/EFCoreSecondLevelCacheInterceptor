@@ -16,6 +16,7 @@ dotnet_diagnostic.CA5394.severity = suggestion
 dotnet_diagnostic.CA1062.severity = suggestion 
 dotnet_diagnostic.CA1852.severity = suggestion 
 dotnet_diagnostic.CA1861.severity = suggestion 
+dotnet_diagnostic.CA1865.severity = suggestion 
 dotnet_diagnostic.CA1812.severity = suggestion 
 dotnet_diagnostic.CA1031.severity = suggestion
 dotnet_diagnostic.CA1707.severity = suggestion
@@ -73,6 +74,7 @@ dotnet_diagnostic.IDISP026.severity = error
 dotnet_diagnostic.CA1510.severity = suggestion
 
 dotnet_diagnostic.CA1848.severity = suggestion
+dotnet_diagnostic.CA1847.severity = suggestion
 
 dotnet_diagnostic.CA2254.severity = suggestion
 

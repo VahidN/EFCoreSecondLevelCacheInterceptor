@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
 using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -174,17 +170,32 @@ public class EFSqlCommandsProcessor(IEFHashProvider hashProvider) : IEFSqlComman
                     break;
                 }
 
-                var tableName = string.Empty;
+                string tableName;
+                var item = sqlItems[i];
 
-                var tableNameParts = sqlItems[i].Split(Separator, StringSplitOptions.RemoveEmptyEntries);
-
-                if (tableNameParts.Length == 1)
+                // Handle bracketed identifiers - don't split on dots inside brackets
+                if (item.StartsWith(value: "[", StringComparison.Ordinal) &&
+                    item.Contains(value: ".", StringComparison.Ordinal) &&
+                    item.Contains(value: "]", StringComparison.Ordinal))
                 {
-                    tableName = tableNameParts[0].Trim();
+                    // Check if this is a schema.table pattern [schema].[table]
+                    // vs a single bracketed name containing a dot [Library.Tag]
+                    if (item.IndexOf(value: "]", StringComparison.Ordinal) <
+                        item.LastIndexOf(value: ".", StringComparison.Ordinal))
+                    {
+                        // Pattern: [schema].[table] - split and take the table part
+                        tableName = GetTableNamePart(item);
+                    }
+                    else
+                    {
+                        // Pattern: [Library.Tag] - use as-is (will strip brackets below)
+                        tableName = item;
+                    }
                 }
-                else if (tableNameParts.Length >= 2)
+                else
                 {
-                    tableName = tableNameParts[1].Trim();
+                    // For unbracketed identifiers, split on dot to get schema.table
+                    tableName = GetTableNamePart(item);
                 }
 
                 if (string.IsNullOrWhiteSpace(tableName))
@@ -203,5 +214,17 @@ public class EFSqlCommandsProcessor(IEFHashProvider hashProvider) : IEFSqlComman
         }
 
         return tables;
+    }
+
+    private static string GetTableNamePart(string item)
+    {
+        var tableNameParts = item.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+
+        return tableNameParts.Length switch
+        {
+            >= 2 => tableNameParts[1].Trim(),
+            1 => tableNameParts[0].Trim(),
+            _ => string.Empty
+        };
     }
 }
