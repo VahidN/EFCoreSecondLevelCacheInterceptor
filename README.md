@@ -47,6 +47,23 @@ This library supports multiple caching providers, each available as a separate N
     dotnet add package EFCoreSecondLevelCacheInterceptor.CacheManager.Core
     ```
   * **Custom**: You can also implement your own provider.
+   
+## Troubleshooting: Transitive Dependency Mitigation
+
+If you encounter an issue with a transitive dependency before the upstream library author releases an update, you can force NuGet to use a patched version using the **"Nearest Wins"** rule. A direct package reference in your project file will always override deeper, transitive references.
+
+To force the project to use a safe or updated version (e.g., `MessagePack` v3.1.7+), explicitly add it to your `.csproj` file:
+
+```xml
+<ItemGroup>
+  <PackageReference Include="SomeParentLibrary" Version="1.0.0" />
+
+  <PackageReference Include="MessagePack" Version="3.1.7" />
+</ItemGroup>
+```
+
+This workaround is perfectly safe for minor patches (e.g., 3.1.6 to 3.1.7) due to Semantic Versioning (SemVer) guarantees. However, forcing a major version jump (e.g., v2.x to v3.x) will likely introduce breaking changes and crash the parent library.
+
 
 ### 2\. Register the Cache Provider and Interceptor
 
