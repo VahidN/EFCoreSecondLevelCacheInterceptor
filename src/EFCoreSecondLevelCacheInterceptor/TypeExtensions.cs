@@ -1,4 +1,4 @@
-#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
 using System.Text.Json;
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -120,7 +120,7 @@ public static class TypeExtensions
     /// <param name="value"></param>
     /// <returns></returns>
     public static bool IsDbNull(
-#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
         [NotNullWhen(returnValue: false)]
 #endif
         this string? value)
