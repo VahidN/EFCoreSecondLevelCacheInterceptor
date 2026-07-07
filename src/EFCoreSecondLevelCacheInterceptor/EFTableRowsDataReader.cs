@@ -234,7 +234,7 @@ public class EFTableRowsDataReader : DbDataReader
         {
             var val = value.ToString();
 
-            if (string.IsNullOrWhiteSpace(val))
+            if (val.IsDbNull())
             {
                 return '\0';
             }
@@ -274,7 +274,7 @@ public class EFTableRowsDataReader : DbDataReader
         {
             var s = value.ToString();
 
-            return string.IsNullOrWhiteSpace(s) ? default : DateTime.Parse(s, CultureInfo.InvariantCulture);
+            return s.IsDbNull() ? default : DateTime.Parse(s, CultureInfo.InvariantCulture);
         }
 
         return (DateTime)value;
@@ -298,7 +298,7 @@ public class EFTableRowsDataReader : DbDataReader
         {
             var s = value.ToString();
 
-            return string.IsNullOrWhiteSpace(s)
+            return s.IsDbNull()
                 ? 0
                 : decimal.Parse(s, NumberStyles.Number | NumberStyles.AllowExponent, CultureInfo.InvariantCulture);
         }
@@ -383,7 +383,7 @@ public class EFTableRowsDataReader : DbDataReader
         {
             var g = value.ToString();
 
-            return string.IsNullOrWhiteSpace(g) ? Guid.NewGuid() : new Guid(g);
+            return g.IsDbNull() ? Guid.NewGuid() : new Guid(g);
         }
 
         if (valueType == TypeExtensions.ByteArrayType)

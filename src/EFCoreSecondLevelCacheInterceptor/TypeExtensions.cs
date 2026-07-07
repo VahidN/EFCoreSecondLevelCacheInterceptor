@@ -1,5 +1,6 @@
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
 using System.Text.Json;
+using System.Diagnostics.CodeAnalysis;
 #endif
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -112,6 +113,18 @@ public static class TypeExtensions
     /// <param name="value"></param>
     /// <returns></returns>
     public static bool IsNull(this object? value) => value is null or DBNull;
+
+    /// <summary>
+    ///     Check value is Null
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool IsDbNull(
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
+        [NotNullWhen(returnValue: false)]
+#endif
+        this string? value)
+        => string.IsNullOrWhiteSpace(value) || value!.Equals(value: "{}", StringComparison.Ordinal);
 
     /// <summary>
     ///     IsGenericType or IsArray
