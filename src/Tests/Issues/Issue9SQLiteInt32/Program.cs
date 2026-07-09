@@ -17,7 +17,7 @@ internal static class Program
 
             foreach (var person in cachedPeople)
             {
-                Console.WriteLine($"{person.Id}, {person.Name}");
+                Console.WriteLine($"{person.Id}, {person.Name}, {person.Points}");
             }
 
             cachedPeople = context.People.Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 51))
@@ -28,12 +28,12 @@ internal static class Program
 
             foreach (var person in cachedPeople)
             {
-                Console.WriteLine($"{person.Id}, {person.Name}");
+                Console.WriteLine($"{person.Id}, {person.Name}, {person.Points}");
             }
 
             var cachedPerson = context.People.Cacheable().FirstOrDefault(x => x.UlongValue == 1);
             cachedPerson = context.People.Cacheable().FirstOrDefault(x => x.UlongValue == 1);
-            Console.WriteLine($"{cachedPerson?.Id}, {cachedPerson?.Name}");
+            Console.WriteLine($"{cachedPerson?.Id}, {cachedPerson?.Name}, {cachedPerson?.Points}");
         });
     }
 

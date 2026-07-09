@@ -74,7 +74,7 @@ public static class EFServiceProvider
 
         //.AddSerializerFactory<MessagePackSerializerFactory>()
 
-        addCacheManagerCoreRedis(services);
+        // addCacheManagerCoreRedis(services)
 
         services.AddDbContext<ApplicationDbContext>((serviceProvider, optionsBuilder) =>
         {
@@ -111,6 +111,7 @@ public static class EFServiceProvider
         return connectionString;
     }
 
+/*
     private static void addCacheManagerCoreRedis(ServiceCollection services)
     {
         var jss = new JsonSerializerSettings
@@ -145,4 +146,5 @@ public static class EFServiceProvider
 
         services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
     }
+*/	
 }
