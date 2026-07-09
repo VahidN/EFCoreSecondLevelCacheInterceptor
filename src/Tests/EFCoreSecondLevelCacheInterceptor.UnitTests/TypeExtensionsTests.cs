@@ -1,21 +1,22 @@
 ﻿using System.Collections;
-using Assert = Xunit.Assert;
+
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+[TestClass]
 public class TypeExtensionsTests
 {
-    [Fact]
+    [TestMethod]
     public void IsNull_ShouldReturnTrue_WhenValueIsNull()
     {
         // Arrange && Act
         var actual = ((object)null).IsNull();
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsNull_ShouldReturnTrue_WhenValueIsDBNull()
     {
         // Arrange
@@ -25,10 +26,10 @@ public class TypeExtensionsTests
         var actual = value.IsNull();
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsNull_ShouldReturnFalse_WhenValueIsNotNullOrDBNull()
     {
         // Arrange
@@ -38,60 +39,60 @@ public class TypeExtensionsTests
         var actual = value.IsNull();
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Theory]
-    [InlineData(null, false)]
-    [InlineData(typeof(int), false)]
-    [InlineData(typeof(int[]), true)]
-    [InlineData(typeof(ArrayList), false)]
-    [InlineData(typeof(LinkedList<>), false)]
-    [InlineData(typeof(LinkedList<int>), false)]
-    [InlineData(typeof(List<>), true)]
-    [InlineData(typeof(List<int>), true)]
-    [InlineData(typeof(SortedList<,>), false)]
-    [InlineData(typeof(SortedList<int, int>), false)]
+    [TestMethod]
+    [DataRow(null, false)]
+    [DataRow(typeof(int), false)]
+    [DataRow(typeof(int[]), true)]
+    [DataRow(typeof(ArrayList), false)]
+    [DataRow(typeof(LinkedList<>), false)]
+    [DataRow(typeof(LinkedList<int>), false)]
+    [DataRow(typeof(List<>), true)]
+    [DataRow(typeof(List<int>), true)]
+    [DataRow(typeof(SortedList<,>), false)]
+    [DataRow(typeof(SortedList<int, int>), false)]
     public void IsArrayOrGenericList_ShouldReturnExpectedResult(Type type, bool expected)
     {
         // Arrange && Act
         var actual = TypeExtensions.IsArrayOrGenericList(type);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Theory]
-    [InlineData(null, false)]
-    [InlineData(typeof(bool), false)]
-    [InlineData(typeof(byte), true)]
-    [InlineData(typeof(sbyte), true)]
-    [InlineData(typeof(char), true)]
-    [InlineData(typeof(decimal), true)]
-    [InlineData(typeof(double), true)]
-    [InlineData(typeof(float), true)]
-    [InlineData(typeof(int), true)]
-    [InlineData(typeof(uint), true)]
-    [InlineData(typeof(nint), false)]
-    [InlineData(typeof(nuint), false)]
-    [InlineData(typeof(long), true)]
-    [InlineData(typeof(ulong), true)]
-    [InlineData(typeof(short), true)]
-    [InlineData(typeof(ushort), true)]
-    [InlineData(typeof(DateOnly), false)]
-    [InlineData(typeof(DateTime), false)]
-    [InlineData(typeof(DateTimeOffset), false)]
-    [InlineData(typeof(TimeOnly), false)]
-    [InlineData(typeof(TimeSpan), false)]
-    [InlineData(typeof(Guid), false)]
-    [InlineData(typeof(object), false)]
-    [InlineData(typeof(string), false)]
+    [TestMethod]
+    [DataRow(null, false)]
+    [DataRow(typeof(bool), false)]
+    [DataRow(typeof(byte), true)]
+    [DataRow(typeof(sbyte), true)]
+    [DataRow(typeof(char), true)]
+    [DataRow(typeof(decimal), true)]
+    [DataRow(typeof(double), true)]
+    [DataRow(typeof(float), true)]
+    [DataRow(typeof(int), true)]
+    [DataRow(typeof(uint), true)]
+    [DataRow(typeof(nint), false)]
+    [DataRow(typeof(nuint), false)]
+    [DataRow(typeof(long), true)]
+    [DataRow(typeof(ulong), true)]
+    [DataRow(typeof(short), true)]
+    [DataRow(typeof(ushort), true)]
+    [DataRow(typeof(DateOnly), false)]
+    [DataRow(typeof(DateTime), false)]
+    [DataRow(typeof(DateTimeOffset), false)]
+    [DataRow(typeof(TimeOnly), false)]
+    [DataRow(typeof(TimeSpan), false)]
+    [DataRow(typeof(Guid), false)]
+    [DataRow(typeof(object), false)]
+    [DataRow(typeof(string), false)]
     public void IsNumber_ShouldReturnExpectedResult(Type type, bool expected)
     {
         // Arrange && Act
         var actual = TypeExtensions.IsNumber(type);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 }

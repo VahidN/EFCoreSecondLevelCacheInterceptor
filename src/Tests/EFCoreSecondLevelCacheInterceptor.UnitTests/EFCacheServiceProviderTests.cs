@@ -1,13 +1,13 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+[TestClass]
 public class EFCacheServiceProviderTests
 {
-    [Fact]
+    [TestMethod]
     public void TestCacheInvalidationWithTwoRoots()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
@@ -44,10 +44,10 @@ public class EFCacheServiceProviderTests
         }, efCachePolicy);
 
         var value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
-        Assert.NotNull(value1);
+        Assert.IsNotNull(value1);
 
         var value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
-        Assert.NotNull(value2);
+        Assert.IsNotNull(value2);
 
         efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
         {
@@ -58,13 +58,13 @@ public class EFCacheServiceProviderTests
         });
 
         value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
-        Assert.Null(value1);
+        Assert.IsNull(value1);
 
         value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
-        Assert.Null(value2);
+        Assert.IsNull(value2);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestCacheInvalidationWithOneRoot()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
@@ -99,10 +99,10 @@ public class EFCacheServiceProviderTests
         }, efCachePolicy);
 
         var value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
-        Assert.NotNull(value1);
+        Assert.IsNotNull(value1);
 
         var value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
-        Assert.NotNull(value2);
+        Assert.IsNotNull(value2);
 
         efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
         {
@@ -113,13 +113,13 @@ public class EFCacheServiceProviderTests
         });
 
         value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
-        Assert.Null(value1);
+        Assert.IsNull(value1);
 
         value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
-        Assert.Null(value2);
+        Assert.IsNull(value2);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestObjectCacheInvalidationWithOneRoot()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
@@ -146,7 +146,7 @@ public class EFCacheServiceProviderTests
         };
 
         var val11888622 = efCacheServiceProvider.GetValue(key11888622, efCachePolicy);
-        Assert.Null(val11888622);
+        Assert.IsNull(val11888622);
 
         efCacheServiceProvider.InsertValue(key11888622, new EFCachedData
         {
@@ -162,7 +162,7 @@ public class EFCacheServiceProviderTests
         };
 
         var val44513A63 = efCacheServiceProvider.GetValue(key44513A63, efCachePolicy);
-        Assert.Null(val44513A63);
+        Assert.IsNull(val44513A63);
 
         efCacheServiceProvider.InsertValue(key44513A63, new EFCachedData
         {
@@ -178,13 +178,13 @@ public class EFCacheServiceProviderTests
         });
 
         val11888622 = efCacheServiceProvider.GetValue(key11888622, efCachePolicy);
-        Assert.Null(val11888622);
+        Assert.IsNull(val11888622);
 
         val44513A63 = efCacheServiceProvider.GetValue(key44513A63, efCachePolicy);
-        Assert.Null(val44513A63);
+        Assert.IsNull(val44513A63);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestCacheInvalidationWithSimilarRoots()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
@@ -220,10 +220,10 @@ public class EFCacheServiceProviderTests
         }, efCachePolicy);
 
         var value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
-        Assert.NotNull(value1);
+        Assert.IsNotNull(value1);
 
         var value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
-        Assert.NotNull(value2);
+        Assert.IsNotNull(value2);
 
         efCacheServiceProvider.InvalidateCacheDependencies(new EFCacheKey(new HashSet<string>
         {
@@ -234,13 +234,13 @@ public class EFCacheServiceProviderTests
         });
 
         value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
-        Assert.Null(value1);
+        Assert.IsNull(value1);
 
         value2 = efCacheServiceProvider.GetValue(key2, efCachePolicy);
-        Assert.Null(value2);
+        Assert.IsNull(value2);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestInsertingNullValues()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
@@ -260,10 +260,10 @@ public class EFCacheServiceProviderTests
         efCacheServiceProvider.InsertValue(key1, value: null, efCachePolicy);
 
         var value1 = efCacheServiceProvider.GetValue(key1, efCachePolicy);
-        Assert.True(value1.IsNull, $"value1 is `{value1}`");
+        Assert.IsTrue(value1.IsNull, $"value1 is `{value1}`");
     }
 
-    [Fact]
+    [TestMethod]
     public async Task TestConcurrentCacheInsertAndInvalidation()
     {
         const string rootKey = "entity1";
@@ -315,7 +315,7 @@ public class EFCacheServiceProviderTests
         }
     }
 
-    [Fact]
+    [TestMethod]
     public void TestParallelCacheInsertAndInvalidation()
     {
         const string rootKey = "entity1";
@@ -365,7 +365,7 @@ public class EFCacheServiceProviderTests
         Parallel.Invoke(tests.OrderBy(a => Random.Shared.Next()).ToArray());
     }
 
-    [Fact]
+    [TestMethod]
     public void TestParallelInsertsAndRemoves()
     {
         var (efCacheServiceProvider, _) = CreateMemoryCacheServiceProvider();
@@ -429,7 +429,7 @@ public class EFCacheServiceProviderTests
             KeyHash = "EF_key1"
         }, efCachePolicy);
 
-        Assert.Null(value1);
+        Assert.IsNull(value1);
     }
 
     private static (IEFCacheServiceProvider, ServiceProvider) CreateMemoryCacheServiceProvider()

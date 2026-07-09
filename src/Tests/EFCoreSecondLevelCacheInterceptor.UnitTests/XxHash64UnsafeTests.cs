@@ -1,10 +1,11 @@
-using Assert = Xunit.Assert;
+
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+[TestClass]
 public class XxHash64UnsafeTests
 {
-    [Fact]
+    [TestMethod]
     public void ComputeHash_ThrowsArgumentNullException_WhenStringDataIsNull()
     {
         // Arrange
@@ -14,7 +15,7 @@ public class XxHash64UnsafeTests
         Assert.Throws<ArgumentNullException>(() => hashProvider.ComputeHash(((string)null)!));
     }
 
-    [Fact]
+    [TestMethod]
     public void ComputeHash_ThrowsArgumentNullException_WhenByteArrayDataIsNull()
     {
         // Arrange
@@ -24,7 +25,7 @@ public class XxHash64UnsafeTests
         Assert.Throws<ArgumentNullException>(() => hashProvider.ComputeHash(((byte[])null)!));
     }
 
-    [Fact]
+    [TestMethod]
     public void ComputeHash_ThrowsArgumentNullException_WhenByteArrayDataWithOffsetIsNull()
     {
         // Arrange
@@ -34,7 +35,7 @@ public class XxHash64UnsafeTests
         Assert.Throws<ArgumentNullException>(() => hashProvider.ComputeHash(null!, offset: 0, len: 0, seed: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void ComputeHash_ReturnsSameHash_ForSameStringData()
     {
         // Arrange
@@ -46,10 +47,10 @@ public class XxHash64UnsafeTests
         var hash2 = hashProvider.ComputeHash(data);
 
         // Act && Assert
-        Assert.Equal(hash1, hash2);
+        Assert.AreEqual(hash1, hash2);
     }
 
-    [Fact]
+    [TestMethod]
     public void ComputeHash_ReturnsSameHash_ForSameByteArrayData()
     {
         // Arrange
@@ -61,10 +62,10 @@ public class XxHash64UnsafeTests
         var hash2 = hashProvider.ComputeHash(data);
 
         // Act && Assert
-        Assert.Equal(hash1, hash2);
+        Assert.AreEqual(hash1, hash2);
     }
 
-    [Fact]
+    [TestMethod]
     public void ComputeHash_ReturnsSameHash_ForSameByteArrayDataWithOffset()
     {
         // Arrange
@@ -76,10 +77,10 @@ public class XxHash64UnsafeTests
         var hash2 = hashProvider.ComputeHash(data, offset: 0, data.Length, seed: 0);
 
         // Act && Assert
-        Assert.Equal(hash1, hash2);
+        Assert.AreEqual(hash1, hash2);
     }
 
-    [Fact]
+    [TestMethod]
     public void ComputeHash_ReturnsDifferentHash_ForDifferentStringData()
     {
         // Arrange
@@ -90,10 +91,10 @@ public class XxHash64UnsafeTests
         var hash2 = hashProvider.ComputeHash(data: "test2");
 
         // Act && Assert
-        Assert.NotEqual(hash1, hash2);
+        Assert.AreNotEqual(hash1, hash2);
     }
 
-    [Fact]
+    [TestMethod]
     public void ComputeHash_ReturnsDifferentHash_ForDifferentByteArrayData()
     {
         // Arrange
@@ -106,10 +107,10 @@ public class XxHash64UnsafeTests
         var hash2 = hashProvider.ComputeHash(data2);
 
         // Act && Assert
-        Assert.NotEqual(hash1, hash2);
+        Assert.AreNotEqual(hash1, hash2);
     }
 
-    [Fact]
+    [TestMethod]
     public void ComputeHash_ReturnsDifferentHash_ForDifferentByteArrayDataWithOffset()
     {
         // Arrange
@@ -122,6 +123,6 @@ public class XxHash64UnsafeTests
         var hash2 = hashProvider.ComputeHash(data2, offset: 0, data2.Length, seed: 0);
 
         // Act && Assert
-        Assert.NotEqual(hash1, hash2);
+        Assert.AreNotEqual(hash1, hash2);
     }
 }

@@ -1,13 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 // ReSharper disable once InconsistentNaming
 public class EFCacheKeyTests
 {
-    [Fact]
+    [TestMethod]
     public void Equals_ReturnsTrue_WhenKeyHashAndDbContextAreEqual()
     {
         // Arrange
@@ -33,10 +34,10 @@ public class EFCacheKeyTests
         var actual = cacheKey1.Equals(cacheKey2);
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Equals_ReturnsFalse_WhenObjIsNotEFCacheKey()
     {
         // Arrange
@@ -55,10 +56,10 @@ public class EFCacheKeyTests
         var actual = cacheKey1.Equals(obj);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Equals_ReturnsFalse_WhenKeyHashIsDifferent()
     {
         // Arrange
@@ -84,10 +85,10 @@ public class EFCacheKeyTests
         var actual = cacheKey1.Equals(cacheKey2);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Equals_ReturnsFalse_WhenDbContextIsDifferent()
     {
         // Arrange
@@ -113,10 +114,10 @@ public class EFCacheKeyTests
         var actual = cacheKey1.Equals(cacheKey2);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetHashCode_ReturnsSameHashCode_ForEqualObjects()
     {
         // Arrange
@@ -143,10 +144,10 @@ public class EFCacheKeyTests
         var hashCode2 = cacheKey2.GetHashCode();
 
         // Assert
-        Assert.Equal(hashCode1, hashCode2);
+        Assert.AreEqual(hashCode1, hashCode2);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetHashCode_ReturnsDifferentHashCode_ForDifferentObjects()
     {
         // Arrange
@@ -173,10 +174,10 @@ public class EFCacheKeyTests
         var hashCode2 = cacheKey2.GetHashCode();
 
         // Assert
-        Assert.NotEqual(hashCode1, hashCode2);
+        Assert.AreNotEqual(hashCode1, hashCode2);
     }
 
-    [Fact]
+    [TestMethod]
     public void ToString_ReturnsExpectedFormat()
     {
         // Arrange
@@ -194,6 +195,6 @@ public class EFCacheKeyTests
         var actual = cacheKey.ToString();
 
         // Assert
-        Assert.Equal(expected: "KeyHash: hash1, DbContext: DbContext, CacheDependencies: Entity1, Entity2.", actual);
+        Assert.AreEqual(expected: "KeyHash: hash1, DbContext: DbContext, CacheDependencies: Entity1, Entity2.", actual);
     }
 }

@@ -3,14 +3,15 @@ using System.Data;
 using System.Data.Common;
 using System.Reflection;
 using Moq;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 // ReSharper disable once InconsistentNaming
 public class EFDataReaderLoaderTests
 {
-    [Fact]
+    [TestMethod]
     public void HasRows_ReturnsTrue_WhenDbReaderHasRows()
     {
         // Arrange
@@ -24,10 +25,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.HasRows;
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void HasRows_ReturnsFalse_WhenDbReaderHasNoRows()
     {
         // Arrange
@@ -41,10 +42,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.HasRows;
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void RecordsAffected_ReturnsExpectedValue()
     {
         // Arrange
@@ -58,10 +59,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.RecordsAffected;
 
         // Assert
-        Assert.Equal(expected: 5, actual);
+        Assert.AreEqual(expected: 5, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void RecordsAffected_ReturnsZero_WhenNoRecordsAffected()
     {
         // Arrange
@@ -75,10 +76,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.RecordsAffected;
 
         // Assert
-        Assert.Equal(expected: 0, actual);
+        Assert.AreEqual(expected: 0, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsClosed_ReturnsTrue_WhenDbReaderIsClosed()
     {
         // Arrange
@@ -92,10 +93,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.IsClosed;
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsClosed_ReturnsFalse_WhenDbReaderIsNotClosed()
     {
         // Arrange
@@ -109,10 +110,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.IsClosed;
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Depth_ReturnsExpectedValue()
     {
         // Arrange
@@ -126,10 +127,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.Depth;
 
         // Assert
-        Assert.Equal(expected: 3, actual);
+        Assert.AreEqual(expected: 3, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Depth_ReturnsZero_WhenDepthIsZero()
     {
         // Arrange
@@ -143,10 +144,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.Depth;
 
         // Assert
-        Assert.Equal(expected: 0, actual);
+        Assert.AreEqual(expected: 0, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void FieldCount_ReturnsExpectedValue()
     {
         // Arrange
@@ -160,10 +161,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.FieldCount;
 
         // Assert
-        Assert.Equal(expected: 10, actual);
+        Assert.AreEqual(expected: 10, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void FieldCount_ReturnsZero_WhenNoFields()
     {
         // Arrange
@@ -177,10 +178,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.FieldCount;
 
         // Assert
-        Assert.Equal(expected: 0, actual);
+        Assert.AreEqual(expected: 0, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void VisibleFieldCount_ReturnsExpectedValue()
     {
         // Arrange
@@ -194,10 +195,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.VisibleFieldCount;
 
         // Assert
-        Assert.Equal(expected: 7, actual);
+        Assert.AreEqual(expected: 7, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void VisibleFieldCount_ReturnsZero_WhenNoVisibleFields()
     {
         // Arrange
@@ -211,10 +212,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.VisibleFieldCount;
 
         // Assert
-        Assert.Equal(expected: 0, actual);
+        Assert.AreEqual(expected: 0, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Indexer_ReturnsExpectedValue_ByName()
     {
         // Arrange
@@ -233,10 +234,10 @@ public class EFDataReaderLoaderTests
         var actual = loader[name: "ColumnName"];
 
         // Assert
-        Assert.Equal(expected: "Value", actual);
+        Assert.AreEqual(expected: "Value", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Indexer_ThrowsIndexOutOfRangeException_WhenColumnNameIsInvalid()
     {
         // Arrange
@@ -250,7 +251,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader[name: "InvalidColumn"]);
     }
 
-    [Fact]
+    [TestMethod]
     public void Indexer_ReturnsExpectedValue_ByOrdinal()
     {
         // Arrange
@@ -268,10 +269,10 @@ public class EFDataReaderLoaderTests
         var actual = loader[ordinal: 0];
 
         // Assert
-        Assert.Equal(expected: "Value", actual);
+        Assert.AreEqual(expected: "Value", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Indexer_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -285,7 +286,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader[ordinal: 100]);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDataTypeName_ReturnsExpectedTypeName()
     {
         // Arrange
@@ -299,10 +300,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetDataTypeName(ordinal: 1);
 
         // Assert
-        Assert.Equal(expected: "Int32", actual);
+        Assert.AreEqual(expected: "Int32", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDataTypeName_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -316,7 +317,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetDataTypeName(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldType_ReturnsExpectedType()
     {
         // Arrange
@@ -330,10 +331,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetFieldType(ordinal: 1);
 
         // Assert
-        Assert.Equal(typeof(int), actual);
+        Assert.AreEqual(typeof(int), actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldType_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -347,7 +348,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetFieldType(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetName_ReturnsExpectedName()
     {
         // Arrange
@@ -361,10 +362,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetName(ordinal: 1);
 
         // Assert
-        Assert.Equal(expected: "ColumnName", actual);
+        Assert.AreEqual(expected: "ColumnName", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetName_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -378,7 +379,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetName(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetOrdinal_ReturnsExpectedOrdinal()
     {
         // Arrange
@@ -392,10 +393,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetOrdinal(name: "ColumnName");
 
         // Assert
-        Assert.Equal(expected: 1, actual);
+        Assert.AreEqual(expected: 1, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetOrdinal_ThrowsIndexOutOfRangeException_WhenColumnNameIsInvalid()
     {
         // Arrange
@@ -409,7 +410,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetOrdinal(name: "InvalidColumn"));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSchemaTable_ReturnsExpectedSchemaTable()
     {
         // Arrange
@@ -424,10 +425,10 @@ public class EFDataReaderLoaderTests
         using var actual = loader.GetSchemaTable();
 
         // Assert
-        Assert.Equal(schemaTable, actual);
+        Assert.AreEqual(schemaTable, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSchemaTable_ReturnsNull_WhenSchemaTableIsNull()
     {
         // Arrange
@@ -441,10 +442,10 @@ public class EFDataReaderLoaderTests
         using var actual = loader.GetSchemaTable();
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetBoolean_ReturnsExpectedBooleanValue()
     {
         // Arrange
@@ -462,10 +463,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetBoolean(ordinal: 0);
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetBoolean_ThrowsInvalidCastException_WhenValueIsNotBoolean()
     {
         // Arrange
@@ -484,7 +485,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetBoolean(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetBoolean_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -498,7 +499,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetBoolean(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetByte_ReturnsExpectedByteValue()
     {
         // Arrange
@@ -516,10 +517,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetByte(ordinal: 0);
 
         // Assert
-        Assert.Equal((byte)123, actual);
+        Assert.AreEqual((byte)123, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetByte_ThrowsInvalidCastException_WhenValueIsNotByte()
     {
         // Arrange
@@ -537,7 +538,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetByte(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetByte_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -551,7 +552,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetByte(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetBytes_ReturnsZero()
     {
         // Arrange
@@ -562,10 +563,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetBytes(ordinal: 1, dataOffset: 0, buffer: null, bufferOffset: 0, length: 0);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetBytes_ReturnsZero_WhenBufferIsNotNull()
     {
         // Arrange
@@ -584,10 +585,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetBytes(ordinal: 0, dataOffset: 0, buffer, bufferOffset: 0, length: 10);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetChar_ReturnsExpectedCharValue()
     {
         // Arrange
@@ -605,10 +606,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetChar(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: 'A', actual);
+        Assert.AreEqual(expected: 'A', actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetChar_ThrowsInvalidCastException_WhenValueIsNotChar()
     {
         // Arrange
@@ -626,7 +627,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetChar(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetChar_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -640,7 +641,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetChar(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetChars_ReturnsZero_WhenBufferIsNull()
     {
         // Arrange
@@ -651,10 +652,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetChars(ordinal: 0, dataOffset: 0, buffer: null, bufferOffset: 0, length: 0);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetChars_ReturnsZero_WhenBufferIsNotNull()
     {
         // Arrange
@@ -668,10 +669,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetChars(ordinal: 1, dataOffset: 0, buffer, bufferOffset: 0, length: 10);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDateTime_ReturnsExpectedDateTimeValue()
     {
         // Arrange
@@ -689,10 +690,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetDateTime(ordinal: 0);
 
         // Assert
-        Assert.Equal(new DateTime(year: 2023, month: 10, day: 1), actual);
+        Assert.AreEqual(new DateTime(year: 2023, month: 10, day: 1), actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDateTime_ThrowsInvalidCastException_WhenValueIsNotDateTime()
     {
         // Arrange
@@ -710,7 +711,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetDateTime(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDateTime_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -724,7 +725,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetDateTime(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDecimal_ReturnsExpectedDecimalValue()
     {
         // Arrange
@@ -742,10 +743,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetDecimal(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: 123.45m, actual);
+        Assert.AreEqual(expected: 123.45m, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDecimal_ThrowsInvalidCastException_WhenValueIsNotDecimal()
     {
         // Arrange
@@ -763,7 +764,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetDecimal(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDecimal_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -777,7 +778,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetDecimal(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDouble_ReturnsExpectedDoubleValue()
     {
         // Arrange
@@ -795,10 +796,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetDouble(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: 123.45, actual);
+        Assert.AreEqual(expected: 123.45, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDouble_ThrowsInvalidCastException_WhenValueIsNotDouble()
     {
         // Arrange
@@ -816,7 +817,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetDouble(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDouble_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -830,7 +831,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetDouble(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetEnumerator_ThrowsNotSupportedException()
     {
         // Arrange
@@ -841,7 +842,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<NotSupportedException>(() => loader.GetEnumerator());
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFloat_ReturnsExpectedFloatValue()
     {
         // Arrange
@@ -859,10 +860,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetFloat(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: 123.45f, actual);
+        Assert.AreEqual(expected: 123.45f, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFloat_ThrowsInvalidCastException_WhenValueIsNotFloat()
     {
         // Arrange
@@ -880,7 +881,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetFloat(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFloat_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -894,7 +895,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetFloat(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetGuid_ReturnsExpectedGuidValue()
     {
         // Arrange
@@ -912,10 +913,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetGuid(ordinal: 0);
 
         // Assert
-        Assert.Equal(new Guid(g: "12345678-1234-1234-1234-1234567890ab"), actual);
+        Assert.AreEqual(new Guid(g: "12345678-1234-1234-1234-1234567890ab"), actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetGuid_ThrowsInvalidCastException_WhenValueIsNotGuid()
     {
         // Arrange
@@ -934,7 +935,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetGuid(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetGuid_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -948,7 +949,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetGuid(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetInt16_ReturnsExpectedInt16Value()
     {
         // Arrange
@@ -965,10 +966,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetInt16(ordinal: 0);
 
         // Act && Assert
-        Assert.Equal((short)123, actual);
+        Assert.AreEqual((short)123, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetInt16_ThrowsInvalidCastException_WhenValueIsNotInt16()
     {
         // Arrange
@@ -986,7 +987,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetInt16(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetInt16_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -1000,7 +1001,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetInt16(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetInt32_ReturnsExpectedInt32Value()
     {
         var dbReaderMock = new Mock<DbDataReader>();
@@ -1017,10 +1018,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetInt32(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: 123, actual);
+        Assert.AreEqual(expected: 123, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetInt32_ThrowsInvalidCastException_WhenValueIsNotInt32()
     {
         // Arrange
@@ -1038,7 +1039,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetInt32(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetInt32_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -1052,7 +1053,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetInt32(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetInt64_ReturnsExpectedInt64Value()
     {
         // Arrange
@@ -1070,10 +1071,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetInt64(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: 123L, actual);
+        Assert.AreEqual(expected: 123L, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetInt64_ThrowsInvalidCastException_WhenValueIsNotInt64()
     {
         // Arrange
@@ -1091,7 +1092,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetInt64(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetInt64_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -1105,7 +1106,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetInt64(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetString_ReturnsExpectedStringValue()
     {
         // Arrange
@@ -1123,10 +1124,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetString(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: "TestString", actual);
+        Assert.AreEqual(expected: "TestString", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetString_ThrowsInvalidCastException_WhenValueIsNotString()
     {
         // Arrange
@@ -1144,7 +1145,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidCastException>(() => loader.GetString(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetString_ThrowsIndexOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -1158,7 +1159,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<IndexOutOfRangeException>(() => loader.GetString(ordinal: 100));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValues_ReturnsExpectedNumberOfValues()
     {
         // Arrange
@@ -1177,10 +1178,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetValues(values);
 
         // Assert
-        Assert.Equal(expected: 3, actual);
+        Assert.AreEqual(expected: 3, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValues_CopiesValuesExpectedly()
     {
         // Arrange
@@ -1202,12 +1203,12 @@ public class EFDataReaderLoaderTests
         loader.GetValues(values);
 
         // Assert
-        Assert.Equal(expected: 1, values[0]);
-        Assert.Equal(expected: "Test", values[1]);
-        Assert.Equal(expected: true, values[2]);
+        Assert.AreEqual(expected: 1, values[0]);
+        Assert.AreEqual(expected: "Test", values[1]);
+        Assert.AreEqual(expected: true, values[2]);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValues_ThrowsArgumentNullException_WhenValuesArrayIsNull()
     {
         // Arrange
@@ -1220,7 +1221,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<ArgumentNullException>(() => loader.GetValues(null!));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValues_ThrowsArgumentException_WhenValuesArrayIsTooSmall()
     {
         // Arrange
@@ -1239,7 +1240,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<ArgumentException>(() => loader.GetValues(values));
     }
 
-    [Fact]
+    [TestMethod]
     public void NextResult_ReturnsTrue_WhenThereAreMoreResults()
     {
         // Arrange
@@ -1253,10 +1254,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.NextResult();
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void NextResult_ReturnsFalse_WhenThereAreNoMoreResults()
     {
         // Arrange
@@ -1270,10 +1271,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.NextResult();
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void NextResult_ThrowsInvalidOperationException_WhenDbReaderThrowsException()
     {
         // Arrange
@@ -1287,7 +1288,7 @@ public class EFDataReaderLoaderTests
         Assert.Throws<InvalidOperationException>(() => loader.NextResult());
     }
 
-    [Fact]
+    [TestMethod]
     public void LoadAndClose_ReturnsTableRowsWithAllData()
     {
         // Arrange
@@ -1306,11 +1307,11 @@ public class EFDataReaderLoaderTests
         var actual = loader.Load();
 
         // Assert
-        Assert.Single(actual.Rows);
-        Assert.Equal(expected: "value", actual.Rows[index: 0][ordinal: 0]);
+        Assert.AreEqual(expected: 1, actual.Rows.Count());
+        Assert.AreEqual(expected: "value", actual.Rows[index: 0][ordinal: 0]);
     }
 
-    [Fact]
+    [TestMethod]
     public void Read_ReturnsFalse_WhenNoMoreRows()
     {
         // Arrange
@@ -1326,10 +1327,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.Read();
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValue_ReturnsExpectedValue()
     {
         // Arrange
@@ -1347,10 +1348,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.GetValue(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: "value", actual);
+        Assert.AreEqual(expected: "value", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValue_ReturnsExpectedBinaryValue()
     {
         // Arrange
@@ -1379,13 +1380,13 @@ public class EFDataReaderLoaderTests
         loader.Read();
 
         // Act
-        var actual = loader.GetValue(ordinal: 0);
+        var actual = (byte[])loader.GetValue(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        CollectionAssert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsDBNull_ReturnsTrue_WhenValueIsDBNull()
     {
         // Arrange
@@ -1403,10 +1404,10 @@ public class EFDataReaderLoaderTests
         var actual = loader.IsDBNull(ordinal: 0);
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Close_ClosesDbReader()
     {
         // Arrange

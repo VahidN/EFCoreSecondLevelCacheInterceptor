@@ -5,10 +5,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+[TestClass]
 public class DbCommandInterceptorProcessorTests
 {
     private readonly Mock<IEFCacheDependenciesProcessor> _cacheDependenciesProcessorMock;
@@ -48,7 +48,7 @@ public class DbCommandInterceptorProcessorTests
             cacheSettingsMock.Object, _cacheServiceCheckMock.Object, _ignoreCachingProcessor);
     }
 
-    [Fact]
+    [TestMethod]
     public void Constructor_ThrowsArgumentNullException_WhenCacheSettingsIsNull()
     {
         // Arrange
@@ -68,7 +68,7 @@ public class DbCommandInterceptorProcessorTests
             cacheSettings: null, cacheServiceCheck, ignoreCachingProcessor));
     }
 
-    [Fact]
+    [TestMethod]
     public void Constructor_InitializesNewInstance()
     {
         // Arrange
@@ -86,10 +86,10 @@ public class DbCommandInterceptorProcessorTests
             cacheDependenciesProcessor, cacheKeyProvider, cacheSettings, cacheServiceCheck, ignoreCachingProcessor);
 
         // Assert
-        Assert.NotNull(processor);
+        Assert.IsNotNull(processor);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_ReturnsExpectedResultWithoutPrecessing_WhenDbContextIsNull()
     {
         // Arrange
@@ -101,10 +101,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands<object>(command: null, context, result: null);
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_ReturnsExpectedResultWithoutPrecessing_WhenCommandIsNull()
     {
         // Arrange
@@ -115,10 +115,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands<object>(command: null, context, result: null);
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_ThrowsInvalidOperationException_WhenNotUseDbCallsIfCachingProviderIsDown()
     {
         // Arrange
@@ -135,7 +135,7 @@ public class DbCommandInterceptorProcessorTests
         Assert.Throws<InvalidOperationException>(Act);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_NotifiesCachingErrorEvent_WhenThrowsInvalidOperationException()
     {
         // Arrange
@@ -159,7 +159,7 @@ public class DbCommandInterceptorProcessorTests
                 null, null), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_ReturnsExpectedResultWithoutPrecessing_WhenCacheServiceIsNotAvailable()
     {
         // Arrange
@@ -173,10 +173,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands(command, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void
         ProcessExecutedCommands_ReturnsExpectedResultWithoutPrecessing_WhenSkipCachingDbContextsSettingIsNotNullAndContainsType()
     {
@@ -196,10 +196,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands(command, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void
         ProcessExecutedCommands_NotifiesCachingSkippedEvent_WhenSkipCachingDbContextsSettingIsNotNullAndContainsTypeAndLoggerEnabled()
     {
@@ -225,7 +225,7 @@ public class DbCommandInterceptorProcessorTests
                 "Skipped caching of this DbContext: Castle.Proxies.DbContextProxy", string.Empty, null), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void
         ProcessExecutedCommands_ReturnsExpectedResultWithoutPrecessing_WhenShouldSkipQueriesInsideExplicitTransactionAndTransactionIsNotNull()
     {
@@ -243,10 +243,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_ReturnsExpectedResultWithoutPrecessing_WhenCachePolicyIsNull()
     {
         // Arrange
@@ -264,10 +264,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_ReturnsExpectedResultWithoutPrecessing_WhenIsCrudCommandAndCachePolicyIsNull()
     {
         // Arrange
@@ -286,10 +286,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void
         ProcessExecutedCommands_ReturnsExpectedResultWithoutPrecessing_WhenInvalidateCacheDependenciesReturnsTrue()
     {
@@ -317,10 +317,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_NotifiesCachingSkippedEvent_WhenIsCrudCommandAndCachePolicyIsNull()
     {
         // Arrange
@@ -345,7 +345,7 @@ public class DbCommandInterceptorProcessorTests
                 null), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_ReturnsCachedTableRows()
     {
         // Arrange
@@ -368,10 +368,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_NotifiesCacheHitEvent_WhenReturningCachedTableRows()
     {
         // Arrange
@@ -404,7 +404,7 @@ public class DbCommandInterceptorProcessorTests
             Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_SkipsCachingResultsIfResultIsIntType()
     {
         // Arrange
@@ -434,7 +434,7 @@ public class DbCommandInterceptorProcessorTests
             Times.Never);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_NotifiesCacheHitEvent_WhenSkipsCachingResultsIfResultIsIntType()
     {
         // Arrange
@@ -465,7 +465,7 @@ public class DbCommandInterceptorProcessorTests
                 "Skipped caching of this result based on the provided predicate.", null, null), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_AddsIntDataToCache()
     {
         // Arrange
@@ -494,7 +494,7 @@ public class DbCommandInterceptorProcessorTests
             Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_NotifiesQueryResultCachedEvent_WhenIntDataAddedToCache()
     {
         // Arrange
@@ -525,7 +525,7 @@ public class DbCommandInterceptorProcessorTests
             Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_ReturnsExpectedResult_WhenIntDataAddedToCache()
     {
         // Arrange
@@ -550,10 +550,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_ReturnsEFTableRowsDataReader_WhenSkipsCachingResultsIfResultIsDbDataReaderType()
     {
         // Arrange
@@ -577,10 +577,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, dataReaderMock.Object);
 
         // Assert
-        Assert.IsType<EFTableRowsDataReader>(actual);
+        Assert.IsInstanceOfType<EFTableRowsDataReader>(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_SkipsCachingResultsIfResultIsDbDataReaderType()
     {
         // Arrange
@@ -609,7 +609,7 @@ public class DbCommandInterceptorProcessorTests
             Times.Never);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_NotifiesCacheHitEvent_WhenSkipsCachingResultsIfDataIsEFTableRowsType()
     {
         // Arrange
@@ -639,7 +639,7 @@ public class DbCommandInterceptorProcessorTests
                 "Skipped caching of this result based on the provided predicate.", null, null), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_AddsEFTableRowsDataToCache()
     {
         // Arrange
@@ -667,7 +667,7 @@ public class DbCommandInterceptorProcessorTests
             Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_NotifiesQueryResultCachedEvent_WhenEFTableRowsDataAddedToCache()
     {
         // Arrange
@@ -698,7 +698,7 @@ public class DbCommandInterceptorProcessorTests
                 efCacheKey), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_SkipsCachingResultsIfResultIsObjectType()
     {
         // Arrange
@@ -727,7 +727,7 @@ public class DbCommandInterceptorProcessorTests
             Times.Never);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_NotifiesCacheHitEvent_WhenSkipsCachingResultsIfResultIsObjectType()
     {
         // Arrange
@@ -757,7 +757,7 @@ public class DbCommandInterceptorProcessorTests
                 "Skipped caching of this result based on the provided predicate.", null, null), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_AddsObjectDataToCache()
     {
         // Arrange
@@ -785,7 +785,7 @@ public class DbCommandInterceptorProcessorTests
             Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_NotifiesQueryResultCachedEvent_WhenObjectDataAddedToCache()
     {
         // Arrange
@@ -815,7 +815,7 @@ public class DbCommandInterceptorProcessorTests
             Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_ReturnsExpectedResult_WhenObjectDataAddedToCache()
     {
         // Arrange
@@ -839,10 +839,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutedCommands_ReturnsNull_WhenResultIsNull()
     {
         // Arrange
@@ -868,10 +868,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutedCommands(commandMock.Object, context, result);
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_ReturnsExpectedResultWithoutPrecessing_WhenDbContextIsNull()
     {
         // Arrange
@@ -883,10 +883,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands<object>(command: null, context, result: null);
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_ReturnsExpectedResultWithoutPrecessing_WhenCommandIsNull()
     {
         // Arrange
@@ -897,10 +897,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands<object>(command: null, context, result: null);
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_ThrowsInvalidOperationException_WhenNotUseDbCallsIfCachingProviderIsDown()
     {
         // Arrange
@@ -917,7 +917,7 @@ public class DbCommandInterceptorProcessorTests
         Assert.Throws<InvalidOperationException>(Act);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_NotifiesCachingErrorEvent_WhenThrowsInvalidOperationException()
     {
         // Arrange
@@ -941,7 +941,7 @@ public class DbCommandInterceptorProcessorTests
                 null, null), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_ReturnsExpectedResultWithoutPrecessing_WhenCacheServiceIsNotAvailable()
     {
         // Arrange
@@ -955,10 +955,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands(command, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void
         ProcessExecutingCommands_ReturnsExpectedResultWithoutPrecessing_WhenSkipCachingDbContextsSettingIsNotNullAndContainsType()
     {
@@ -978,10 +978,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands(command, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void
         ProcessExecutingCommands_NotifiesCachingSkippedEvent_WhenSkipCachingDbContextsSettingIsNotNullAndContainsTypeAndLoggerEnabled()
     {
@@ -1007,7 +1007,7 @@ public class DbCommandInterceptorProcessorTests
                 "Skipped caching of this DbContext: Castle.Proxies.DbContextProxy", string.Empty, null), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void
         ProcessExecutingCommands_ReturnsExpectedResultWithoutPrecessing_WhenShouldSkipQueriesInsideExplicitTransactionAndTransactionIsNotNull()
     {
@@ -1025,10 +1025,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands(commandMock.Object, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_ReturnsExpectedResultWithoutPrecessing_WhenCachePolicyIsNull()
     {
         // Arrange
@@ -1046,10 +1046,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands(commandMock.Object, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_ReturnsExpectedResultWithoutPrecessing_WhenIsCrudCommandAndCachePolicyIsNull()
     {
         // Arrange
@@ -1068,10 +1068,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands(commandMock.Object, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_NotifiesCachingSkippedEvent_WhenCachePolicyIsNull()
     {
         // Arrange
@@ -1096,7 +1096,7 @@ public class DbCommandInterceptorProcessorTests
                 null), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_ReturnsExpectedResultWithoutPrecessing_WhenCacheKeyWasNotPresentInTheCache()
     {
         // Arrange
@@ -1117,10 +1117,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands(commandMock.Object, context, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_NotifiesQueryResultSuppressedEvent_WhenThrowsInvalidOperationException()
     {
         // Arrange
@@ -1148,7 +1148,7 @@ public class DbCommandInterceptorProcessorTests
                 "Suppressed the result with an empty TableRows.", null, efCacheKey), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_ReturnsSuppressedResult()
     {
         // Arrange
@@ -1171,10 +1171,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert
-        Assert.IsType<InterceptionResult<DbDataReader>>(actual);
+        Assert.IsInstanceOfType<InterceptionResult<DbDataReader>>(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_NotifiesQueryResultSuppressedEvent_WhenCacheResultIsNutNull()
     {
         // Arrange
@@ -1211,7 +1211,7 @@ public class DbCommandInterceptorProcessorTests
                 null, efCacheKey), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_NotifiesQueryResultSuppressedEvent_WhenInterceptionResultGenericIsIntType()
     {
         // Arrange
@@ -1245,7 +1245,7 @@ public class DbCommandInterceptorProcessorTests
                 null, efCacheKey), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_ReturnsCachedResult_WhenInterceptionResultGenericIsIntType()
     {
         // Arrange
@@ -1275,10 +1275,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert
-        Assert.Equal(expected, actual.Result);
+        Assert.AreEqual(expected, actual.Result);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_NotifiesQueryResultSuppressedEvent_WhenInterceptionResultGenericIsObjectType()
     {
         // Arrange
@@ -1313,7 +1313,7 @@ public class DbCommandInterceptorProcessorTests
                 null, efCacheKey), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_ReturnsCachedResult_WhenInterceptionResultGenericIsObjectType()
     {
         // Arrange
@@ -1342,10 +1342,10 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert
-        Assert.Equal(expected, actual.Result);
+        Assert.AreEqual(expected, actual.Result);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_NotifiesCachingSkippedEvent_WhenResultIsNull()
     {
         // Arrange
@@ -1375,7 +1375,7 @@ public class DbCommandInterceptorProcessorTests
                 efCacheKey), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ProcessExecutingCommands_ReturnsNull_WhenResultIsNull()
     {
         // Arrange
@@ -1400,6 +1400,6 @@ public class DbCommandInterceptorProcessorTests
         var actual = _processor.ProcessExecutingCommands(commandMock.Object, context, result);
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 }

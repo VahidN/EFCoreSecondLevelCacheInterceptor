@@ -1,8 +1,9 @@
 using System.Globalization;
 using System.Text.Json;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 // ReSharper disable once InconsistentNaming
 public class EFTableRowsDataReaderTests
@@ -305,7 +306,7 @@ public class EFTableRowsDataReaderTests
         }
     };
 
-    [Fact]
+    [TestMethod]
     public void GetFieldCount_ReturnsExpectedFieldCount()
     {
         // Arrange
@@ -320,10 +321,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.FieldCount;
 
         // Assert
-        Assert.Equal(expected: 1, actual);
+        Assert.AreEqual(expected: 1, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetHasRows_ReturnsTrue_WhenRowsArePresent()
     {
         // Arrange
@@ -348,10 +349,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.HasRows;
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetHasRows_ReturnsFalse_WhenNoRowsArePresent()
     {
         // Arrange
@@ -362,10 +363,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.HasRows;
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetIsClosed_ReturnsTrue_WhenDataReaderIsClosed()
     {
         // Arrange
@@ -378,10 +379,10 @@ public class EFTableRowsDataReaderTests
         // Assert
         var actual = dataReader.IsClosed;
 
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetIsClosed_ReturnsFalse_WhenDataReaderIsOpen()
     {
         // Arrange
@@ -392,10 +393,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.IsClosed;
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDepth_ReturnsExpectedDepth()
     {
         // Arrange
@@ -423,10 +424,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.Depth;
 
         // Assert
-        Assert.Equal(expected: 1, actual);
+        Assert.AreEqual(expected: 1, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetRecordsAffected_ReturnsMinusOne()
     {
         // Arrange
@@ -437,10 +438,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.RecordsAffected;
 
         // Assert
-        Assert.Equal(expected: -1, actual);
+        Assert.AreEqual(expected: -1, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetTableName_ReturnsExpectedTableName()
     {
         // Arrange
@@ -455,10 +456,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.TableName;
 
         // Assert
-        Assert.Equal(expected: "TestTable", actual);
+        Assert.AreEqual(expected: "TestTable", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetTableName_ReturnsGuid()
     {
         // Arrange
@@ -469,10 +470,10 @@ public class EFTableRowsDataReaderTests
         var actual = Guid.TryParse(dataReader.TableName, out _);
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Indexer_ReturnsExpectedValue_WhenNameIsValid()
     {
         // Arrange
@@ -511,10 +512,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader[name: "test"];
 
         // Assert
-        Assert.Equal(expected: "test", actual);
+        Assert.AreEqual(expected: "test", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Indexer_ThrowsArgumentOutOfRangeException_WhenNameIsInvalid()
     {
         // Arrange
@@ -544,7 +545,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<ArgumentOutOfRangeException>(() => dataReader[name: "invalid"]);
     }
 
-    [Fact]
+    [TestMethod]
     public void Indexer_ReturnsNull_WhenValueIsNull()
     {
         // Arrange
@@ -581,10 +582,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader[name: "null"];
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void IndexerByOrdinal_ReturnsExpectedValue_WhenOrdinalIsValid()
     {
         // Arrange
@@ -613,10 +614,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader[ordinal: 1];
 
         // Assert
-        Assert.Equal(expected: "test", actual);
+        Assert.AreEqual(expected: "test", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void IndexerByOrdinal_ThrowsArgumentOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -645,7 +646,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<ArgumentOutOfRangeException>(() => dataReader[ordinal: 5]);
     }
 
-    [Fact]
+    [TestMethod]
     public void IndexerByOrdinal_ReturnsNull_WhenValueIsNull()
     {
         // Arrange
@@ -672,10 +673,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader[ordinal: 0];
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDataTypeName_ReturnsExpectedTypeName_WhenOrdinalIsValid()
     {
         // Arrange
@@ -698,10 +699,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetDataTypeName(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: "Int32", actual);
+        Assert.AreEqual(expected: "Int32", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDataTypeName_ThrowsKeyNotFoundException_WhenOrdinalNotFound()
     {
         // Arrange
@@ -712,7 +713,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<KeyNotFoundException>(() => dataReader.GetDataTypeName(ordinal: 5));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDataTypeName_ReturnsEmptyString_WhenTypeNameIsEmpty()
     {
         // Arrange
@@ -735,10 +736,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetDataTypeName(ordinal: 0);
 
         // Assert
-        Assert.Equal(string.Empty, actual);
+        Assert.AreEqual(string.Empty, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldType_ReturnsExpectedType_WhenOrdinalIsValid()
     {
         // Arrange
@@ -761,10 +762,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldType(ordinal: 0);
 
         // Assert
-        Assert.Equal(typeof(int), actual);
+        Assert.AreEqual(typeof(int), actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldType_ThrowsKeyNotFoundException_WhenOrdinalNotFound()
     {
         // Arrange
@@ -775,7 +776,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<KeyNotFoundException>(() => dataReader.GetFieldType(ordinal: 5));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldType_ReturnsNull_WhenFieldTypeIsNull()
     {
         // Arrange
@@ -798,10 +799,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldType(ordinal: 0);
 
         // Assert
-        Assert.Equal(typeof(string), actual);
+        Assert.AreEqual(typeof(string), actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetName_ReturnsExpectedName_WhenOrdinalIsValid()
     {
         // Arrange
@@ -826,10 +827,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetName(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetName_ThrowsKeyNotFoundException_WhenOrdinalNotFound()
     {
         // Arrange
@@ -840,7 +841,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<KeyNotFoundException>(() => dataReader.GetName(ordinal: 5));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetName_ReturnsEmptyString_WhenNameIsEmpty()
     {
         // Arrange
@@ -863,10 +864,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetName(ordinal: 0);
 
         // Assert
-        Assert.Equal(string.Empty, actual);
+        Assert.AreEqual(string.Empty, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSchemaTable_ThrowsInvalidOperationException()
     {
         // Arrange
@@ -880,7 +881,7 @@ public class EFTableRowsDataReaderTests
         });
     }
 
-    [Fact]
+    [TestMethod]
     public void NextResult_ReturnsFalse()
     {
         // Arrange
@@ -891,10 +892,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.NextResult();
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Close_SetsIsClosedToTrue()
     {
         // Arrange
@@ -905,10 +906,10 @@ public class EFTableRowsDataReaderTests
         dataReader.Close();
 
         // Assert
-        Assert.True(dataReader.IsClosed);
+        Assert.IsTrue(dataReader.IsClosed);
     }
 
-    [Fact]
+    [TestMethod]
     public void Read_ReturnsTrue_WhenCurrentRowIsWithinRange()
     {
         // Arrange
@@ -935,10 +936,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.Read();
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Read_ReturnsFalse_WhenCurrentRowIsOutOfRange()
     {
         // Arrange
@@ -949,10 +950,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.Read();
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void Read_UpdatesRowValues_WhenCurrentRowIsWithinRange()
     {
         // Arrange
@@ -981,19 +982,19 @@ public class EFTableRowsDataReaderTests
         // Assert
         var actual = dataReader.GetValue(ordinal: 0);
 
-        Assert.Equal(expected: 123, actual);
+        Assert.AreEqual(expected: 123, actual);
     }
 
-    [Theory]
-    [InlineData(null, false)]
-    [InlineData(1L, true)]
-    [InlineData(0L, false)]
-    [InlineData(1UL, true)]
-    [InlineData(0UL, false)]
-    [InlineData(true, true)]
-    [InlineData(false, false)]
-    [InlineData("1", true)]
-    [InlineData("0", false)]
+    [TestMethod]
+    [DataRow(null, false)]
+    [DataRow(1L, true)]
+    [DataRow(0L, false)]
+    [DataRow(1UL, true)]
+    [DataRow(0UL, false)]
+    [DataRow(true, true)]
+    [DataRow(false, false)]
+    [DataRow("1", true)]
+    [DataRow("0", false)]
     public void GetBoolean_ReturnsExpectedValue(object value, bool expected)
     {
         // Arrange
@@ -1020,11 +1021,11 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetBoolean(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Theory]
-    [MemberData(nameof(GetByteData))]
+    [TestMethod]
+    [DynamicData(nameof(GetByteData))]
     public void GetByte_ReturnsExpectedValue(object value, byte expected)
     {
         // Arrange
@@ -1051,10 +1052,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetByte(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetByte_ThrowsFormatException_WhenValueIsEmptyString()
     {
         // Arrange
@@ -1081,7 +1082,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<FormatException>(() => dataReader.GetByte(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetByte_ThrowsFormatException_WhenValueIsWhiteSpace()
     {
         // Arrange
@@ -1108,7 +1109,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<FormatException>(() => dataReader.GetByte(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetBytes_ReturnsZero_WhenBufferIsNull()
     {
         // Arrange
@@ -1119,10 +1120,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetBytes(ordinal: 0, dataOffset: 0, buffer: null, bufferOffset: 0, length: 0);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetBytes_ReturnsZero_WhenBufferIsNotNull()
     {
         // Arrange
@@ -1134,10 +1135,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetBytes(ordinal: 0, dataOffset: 0, buffer, bufferOffset: 0, buffer.Length);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetBytes_ReturnsZero_WhenDataOffsetIsNonZero()
     {
         // Arrange
@@ -1149,17 +1150,17 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetBytes(ordinal: 0, dataOffset: 5, buffer, bufferOffset: 0, buffer.Length);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Theory]
-    [InlineData(null, default(char))]
-    [InlineData("", default(char))]
-    [InlineData(" ", default(char))]
-    [InlineData("A", 'A')]
-    [InlineData("65", 'A')]
-    [InlineData(65L, 'A')]
-    [InlineData(65, 'A')]
+    [TestMethod]
+    [DataRow(null, default(char))]
+    [DataRow("", default(char))]
+    [DataRow(" ", default(char))]
+    [DataRow("A", 'A')]
+    [DataRow("65", 'A')]
+    [DataRow(65L, 'A')]
+    [DataRow(65, 'A')]
     public void GetChar_ReturnsExpectedValue(object value, char expected)
     {
         // Arrange
@@ -1186,10 +1187,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetChar(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetChars_ReturnsZero_WhenBufferIsNull()
     {
         // Arrange
@@ -1200,10 +1201,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetChars(ordinal: 0, dataOffset: 0, buffer: null, bufferOffset: 0, length: 0);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetChars_ReturnsZero_WhenBufferIsNotNull()
     {
         // Arrange
@@ -1215,10 +1216,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetChars(ordinal: 0, dataOffset: 0, buffer, bufferOffset: 0, buffer.Length);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetChars_ReturnsZero_WhenDataOffsetIsNonZero()
     {
         // Arrange
@@ -1230,10 +1231,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetChars(ordinal: 0, dataOffset: 5, buffer, bufferOffset: 0, buffer.Length);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetChars_ReturnsZero_WhenBufferOffsetIsNonZero()
     {
         // Arrange
@@ -1245,10 +1246,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetChars(ordinal: 0, dataOffset: 0, buffer, bufferOffset: 5, buffer.Length - 5);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetChars_ReturnsZero_WhenLengthIsNonZero()
     {
         // Arrange
@@ -1260,11 +1261,11 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetChars(ordinal: 0, dataOffset: 0, buffer, bufferOffset: 0, length: 5);
 
         // Assert
-        Assert.Equal(expected: 0L, actual);
+        Assert.AreEqual(expected: 0L, actual);
     }
 
-    [Theory]
-    [MemberData(nameof(GetDateTimeData))]
+    [TestMethod]
+    [DynamicData(nameof(GetDateTimeData))]
     public void GetDateTime_ReturnsExpectedValue(object value, DateTime expected)
     {
         // Arrange
@@ -1291,11 +1292,11 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetDateTime(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Theory]
-    [MemberData(nameof(GetDecimalData))]
+    [TestMethod]
+    [DynamicData(nameof(GetDecimalData))]
     public void GetDecimal_ReturnsExpectedValue(object value, decimal expected)
     {
         // Arrange
@@ -1322,11 +1323,11 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetDecimal(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Theory]
-    [MemberData(nameof(GetDoubleData))]
+    [TestMethod]
+    [DynamicData(nameof(GetDoubleData))]
     public void GetDouble_ReturnsExpectedValue(object value, double expected)
     {
         // Arrange
@@ -1353,10 +1354,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetDouble(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDouble_ThrowsFormatException_WhenValueIsEmptyString()
     {
         // Arrange
@@ -1383,7 +1384,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<FormatException>(() => dataReader.GetDouble(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDouble_ThrowsFormatException_WhenValueIsWhiteSpace()
     {
         // Arrange
@@ -1410,7 +1411,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<FormatException>(() => dataReader.GetDouble(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetEnumerator_ThrowsNotSupportedException()
     {
         // Arrange
@@ -1421,8 +1422,8 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<NotSupportedException>(() => dataReader.GetEnumerator());
     }
 
-    [Theory]
-    [MemberData(nameof(GetFloatData))]
+    [TestMethod]
+    [DynamicData(nameof(GetFloatData))]
     public void GetFloat_ReturnsExpectedValue(object value, float expected)
     {
         // Arrange
@@ -1449,10 +1450,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFloat(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFloat_ThrowsFormatException_WhenValueIsEmptyString()
     {
         // Arrange
@@ -1479,7 +1480,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<FormatException>(() => dataReader.GetFloat(ordinal: 0));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFloat_ThrowsFormatException_WhenValueIsWhiteSpace()
     {
         // Arrange
@@ -1506,8 +1507,8 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<FormatException>(() => dataReader.GetFloat(ordinal: 0));
     }
 
-    [Theory]
-    [MemberData(nameof(GetGuidData))]
+    [TestMethod]
+    [DynamicData(nameof(GetGuidData))]
     public void GetGuid_ReturnsExpectedValue(object value, Guid expected)
     {
         // Arrange
@@ -1534,10 +1535,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetGuid(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetGuid_ReturnsGuid_WhenValueIsNull()
     {
         // Arrange
@@ -1564,10 +1565,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetGuid(ordinal: 0);
 
         // Assert
-        Assert.IsType<Guid>(actual);
+        Assert.IsInstanceOfType<Guid>(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetGuid_ReturnsGuid_WhenValueIsEmptyString()
     {
         // Arrange
@@ -1594,10 +1595,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetGuid(ordinal: 0);
 
         // Assert
-        Assert.IsType<Guid>(actual);
+        Assert.IsInstanceOfType<Guid>(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetGuid_ReturnsGuid_WhenValueIsWhiteSpace()
     {
         // Arrange
@@ -1624,11 +1625,11 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetGuid(ordinal: 0);
 
         // Assert
-        Assert.IsType<Guid>(actual);
+        Assert.IsInstanceOfType<Guid>(actual);
     }
 
-    [Theory]
-    [MemberData(nameof(GetInt16Data))]
+    [TestMethod]
+    [DynamicData(nameof(GetInt16Data))]
     public void GetInt16_ReturnsExpectedValue(object value, short expected)
     {
         // Arrange
@@ -1655,11 +1656,11 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetInt16(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Theory]
-    [MemberData(nameof(GetInt32Data))]
+    [TestMethod]
+    [DynamicData(nameof(GetInt32Data))]
     public void GetInt32_ReturnsExpectedValue(object value, int expected)
     {
         // Arrange
@@ -1686,11 +1687,11 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetInt32(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Theory]
-    [MemberData(nameof(GetInt64Data))]
+    [TestMethod]
+    [DynamicData(nameof(GetInt64Data))]
     public void GetInt64_ReturnsExpectedValue(object value, long expected)
     {
         // Arrange
@@ -1717,11 +1718,11 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetInt64(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Theory]
-    [MemberData(nameof(GetStringData))]
+    [TestMethod]
+    [DynamicData(nameof(GetStringData))]
     public void GetString_ReturnsExpectedValue(object value, string expected)
     {
         // Arrange
@@ -1748,10 +1749,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetString(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetString_ReturnsExpectedValueFromInvariantDecimal()
     {
         // Arrange
@@ -1778,10 +1779,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetString(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: "123.45", actual);
+        Assert.AreEqual(expected: "123.45", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValue_ReturnsExpectedValue_WhenOrdinalIsValid()
     {
         // Arrange
@@ -1810,10 +1811,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetValue(ordinal: 1);
 
         // Assert
-        Assert.Equal(expected: "test", actual);
+        Assert.AreEqual(expected: "test", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValue_ThrowsArgumentOutOfRangeException_WhenOrdinalIsOutOfRange()
     {
         // Arrange
@@ -1842,7 +1843,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<ArgumentOutOfRangeException>(() => dataReader.GetValue(ordinal: 5));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValue_ReturnsNull_WhenValueIsNull()
     {
         // Arrange
@@ -1869,10 +1870,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetValue(ordinal: 0);
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValue_ReturnsEmptyString_WhenValueIsEmptyString()
     {
         // Arrange
@@ -1899,10 +1900,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetValue(ordinal: 0);
 
         // Assert
-        Assert.Equal(string.Empty, actual);
+        Assert.AreEqual(string.Empty, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValue_ReturnsBoolean_WhenValueIsBoolean()
     {
         // Arrange
@@ -1929,10 +1930,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetValue(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: true, actual);
+        Assert.AreEqual(expected: true, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedByteValue()
     {
         // Arrange
@@ -1961,10 +1962,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<byte>(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedBoolValue()
     {
         // Arrange
@@ -1991,10 +1992,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<bool>(ordinal: 0);
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedBoolValue_WhenNumberIsULongType()
     {
         // Arrange
@@ -2021,10 +2022,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<bool>(ordinal: 0);
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ThrowsInvalidCastException_WhenNumberIsNotULongType()
     {
         // Arrange
@@ -2054,7 +2055,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<InvalidCastException>(Act);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedBoolValueFromString()
     {
         // Arrange
@@ -2093,7 +2094,7 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<InvalidCastException>(Act);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedDateTimeOffsetValueFromDateTime()
     {
         // Arrange
@@ -2120,10 +2121,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<DateTimeOffset>(ordinal: 0);
 
         // Assert
-        Assert.Equal(DateTimeOffset.MaxValue.Date, actual.Date);
+        Assert.AreEqual(DateTimeOffset.MaxValue.Date, actual.Date);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedDateTimeOffsetValueFromString()
     {
         // Arrange
@@ -2150,10 +2151,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<DateTimeOffset>(ordinal: 0);
 
         // Assert
-        Assert.Equal(DateTimeOffset.MaxValue.Date, actual.Date);
+        Assert.AreEqual(DateTimeOffset.MaxValue.Date, actual.Date);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedTimeSpanValueFromString()
     {
         // Arrange
@@ -2180,10 +2181,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<TimeSpan>(ordinal: 0);
 
         // Assert
-        Assert.Equal(TimeSpan.MaxValue, actual);
+        Assert.AreEqual(TimeSpan.MaxValue, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedTimeSpanValueFromNumber()
     {
         // Arrange
@@ -2210,11 +2211,11 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<TimeSpan>(ordinal: 0);
 
         // Assert
-        Assert.Equal(TimeSpan.MaxValue, actual);
+        Assert.AreEqual(TimeSpan.MaxValue, actual);
     }
 
-    [Theory]
-    [MemberData(nameof(ValidNumberData))]
+    [TestMethod]
+    [DynamicData(nameof(ValidNumberData))]
     public void GetFieldValue_ShouldReturnExpectedDecimalNumber(object value)
     {
         // Arrange
@@ -2251,10 +2252,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<decimal>(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: 1M, actual);
+        Assert.AreEqual(expected: 1M, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedByteNumberFromChar()
     {
         // Arrange
@@ -2291,11 +2292,11 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<byte>(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: 49, actual);
+        Assert.AreEqual(expected: 49, actual);
     }
 
-    [Theory]
-    [MemberData(nameof(ValidNumberData))]
+    [TestMethod]
+    [DynamicData(nameof(ValidNumberData))]
     public void GetFieldValue_ShouldNotThrowInvalidCastExceptionWhenConvertToDecimal(object value)
     {
         // Arrange
@@ -2329,14 +2330,14 @@ public class EFTableRowsDataReaderTests
         dataReader.Read();
 
         // Act
-        var actual = Record.Exception(() => dataReader.GetFieldValue<decimal>(ordinal: 0));
+        var actual = AssertsExtensions.RecordException(() => dataReader.GetFieldValue<decimal>(ordinal: 0));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Theory]
-    [MemberData(nameof(InvalidNumberData))]
+    [TestMethod]
+    [DynamicData(nameof(InvalidNumberData))]
     public void GetFieldValue_ThrowsInvalidCastException_WhenValueIsNotNumber(object value)
     {
         // Arrange
@@ -2376,9 +2377,9 @@ public class EFTableRowsDataReaderTests
         Assert.Throws<InvalidCastException>(Act);
     }
 
-    [Theory]
-    [InlineData(true, 1)]
-    [InlineData(false, 0)]
+    [TestMethod]
+    [DataRow(true, 1)]
+    [DataRow(false, 0)]
     public void GetFieldValue_ShouldReturnExpectedNumberValueFromBool(bool value, int expected)
     {
         // Arrange
@@ -2405,10 +2406,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<int>(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedArray()
     {
         // Arrange
@@ -2438,13 +2439,13 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<int[]>(ordinal: 0);
 
         // Assert
-        Assert.Equal(new[]
+        CollectionAssert.AreEqual(new[]
         {
             1, 2, 3
         }, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedList()
     {
         // Arrange
@@ -2474,7 +2475,7 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<List<int>>(ordinal: 0);
 
         // Assert
-        Assert.Equal(new List<int>
+        CollectionAssert.AreEqual(new List<int>
         {
             1,
             2,
@@ -2482,7 +2483,7 @@ public class EFTableRowsDataReaderTests
         }, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedObject()
     {
         // Arrange
@@ -2519,10 +2520,10 @@ public class EFTableRowsDataReaderTests
         var actual = JsonSerializer.Serialize(dataReader.GetFieldValue<object>(ordinal: 0));
 
         // Assert
-        Assert.Equal(expected: "{}", actual);
+        Assert.AreEqual(expected: "{}", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedDateOnlyValueFromDateTime()
     {
         // Arrange
@@ -2559,10 +2560,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<DateOnly>(ordinal: 0);
 
         // Assert
-        Assert.Equal(DateOnly.MaxValue, actual);
+        Assert.AreEqual(DateOnly.MaxValue, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedDateOnlyValueFromString()
     {
         // Arrange
@@ -2599,10 +2600,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<DateOnly>(ordinal: 0);
 
         // Assert
-        Assert.Equal(DateOnly.MaxValue, actual);
+        Assert.AreEqual(DateOnly.MaxValue, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldNotThrowInvalidCastExceptionWhenValueConversionFromStringToDateOnly()
     {
         // Arrange
@@ -2636,13 +2637,13 @@ public class EFTableRowsDataReaderTests
         dataReader.Read();
 
         // Act
-        var actual = Record.Exception(() => dataReader.GetFieldValue<DateOnly>(ordinal: 0));
+        var actual = AssertsExtensions.RecordException(() => dataReader.GetFieldValue<DateOnly>(ordinal: 0));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedTimeOnlyValueFromTimeSpan()
     {
         // Arrange
@@ -2679,10 +2680,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<TimeOnly>(ordinal: 0);
 
         // Assert
-        Assert.Equal(TimeOnly.MaxValue, actual);
+        Assert.AreEqual(TimeOnly.MaxValue, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedTimeOnlyValueFromNumber()
     {
         // Arrange
@@ -2719,10 +2720,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<TimeOnly>(ordinal: 0);
 
         // Assert
-        Assert.Equal(TimeOnly.MaxValue, actual);
+        Assert.AreEqual(TimeOnly.MaxValue, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldReturnExpectedTimeOnlyValueFromString()
     {
         // Arrange
@@ -2759,10 +2760,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetFieldValue<TimeOnly>(ordinal: 0);
 
         // Assert
-        Assert.Equal(TimeOnly.MaxValue, actual);
+        Assert.AreEqual(TimeOnly.MaxValue, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldValue_ShouldNotThrowInvalidCastExceptionWhenValueConversionFromStringToTimeOnly()
     {
         // Arrange
@@ -2796,13 +2797,13 @@ public class EFTableRowsDataReaderTests
         dataReader.Read();
 
         // Act
-        var actual = Record.Exception(() => dataReader.GetFieldValue<TimeOnly>(ordinal: 0));
+        var actual = AssertsExtensions.RecordException(() => dataReader.GetFieldValue<TimeOnly>(ordinal: 0));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValues_CopiesRowValuesToArray()
     {
         // Arrange
@@ -2833,10 +2834,10 @@ public class EFTableRowsDataReaderTests
         dataReader.GetValues(actual);
 
         // Assert
-        Assert.Equal(expected, actual);
+        CollectionAssert.AreEqual(expected.ToArray(), actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValues_ReturnsRowValuesCount()
     {
         // Arrange
@@ -2865,10 +2866,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.GetValues(new object[values.Count]);
 
         // Assert
-        Assert.Equal(values.Count, actual);
+        Assert.AreEqual(values.Count, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValues_CopiesEmptyRowValuesToArray()
     {
         // Arrange
@@ -2883,10 +2884,10 @@ public class EFTableRowsDataReaderTests
         dataReader.GetValues(actual);
 
         // Assert
-        Assert.Empty(actual);
+        Assert.IsEmpty(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValues_CopiesPartialRowValuesToArray()
     {
         // Arrange
@@ -2917,10 +2918,10 @@ public class EFTableRowsDataReaderTests
         dataReader.GetValues(actual);
 
         // Assert
-        Assert.Equal(actual.Take(values.Count), values);
+        CollectionAssert.AreEqual(actual.Take(values.Count).ToList(), values);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsDBNull_ReturnsTrue_WhenValueIsNull()
     {
         // Arrange
@@ -2947,10 +2948,10 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.IsDBNull(ordinal: 0);
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsDBNull_ReturnsFalse_WhenValueIsNotNull()
     {
         // Arrange
@@ -2979,6 +2980,6 @@ public class EFTableRowsDataReaderTests
         var actual = dataReader.IsDBNull(ordinal: 0);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 }

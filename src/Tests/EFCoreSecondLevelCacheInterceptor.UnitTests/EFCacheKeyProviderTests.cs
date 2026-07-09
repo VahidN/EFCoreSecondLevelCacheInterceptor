@@ -6,9 +6,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 // ReSharper disable once InconsistentNaming
 public class EFCacheKeyProviderTests
@@ -38,7 +39,7 @@ public class EFCacheKeyProviderTests
             _cacheKeyPrefixProviderMock.Object, cacheSettingsMock.Object);
     }
 
-    [Fact]
+    [TestMethod]
     public void EFCacheKeyProvider_ThrowsArgumentNullException_WhenHashProviderIsNull()
     {
         // Arrange
@@ -63,7 +64,7 @@ public class EFCacheKeyProviderTests
         ));
     }
 
-    [Fact]
+    [TestMethod]
     public void EFCacheKeyProvider_ThrowsArgumentNullException_WhenCacheSettingsIsNull()
     {
         // Arrange
@@ -85,7 +86,7 @@ public class EFCacheKeyProviderTests
 #endif
     }
 
-    [Fact]
+    [TestMethod]
     public void EFCacheKeyProvider_CreatesInstanceSuccessfully()
     {
         // Arrange
@@ -109,10 +110,10 @@ public class EFCacheKeyProviderTests
         );
 
         // Assert
-        Assert.NotNull(provider);
+        Assert.IsNotNull(provider);
     }
 
-    [Fact]
+    [TestMethod]
     [SuppressMessage(category: "ReSharper", checkId: "AssignNullToNotNullAttribute")]
     public void GetEFCacheKey_ThrowsArgumentNullException_WhenContextIsNull()
     {
@@ -125,10 +126,10 @@ public class EFCacheKeyProviderTests
         void Act() => _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
 
         // Assert
-        Assert.Throws<ArgumentNullException>(paramName: "context", Act);
+        Assert.Throws<ArgumentNullException>(Act, message: "context");
     }
 
-    [Fact]
+    [TestMethod]
     [SuppressMessage(category: "ReSharper", checkId: "AssignNullToNotNullAttribute")]
     public void GetEFCacheKey_ThrowsArgumentNullException_WhenCommandIsNull()
     {
@@ -141,10 +142,10 @@ public class EFCacheKeyProviderTests
         void Act() => _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
 
         // Assert
-        Assert.Throws<ArgumentNullException>(paramName: "command", Act);
+        Assert.Throws<ArgumentNullException>(Act, message: "command");
     }
 
-    [Fact]
+    [TestMethod]
     public void GetEFCacheKey_ThrowsArgumentNullException_WhenCachePolicyIsNull()
     {
         // Arrange
@@ -157,10 +158,10 @@ public class EFCacheKeyProviderTests
         void Act() => _cacheKeyProvider.GetEFCacheKey(command, context, cachePolicy);
 
         // Assert
-        Assert.Throws<ArgumentNullException>(paramName: "cachePolicy", Act);
+        Assert.Throws<ArgumentNullException>(Act, message: "cachePolicy");
     }
 
-    [Fact]
+    [TestMethod]
     public void GetEFCacheKey_ReturnsExpectedCacheKey()
     {
         // Arrange
@@ -210,10 +211,10 @@ public class EFCacheKeyProviderTests
         var actual = _cacheKeyProvider.GetEFCacheKey(commandMock.Object, context, cachePolicy);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetEFCacheKey_ReturnsExpectedCacheKeyWithPrefix()
     {
         // Arrange
@@ -265,6 +266,6 @@ public class EFCacheKeyProviderTests
         var actual = _cacheKeyProvider.GetEFCacheKey(commandMock.Object, context, cachePolicy);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 }

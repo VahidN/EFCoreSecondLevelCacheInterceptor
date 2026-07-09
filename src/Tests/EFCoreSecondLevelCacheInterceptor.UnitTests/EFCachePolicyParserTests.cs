@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+[TestClass]
 public class EFCachePolicyParserTests
 {
     private readonly IEFCachePolicyParser _efCachePolicyParser;
@@ -27,7 +27,7 @@ public class EFCachePolicyParserTests
             cachePolicyParserLogger);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetEFCachePolicyWith2Parts()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
@@ -40,11 +40,11 @@ public class EFCachePolicyParserTests
 
         var (cachePolicy, _) = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
 
-        Assert.Equal(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
-        Assert.Equal(TimeSpan.FromMinutes(value: 45), cachePolicy.CacheTimeout);
+        Assert.AreEqual(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
+        Assert.AreEqual(TimeSpan.FromMinutes(value: 45), cachePolicy.CacheTimeout);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetEFCachePolicyWithNullTimeoutParts()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> NeverRemove|
@@ -57,11 +57,11 @@ public class EFCachePolicyParserTests
 
         var (cachePolicy, _) = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
 
-        Assert.Equal(CacheExpirationMode.NeverRemove, cachePolicy.CacheExpirationMode);
-        Assert.Null(cachePolicy.CacheTimeout);
+        Assert.AreEqual(CacheExpirationMode.NeverRemove, cachePolicy.CacheExpirationMode);
+        Assert.IsNull(cachePolicy.CacheTimeout);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetEFCachePolicyWithAdditionalTagComments()
     {
         const string commandText = @"-- CustomTagAbove
@@ -78,11 +78,11 @@ ORDER BY [p].[Id]";
 
         var (cachePolicy, _) = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
 
-        Assert.Equal(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
-        Assert.Equal(TimeSpan.FromMinutes(value: 45), cachePolicy.CacheTimeout);
+        Assert.AreEqual(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
+        Assert.AreEqual(TimeSpan.FromMinutes(value: 45), cachePolicy.CacheTimeout);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetEFCachePolicyWithAllParts()
     {
         var commandText = "-- " + EFCachePolicy.Configure(options
@@ -93,19 +93,19 @@ ORDER BY [p].[Id]";
 
         var (cachePolicy, _) = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
 
-        Assert.NotNull(cachePolicy);
-        Assert.Equal(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
-        Assert.Equal(TimeSpan.FromMinutes(value: 45), cachePolicy.CacheTimeout);
-        Assert.Equal(expected: "saltKey", cachePolicy.CacheSaltKey);
+        Assert.IsNotNull(cachePolicy);
+        Assert.AreEqual(CacheExpirationMode.Absolute, cachePolicy.CacheExpirationMode);
+        Assert.AreEqual(TimeSpan.FromMinutes(value: 45), cachePolicy.CacheTimeout);
+        Assert.AreEqual(expected: "saltKey", cachePolicy.CacheSaltKey);
 
-        Assert.Equal(new SortedSet<string>
+        CollectionAssert.AreEqual(new SortedSet<string>
         {
             "item 1",
             "item 2"
         }, cachePolicy.CacheItemsDependencies as SortedSet<string>);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetEFCachePolicyWithNullParts()
     {
         var commandText = "-- " + EFCachePolicy.Configure(options
@@ -116,19 +116,19 @@ ORDER BY [p].[Id]";
 
         var (cachePolicy, _) = _efCachePolicyParser.GetEFCachePolicy(commandText, allEntityTypes: null);
 
-        Assert.NotNull(cachePolicy);
-        Assert.Equal(CacheExpirationMode.NeverRemove, cachePolicy.CacheExpirationMode);
-        Assert.Null(cachePolicy.CacheTimeout);
-        Assert.Equal(expected: "saltKey", cachePolicy.CacheSaltKey);
+        Assert.IsNotNull(cachePolicy);
+        Assert.AreEqual(CacheExpirationMode.NeverRemove, cachePolicy.CacheExpirationMode);
+        Assert.IsNull(cachePolicy.CacheTimeout);
+        Assert.AreEqual(expected: "saltKey", cachePolicy.CacheSaltKey);
 
-        Assert.Equal(new SortedSet<string>
+        CollectionAssert.AreEqual(new SortedSet<string>
         {
             "item 1",
             "item 2"
         }, cachePolicy.CacheItemsDependencies as SortedSet<string>);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestRemoveEFCachePolicyTagWithAdditionalTagComments()
     {
         const string commandText = @"-- CustomTagAbove
@@ -155,6 +155,6 @@ INNER JOIN [Users] AS [u] ON [p].[UserId] = [u].[Id]
 WHERE [p].[post_type] IN (N'post_base', N'post_page') AND ([p].[Id] > @__param1_0)
 ORDER BY [p].[Id]";
 
-        Assert.Equal(expectedResult, commandTextWithCachePolicyTagRemoved);
+        Assert.AreEqual(expectedResult, commandTextWithCachePolicyTagRemoved);
     }
 }

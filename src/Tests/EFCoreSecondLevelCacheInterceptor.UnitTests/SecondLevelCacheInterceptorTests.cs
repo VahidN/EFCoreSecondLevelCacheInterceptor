@@ -3,14 +3,14 @@ using System.Diagnostics.CodeAnalysis;
 using AsyncKeyedLock;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+[TestClass]
 [SuppressMessage(category: "ReSharper", checkId: "AssignNullToNotNullAttribute")]
 public class SecondLevelCacheInterceptorTests
 {
-    [Fact]
+    [TestMethod]
     public void Constructor_InitializesFields_WhenArgumentsAreValid()
     {
         var processorMock = new Mock<IDbCommandInterceptorProcessor>();
@@ -18,10 +18,10 @@ public class SecondLevelCacheInterceptorTests
 
         var interceptor = new SecondLevelCacheInterceptor(processorMock.Object, lockProviderMock.Object);
 
-        Assert.NotNull(interceptor);
+        Assert.IsNotNull(interceptor);
     }
 
-    [Fact]
+    [TestMethod]
     public void Constructor_ThrowsArgumentNullException_WhenProcessorIsNull()
     {
         var lockProviderMock = new Mock<ILockProvider>();
@@ -30,7 +30,7 @@ public class SecondLevelCacheInterceptorTests
             => new SecondLevelCacheInterceptor(processor: null, lockProviderMock.Object));
     }
 
-    [Fact]
+    [TestMethod]
     public void Constructor_ThrowsArgumentNullException_WhenLockProviderIsNull()
     {
         var processorMock = new Mock<IDbCommandInterceptorProcessor>();
@@ -39,7 +39,7 @@ public class SecondLevelCacheInterceptorTests
             => new SecondLevelCacheInterceptor(processorMock.Object, lockProvider: null));
     }
 
-    [Fact]
+    [TestMethod]
     public void NonQueryExecuted_ShouldLock()
     {
         // Arrange
@@ -69,7 +69,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void NonQueryExecuted_ReturnsProcessedResult()
     {
         // Arrange
@@ -96,10 +96,10 @@ public class SecondLevelCacheInterceptorTests
         var actual = interceptor.NonQueryExecuted(command, eventData, result);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void NonQueryExecuted_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -123,13 +123,15 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() => interceptor.NonQueryExecuted(command: null, eventData: null, result));
+        var actual =
+            AssertsExtensions.RecordException(()
+                => interceptor.NonQueryExecuted(command: null, eventData: null, result));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task NonQueryExecutedAsync_ShouldLock()
     {
         // Arrange
@@ -162,7 +164,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task NonQueryExecutedAsync_ReturnsProcessedResult()
     {
         // Arrange
@@ -189,10 +191,10 @@ public class SecondLevelCacheInterceptorTests
         var actual = await interceptor.NonQueryExecutedAsync(command, eventData, result);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task NonQueryExecutedAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -216,14 +218,14 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record.ExceptionAsync(async ()
+        var actual = await AssertsExtensions.RecordExceptionAsync(async ()
             => await interceptor.NonQueryExecutedAsync(command: null, eventData: null, result));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void NonQueryExecuting_ShouldLock()
     {
         // Arrange
@@ -253,7 +255,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void NonQueryExecuting_ReturnsExpectedInterceptionResult()
     {
         // Arrange
@@ -280,10 +282,10 @@ public class SecondLevelCacheInterceptorTests
         var actual = interceptor.NonQueryExecuting(command, eventData, result);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void NonQueryExecuting_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -307,13 +309,15 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() => interceptor.NonQueryExecuting(command: null, eventData: null, result));
+        var actual =
+            AssertsExtensions.RecordException(()
+                => interceptor.NonQueryExecuting(command: null, eventData: null, result));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task NonQueryExecutingAsync_ShouldLock()
     {
         // Arrange
@@ -346,7 +350,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task NonQueryExecutingAsync_ReturnsExpectedInterceptionResult()
     {
         // Arrange
@@ -373,10 +377,10 @@ public class SecondLevelCacheInterceptorTests
         var actual = await interceptor.NonQueryExecutingAsync(command, eventData, result);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task NonQueryExecutingAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -400,14 +404,14 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record.ExceptionAsync(async ()
+        var actual = await AssertsExtensions.RecordExceptionAsync(async ()
             => await interceptor.NonQueryExecutingAsync(command: null, eventData: null, result));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ReaderExecuted_ShouldLock()
     {
         // Arrange
@@ -435,7 +439,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ReaderExecuted_ReturnsExpectedDbDataReader()
     {
         // Arrange
@@ -460,10 +464,10 @@ public class SecondLevelCacheInterceptorTests
         using var actual = interceptor.ReaderExecuted(command, eventData, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ReaderExecuted_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -485,16 +489,16 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() =>
+        var actual = AssertsExtensions.RecordException(() =>
         {
             using var data = interceptor.ReaderExecuted(command: null, eventData: null, expected);
         });
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ReaderExecutedAsync_ShouldLock()
     {
         // Arrange
@@ -525,7 +529,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ReaderExecutedAsync_ReturnsExpectedDbDataReader()
     {
         // Arrange
@@ -550,10 +554,10 @@ public class SecondLevelCacheInterceptorTests
         var actual = await interceptor.ReaderExecutedAsync(command, eventData, expected);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ReaderExecutedAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -575,14 +579,14 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record.ExceptionAsync(async ()
+        var actual = await AssertsExtensions.RecordExceptionAsync(async ()
             => await interceptor.ReaderExecutedAsync(command: null, eventData: null, expected));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ReaderExecuting_ShouldLock()
     {
         // Arrange
@@ -613,7 +617,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ReaderExecuting_ReturnsExpectedInterceptionResult()
     {
         // Arrange
@@ -641,10 +645,10 @@ public class SecondLevelCacheInterceptorTests
         var actual = interceptor.ReaderExecuting(command, eventData, result);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ReaderExecuting_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -669,13 +673,15 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() => interceptor.ReaderExecuting(command: null, eventData: null, result));
+        var actual =
+            AssertsExtensions.RecordException(()
+                => interceptor.ReaderExecuting(command: null, eventData: null, result));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ReaderExecutingAsync_ShouldLock()
     {
         // Arrange
@@ -709,7 +715,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ReaderExecutingAsync_ReturnsExpectedInterceptionResult()
     {
         // Arrange
@@ -737,10 +743,10 @@ public class SecondLevelCacheInterceptorTests
         var actual = await interceptor.ReaderExecutingAsync(command, eventData, result);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ReaderExecutingAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -765,14 +771,14 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record.ExceptionAsync(async ()
+        var actual = await AssertsExtensions.RecordExceptionAsync(async ()
             => await interceptor.ReaderExecutingAsync(command: null, eventData: null, result));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ScalarExecuted_ShouldLock()
     {
         // Arrange
@@ -802,7 +808,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ScalarExecuted_ReturnsProcessedResult()
     {
         // Arrange
@@ -829,10 +835,10 @@ public class SecondLevelCacheInterceptorTests
         var actual = interceptor.ScalarExecuted(command, eventData, result);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ScalarExecuted_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -856,13 +862,14 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() => interceptor.ScalarExecuted(command: null, eventData: null, result));
+        var actual =
+            AssertsExtensions.RecordException(() => interceptor.ScalarExecuted(command: null, eventData: null, result));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ScalarExecutedAsync_ShouldLock()
     {
         // Arrange
@@ -895,7 +902,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ScalarExecutedAsync_ReturnsProcessedResult()
     {
         // Arrange
@@ -922,10 +929,10 @@ public class SecondLevelCacheInterceptorTests
         var actual = await interceptor.ScalarExecutedAsync(command, eventData, result);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ScalarExecutedAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -949,14 +956,14 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record.ExceptionAsync(async ()
+        var actual = await AssertsExtensions.RecordExceptionAsync(async ()
             => await interceptor.ScalarExecutedAsync(command: null, eventData: null, result));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ScalarExecuting_ShouldLock()
     {
         // Arrange
@@ -986,7 +993,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void ScalarExecuting_ReturnsExpectedInterceptionResult()
     {
         // Arrange
@@ -1013,10 +1020,10 @@ public class SecondLevelCacheInterceptorTests
         var actual = interceptor.ScalarExecuting(command, eventData, result);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ScalarExecuting_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -1040,13 +1047,15 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = Record.Exception(() => interceptor.ScalarExecuting(command: null, eventData: null, result));
+        var actual =
+            AssertsExtensions.RecordException(()
+                => interceptor.ScalarExecuting(command: null, eventData: null, result));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ScalarExecutingAsync_ShouldLock()
     {
         // Arrange
@@ -1079,7 +1088,7 @@ public class SecondLevelCacheInterceptorTests
         lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ScalarExecutingAsync_ReturnsExpectedInterceptionResult()
     {
         // Arrange
@@ -1106,10 +1115,10 @@ public class SecondLevelCacheInterceptorTests
         var actual = await interceptor.ScalarExecutingAsync(command, eventData, result);
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task ScalarExecutingAsync_ShouldNotThrowArgumentNullException_WhenAnyParameterIsNull()
     {
         // Arrange
@@ -1133,10 +1142,10 @@ public class SecondLevelCacheInterceptorTests
         var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
 
         // Act
-        var actual = await Record.ExceptionAsync(async ()
+        var actual = await AssertsExtensions.RecordExceptionAsync(async ()
             => await interceptor.ScalarExecutingAsync(command: null, eventData: null, result));
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 }

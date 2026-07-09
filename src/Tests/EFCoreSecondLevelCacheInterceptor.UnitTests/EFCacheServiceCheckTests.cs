@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 // ReSharper disable once InconsistentNaming
 public class EFCacheServiceCheckTests
@@ -27,7 +28,7 @@ public class EFCacheServiceCheckTests
             loggerMock.Object, cacheServiceCheckLoggerMock.Object);
     }
 
-    [Fact]
+    [TestMethod]
     public void EFCacheServiceCheck_ThrowsArgumentNullException_WhenCacheSettingsIsNull()
     {
         // Arrange
@@ -39,7 +40,7 @@ public class EFCacheServiceCheckTests
             cacheServiceProviderMock.Object, logger: null, cacheServiceCheckLogger: null));
     }
 
-    [Fact]
+    [TestMethod]
     public void EFCacheServiceCheck_CreatesInstanceSuccessfully()
     {
         // Arrange
@@ -54,10 +55,10 @@ public class EFCacheServiceCheckTests
             logger: null, cacheServiceCheckLogger: null);
 
         // Assert
-        Assert.NotNull(serviceCheck);
+        Assert.IsNotNull(serviceCheck);
     }
 
-    [Fact]
+    [TestMethod]
     public void EFCacheServiceCheck_ShouldNotThrowArgumentNullException_WhenCacheServiceProviderIsNull()
     {
         // Arrange
@@ -72,13 +73,13 @@ public class EFCacheServiceCheckTests
                 cacheServiceCheckLogger: null);
 
         // Act
-        var actual = Record.Exception(Act);
+        var actual = AssertsExtensions.RecordException(Act);
 
         // Assert
-        Assert.Null(actual);
+        Assert.IsNull(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsCacheServiceAvailable_ReturnsFalse_WhenIsCachingInterceptorEnabledIsFalse()
     {
         // Arrange
@@ -88,10 +89,10 @@ public class EFCacheServiceCheckTests
         var result = _serviceCheck.IsCacheServiceAvailable();
 
         // Assert
-        Assert.False(result);
+        Assert.IsTrue(!result);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsCacheServiceAvailable_ReturnsTrue_WhenUseDbCallsIfCachingProviderIsDownIsFalse()
     {
         // Arrange
@@ -102,10 +103,10 @@ public class EFCacheServiceCheckTests
         var result = _serviceCheck.IsCacheServiceAvailable();
 
         // Assert
-        Assert.True(result);
+        Assert.IsTrue(result);
     }
 
-    [Fact]
+    [TestMethod]
     public void
         IsCacheServiceAvailable_ReturnsTrue_WhenUseDbCallsIfCachingProviderIsDownIsTrue_And_CacheServerIsAvailable()
     {
@@ -120,10 +121,10 @@ public class EFCacheServiceCheckTests
         var result = _serviceCheck.IsCacheServiceAvailable();
 
         // Assert
-        Assert.True(result);
+        Assert.IsTrue(result);
     }
 
-    [Fact]
+    [TestMethod]
     public void
         IsCacheServiceAvailable_DoesNotThrowsInvalidOperationException_WhenUseDbCallsIfCachingProviderIsDownIsTrue_And_CacheServerIsNotAvailable()
     {
@@ -138,10 +139,10 @@ public class EFCacheServiceCheckTests
         var result = _serviceCheck.IsCacheServiceAvailable();
 
         // Assert
-        Assert.False(result);
+        Assert.IsTrue(!result);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsCacheServiceAvailable_ReturnsTrue_WhenNotEnoughTimeHasPassedSinceTheLastCheck()
     {
         // Arrange
@@ -158,6 +159,6 @@ public class EFCacheServiceCheckTests
         var result = _serviceCheck.IsCacheServiceAvailable();
 
         // Assert
-        Assert.True(result);
+        Assert.IsTrue(result);
     }
 }

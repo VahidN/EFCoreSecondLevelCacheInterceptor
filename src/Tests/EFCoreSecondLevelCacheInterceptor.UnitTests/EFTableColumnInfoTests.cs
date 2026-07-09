@@ -1,11 +1,11 @@
-using Assert = Xunit.Assert;
-
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 // ReSharper disable once InconsistentNaming
 public class EFTableColumnInfoTests
 {
-    [Fact]
+    [TestMethod]
     public void ToString_ReturnsFormattedString_WithValidProperties()
     {
         // Arrange
@@ -21,10 +21,10 @@ public class EFTableColumnInfoTests
         var actual = columnInfo.ToString();
 
         // Assert
-        Assert.Equal(expected: "Ordinal: 1, Name: ColumnName, DbTypeName: DbType, TypeName= Type.", actual);
+        Assert.AreEqual(expected: "Ordinal: 1, Name: ColumnName, DbTypeName: DbType, TypeName= Type.", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ToString_ReturnsFormattedString_WithDefaultProperties()
     {
         // Arrange
@@ -34,6 +34,6 @@ public class EFTableColumnInfoTests
         var actual = columnInfo.ToString();
 
         // Assert
-        Assert.Equal(expected: "Ordinal: 0, Name: , DbTypeName: , TypeName= .", actual);
+        Assert.AreEqual(expected: "Ordinal: 0, Name: , DbTypeName: , TypeName= .", actual);
     }
 }

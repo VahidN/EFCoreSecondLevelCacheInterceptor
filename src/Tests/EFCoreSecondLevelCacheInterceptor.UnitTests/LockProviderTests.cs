@@ -1,10 +1,9 @@
-using Assert = Xunit.Assert;
-
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+[TestClass]
 public class LockProviderTests
 {
-    [Fact]
+    [TestMethod]
     public void Lock_ReturnsNonNullReleaser()
     {
         // Arrange
@@ -14,10 +13,10 @@ public class LockProviderTests
         using var releaser = lockProvider.Lock();
 
         // Assert
-        Assert.IsAssignableFrom<IDisposable>(releaser);
+        Assert.IsInstanceOfType<IDisposable>(releaser);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task LockAsync_ReturnsNonNullReleaser()
     {
         // Arrange
@@ -27,10 +26,10 @@ public class LockProviderTests
         var releaser = await lockProvider.LockAsync();
 
         // Assert
-        Assert.IsAssignableFrom<IDisposable>(releaser);
+        Assert.IsInstanceOfType<IDisposable>(releaser);
     }
 
-    [Fact]
+    [TestMethod]
     public void Lock_CanBeDisposed()
     {
         // Arrange
@@ -41,10 +40,10 @@ public class LockProviderTests
         releaser?.Dispose();
 
         // Assert
-        Assert.True(condition: true); // If no exception is thrown, the test passes
+        // If no exception is thrown, the test passes
     }
 
-    [Fact]
+    [TestMethod]
     public async Task LockAsync_CanBeDisposed()
     {
         // Arrange
@@ -55,16 +54,16 @@ public class LockProviderTests
         releaser?.Dispose();
 
         // Assert
-        Assert.True(condition: true); // If no exception is thrown, the test passes
+        // If no exception is thrown, the test passes
     }
 
-    [Fact]
+    [TestMethod]
     public void Dispose_DisposesLockProvider()
     {
         using (var lockProvider = new LockProvider())
         {
             // Assert
-            Assert.True(condition: true); // If no exception is thrown, the test passes
+            // If no exception is thrown, the test passes
         }
     }
 }

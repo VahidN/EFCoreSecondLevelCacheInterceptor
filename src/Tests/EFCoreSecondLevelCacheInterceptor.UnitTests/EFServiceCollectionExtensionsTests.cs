@@ -1,14 +1,15 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 // ReSharper disable once InconsistentNaming
 public class EFServiceCollectionExtensionsTests
 {
-    [Fact]
+    [TestMethod]
     public void AddEFSecondLevelCache_ThrowsArgumentNullException_WhenOptionsIsNull()
     {
         // Arrange
@@ -18,7 +19,7 @@ public class EFServiceCollectionExtensionsTests
         Assert.Throws<ArgumentNullException>(() => services.AddEFSecondLevelCache(null!));
     }
 
-    [Fact]
+    [TestMethod]
     public void AddEFSecondLevelCache_RegistersRequiredServices()
     {
         // Arrange
@@ -31,20 +32,20 @@ public class EFServiceCollectionExtensionsTests
         // Assert
         using var serviceProvider = services.BuildServiceProvider();
 
-        Assert.NotNull(serviceProvider.GetService<IEFDebugLogger>());
-        Assert.NotNull(serviceProvider.GetService<IEFCacheServiceCheck>());
-        Assert.NotNull(serviceProvider.GetService<IEFCacheKeyPrefixProvider>());
-        Assert.NotNull(serviceProvider.GetService<IEFCacheKeyProvider>());
-        Assert.NotNull(serviceProvider.GetService<IEFCachePolicyParser>());
-        Assert.NotNull(serviceProvider.GetService<IEFSqlCommandsProcessor>());
-        Assert.NotNull(serviceProvider.GetService<IEFCacheDependenciesProcessor>());
-        Assert.NotNull(serviceProvider.GetService<ILockProvider>());
-        Assert.NotNull(serviceProvider.GetService<IMemoryCacheChangeTokenProvider>());
-        Assert.NotNull(serviceProvider.GetService<IDbCommandInterceptorProcessor>());
-        Assert.NotNull(serviceProvider.GetService<SecondLevelCacheInterceptor>());
+        Assert.IsNotNull(serviceProvider.GetService<IEFDebugLogger>());
+        Assert.IsNotNull(serviceProvider.GetService<IEFCacheServiceCheck>());
+        Assert.IsNotNull(serviceProvider.GetService<IEFCacheKeyPrefixProvider>());
+        Assert.IsNotNull(serviceProvider.GetService<IEFCacheKeyProvider>());
+        Assert.IsNotNull(serviceProvider.GetService<IEFCachePolicyParser>());
+        Assert.IsNotNull(serviceProvider.GetService<IEFSqlCommandsProcessor>());
+        Assert.IsNotNull(serviceProvider.GetService<IEFCacheDependenciesProcessor>());
+        Assert.IsNotNull(serviceProvider.GetService<ILockProvider>());
+        Assert.IsNotNull(serviceProvider.GetService<IMemoryCacheChangeTokenProvider>());
+        Assert.IsNotNull(serviceProvider.GetService<IDbCommandInterceptorProcessor>());
+        Assert.IsNotNull(serviceProvider.GetService<SecondLevelCacheInterceptor>());
     }
 
-    [Fact]
+    [TestMethod]
     public void AddEFSecondLevelCache_RegistersDefaultHashProvider_WhenHashProviderIsNull()
     {
         // Arrange
@@ -60,10 +61,10 @@ public class EFServiceCollectionExtensionsTests
         // Assert
         using var serviceProvider = services.BuildServiceProvider();
 
-        Assert.IsType<XxHash64Unsafe>(serviceProvider.GetService<IEFHashProvider>());
+        Assert.IsInstanceOfType<XxHash64Unsafe>(serviceProvider.GetService<IEFHashProvider>());
     }
 
-    [Fact]
+    [TestMethod]
     public void AddEFSecondLevelCache_RegistersCustomHashProvider_WhenHashProviderIsNotNull()
     {
         // Arrange
@@ -79,10 +80,10 @@ public class EFServiceCollectionExtensionsTests
         // Assert
         using var serviceProvider = services.BuildServiceProvider();
 
-        Assert.IsType<CustomHashProvider>(serviceProvider.GetService<IEFHashProvider>());
+        Assert.IsInstanceOfType<CustomHashProvider>(serviceProvider.GetService<IEFHashProvider>());
     }
 
-    [Fact]
+    [TestMethod]
     public void AddEFSecondLevelCache_RegistersDefaultCacheProvider_WhenCacheProviderIsNull()
     {
         var services = new ServiceCollection();
@@ -93,7 +94,7 @@ public class EFServiceCollectionExtensionsTests
         }));
     }
 
-    [Fact]
+    [TestMethod]
     public void AddEFSecondLevelCache_RegistersCustomCacheProvider_WhenCacheProviderIsNotNull()
     {
         // Arrange
@@ -105,7 +106,7 @@ public class EFServiceCollectionExtensionsTests
         // Assert
         using var serviceProvider = services.BuildServiceProvider();
 
-        Assert.IsType<CustomCacheProvider>(serviceProvider.GetService<IEFCacheServiceProvider>());
+        Assert.IsInstanceOfType<CustomCacheProvider>(serviceProvider.GetService<IEFCacheServiceProvider>());
     }
 
     private class Logger<TCategoryName> : ILogger<TCategoryName>

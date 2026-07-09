@@ -1,10 +1,11 @@
-using Assert = Xunit.Assert;
+
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+[TestClass]
 public class StringExtensionsTests
 {
-    [Fact]
+    [TestMethod]
     public void EndsWith_ReturnsFalse_WhenValueIsNull()
     {
         // Arrange
@@ -18,10 +19,10 @@ public class StringExtensionsTests
         var actual = collection.EndsWith(value: null, StringComparison.OrdinalIgnoreCase);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void EndsWith_ReturnsTrue_WhenCollectionContainsItemEndingWithValue()
     {
         // Arrange
@@ -35,10 +36,10 @@ public class StringExtensionsTests
         var actual = collection.EndsWith(value: "Value", StringComparison.OrdinalIgnoreCase);
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void EndsWith_ReturnsFalse_WhenCollectionDoesNotContainItemEndingWithValue()
     {
         // Arrange
@@ -52,10 +53,10 @@ public class StringExtensionsTests
         var actual = collection.EndsWith(value: "NotExist", StringComparison.OrdinalIgnoreCase);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void StartsWith_ReturnsFalse_WhenValueIsNull()
     {
         // Arrange
@@ -69,10 +70,10 @@ public class StringExtensionsTests
         var actual = collection.StartsWith(value: null, StringComparison.OrdinalIgnoreCase);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void StartsWith_ReturnsTrue_WhenCollectionContainsItemStartingWithValue()
     {
         // Arrange
@@ -86,10 +87,10 @@ public class StringExtensionsTests
         var actual = collection.StartsWith(value: "Value", StringComparison.OrdinalIgnoreCase);
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void StartsWith_ReturnsFalse_WhenCollectionDoesNotContainItemStartingWithValue()
     {
         // Arrange
@@ -103,10 +104,10 @@ public class StringExtensionsTests
         var actual = collection.StartsWith(value: "NotExist", StringComparison.OrdinalIgnoreCase);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ContainsEvery_ReturnsFalse_WhenCollectionIsNull()
     {
         // Arrange
@@ -121,10 +122,10 @@ public class StringExtensionsTests
         var actual = source.ContainsEvery(collection: null, StringComparer.OrdinalIgnoreCase);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ContainsEvery_ReturnsTrue_WhenSourceContainsEveryItemInCollection()
     {
         // Arrange
@@ -146,10 +147,10 @@ public class StringExtensionsTests
         var actual = source.ContainsEvery(collection, StringComparer.OrdinalIgnoreCase);
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ContainsEvery_ReturnsFalse_WhenSourceDoesNotContainEveryItemInCollection()
     {
         // Arrange
@@ -170,10 +171,10 @@ public class StringExtensionsTests
         var actual = source.ContainsEvery(collection, StringComparer.OrdinalIgnoreCase);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ContainsOnly_ReturnsFalse_WhenCollectionIsNull()
     {
         // Arrange
@@ -187,10 +188,10 @@ public class StringExtensionsTests
         var actual = source.ContainsOnly(collection: null, StringComparer.OrdinalIgnoreCase);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ContainsOnly_ReturnsTrue_WhenSourceContainsOnlyItemsInCollection()
     {
         // Arrange
@@ -211,10 +212,10 @@ public class StringExtensionsTests
         var actual = source.ContainsOnly(collection, StringComparer.OrdinalIgnoreCase);
 
         // Assert
-        Assert.True(actual);
+        Assert.IsTrue(actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ContainsOnly_ReturnsFalse_WhenSourceContainsItemsNotInCollection()
     {
         // Arrange
@@ -235,6 +236,6 @@ public class StringExtensionsTests
         var actual = source.ContainsOnly(collection, StringComparer.OrdinalIgnoreCase);
 
         // Assert
-        Assert.False(actual);
+        Assert.IsTrue(!actual);
     }
 }

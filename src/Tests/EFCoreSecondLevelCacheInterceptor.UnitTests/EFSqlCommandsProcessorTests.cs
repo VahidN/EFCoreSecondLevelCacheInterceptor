@@ -1,6 +1,6 @@
-using Assert = Xunit.Assert;
-
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 /// <summary>
 ///     Tests for EFSqlCommandsProcessor.GetRawSqlCommandTableNames
@@ -11,7 +11,7 @@ public class EFSqlCommandsProcessorTests
 
     public EFSqlCommandsProcessorTests() => _sqlCommandsProcessor = new EFSqlCommandsProcessor(new XxHash64Unsafe());
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithSimpleTableName_ReturnsCorrectTableName()
     {
         // Arrange
@@ -21,11 +21,11 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Single(tableNames);
+        Assert.AreEqual(expected: 1, tableNames.Count());
         Assert.Contains(expected: "Users", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithSchemaQualifiedTableName_ReturnsOnlyTableName()
     {
         // Arrange
@@ -35,25 +35,25 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Single(tableNames);
+        Assert.AreEqual(expected: 1, tableNames.Count());
         Assert.Contains(expected: "Users", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithBracketedSchemaAndTableName_ReturnsOnlyTableName()
     {
         // Arrange
         const string commandText = @"SELECT * FROM [dbo].[Users]";
 
         // Act
-        var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
+        var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText); 
 
         // Assert
-        Assert.Single(tableNames);
+        Assert.AreEqual(expected: 1, tableNames.Count());
         Assert.Contains(expected: "Users", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithBracketedTableNameContainingDot_ReturnsBracketedName()
     {
         // Arrange - Issue #333: Table name with dot inside brackets
@@ -63,11 +63,11 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Single(tableNames);
+        Assert.AreEqual(expected: 1, tableNames.Count());
         Assert.Contains(expected: "Library.Tag", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithMultipleBracketedTableNamesContainingDots_ReturnsAllNames()
     {
         // Arrange - Issue #333: Multiple tables with dots inside brackets
@@ -79,12 +79,12 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Equal(expected: 2, tableNames.Count);
+        Assert.AreEqual(expected: 2, tableNames.Count);
         Assert.Contains(expected: "Library.Tag", tableNames);
         Assert.Contains(expected: "Library.CostCenter", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithBracketedTableNameAndJoin_ReturnsBothNames()
     {
         // Arrange
@@ -96,12 +96,12 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Equal(expected: 2, tableNames.Count);
+        Assert.AreEqual(expected: 2, tableNames.Count);
         Assert.Contains(expected: "Library.Tag", tableNames);
         Assert.Contains(expected: "Users", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithBracketedTableNameInInsert_ReturnsBracketedName()
     {
         // Arrange
@@ -111,11 +111,11 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Single(tableNames);
+        Assert.AreEqual(expected: 1, tableNames.Count());
         Assert.Contains(expected: "Library.Tag", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithBracketedTableNameInUpdate_ReturnsBracketedName()
     {
         // Arrange
@@ -125,11 +125,11 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Single(tableNames);
+        Assert.AreEqual(expected: 1, tableNames.Count());
         Assert.Contains(expected: "Library.Tag", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithBracketedTableNameInDelete_ReturnsBracketedName()
     {
         // Arrange
@@ -139,11 +139,11 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Single(tableNames);
+        Assert.AreEqual(expected: 1, tableNames.Count());
         Assert.Contains(expected: "Library.Tag", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithBracketedTableNameInMerge_ReturnsBracketedName()
     {
         // Arrange
@@ -156,11 +156,11 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Single(tableNames);
+        Assert.AreEqual(expected: 1, tableNames.Count());
         Assert.Contains(expected: "Library.Tag", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithComplexQueryMultipleBracketedDotsAndSchemas_ReturnsAllNames()
     {
         // Arrange - Complex scenario mixing normal and dotted table names
@@ -175,13 +175,13 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Equal(expected: 3, tableNames.Count);
+        Assert.AreEqual(expected: 3, tableNames.Count);
         Assert.Contains(expected: "Library.Tag", tableNames);
         Assert.Contains(expected: "Posts", tableNames);
         Assert.Contains(expected: "Catalog.Product", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithUnbracketedTableName_ReturnsTableName()
     {
         // Arrange
@@ -191,11 +191,11 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Single(tableNames);
+        Assert.AreEqual(expected: 1, tableNames.Count());
         Assert.Contains(expected: "Users", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetSqlCommandTableNames_WithMultipleFromClauses_ReturnsLastTableName()
     {
         // Arrange - This tests behavior with FROM appearing multiple times
@@ -207,12 +207,12 @@ public class EFSqlCommandsProcessorTests
         var tableNames = _sqlCommandsProcessor.GetSqlCommandTableNames(commandText);
 
         // Assert
-        Assert.Equal(expected: 2, tableNames.Count);
+        Assert.AreEqual(expected: 2, tableNames.Count);
         Assert.Contains(expected: "Library.Tag", tableNames);
         Assert.Contains(expected: "Users", tableNames);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsCrudCommand_WithInsertCommand_ReturnsTrue()
     {
         // Arrange
@@ -222,10 +222,10 @@ public class EFSqlCommandsProcessorTests
         var isCrud = _sqlCommandsProcessor.IsCrudCommand(commandText);
 
         // Assert
-        Assert.True(isCrud);
+        Assert.IsTrue(isCrud);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsCrudCommand_WithUpdateCommand_ReturnsTrue()
     {
         // Arrange
@@ -235,10 +235,10 @@ public class EFSqlCommandsProcessorTests
         var isCrud = _sqlCommandsProcessor.IsCrudCommand(commandText);
 
         // Assert
-        Assert.True(isCrud);
+        Assert.IsTrue(isCrud);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsCrudCommand_WithDeleteCommand_ReturnsTrue()
     {
         // Arrange
@@ -248,10 +248,10 @@ public class EFSqlCommandsProcessorTests
         var isCrud = _sqlCommandsProcessor.IsCrudCommand(commandText);
 
         // Assert
-        Assert.True(isCrud);
+        Assert.IsTrue(isCrud);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsCrudCommand_WithSelectCommand_ReturnsFalse()
     {
         // Arrange
@@ -261,10 +261,10 @@ public class EFSqlCommandsProcessorTests
         var isCrud = _sqlCommandsProcessor.IsCrudCommand(commandText);
 
         // Assert
-        Assert.False(isCrud);
+        Assert.IsTrue(!isCrud);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsCrudCommand_WithNullCommand_ReturnsFalse()
     {
         // Arrange
@@ -274,10 +274,10 @@ public class EFSqlCommandsProcessorTests
         var isCrud = _sqlCommandsProcessor.IsCrudCommand(commandText);
 
         // Assert
-        Assert.False(isCrud);
+        Assert.IsTrue(!isCrud);
     }
 
-    [Fact]
+    [TestMethod]
     public void IsCrudCommand_WithEmptyCommand_ReturnsFalse()
     {
         // Arrange
@@ -287,6 +287,6 @@ public class EFSqlCommandsProcessorTests
         var isCrud = _sqlCommandsProcessor.IsCrudCommand(commandText);
 
         // Assert
-        Assert.False(isCrud);
+        Assert.IsTrue(!isCrud);
     }
 }

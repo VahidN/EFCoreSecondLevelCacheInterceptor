@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options;
 using Moq;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+[TestClass]
 public class EFMessagePackSerializerTests
 {
     private static Mock<IOptions<EFCoreSecondLevelCacheSettings>> GetCacheSettingsMock(bool enableCompression)
@@ -22,7 +22,7 @@ public class EFMessagePackSerializerTests
         return cacheSettingsMock;
     }
 
-    [Fact]
+    [TestMethod]
     public void SerializeAndDeserializeWhenObjectIsComplexAndCompressionDisabledShouldReturnEqualObject()
     {
         // Arrange
@@ -43,13 +43,13 @@ public class EFMessagePackSerializerTests
         var deserializedObject = serializer.Deserialize<Person>(serializedData);
 
         // Assert
-        Assert.NotNull(serializedData);
-        Assert.True(serializedData.Length > 0);
-        Assert.NotNull(deserializedObject);
-        Assert.Equal(originalObject, deserializedObject);
+        Assert.IsNotNull(serializedData);
+        Assert.IsTrue(serializedData.Length > 0);
+        Assert.IsNotNull(deserializedObject);
+        Assert.AreEqual(originalObject, deserializedObject);
     }
 
-    [Fact]
+    [TestMethod]
     public void SerializeAndDeserializeWhenObjectIsComplexAndCompressionEnabledShouldReturnEqualObject()
     {
         // Arrange
@@ -70,13 +70,13 @@ public class EFMessagePackSerializerTests
         var deserializedObject = serializer.Deserialize<Person>(serializedData);
 
         // Assert
-        Assert.NotNull(serializedData);
-        Assert.True(serializedData.Length > 0);
-        Assert.NotNull(deserializedObject);
-        Assert.Equal(originalObject, deserializedObject);
+        Assert.IsNotNull(serializedData);
+        Assert.IsTrue(serializedData.Length > 0);
+        Assert.IsNotNull(deserializedObject);
+        Assert.AreEqual(originalObject, deserializedObject);
     }
 
-    [Fact]
+    [TestMethod]
     public void SerializeWhenObjectIsNullShouldReturnValidByteArrayForNull()
     {
         // Arrange
@@ -88,13 +88,13 @@ public class EFMessagePackSerializerTests
 
         // Assert
         // MessagePack 'nil' is represented by a single byte 0xc0
-        Assert.NotNull(serializedData);
-        Assert.Single(serializedData);
-        Assert.Equal(expected: 0xc0, serializedData[0]);
-        Assert.Null(deserializedObject);
+        Assert.IsNotNull(serializedData);
+        Assert.AreEqual(expected: 1, serializedData.Count());
+        Assert.AreEqual(expected: 0xc0, serializedData[0]);
+        Assert.IsNull(deserializedObject);
     }
 
-    [Fact]
+    [TestMethod]
     public void DeserializeWhenDataIsNullShouldReturnDefaultOfT()
     {
         // Arrange
@@ -104,6 +104,6 @@ public class EFMessagePackSerializerTests
         var result = serializer.Deserialize<Person>(data: null);
 
         // Assert
-        Assert.Null(result); // default(Person) is null for reference types
+        Assert.IsNull(result); // default(Person) is null for reference types
     }
 }

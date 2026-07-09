@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+[TestClass]
 public class EFCacheDependenciesProcessorTests
 {
     private const string CacheKeyPrefix = "EF_";
@@ -31,7 +31,7 @@ public class EFCacheDependenciesProcessorTests
             cacheServiceProvider, sqlCommandsProcessor, cacheSettingsMock.Object, cacheKeyPrefixProviderMock);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorksWithNormalEFQueries()
     {
         // Arrange
@@ -45,11 +45,13 @@ public class EFCacheDependenciesProcessorTests
         var cacheDependencies = _efCacheDependenciesProcessor.GetCacheDependencies(new EFCachePolicy(),
             ["Posts", "Users", "Products"], commandText);
 
+        SortedSet<string> expected = [$"{CacheKeyPrefix}Users"];
+
         // Assert
-        Assert.Equal([$"{CacheKeyPrefix}Users"], cacheDependencies);
+        CollectionAssert.AreEqual(expected, cacheDependencies);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorks()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
@@ -65,10 +67,10 @@ public class EFCacheDependenciesProcessorTests
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Posts", $"{CacheKeyPrefix}Users"];
 
-        Assert.Equal(inUseTableNames, cacheDependencies);
+        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorksWithSchemas()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
@@ -84,10 +86,10 @@ public class EFCacheDependenciesProcessorTests
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Posts", $"{CacheKeyPrefix}Users"];
 
-        Assert.Equal(inUseTableNames, cacheDependencies);
+        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorksWithASquareBracketInsideAStringValue()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
@@ -103,10 +105,10 @@ public class EFCacheDependenciesProcessorTests
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Posts", $"{CacheKeyPrefix}Users"];
 
-        Assert.Equal(inUseTableNames, cacheDependencies);
+        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorksWithAQuoteInsideAStringValue()
     {
         const string commandText = @"-- EFCachePolicy[Index(27)] --> Absolute|00:45:00
@@ -122,10 +124,10 @@ public class EFCacheDependenciesProcessorTests
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Posts", $"{CacheKeyPrefix}Users"];
 
-        Assert.Equal(inUseTableNames, cacheDependencies);
+        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorksForInserts()
     {
         const string commandText = @"SET NOCOUNT ON;
@@ -140,10 +142,10 @@ public class EFCacheDependenciesProcessorTests
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Products"];
 
-        Assert.Equal(inUseTableNames, cacheDependencies);
+        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorksForInsertsWithBacktick()
     {
         const string commandText = @"SET NOCOUNT ON;
@@ -158,10 +160,10 @@ public class EFCacheDependenciesProcessorTests
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Products"];
 
-        Assert.Equal(inUseTableNames, cacheDependencies);
+        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorksForDeletes()
     {
         const string commandText = @"SET NOCOUNT ON;
@@ -174,10 +176,10 @@ public class EFCacheDependenciesProcessorTests
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Products"];
 
-        Assert.Equal(inUseTableNames, cacheDependencies);
+        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorksForUpdates()
     {
         const string commandText = @"SET NOCOUNT ON;
@@ -190,10 +192,10 @@ public class EFCacheDependenciesProcessorTests
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Users"];
 
-        Assert.Equal(inUseTableNames, cacheDependencies);
+        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorksForBatchInserts()
     {
         const string commandText = @"SET NOCOUNT ON;
@@ -216,10 +218,10 @@ INTO @inserted2;";
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Blogs"];
 
-        Assert.Equal(inUseTableNames, cacheDependencies);
+        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorksForBulkInsertOrUpdate()
     {
         const string commandText =
@@ -230,10 +232,10 @@ INTO @inserted2;";
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}People"];
 
-        Assert.Equal(inUseTableNames, cacheDependencies);
+        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
     }
 
-    [Fact]
+    [TestMethod]
     public void TestGetCacheDependenciesWorksForQueryHints()
     {
         const string commandText = @"SET NOCOUNT ON;
@@ -248,6 +250,6 @@ INTO @inserted2;";
 
         SortedSet<string> inUseTableNames = [$"{CacheKeyPrefix}Products"];
 
-        Assert.Equal(inUseTableNames, cacheDependencies);
+        CollectionAssert.AreEqual(inUseTableNames, cacheDependencies);
     }
 }

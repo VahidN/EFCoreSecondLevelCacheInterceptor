@@ -1,13 +1,14 @@
 using System.Data.Common;
 using Moq;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 // ReSharper disable once InconsistentNaming
 public class EFTableRowsTests
 {
-    [Fact]
+    [TestMethod]
     public void Constructor_ShouldThrowArgumentNullException_WhenReaderIsNull()
     {
         // Arrange
@@ -15,10 +16,10 @@ public class EFTableRowsTests
 
         // Act & Assert
         // ReSharper disable once AssignNullToNotNullAttribute
-        Assert.Throws<ArgumentNullException>(paramName: "reader", () => new EFTableRows(reader));
+        Assert.Throws<ArgumentNullException>(() => new EFTableRows(reader), message: "reader");
     }
 
-    [Fact]
+    [TestMethod]
     public void Constructor_InitializesColumnsInfo_WithValidReader()
     {
         // Arrange
@@ -36,16 +37,16 @@ public class EFTableRowsTests
         var tableRows = new EFTableRows(readerMock.Object);
 
         // Assert
-        Assert.Equal(expected: 2, tableRows.ColumnsInfo.Count);
-        Assert.Equal(expected: "Column1", tableRows.ColumnsInfo[key: 0].Name);
-        Assert.Equal(expected: "Column2", tableRows.ColumnsInfo[key: 1].Name);
-        Assert.Equal(expected: "int", tableRows.ColumnsInfo[key: 0].DbTypeName);
-        Assert.Equal(expected: "string", tableRows.ColumnsInfo[key: 1].DbTypeName);
-        Assert.Equal(typeof(int).ToString(), tableRows.ColumnsInfo[key: 0].TypeName);
-        Assert.Equal(typeof(string).ToString(), tableRows.ColumnsInfo[key: 1].TypeName);
+        Assert.AreEqual(expected: 2, tableRows.ColumnsInfo.Count);
+        Assert.AreEqual(expected: "Column1", tableRows.ColumnsInfo[key: 0].Name);
+        Assert.AreEqual(expected: "Column2", tableRows.ColumnsInfo[key: 1].Name);
+        Assert.AreEqual(expected: "int", tableRows.ColumnsInfo[key: 0].DbTypeName);
+        Assert.AreEqual(expected: "string", tableRows.ColumnsInfo[key: 1].DbTypeName);
+        Assert.AreEqual(typeof(int).ToString(), tableRows.ColumnsInfo[key: 0].TypeName);
+        Assert.AreEqual(typeof(string).ToString(), tableRows.ColumnsInfo[key: 1].TypeName);
     }
 
-    [Fact]
+    [TestMethod]
     public void Constructor_SetsDefaultTypeName_WhenFieldTypeIsNull()
     {
         // Arrange
@@ -60,11 +61,11 @@ public class EFTableRowsTests
         var tableRows = new EFTableRows(readerMock.Object);
 
         // Assert
-        Assert.Equal(typeof(string).ToString(), tableRows.ColumnsInfo[key: 0].DbTypeName);
-        Assert.Equal(typeof(string).ToString(), tableRows.ColumnsInfo[key: 0].TypeName);
+        Assert.AreEqual(typeof(string).ToString(), tableRows.ColumnsInfo[key: 0].DbTypeName);
+        Assert.AreEqual(typeof(string).ToString(), tableRows.ColumnsInfo[key: 0].TypeName);
     }
 
-    [Fact]
+    [TestMethod]
     public void Constructor_ShouldInitializeColumnsInfo_WhenReaderIsValid()
     {
         // Arrange
@@ -74,10 +75,10 @@ public class EFTableRowsTests
         var tableRows = new EFTableRows(reader);
 
         // Assert
-        Assert.Equal(reader.FieldCount, tableRows.ColumnsInfo.Count);
+        Assert.AreEqual(reader.FieldCount, tableRows.ColumnsInfo.Count);
     }
 
-    [Fact]
+    [TestMethod]
     public void Indexer_ReturnsExpectedRow_WhenIndexIsValid()
     {
         // Arrange
@@ -102,10 +103,10 @@ public class EFTableRowsTests
         var actual = tableRows[index: 1];
 
         // Assert
-        Assert.Equal(expected: 2, actual.Values[index: 0]);
+        Assert.AreEqual(expected: 2, actual.Values[index: 0]);
     }
 
-    [Fact]
+    [TestMethod]
     public void Indexer_SetsExpectedRow_WhenIndexIsValid()
     {
         // Arrange
@@ -135,10 +136,10 @@ public class EFTableRowsTests
         tableRows[index: 1] = newRow;
 
         // Assert
-        Assert.Equal(expected: 3, tableRows[index: 1].Values[index: 0]);
+        Assert.AreEqual(expected: 3, tableRows[index: 1].Values[index: 0]);
     }
 
-    [Fact]
+    [TestMethod]
     public void Indexer_ThrowsArgumentOutOfRangeException_WhenIndexIsInvalid()
     {
         // Arrange
@@ -159,7 +160,7 @@ public class EFTableRowsTests
         Assert.Throws<ArgumentOutOfRangeException>(() => tableRows[index: 1]);
     }
 
-    [Fact]
+    [TestMethod]
     public void Indexer_ThrowsArgumentOutOfRangeException_WhenSettingInvalidIndex()
     {
         // Arrange
@@ -185,7 +186,7 @@ public class EFTableRowsTests
         Assert.Throws<ArgumentOutOfRangeException>(() => tableRows[index: 1] = newRow);
     }
 
-    [Fact]
+    [TestMethod]
     public void Add_ShouldAddItemToRows()
     {
         // Arrange
@@ -196,10 +197,10 @@ public class EFTableRowsTests
         tableRows.Add(row);
 
         // Assert
-        Assert.Single(tableRows.Rows);
+        Assert.AreEqual(expected: 1, tableRows.Rows.Count());
     }
 
-    [Fact]
+    [TestMethod]
     public void Get_ShouldReturnExpectedRow()
     {
         // Arrange
@@ -212,10 +213,10 @@ public class EFTableRowsTests
         var actual = tableRows.Get(index: 0);
 
         // Assert
-        Assert.Equal(row, actual);
+        Assert.AreEqual(row, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetOrdinal_ShouldReturnExpectedOrdinal()
     {
         // Arrange
@@ -236,10 +237,10 @@ public class EFTableRowsTests
         var ordinal = tableRows.GetOrdinal(name: "Column1");
 
         // Assert
-        Assert.Equal(expected: 0, ordinal);
+        Assert.AreEqual(expected: 0, ordinal);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetName_ShouldReturnExpectedName()
     {
         // Arrange
@@ -260,10 +261,10 @@ public class EFTableRowsTests
         var name = tableRows.GetName(ordinal: 0);
 
         // Assert
-        Assert.Equal(expected: "Column1", name);
+        Assert.AreEqual(expected: "Column1", name);
     }
 
-    [Fact]
+    [TestMethod]
     public void HasRows_ShouldReturnTrue_WhenRowsArePresent()
     {
         // Arrange
@@ -276,20 +277,20 @@ public class EFTableRowsTests
         var hasRows = tableRows.HasRows;
 
         // Assert
-        Assert.True(hasRows);
+        Assert.IsTrue(hasRows);
     }
 
-    [Fact]
+    [TestMethod]
     public void RecordsAffected_ReturnsMinusOne()
     {
         // Arrange
         var tableRows = new EFTableRows();
 
         // Act && Assert
-        Assert.Equal(expected: -1, tableRows.RecordsAffected);
+        Assert.AreEqual(expected: -1, tableRows.RecordsAffected);
     }
 
-    [Fact]
+    [TestMethod]
     public void VisibleFieldCount_ReturnsExpectedValue_WhenSet()
     {
         // Arrange
@@ -299,18 +300,18 @@ public class EFTableRowsTests
         };
 
         // Act && Assert
-        Assert.Equal(expected: 5, tableRows.VisibleFieldCount);
+        Assert.AreEqual(expected: 5, tableRows.VisibleFieldCount);
     }
 
-    [Fact]
+    [TestMethod]
     public void VisibleFieldCount_DefaultsToZero_WhenNotSet()
     {
         var tableRows = new EFTableRows();
 
-        Assert.Equal(expected: 0, tableRows.VisibleFieldCount);
+        Assert.AreEqual(expected: 0, tableRows.VisibleFieldCount);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldTypeName_ReturnsTypeName_WhenOrdinalIsValid()
     {
         // Arrange
@@ -333,10 +334,10 @@ public class EFTableRowsTests
         // Act
         var actual = tableRows.GetFieldTypeName(ordinal: 0);
 
-        Assert.Equal(expected: "System.String", actual);
+        Assert.AreEqual(expected: "System.String", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldTypeName_ThrowsArgumentOutOfRangeException_WhenOrdinalIsInvalid()
     {
         // Arrange
@@ -356,6 +357,6 @@ public class EFTableRowsTests
         var actual = Assert.Throws<ArgumentOutOfRangeException>(() => tableRows.GetFieldTypeName(ordinal: 0));
 
         // Assert
-        Assert.Equal(expected: "Index[0] was outside of array's bounds. (Parameter 'ordinal')", actual.Message);
+        Assert.AreEqual(expected: "Index[0] was outside of array's bounds. (Parameter 'ordinal')", actual.Message);
     }
 }

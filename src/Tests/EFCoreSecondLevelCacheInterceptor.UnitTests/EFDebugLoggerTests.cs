@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 // ReSharper disable once InconsistentNaming
 public class EFDebugLoggerTests
@@ -35,7 +36,7 @@ public class EFDebugLoggerTests
         _debugLogger = new EFDebugLogger(cacheSettingsMock.Object, loggerMock.Object, _serviceProviderMock.Object);
     }
 
-    [Fact]
+    [TestMethod]
     public void EFDebugLogger_ThrowsArgumentNullException_WhenCacheSettingsIsNull()
     {
         // Arrange
@@ -46,7 +47,7 @@ public class EFDebugLoggerTests
             => new EFDebugLogger(null!, loggerMock.Object, serviceProviderMock.Object));
     }
 
-    [Fact]
+    [TestMethod]
     public void EFDebugLogger_ThrowsArgumentNullException_WhenLoggerIsNull()
     {
         // Arrange
@@ -58,7 +59,7 @@ public class EFDebugLoggerTests
             => new EFDebugLogger(cacheSettingsMock.Object, null!, serviceProviderMock.Object));
     }
 
-    [Fact]
+    [TestMethod]
     public void EFDebugLogger_EnablesLogging_WhenCacheSettingsEnableLoggingIsTrue()
     {
         // Arrange
@@ -78,10 +79,10 @@ public class EFDebugLoggerTests
         var logger = new EFDebugLogger(cacheSettingsMock.Object, loggerMock.Object, serviceProviderMock.Object);
 
         // Assert
-        Assert.True(logger.IsLoggerEnabled);
+        Assert.IsTrue(logger.IsLoggerEnabled);
     }
 
-    [Fact]
+    [TestMethod]
     public void EFDebugLogger_DisablesLogging_WhenCacheSettingsEnableLoggingIsFalse()
     {
         // Arrange
@@ -99,10 +100,10 @@ public class EFDebugLoggerTests
         var logger = new EFDebugLogger(cacheSettingsMock.Object, loggerMock.Object, serviceProviderMock.Object);
 
         // Assert
-        Assert.False(logger.IsLoggerEnabled);
+        Assert.IsTrue(!logger.IsLoggerEnabled);
     }
 
-    [Fact]
+    [TestMethod]
     public void NotifyCacheableEvent_InvokesCacheableEvent_WhenLoggerIsEnabled()
     {
         // Arrange && Act
@@ -116,7 +117,7 @@ public class EFDebugLoggerTests
                    x.CommandText == "TestCommand" && x.ServiceProvider == _serviceProviderMock.Object)), Times.Once);
     }
 
-    [Fact]
+    [TestMethod]
     public void NotifyCacheableEvent_DoesNotInvokeCacheableEvent_WhenLoggerIsDisabled()
     {
         // Arrange
@@ -143,7 +144,7 @@ public class EFDebugLoggerTests
         cacheableEventMock.Verify(e => e.Invoke(It.IsAny<EFCacheableLogEvent>()), Times.Never);
     }
 
-    [Fact]
+    [TestMethod]
     public void NotifyCacheableEvent_DoesNotInvokeCacheableEvent_WhenCacheableEventIsNull()
     {
         // Arrange
@@ -170,7 +171,7 @@ public class EFDebugLoggerTests
         cacheableEventMock.Verify(e => e.Invoke(It.IsAny<EFCacheableLogEvent>()), Times.Never);
     }
 
-    [Fact]
+    [TestMethod]
     public void NotifyCacheInvalidation_InvokesEFCacheInvalidationInfo()
     {
         // Arrange 

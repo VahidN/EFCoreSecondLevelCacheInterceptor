@@ -1,11 +1,11 @@
-using Assert = Xunit.Assert;
-
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 // ReSharper disable once InconsistentNaming
 public class EFTableRowTests
 {
-    [Fact]
+    [TestMethod]
     public void Constructor_ShouldInitializeValues()
     {
         // Arrange
@@ -19,10 +19,10 @@ public class EFTableRowTests
         var row = new EFTableRow(values);
 
         // Assert
-        Assert.Equal(values, row.Values);
+        Assert.AreEqual(values, row.Values);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetValues_ShouldReturnExpectedValues()
     {
         // Arrange
@@ -38,10 +38,10 @@ public class EFTableRowTests
         var actual = row.Values;
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetDepth_ShouldReturnExpectedCount()
     {
         // Arrange
@@ -62,10 +62,10 @@ public class EFTableRowTests
         var actual = row.Depth;
 
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetFieldCount_ShouldReturnExpectedCount()
     {
         // Arrange
@@ -81,10 +81,10 @@ public class EFTableRowTests
         var fieldCount = row.FieldCount;
 
         // Assert
-        Assert.Equal(values.Count, fieldCount);
+        Assert.AreEqual(values.Count, fieldCount);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetByIndexer_ShouldReturnExpectedValue()
     {
         // Arrange
@@ -102,6 +102,6 @@ public class EFTableRowTests
         var value = row[ordinal: 1];
 
         // Assert
-        Assert.Equal(expected, value);
+        Assert.AreEqual(expected, value);
     }
 }

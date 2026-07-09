@@ -1,10 +1,11 @@
-using Assert = Xunit.Assert;
+
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
+[TestClass]
 public class TableEntityInfoTests
 {
-    [Fact]
+    [TestMethod]
     public void ToString_ReturnsExpectedFormat_WhenClrTypeAndTableNameAreSet()
     {
         // Arrange
@@ -18,10 +19,10 @@ public class TableEntityInfoTests
         var actual = entityInfo.ToString();
 
         // Assert
-        Assert.Equal(expected: "System.String::TestTable", actual);
+        Assert.AreEqual(expected: "System.String::TestTable", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ToString_ReturnsExpectedFormat_WhenClrTypeIsNull()
     {
         // Arrange
@@ -35,10 +36,10 @@ public class TableEntityInfoTests
         var actual = entityInfo.ToString();
 
         // Assert
-        Assert.Equal(expected: "::TestTable", actual);
+        Assert.AreEqual(expected: "::TestTable", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ToString_ReturnsExpectedFormat_WhenTableNameIsNull()
     {
         // Arrange
@@ -52,10 +53,10 @@ public class TableEntityInfoTests
         var actual = entityInfo.ToString();
 
         // Assert
-        Assert.Equal(expected: "System.String::", actual);
+        Assert.AreEqual(expected: "System.String::", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void ToString_ReturnsExpectedFormat_WhenBothClrTypeAndTableNameAreNull()
     {
         // Arrange
@@ -69,6 +70,6 @@ public class TableEntityInfoTests
         var actual = entityInfo.ToString();
 
         // Assert
-        Assert.Equal(expected: "::", actual);
+        Assert.AreEqual(expected: "::", actual);
     }
 }

@@ -1,13 +1,14 @@
 using Microsoft.Extensions.Options;
 using Moq;
-using Assert = Xunit.Assert;
 
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
+
+[TestClass]
 
 // ReSharper disable once InconsistentNaming
 public class EFCacheKeyPrefixProviderTests
 {
-    [Fact]
+    [TestMethod]
     public void Constructor_ThrowsArgumentNullException_WhenCacheSettingsIsNull()
     {
         // Arrange
@@ -17,10 +18,10 @@ public class EFCacheKeyPrefixProviderTests
         void Act() => new EFCacheKeyPrefixProvider(serviceProvider, null!);
 
         // Act && Assert
-        Assert.Throws<ArgumentNullException>(paramName: "cacheSettings", Act);
+        Assert.Throws<ArgumentNullException>(Act, message: "cacheSettings");
     }
 
-    [Fact]
+    [TestMethod]
     public void GetCacheKeyPrefix_ReturnsCacheKeyPrefixSelectorResult_WhenSelectorIsNotNull()
     {
         // Arrange
@@ -37,10 +38,10 @@ public class EFCacheKeyPrefixProviderTests
         var actual = provider.GetCacheKeyPrefix();
 
         // Assert
-        Assert.Equal(expected: "CustomPrefix", actual);
+        Assert.AreEqual(expected: "CustomPrefix", actual);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetCacheKeyPrefix_ReturnsCacheKeyPrefix_WhenSelectorIsNull()
     {
         // Arrange
@@ -58,6 +59,6 @@ public class EFCacheKeyPrefixProviderTests
         var actual = provider.GetCacheKeyPrefix();
 
         // Assert
-        Assert.Equal(expected: "DefaultPrefix", actual);
+        Assert.AreEqual(expected: "DefaultPrefix", actual);
     }
 }
