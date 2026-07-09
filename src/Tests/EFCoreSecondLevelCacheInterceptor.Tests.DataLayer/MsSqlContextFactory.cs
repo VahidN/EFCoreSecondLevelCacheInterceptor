@@ -40,7 +40,9 @@ public class MsSqlContextFactory : IDesignTimeDbContextFactory<ApplicationDbCont
 
         services.AddConfiguredMsSqlDbContext(connectionString);
 
+#pragma warning disable IDISP001
         var buildServiceProvider = services.BuildServiceProvider();
+#pragma warning restore IDISP001
 
         return buildServiceProvider.GetRequiredService<ApplicationDbContext>();
     }

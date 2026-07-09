@@ -10,7 +10,10 @@ public class Worker(ILogger<Worker> logger, IServiceScopeFactory serviceScopeFac
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation(message: "Worker running at: {Time}", DateTimeOffset.Now);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation(message: "Worker running at: {Time}", DateTimeOffset.Now);
+        }
 
         await RunInContextAsync(async context =>
         {
@@ -28,7 +31,10 @@ public class Worker(ILogger<Worker> logger, IServiceScopeFactory serviceScopeFac
                 .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
                 .FirstOrDefaultAsync(stoppingToken);
 
-            logger.LogInformation(message: "Title: {Post1Title}", post1?.Title);
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation(message: "Title: {Post1Title}", post1?.Title);
+            }
         });
     }
 
