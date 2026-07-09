@@ -1,1 +1,2 @@
-dotnet watch run
+dotnet run
+pause

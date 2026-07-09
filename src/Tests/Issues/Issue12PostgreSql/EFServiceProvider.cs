@@ -1,15 +1,11 @@
-using EasyCaching.Core.Configurations;
 using EFCoreSecondLevelCacheInterceptor;
 using Issue12PostgreSql.DataLayer;
-using MessagePack;
-using MessagePack.Formatters;
-using MessagePack.Resolvers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Issue12PostgreSql;
 
@@ -57,7 +53,7 @@ public static class EFServiceProvider
 
         services.AddSingleton(_ => configuration);
 
-        const string providerName = "Redis1";
+        /*const string providerName = "Redis1";
 
         services.AddEasyCaching(o =>
         {
@@ -83,21 +79,35 @@ public static class EFServiceProvider
                     DynamicGenericResolver.Instance
                 });
             }, name: "Pack");
-        });
+        });*/
 
-        services.AddHybridCache(options =>
+        /*services.AddHybridCache(options =>
         {
             options.DefaultEntryOptions = new HybridCacheEntryOptions
             {
                 Expiration = TimeSpan.FromHours(hours: 1),
                 LocalCacheExpiration = TimeSpan.FromHours(hours: 1)
             };
-        });
+        });*/
+
+        services.AddFusionCache()
+            .WithOptions(options =>
+            {
+                options.DefaultEntryOptions = new FusionCacheEntryOptions
+                {
+                    Duration = TimeSpan.FromMinutes(minutes: 1),
+                    IsFailSafeEnabled = true,
+                    FailSafeMaxDuration = TimeSpan.FromHours(hours: 2)
+
+                    // ... other FusionCache options
+                };
+            });
 
         services.AddEFSecondLevelCache(o =>
         {
-            o.UseHybridCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromHours(hours: 1))
+            o.UseFusionCacheProvider()
 
+                //.UseHybridCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromHours(hours: 1))
                 //.UseMemoryCacheProvider()
                 //.UseEasyCachingCoreProvider(providerName).ConfigureLogging(enable: true)
                 .CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 10))

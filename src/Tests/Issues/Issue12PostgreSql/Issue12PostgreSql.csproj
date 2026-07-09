@@ -8,6 +8,7 @@
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.MemoryCache\EFCoreSecondLevelCacheInterceptor.MemoryCache.csproj"/>
 		<ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.HybridCache\EFCoreSecondLevelCacheInterceptor.HybridCache.csproj"/>
         <ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor\EFCoreSecondLevelCacheInterceptor.csproj"/>
+		<ProjectReference Include="..\..\..\EFCoreSecondLevelCacheInterceptor.FusionCache\EFCoreSecondLevelCacheInterceptor.FusionCache.csproj"/>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore" />
