@@ -14,5 +14,10 @@ public class DBNullFormatter : IMessagePackFormatter<DBNull?>
     public void Serialize(ref MessagePackWriter writer, DBNull? value, MessagePackSerializerOptions options)
         => writer.WriteNil();
 
-    public DBNull? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) => DBNull.Value;
+    public DBNull Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
+    {
+        reader.ReadNil();
+
+        return DBNull.Value;
+    }
 }
