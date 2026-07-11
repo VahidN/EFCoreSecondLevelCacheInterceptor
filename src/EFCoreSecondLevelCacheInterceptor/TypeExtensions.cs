@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Globalization;
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
 using System.Text.Json;
 using System.Diagnostics.CodeAnalysis;
@@ -21,6 +23,11 @@ public static class TypeExtensions
     ///     Cached version of typeof(long)
     /// </summary>
     public static readonly Type LongType = typeof(long);
+
+    /// <summary>
+    ///     Cached version of typeof(Guid)
+    /// </summary>
+    public static readonly Type GuidType = typeof(Guid);
 
     /// <summary>
     ///     Cached version of typeof(ulong)
@@ -119,12 +126,12 @@ public static class TypeExtensions
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static bool IsDbNull(
+    public static bool IsDbNullOrEmpty(
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETCORE3_1
         [NotNullWhen(returnValue: false)]
 #endif
         this string? value)
-        => string.IsNullOrWhiteSpace(value) || value!.Equals(value: "{}", StringComparison.Ordinal);
+        => string.IsNullOrWhiteSpace(value) || value is "{}" or "[]" or "null";
 
     /// <summary>
     ///     IsGenericType or IsArray
@@ -145,7 +152,168 @@ public static class TypeExtensions
            type == ShortType || type == SByteType || type == ByteType || type == FloatType || type == DoubleType ||
            type == DecimalType || type == CharType;
 
+    /// <summary>
+    ///     Converts an IEnumerable to a generic one
+    /// </summary>
+    public static T ConvertEnumerable<T>(this IEnumerable enumerable)
+    {
+        var targetCollectionType = typeof(T);
+
+        var items = enumerable.Cast<object?>().ToArray();
+
+        if (targetCollectionType.IsArray)
+        {
+            var targetElementType = targetCollectionType.GetCollectionElementType();
+            var array = Array.CreateInstance(targetElementType, items.Length);
+
+            for (var i = 0; i < items.Length; i++)
+            {
+                array.SetValue(items[i], i);
+            }
+
+            return (T)(object)array;
+        }
+
+        var list = (IList)Activator.CreateInstance(targetCollectionType)!;
+
+        foreach (var item in items)
+        {
+            list.Add(item);
+        }
+
+        return (T)list;
+    }
+
+    /// <summary>
+    ///     Returns the type of the collection
+    /// </summary>
+    public static Type GetCollectionElementType(this Type collectionType)
+    {
+        if (collectionType.IsArray)
+        {
+            return collectionType.GetElementType() ??
+                   throw new InvalidOperationException($"Unable to determine element type of '{collectionType}'.");
+        }
+
+        if (collectionType.IsGenericType && collectionType.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            return collectionType.GetGenericArguments()[0];
+        }
+
+        throw new InvalidOperationException($"'{collectionType}' is not a supported collection type.");
+    }
+
+    /// <summary>
+    ///     Returns a formatted value
+    /// </summary>
+    public static string FormatDbValue(this object? value)
+    {
+        if (value is null)
+        {
+            return "<null>";
+        }
+
+        if (value is string s)
+        {
+            return $"\"{s}\"";
+        }
+
+        if (value is IEnumerable enumerable and not string)
+        {
+            return "[" + string.Join(separator: ", ", enumerable.Cast<object?>().Select(FormatDbValue)) + "]";
+        }
+
+        return value.ToString() ?? value.GetType().Name;
+    }
+
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+    /// <summary>
+    ///     Returns the given JsonElement value
+    /// </summary>
+    public static T GetJsonElementValue<T>(this object value, JsonSerializerOptions? options)
+    {
+        if (value is not JsonElement element || element.IsJsonValueNullOrEmpty())
+        {
+            return default!;
+        }
+
+        var expectedType = typeof(T);
+
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.String when expectedType != StringType:
+                var jsonString = element.GetString();
+
+                if (!string.IsNullOrEmpty(jsonString) &&
+                    (jsonString.StartsWith(value: '{') || jsonString.StartsWith(value: '[')))
+                {
+                    return options is null
+                        ? JsonSerializer.Deserialize<T>(jsonString)!
+                        : JsonSerializer.Deserialize<T>(jsonString, options)!;
+                }
+
+                break;
+            case JsonValueKind.Object:
+                return DeserializeFallback<T>(element, options);
+        }
+
+        object? converted = expectedType switch
+        {
+            _ when expectedType == StringType => element.GetString(),
+            _ when expectedType == BoolType => element.GetBoolean(),
+            _ when expectedType == ByteType => element.GetByte(),
+            _ when expectedType == SByteType => element.GetSByte(),
+            _ when expectedType == ShortType => element.GetInt16(),
+            _ when expectedType == UShortType => element.GetUInt16(),
+            _ when expectedType == IntType => element.GetInt32(),
+            _ when expectedType == UintType => element.GetUInt32(),
+            _ when expectedType == LongType => element.GetInt64(),
+            _ when expectedType == UlongTYpe => element.GetUInt64(),
+            _ when expectedType == FloatType => element.GetSingle(),
+            _ when expectedType == DoubleType => element.GetDouble(),
+            _ when expectedType == DecimalType => element.GetDecimal(),
+            _ when expectedType == GuidType => element.GetGuid(),
+            _ when expectedType == DateTimeType => element.GetDateTime(),
+            _ when expectedType == DateTimeOffsetType => element.GetDateTimeOffset(),
+            _ when expectedType == DateOnlyType => DateOnly.Parse(element.GetString()!, CultureInfo.InvariantCulture),
+            _ when expectedType == TimeOnlyType => TimeOnly.Parse(element.GetString()!, CultureInfo.InvariantCulture),
+            _ when expectedType == TimeSpanType => TimeSpan.Parse(element.GetString()!, CultureInfo.InvariantCulture),
+            _ when expectedType == ByteArrayType => element.GetBytesFromBase64(),
+
+            _ => DeserializeFallback<T>(element, options)
+        };
+
+        if (converted is null)
+        {
+            return default!;
+        }
+
+        return converted is T result
+            ? result
+            : throw new InvalidCastException(
+                $"Unable to cast '{element.GetRawText()}' to '{expectedType.FullName}': '{converted.FormatDbValue()}'. ValueKind: '{element.ValueKind}'.");
+    }
+
+    private static T DeserializeFallback<T>(JsonElement element, JsonSerializerOptions? options)
+    {
+        var rawText = element.GetRawText().Trim();
+
+        if (rawText.IsDbNullOrEmpty())
+        {
+            return default!;
+        }
+
+        return options is null
+            ? JsonSerializer.Deserialize<T>(rawText)!
+            : JsonSerializer.Deserialize<T>(rawText, options)!;
+    }
+
+    /// <summary>
+    ///     Is it JsonValueKind.Null
+    /// </summary>
+    public static bool IsJsonValueNullOrEmpty(this JsonElement element)
+        => element.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined;
+
     /// <summary>
     ///     Cached version of typeof(DateOnly)
     /// </summary>

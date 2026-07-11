@@ -147,6 +147,13 @@ public class EFTableRowsDataReader : DbDataReader
 
         var valueType = GetOrdinalValueType(ordinal, value);
 
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetJsonElementValue<bool>(_settings.JsonSerializerOptions);
+        }
+#endif
+
         if (valueType == TypeExtensions.LongType)
         {
             return (long)value != 0;
@@ -192,6 +199,13 @@ public class EFTableRowsDataReader : DbDataReader
 
         var valueType = GetOrdinalValueType(ordinal, value);
 
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetJsonElementValue<byte>(_settings.JsonSerializerOptions);
+        }
+#endif
+
         if (valueType == TypeExtensions.BoolType)
         {
             return (bool)value ? (byte)1 : (byte)0;
@@ -230,24 +244,38 @@ public class EFTableRowsDataReader : DbDataReader
 
         var valueType = GetOrdinalValueType(ordinal, value);
 
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            var c = ((JsonElement)value).GetJsonElementValue<string>(_settings.JsonSerializerOptions);
+
+            return GetChar(ordinal, c);
+        }
+#endif
+
         if (valueType == TypeExtensions.StringType)
         {
             var val = value.ToString();
 
-            if (val.IsDbNull())
-            {
-                return '\0';
-            }
-
-            if (val.Length == 1)
-            {
-                return val[index: 0];
-            }
-
-            return checked((char)GetInt64(ordinal));
+            return GetChar(ordinal, val);
         }
 
         return Convert.ToChar(value, CultureInfo.InvariantCulture);
+    }
+
+    private char GetChar(int ordinal, string? val)
+    {
+        if (val.IsDbNullOrEmpty())
+        {
+            return '\0';
+        }
+
+        if (val!.Length == 1)
+        {
+            return val[index: 0];
+        }
+
+        return checked((char)GetInt64(ordinal));
     }
 
     /// <summary>
@@ -270,11 +298,18 @@ public class EFTableRowsDataReader : DbDataReader
 
         var valueType = GetOrdinalValueType(ordinal, value);
 
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetJsonElementValue<DateTime>(_settings.JsonSerializerOptions);
+        }
+#endif
+
         if (valueType != TypeExtensions.DateTimeType)
         {
             var s = value.ToString();
 
-            return s.IsDbNull() ? default : DateTime.Parse(s, CultureInfo.InvariantCulture);
+            return s.IsDbNullOrEmpty() ? default : DateTime.Parse(s, CultureInfo.InvariantCulture);
         }
 
         return (DateTime)value;
@@ -294,11 +329,18 @@ public class EFTableRowsDataReader : DbDataReader
 
         var valueType = GetOrdinalValueType(ordinal, value);
 
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetJsonElementValue<decimal>(_settings.JsonSerializerOptions);
+        }
+#endif
+
         if (valueType == TypeExtensions.StringType)
         {
             var s = value.ToString();
 
-            return s.IsDbNull()
+            return s.IsDbNullOrEmpty()
                 ? 0
                 : decimal.Parse(s, NumberStyles.Number | NumberStyles.AllowExponent, CultureInfo.InvariantCulture);
         }
@@ -324,6 +366,13 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = GetOrdinalValueType(ordinal, value);
+
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetJsonElementValue<double>(_settings.JsonSerializerOptions);
+        }
+#endif
 
         if (valueType != TypeExtensions.DoubleType)
         {
@@ -352,6 +401,13 @@ public class EFTableRowsDataReader : DbDataReader
 
         var valueType = GetOrdinalValueType(ordinal, value);
 
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetJsonElementValue<float>(_settings.JsonSerializerOptions);
+        }
+#endif
+
         if (valueType == TypeExtensions.DoubleType)
         {
             return (float)(double)value;
@@ -379,11 +435,18 @@ public class EFTableRowsDataReader : DbDataReader
 
         var valueType = GetOrdinalValueType(ordinal, value);
 
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetJsonElementValue<Guid>(_settings.JsonSerializerOptions);
+        }
+#endif
+
         if (valueType == TypeExtensions.StringType)
         {
             var g = value.ToString();
 
-            return g.IsDbNull() ? Guid.NewGuid() : new Guid(g);
+            return g.IsDbNullOrEmpty() ? Guid.NewGuid() : new Guid(g);
         }
 
         if (valueType == TypeExtensions.ByteArrayType)
@@ -407,6 +470,13 @@ public class EFTableRowsDataReader : DbDataReader
         }
 
         var valueType = GetOrdinalValueType(ordinal, value);
+
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetJsonElementValue<short>(_settings.JsonSerializerOptions);
+        }
+#endif
 
         if (valueType == TypeExtensions.BoolType)
         {
@@ -440,6 +510,13 @@ public class EFTableRowsDataReader : DbDataReader
 
         var valueType = GetOrdinalValueType(ordinal, value);
 
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetJsonElementValue<int>(_settings.JsonSerializerOptions);
+        }
+#endif
+
         if (valueType == TypeExtensions.BoolType)
         {
             return (bool)value ? 1 : 0;
@@ -449,13 +526,6 @@ public class EFTableRowsDataReader : DbDataReader
         {
             return (int)(long)value;
         }
-
-#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
-        if (valueType == TypeExtensions.JsonElement)
-        {
-            return ((JsonElement)value).GetInt32();
-        }
-#endif
 
         if (valueType != TypeExtensions.IntType)
         {
@@ -479,6 +549,13 @@ public class EFTableRowsDataReader : DbDataReader
 
         var valueType = GetOrdinalValueType(ordinal, value);
 
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetJsonElementValue<long>(_settings.JsonSerializerOptions);
+        }
+#endif
+
         if (valueType == TypeExtensions.BoolType)
         {
             return (bool)value ? 1 : 0;
@@ -499,7 +576,21 @@ public class EFTableRowsDataReader : DbDataReader
     {
         var value = GetValue(ordinal);
 
-        return value.IsNull() ? string.Empty : value.ToString() ?? string.Empty;
+        if (value.IsNull())
+        {
+            return string.Empty;
+        }
+
+        var valueType = GetOrdinalValueType(ordinal, value);
+
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (valueType == TypeExtensions.JsonElement)
+        {
+            return ((JsonElement)value).GetJsonElementValue<string>(_settings.JsonSerializerOptions);
+        }
+#endif
+
+        return value.ToString() ?? string.Empty;
     }
 
     /// <summary>
@@ -511,6 +602,12 @@ public class EFTableRowsDataReader : DbDataReader
     public override T GetFieldValue<T>(int ordinal)
     {
         var value = GetValue(ordinal);
+
+        if (value.IsNull())
+        {
+            return default!;
+        }
+
         var actualValueType = GetOrdinalValueType(ordinal, value);
         var expectedValueType = typeof(T);
 
@@ -574,11 +671,18 @@ public class EFTableRowsDataReader : DbDataReader
             return (T)(object)((ulong)value != 0);
         }
 
-        if (actualValueType.IsArray && TypeExtensions.IsArrayOrGenericList(expectedValueType) &&
-            value is IEnumerable enumerable)
+        if ((actualValueType.IsArray || TypeExtensions.IsArrayOrGenericList(actualValueType)) &&
+            TypeExtensions.IsArrayOrGenericList(expectedValueType) && value is IEnumerable enumerableItems)
         {
-            return ProcessPostgresArrayOrList<T>(expectedValueType, enumerable);
+            return enumerableItems.ConvertEnumerable<T>();
         }
+
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0
+        if (actualValueType == TypeExtensions.JsonElement)
+        {
+            return value.GetJsonElementValue<T>(_settings.JsonSerializerOptions);
+        }
+#endif
 
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0
         var dbTypeName = GetDataTypeName(ordinal);
@@ -624,43 +728,10 @@ public class EFTableRowsDataReader : DbDataReader
         }
 #endif
 
-        return (T)value;
-    }
-
-    private static T ProcessPostgresArrayOrList<T>(Type expectedValueType, IEnumerable enumerable)
-    {
-        var elementType = expectedValueType.IsArray
-            ? expectedValueType.GetElementType()
-            : expectedValueType.GetGenericArguments()[0];
-
-        if (elementType is null)
-        {
-            throw new InvalidOperationException(
-                $"Expected ValueType `{nameof(elementType)}` must be an array or a generic list.");
-        }
-
-        var items = enumerable.OfType<object>().ToArray();
-        var array = Array.CreateInstance(elementType, items.Length);
-
-        for (var i = 0; i < items.Length; i++)
-        {
-            array.SetValue(items[i], i);
-        }
-
-        if (expectedValueType.IsArray)
-        {
-            return (T)(object)array;
-        }
-
-        var type = typeof(List<>).MakeGenericType(elementType);
-        var list = (IList)Activator.CreateInstance(type)!;
-
-        foreach (var item in items)
-        {
-            list.Add(item);
-        }
-
-        return (T)list;
+        return value is T result
+            ? result
+            : throw new InvalidCastException(
+                $"Unable to cast value '{value.FormatDbValue()}' of type '{value.GetType().FullName ?? "<null>"}' to '{typeof(T).FullName}'.");
     }
 
     /// <summary>

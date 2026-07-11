@@ -120,7 +120,7 @@ static void AddPeople(ApplicationDbContext context)
             GuidValue = Guid.NewGuid(),
             TimeSpanValue = TimeSpan.FromDays(days: 1),
             ShortValue = 2,
-            ByteArrayValue = [1, 2],
+            ByteArrayValue = [11, 21],
             UintValue = 1,
             UlongValue = 1,
             UshortValue = 1,

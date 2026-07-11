@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
 using System.Runtime.Serialization;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -27,12 +24,20 @@ public class EFTableRows
 
         for (var i = 0; i < reader.FieldCount; i++)
         {
+            var dbTypeName = reader.GetDataTypeName(i) ?? typeof(string).ToString();
+            var typeName = reader.GetFieldType(i)?.ToString() ?? typeof(string).ToString();
+
+            if (string.Equals(typeName, typeof(Array).FullName, StringComparison.Ordinal))
+            {
+                typeName = GetPgTypeArrayFullName(dbTypeName);
+            }
+
             ColumnsInfo.Add(i, new EFTableColumnInfo
             {
                 Ordinal = i,
                 Name = reader.GetName(i),
-                DbTypeName = reader.GetDataTypeName(i) ?? typeof(string).ToString(),
-                TypeName = reader.GetFieldType(i)?.ToString() ?? typeof(string).ToString()
+                DbTypeName = dbTypeName,
+                TypeName = typeName
             });
         }
     }
@@ -98,6 +103,20 @@ public class EFTableRows
         get => Get(index);
         set => Rows[index] = value;
     }
+
+    private static string GetPgTypeArrayFullName(string dbTypeName)
+        => dbTypeName switch
+        {
+            "integer[]" => typeof(int[]).FullName!,
+            "bigint[]" => typeof(long[]).FullName!,
+            "text[]" => typeof(string[]).FullName!,
+            "uuid[]" => typeof(Guid[]).FullName!,
+            "numeric[]" => typeof(decimal[]).FullName!,
+            "bytea" => typeof(byte[]).FullName!,
+            "bytea[]" => typeof(byte[][]).FullName!,
+            "boolean[]" => typeof(bool[]).FullName!,
+            _ => throw new NotSupportedException(dbTypeName)
+        };
 
     /// <summary>
     ///     Adds an item to the EFTableRows

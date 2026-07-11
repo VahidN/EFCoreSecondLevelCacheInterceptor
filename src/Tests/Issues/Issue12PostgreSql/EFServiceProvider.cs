@@ -1,11 +1,14 @@
 using EFCoreSecondLevelCacheInterceptor;
 using Issue12PostgreSql.DataLayer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using StackExchange.Redis;
 using ZiggyCreatures.Caching.Fusion;
+using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 namespace Issue12PostgreSql;
 
@@ -90,32 +93,7 @@ public static class EFServiceProvider
             };
         });*/
 
-        services.AddFusionCache()
-            .WithOptions(options =>
-            {
-                options.DefaultEntryOptions = new FusionCacheEntryOptions
-                {
-                    Duration = TimeSpan.FromMinutes(minutes: 1),
-                    IsFailSafeEnabled = true,
-                    FailSafeMaxDuration = TimeSpan.FromHours(hours: 2)
-
-                    // ... other FusionCache options
-                };
-            });
-
-        services.AddEFSecondLevelCache(o =>
-        {
-            o.UseFusionCacheProvider()
-
-                //.UseHybridCacheProvider(CacheExpirationMode.Absolute, TimeSpan.FromHours(hours: 1))
-                //.UseMemoryCacheProvider()
-                //.UseEasyCachingCoreProvider(providerName).ConfigureLogging(enable: true)
-                .CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 10))
-                .UseCacheKeyPrefix(prefix: "EF_")
-
-                // Fallback on db if the caching provider (redis) is down.
-                .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1));
-        });
+        AddFusionCache(services);
 
 #pragma warning disable IDISP001
         var dataSource =
@@ -132,4 +110,58 @@ public static class EFServiceProvider
 
         return services.BuildServiceProvider();
     }
+
+#pragma warning disable IDISP001
+    private static void AddFusionCache(ServiceCollection services)
+    {
+        var distributedCache = new RedisCache(new RedisCacheOptions
+        {
+            ConfigurationOptions = new ConfigurationOptions
+            {
+                EndPoints =
+                {
+                    "127.0.0.1:6379"
+                },
+                AllowAdmin = true,
+                ConnectTimeout = 10000
+            }
+        });
+
+        services.AddFusionCacheStackExchangeRedisBackplane(opt => opt.Configuration = "127.0.0.1:6379");
+
+        var jsonSerializer = new FusionCacheSystemTextJsonSerializer();
+
+        services.AddFusionCache()
+            .WithDistributedCache(distributedCache, jsonSerializer)
+            .WithSystemTextJsonSerializer()
+            .WithOptions(options =>
+            {
+                options.DefaultEntryOptions = new FusionCacheEntryOptions
+                {
+                    Duration = TimeSpan.FromMinutes(minutes: 30),
+                    IsFailSafeEnabled = true,
+                    FailSafeMaxDuration = TimeSpan.FromMinutes(minutes: 10),
+                    FailSafeThrottleDuration = TimeSpan.FromMinutes(minutes: 10),
+                    FactorySoftTimeout = TimeSpan.FromMilliseconds(milliseconds: 300),
+                    FactoryHardTimeout = TimeSpan.FromMilliseconds(milliseconds: 1000),
+                    DistributedCacheSoftTimeout = TimeSpan.FromMilliseconds(milliseconds: 500),
+                    DistributedCacheHardTimeout = TimeSpan.FromSeconds(seconds: 5),
+                    AllowBackgroundDistributedCacheOperations = true,
+                    JitterMaxDuration = TimeSpan.FromSeconds(seconds: 2)
+                };
+
+                options.DistributedCacheCircuitBreakerDuration = TimeSpan.FromSeconds(seconds: 5);
+            })
+            .WithRegisteredBackplane();
+
+        services.AddEFSecondLevelCache(options =>
+        {
+            options.UseFusionCacheProvider()
+                .CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 30))
+                .UseCacheKeyPrefix(prefix: "EF_")
+                .ConfigureLogging(enable: true)
+                .UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(minutes: 1));
+        });
+    }
 }
+#pragma warning restore IDISP001
