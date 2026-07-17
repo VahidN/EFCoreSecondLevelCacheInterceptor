@@ -62,14 +62,17 @@ public sealed class EFFusionCacheProvider : IEFCacheServiceProvider, IDisposable
 
         _fusionCache.Set(cacheKey.KeyHash, value, entryOptions =>
         {
-            if (cachePolicy.CacheExpirationMode != CacheExpirationMode.NeverRemove && cachePolicy.CacheTimeout.HasValue)
+            var timeout = cachePolicy.CacheTimeout;
+
+            if (cachePolicy.CacheExpirationMode != CacheExpirationMode.NeverRemove && timeout.HasValue)
             {
-                entryOptions.SetDuration(cachePolicy.CacheTimeout.Value);
+                var jitter = TimeSpan.FromSeconds(Math.Abs(Environment.TickCount) % 10); // to prevent thundering herds
+                var timeSpan = timeout.Value + jitter;
+                entryOptions.SetDuration(timeSpan);
 
                 if (cachePolicy.CacheExpirationMode == CacheExpirationMode.Sliding)
                 {
-                    entryOptions.SetFailSafe(isEnabled: true,
-                        cachePolicy.CacheTimeout.Value.Add(cachePolicy.CacheTimeout.Value));
+                    entryOptions.SetFailSafe(isEnabled: true, timeSpan.Add(timeSpan));
                 }
             }
         }, cacheKey.CacheDependencies);

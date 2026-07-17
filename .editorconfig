@@ -30,8 +30,10 @@ dotnet_diagnostic.CA2000.severity = suggestion
 dotnet_diagnostic.S1066.severity = suggestion
 dotnet_diagnostic.MA0055.severity = suggestion
 dotnet_diagnostic.S6562.severity = suggestion
+dotnet_diagnostic.S6640.severity = suggestion
 dotnet_diagnostic.S2701.severity = suggestion
 dotnet_diagnostic.S2699.severity = suggestion
+dotnet_diagnostic.S5766.severity = suggestion
 
 dotnet_diagnostic.IDE0055.severity = none
 dotnet_diagnostic.IDE0160.severity = none

@@ -1,6 +1,5 @@
 ﻿using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
-using AsyncKeyedLock;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
 
@@ -14,59 +13,10 @@ public class SecondLevelCacheInterceptorTests
     public void Constructor_InitializesFields_WhenArgumentsAreValid()
     {
         var processorMock = new Mock<IDbCommandInterceptorProcessor>();
-        var lockProviderMock = new Mock<ILockProvider>();
 
-        var interceptor = new SecondLevelCacheInterceptor(processorMock.Object, lockProviderMock.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processorMock.Object);
 
         Assert.IsNotNull(interceptor);
-    }
-
-    [TestMethod]
-    public void Constructor_ThrowsArgumentNullException_WhenProcessorIsNull()
-    {
-        var lockProviderMock = new Mock<ILockProvider>();
-
-        Assert.Throws<ArgumentNullException>(()
-            => new SecondLevelCacheInterceptor(processor: null, lockProviderMock.Object));
-    }
-
-    [TestMethod]
-    public void Constructor_ThrowsArgumentNullException_WhenLockProviderIsNull()
-    {
-        var processorMock = new Mock<IDbCommandInterceptorProcessor>();
-
-        Assert.Throws<ArgumentNullException>(()
-            => new SecondLevelCacheInterceptor(processorMock.Object, lockProvider: null));
-    }
-
-    [TestMethod]
-    public void NonQueryExecuted_ShouldLock()
-    {
-        // Arrange
-        const int expected = int.MaxValue;
-        const int result = int.MinValue;
-
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        interceptor.NonQueryExecuted(command, eventData, result);
-
-        // Assert
-        lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -83,14 +33,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = interceptor.NonQueryExecuted(command, eventData, result);
@@ -113,14 +60,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual =
@@ -129,39 +73,6 @@ public class SecondLevelCacheInterceptorTests
 
         // Assert
         Assert.IsNull(actual);
-    }
-
-    [TestMethod]
-    public async Task NonQueryExecutedAsync_ShouldLock()
-    {
-        // Arrange
-        const int expected = int.MaxValue;
-        const int result = int.MinValue;
-
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var mockDisposable = new MockDisposable();
-
-        lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<IDisposable>(mockDisposable));
-
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        await interceptor.NonQueryExecutedAsync(command, eventData, result);
-
-        // Assert
-        lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -178,14 +89,12 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommandsAsync(command, eventData.Context, result, CancellationToken.None))
+            .Returns(Task.FromResult(expected));
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await interceptor.NonQueryExecutedAsync(command, eventData, result);
@@ -208,14 +117,12 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommandsAsync(command, eventData.Context, result, CancellationToken.None))
+            .Returns(Task.FromResult(expected));
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await AssertsExtensions.RecordExceptionAsync(async ()
@@ -223,36 +130,6 @@ public class SecondLevelCacheInterceptorTests
 
         // Assert
         Assert.IsNull(actual);
-    }
-
-    [TestMethod]
-    public void NonQueryExecuting_ShouldLock()
-    {
-        // Arrange
-        var expected = InterceptionResult<int>.SuppressWithResult(int.MaxValue);
-        var result = InterceptionResult<int>.SuppressWithResult(int.MinValue);
-
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        interceptor.NonQueryExecuting(command, eventData, result);
-
-        // Assert
-        lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -269,14 +146,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = interceptor.NonQueryExecuting(command, eventData, result);
@@ -299,14 +173,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual =
@@ -315,39 +186,6 @@ public class SecondLevelCacheInterceptorTests
 
         // Assert
         Assert.IsNull(actual);
-    }
-
-    [TestMethod]
-    public async Task NonQueryExecutingAsync_ShouldLock()
-    {
-        // Arrange
-        var expected = InterceptionResult<int>.SuppressWithResult(int.MaxValue);
-        var result = InterceptionResult<int>.SuppressWithResult(int.MinValue);
-
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var mockDisposable = new MockDisposable();
-
-        lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<IDisposable>(mockDisposable));
-
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        await interceptor.NonQueryExecutingAsync(command, eventData, result);
-
-        // Assert
-        lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -364,14 +202,13 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor
+            .Setup(p => p.ProcessExecutingCommandsAsync(command, eventData.Context, result, CancellationToken.None))
+            .Returns(Task.FromResult(expected));
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await interceptor.NonQueryExecutingAsync(command, eventData, result);
@@ -394,14 +231,13 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor
+            .Setup(p => p.ProcessExecutingCommandsAsync(command, eventData.Context, result, CancellationToken.None))
+            .Returns(Task.FromResult(expected));
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await AssertsExtensions.RecordExceptionAsync(async ()
@@ -409,34 +245,6 @@ public class SecondLevelCacheInterceptorTests
 
         // Assert
         Assert.IsNull(actual);
-    }
-
-    [TestMethod]
-    public void ReaderExecuted_ShouldLock()
-    {
-        // Arrange
-        var expected = Mock.Of<DbDataReader>();
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        using var data = interceptor.ReaderExecuted(command, eventData, expected);
-
-        // Assert
-        lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -451,14 +259,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         using var actual = interceptor.ReaderExecuted(command, eventData, expected);
@@ -479,14 +284,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = AssertsExtensions.RecordException(() =>
@@ -496,37 +298,6 @@ public class SecondLevelCacheInterceptorTests
 
         // Assert
         Assert.IsNull(actual);
-    }
-
-    [TestMethod]
-    public async Task ReaderExecutedAsync_ShouldLock()
-    {
-        // Arrange
-        var expected = Mock.Of<DbDataReader>();
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var mockDisposable = new MockDisposable();
-
-        lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<IDisposable>(mockDisposable));
-
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        await interceptor.ReaderExecutedAsync(command, eventData, expected);
-
-        // Assert
-        lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -541,14 +312,13 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
+        processor.Setup(p
+                => p.ProcessExecutedCommandsAsync(command, eventData.Context, expected, CancellationToken.None))
+            .Returns(Task.FromResult(expected));
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await interceptor.ReaderExecutedAsync(command, eventData, expected);
@@ -569,14 +339,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, expected)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await AssertsExtensions.RecordExceptionAsync(async ()
@@ -584,37 +351,6 @@ public class SecondLevelCacheInterceptorTests
 
         // Assert
         Assert.IsNull(actual);
-    }
-
-    [TestMethod]
-    public void ReaderExecuting_ShouldLock()
-    {
-        // Arrange
-        var dataReader = Mock.Of<DbDataReader>();
-        var expected = InterceptionResult<DbDataReader>.SuppressWithResult(dataReader);
-        var result = InterceptionResult<DbDataReader>.SuppressWithResult(dataReader);
-
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        interceptor.ReaderExecuting(command, eventData, result);
-
-        // Assert
-        lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -632,14 +368,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = interceptor.ReaderExecuting(command, eventData, result);
@@ -663,14 +396,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual =
@@ -679,40 +409,6 @@ public class SecondLevelCacheInterceptorTests
 
         // Assert
         Assert.IsNull(actual);
-    }
-
-    [TestMethod]
-    public async Task ReaderExecutingAsync_ShouldLock()
-    {
-        // Arrange
-        var dataReader = Mock.Of<DbDataReader>();
-        var expected = InterceptionResult<DbDataReader>.SuppressWithResult(dataReader);
-        var result = InterceptionResult<DbDataReader>.SuppressWithResult(dataReader);
-
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var mockDisposable = new MockDisposable();
-
-        lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<IDisposable>(mockDisposable));
-
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        await interceptor.ReaderExecutingAsync(command, eventData, result);
-
-        // Assert
-        lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -730,14 +426,13 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor
+            .Setup(p => p.ProcessExecutingCommandsAsync(command, eventData.Context, result, CancellationToken.None))
+            .Returns(Task.FromResult(expected));
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await interceptor.ReaderExecutingAsync(command, eventData, result);
@@ -761,14 +456,13 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor
+            .Setup(p => p.ProcessExecutingCommandsAsync(command, eventData.Context, result, CancellationToken.None))
+            .Returns(Task.FromResult(expected));
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await AssertsExtensions.RecordExceptionAsync(async ()
@@ -776,36 +470,6 @@ public class SecondLevelCacheInterceptorTests
 
         // Assert
         Assert.IsNull(actual);
-    }
-
-    [TestMethod]
-    public void ScalarExecuted_ShouldLock()
-    {
-        // Arrange
-        var expected = new object();
-        var result = new object();
-
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        interceptor.ScalarExecuted(command, eventData, result);
-
-        // Assert
-        lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -822,14 +486,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = interceptor.ScalarExecuted(command, eventData, result);
@@ -852,14 +513,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual =
@@ -867,39 +525,6 @@ public class SecondLevelCacheInterceptorTests
 
         // Assert
         Assert.IsNull(actual);
-    }
-
-    [TestMethod]
-    public async Task ScalarExecutedAsync_ShouldLock()
-    {
-        // Arrange
-        var expected = new object();
-        var result = new object();
-
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var mockDisposable = new MockDisposable();
-
-        lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<IDisposable>(mockDisposable));
-
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        await interceptor.ScalarExecutedAsync(command, eventData, result);
-
-        // Assert
-        lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -916,14 +541,12 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommandsAsync(command, eventData.Context, result, CancellationToken.None))
+            .Returns(Task.FromResult(expected));
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await interceptor.ScalarExecutedAsync(command, eventData, result);
@@ -946,14 +569,12 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutedCommands(command, eventData.Context, result)).Returns(expected);
+        processor.Setup(p => p.ProcessExecutedCommandsAsync(command, eventData.Context, result, CancellationToken.None))
+            .Returns(Task.FromResult(expected));
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await AssertsExtensions.RecordExceptionAsync(async ()
@@ -961,36 +582,6 @@ public class SecondLevelCacheInterceptorTests
 
         // Assert
         Assert.IsNull(actual);
-    }
-
-    [TestMethod]
-    public void ScalarExecuting_ShouldLock()
-    {
-        // Arrange
-        var expected = InterceptionResult<object>.SuppressWithResult(new object());
-        var result = InterceptionResult<object>.SuppressWithResult(new object());
-
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        interceptor.ScalarExecuting(command, eventData, result);
-
-        // Assert
-        lockProvider.Verify(lp => lp.Lock(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -1007,14 +598,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = interceptor.ScalarExecuting(command, eventData, result);
@@ -1037,14 +625,11 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
         processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual =
@@ -1053,39 +638,6 @@ public class SecondLevelCacheInterceptorTests
 
         // Assert
         Assert.IsNull(actual);
-    }
-
-    [TestMethod]
-    public async Task ScalarExecutingAsync_ShouldLock()
-    {
-        // Arrange
-        var expected = InterceptionResult<object>.SuppressWithResult(new object());
-        var result = InterceptionResult<object>.SuppressWithResult(new object());
-
-        var command = Mock.Of<DbCommand>();
-
-        var eventData = new CommandExecutedEventData(eventDefinition: null, messageGenerator: null, connection: null,
-            command, logCommandText: null, context: null, DbCommandMethod.ExecuteNonQuery, Guid.Empty, Guid.Empty,
-            result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
-            CommandSource.LinqQuery);
-
-        var lockProvider = new Mock<ILockProvider>();
-        var processor = new Mock<IDbCommandInterceptorProcessor>();
-
-        using var mockDisposable = new MockDisposable();
-
-        lockProvider.Setup(lp => lp.LockAsync(CancellationToken.None))
-            .Returns(new ValueTask<IDisposable>(mockDisposable));
-
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
-
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
-
-        // Act
-        await interceptor.ScalarExecutingAsync(command, eventData, result);
-
-        // Assert
-        lockProvider.Verify(lp => lp.LockAsync(CancellationToken.None), Times.Once);
     }
 
     [TestMethod]
@@ -1102,14 +654,13 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor
+            .Setup(p => p.ProcessExecutingCommandsAsync(command, eventData.Context, result, CancellationToken.None))
+            .Returns(Task.FromResult(expected));
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await interceptor.ScalarExecutingAsync(command, eventData, result);
@@ -1132,14 +683,13 @@ public class SecondLevelCacheInterceptorTests
             result: null, async: false, logParameterValues: false, DateTimeOffset.Now, TimeSpan.Zero,
             CommandSource.LinqQuery);
 
-        var lockProvider = new Mock<ILockProvider>();
         var processor = new Mock<IDbCommandInterceptorProcessor>();
 
-        using var asyncNonKeyedLockReleaser = new AsyncNonKeyedLockReleaser();
-        lockProvider.Setup(lp => lp.Lock(CancellationToken.None)).Returns(asyncNonKeyedLockReleaser);
-        processor.Setup(p => p.ProcessExecutingCommands(command, eventData.Context, result)).Returns(expected);
+        processor
+            .Setup(p => p.ProcessExecutingCommandsAsync(command, eventData.Context, result, CancellationToken.None))
+            .Returns(Task.FromResult(expected));
 
-        var interceptor = new SecondLevelCacheInterceptor(processor.Object, lockProvider.Object);
+        var interceptor = new SecondLevelCacheInterceptor(processor.Object);
 
         // Act
         var actual = await AssertsExtensions.RecordExceptionAsync(async ()

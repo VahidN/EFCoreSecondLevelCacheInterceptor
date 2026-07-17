@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 #if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
 using System.Text.Json;
@@ -43,7 +41,7 @@ public class EFCoreSecondLevelCacheSettings
     ///     This option will let you choose a different redis database for your current tenant.
     ///     <![CDATA[ Such as: (serviceProvider, cacheKey) => "redis-db-" + serviceProvider.GetRequiredService<IHttpContextAccesor>().HttpContext.Request.Headers["tenant-id"]; ]]>
     /// </summary>
-    public Func<IServiceProvider, EFCacheKey?, string>? CacheProviderName { set; get; }
+    public Func<IServiceProvider, EFCacheKey?, string>? CacheProviderName { get; set; }
 
     /// <summary>
     ///     Is an instance of EasyCaching.HybridCache
@@ -69,6 +67,11 @@ public class EFCoreSecondLevelCacheSettings
     public CacheAllQueriesOptions CacheAllQueriesOptions { get; set; } = new();
 
     /// <summary>
+    ///     CacheLock Options
+    /// </summary>
+    public EFCacheLockOptions CacheLockOptions { get; set; } = new();
+
+    /// <summary>
     ///     Cache Specific Queries Options
     /// </summary>
     public CacheSpecificQueriesOptions CacheSpecificQueriesOptions { get; set; } = new(entityTypes: null);
@@ -86,68 +89,68 @@ public class EFCoreSecondLevelCacheSettings
     /// <summary>
     ///     Should the debug level logging be enabled?
     /// </summary>
-    public bool EnableLogging { set; get; }
+    public bool EnableLogging { get; set; }
 
     /// <summary>
     ///     Fallback on db if the caching provider (redis) is down.
     /// </summary>
-    public bool UseDbCallsIfCachingProviderIsDown { set; get; }
+    public bool UseDbCallsIfCachingProviderIsDown { get; set; }
 
     /// <summary>
     ///     Set it to `false` to disable this caching interceptor.
     ///     Its default value is `true`.
     /// </summary>
-    public bool IsCachingInterceptorEnabled { set; get; } = true;
+    public bool IsCachingInterceptorEnabled { get; set; } = true;
 
     /// <summary>
     ///     The cache server's availability check interval value.
     /// </summary>
-    public TimeSpan NextCacheServerAvailabilityCheck { set; get; } = TimeSpan.FromMinutes(value: 1);
+    public TimeSpan NextCacheServerAvailabilityCheck { get; set; } = TimeSpan.FromMinutes(value: 1);
 
     /// <summary>
     ///     Possibility to allow caching with explicit transactions.
     ///     Its default value is false.
     /// </summary>
-    public bool AllowCachingWithExplicitTransactions { set; get; }
+    public bool AllowCachingWithExplicitTransactions { get; set; }
 
     /// <summary>
     ///     Here you can decide based on the correct executing SQL command, should we cache its result or not?
     /// </summary>
-    public Predicate<string>? SkipCachingCommands { set; get; }
+    public Predicate<string>? SkipCachingCommands { get; set; }
 
     /// <summary>
     ///     Here you can decide based on the correct executing SQL command, should we invalidate the cache or not?
     /// </summary>
-    public Predicate<string>? SkipCacheInvalidationCommands { set; get; }
+    public Predicate<string>? SkipCacheInvalidationCommands { get; set; }
 
     /// <summary>
     ///     Here you can override the default cache-policy of the current query.
     ///     Return null, if you want to use the default settings.
     /// </summary>
-    public Func<EFCachePolicyContext, EFCachePolicy?>? OverrideCachePolicy { set; get; }
+    public Func<EFCachePolicyContext, EFCachePolicy?>? OverrideCachePolicy { get; set; }
 
     /// <summary>
     ///     Queries containing these types will not be cached.
     /// </summary>
-    public IList<Type>? SkipCachingDbContexts { set; get; }
+    public IList<Type>? SkipCachingDbContexts { get; set; }
 
     /// <summary>
     ///     Here you can decide based on the correct executing result, should we cache this result or not?
     /// </summary>
-    public Predicate<(string CommandText, object Value)>? SkipCachingResults { set; get; }
+    public Predicate<(string CommandText, object? Value)>? SkipCachingResults { get; set; }
 
     /// <summary>
     ///     If you set DisableLogging to false, this delegate will give you the internal caching events of the library.
     /// </summary>
-    public Action<EFCacheableLogEvent>? CacheableEvent { set; get; }
+    public Action<EFCacheableLogEvent>? CacheableEvent { get; set; }
 
     /// <summary>
     ///     Determines which entities are involved in the current cache-invalidation event.
     /// </summary>
-    public Action<EFCacheInvalidationInfo>? CacheInvalidationEvent { set; get; }
+    public Action<EFCacheInvalidationInfo>? CacheInvalidationEvent { get; set; }
 
     /// <summary>
     ///     Provides some optional data
     /// </summary>
-    public object? AdditionalData { set; get; }
+    public object? AdditionalData { get; set; }
 }

@@ -19,7 +19,7 @@ public class EFTableRowTests
         var row = new EFTableRow(values);
 
         // Assert
-        Assert.AreEqual(values, row.Values);
+        Assert.AreSequenceEqual(values, row.Values);
     }
 
     [TestMethod]
@@ -38,7 +38,7 @@ public class EFTableRowTests
         var actual = row.Values;
 
         // Assert
-        Assert.AreEqual(expected, actual);
+        Assert.AreSequenceEqual(expected, actual);
     }
 
     [TestMethod]

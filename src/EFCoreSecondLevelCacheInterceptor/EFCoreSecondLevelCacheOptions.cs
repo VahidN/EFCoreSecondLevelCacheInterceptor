@@ -1,4 +1,3 @@
-using System;
 #if NET10_0 || NET9_0 || NET5_0 || NET6_0 || NET7_0 || NET8_0
 using System.Text.Json;
 #endif
@@ -43,6 +42,23 @@ public class EFCoreSecondLevelCacheOptions
             ExpirationMode = expirationMode,
             Timeout = timeout,
             IsActive = true
+        };
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Defines locking preferences.
+    /// </summary>
+    /// <param name="mode">Backward-compatible mode is `Global`. Its default value is `Keyed`.</param>
+    /// <param name="timeout">Lock acquisition timeout. Its default value is 7 seconds.</param>
+    /// <returns></returns>
+    public EFCoreSecondLevelCacheOptions CacheLockOptions(EFLockMode mode, TimeSpan timeout)
+    {
+        Settings.CacheLockOptions = new EFCacheLockOptions
+        {
+            Mode = mode,
+            Timeout = timeout
         };
 
         return this;
@@ -261,7 +277,7 @@ public class EFCoreSecondLevelCacheOptions
     ///     Here you can decide based on the correct executing result, should we cache this result or not?
     /// </summary>
     /// <exception cref="ArgumentNullException"><paramref name="predicate" /> is <c>null</c>.</exception>
-    public EFCoreSecondLevelCacheOptions SkipCachingResults(Predicate<(string CommandText, object Value)> predicate)
+    public EFCoreSecondLevelCacheOptions SkipCachingResults(Predicate<(string CommandText, object? Value)> predicate)
     {
         Settings.SkipCachingResults = predicate ?? throw new ArgumentNullException(nameof(predicate));
 

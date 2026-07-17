@@ -62,7 +62,7 @@ public class DbCommandIgnoreCachingProcessor(
     /// <summary>
     ///     Skip caching of this result based on the provided predicate
     /// </summary>
-    public bool ShouldSkipCachingResults(string commandText, object value)
+    public bool ShouldSkipCachingResults(string commandText, object? value)
     {
         var result = cacheSettings.Value.SkipCachingResults != null &&
                      cacheSettings.Value.SkipCachingResults((commandText, value));

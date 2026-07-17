@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Hybrid;
+﻿using Microsoft.Extensions.Caching.Hybrid;
 
 namespace EFCoreSecondLevelCacheInterceptor;
 
@@ -29,10 +26,14 @@ public class EFHybridCacheProvider(
             IsNull = true
         };
 
+        var cacheTimeout = cachePolicy.CacheTimeout;
+        var jitter = TimeSpan.FromSeconds(Math.Abs(Environment.TickCount) % 10); // to prevent thundering herds
+        cacheTimeout = cacheTimeout?.Add(jitter);
+
         hybridCache.SetAsync(cacheKey.KeyHash, value, new HybridCacheEntryOptions
             {
-                Expiration = cachePolicy.CacheTimeout,
-                LocalCacheExpiration = cachePolicy.CacheTimeout
+                Expiration = cacheTimeout,
+                LocalCacheExpiration = cacheTimeout
             }, cacheKey.CacheDependencies)
             .Preserve()
             .GetAwaiter()
@@ -62,8 +63,9 @@ public class EFHybridCacheProvider(
     {
         ArgumentNullException.ThrowIfNull(cacheKey);
 
-        return hybridCache.GetOrCreateAsync<EFCachedData?>(cacheKey.KeyHash, factory
-                => ValueTask.FromResult<EFCachedData?>(null))
+        return hybridCache
+            .GetOrCreateAsync<EFCachedData?>(cacheKey.KeyHash,
+                factory => ValueTask.FromResult<EFCachedData?>(result: null))
             .Preserve()
             .GetAwaiter()
             .GetResult();

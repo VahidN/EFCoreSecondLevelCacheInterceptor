@@ -18,5 +18,5 @@ public interface IDbCommandIgnoreCachingProcessor
     /// <summary>
     ///     Skip caching of this result based on the provided predicate
     /// </summary>
-    bool ShouldSkipCachingResults(string commandText, object value);
+    bool ShouldSkipCachingResults(string commandText, object? value);
 }

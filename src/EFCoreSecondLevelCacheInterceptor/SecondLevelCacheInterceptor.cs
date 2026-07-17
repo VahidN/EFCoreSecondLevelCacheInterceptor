@@ -1,7 +1,4 @@
-using System;
 using System.Data.Common;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -17,44 +14,36 @@ namespace EFCoreSecondLevelCacheInterceptor;
 ///     &gt;()));
 ///     to register it.
 /// </remarks>
-public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processor, ILockProvider lockProvider)
-    : DbCommandInterceptor
+public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processor) : DbCommandInterceptor
 {
-    private readonly ILockProvider
-        _lockProvider = lockProvider ?? throw new ArgumentNullException(nameof(lockProvider));
-
-    private readonly IDbCommandInterceptorProcessor _processor =
-        processor ?? throw new ArgumentNullException(nameof(processor));
-
     /// <summary>
     ///     Called immediately after EF calls System.Data.Common.DbCommand.ExecuteNonQuery
     /// </summary>
     public override int NonQueryExecuted(DbCommand command, CommandExecutedEventData eventData, int result)
-    {
-        using var @lock = _lockProvider.Lock();
-
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
-    }
+        => processor.ProcessExecutedCommands(command, eventData?.Context, result);
 
     /// <summary>
     ///     Called immediately after EF calls System.Data.Common.DbCommand.ExecuteNonQueryAsync.
     /// </summary>
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
-    public override async ValueTask<int> NonQueryExecutedAsync(DbCommand command,
+    public override ValueTask<int> NonQueryExecutedAsync(DbCommand command,
         CommandExecutedEventData eventData,
         int result,
         CancellationToken cancellationToken = default)
 #else
-        public override async Task<int> NonQueryExecutedAsync(
-            DbCommand command,
-            CommandExecutedEventData eventData,
-            int result,
-            CancellationToken cancellationToken = default)
+    public override Task<int> NonQueryExecutedAsync(DbCommand command,
+        CommandExecutedEventData eventData,
+        int result,
+        CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
+        var processExecutedCommandsAsync =
+            processor.ProcessExecutedCommandsAsync(command, eventData?.Context, result, cancellationToken);
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+        return new ValueTask<int>(processExecutedCommandsAsync);
+#else
+        return processExecutedCommandsAsync;
+#endif
     }
 
     /// <summary>
@@ -63,31 +52,30 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     public override InterceptionResult<int> NonQueryExecuting(DbCommand command,
         CommandEventData eventData,
         InterceptionResult<int> result)
-    {
-        using var @lock = _lockProvider.Lock();
-
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
-    }
+        => processor.ProcessExecutingCommands(command, eventData?.Context, result);
 
     /// <summary>
     ///     Called just before EF intends to call System.Data.Common.DbCommand.ExecuteNonQueryAsync.
     /// </summary>
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
-    public override async ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command,
+    public override ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command,
         CommandEventData eventData,
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
 #else
-        public override async Task<InterceptionResult<int>> NonQueryExecutingAsync(
-            DbCommand command,
-            CommandEventData eventData,
-            InterceptionResult<int> result,
-            CancellationToken cancellationToken = default)
+    public override Task<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
+        var processExecutingCommandsAsync =
+            processor.ProcessExecutingCommandsAsync(command, eventData?.Context, result, cancellationToken);
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+        return new ValueTask<InterceptionResult<int>>(processExecutingCommandsAsync);
+#else
+        return processExecutingCommandsAsync;
+#endif
     }
 
     /// <summary>
@@ -96,31 +84,31 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     public override DbDataReader ReaderExecuted(DbCommand command,
         CommandExecutedEventData eventData,
         DbDataReader result)
-    {
-        using var @lock = _lockProvider.Lock();
-
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
-    }
+        => processor.ProcessExecutedCommands(command, eventData?.Context, result);
 
     /// <summary>
     ///     Called immediately after EF calls System.Data.Common.DbCommand.ExecuteReaderAsync.
     /// </summary>
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
-    public override async ValueTask<DbDataReader> ReaderExecutedAsync(DbCommand command,
+    public override ValueTask<DbDataReader> ReaderExecutedAsync(DbCommand command,
         CommandExecutedEventData eventData,
         DbDataReader result,
         CancellationToken cancellationToken = default)
 #else
-        public override async Task<DbDataReader> ReaderExecutedAsync(
-            DbCommand command,
-            CommandExecutedEventData eventData,
-            DbDataReader result,
-            CancellationToken cancellationToken = default)
+    public override Task<DbDataReader> ReaderExecutedAsync(DbCommand command,
+        CommandExecutedEventData eventData,
+        DbDataReader result,
+        CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        var processExecutedCommands =
+            processor.ProcessExecutedCommandsAsync(command, eventData?.Context, result, cancellationToken);
 
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+        return new ValueTask<DbDataReader>(processExecutedCommands);
+#else
+        return processExecutedCommands;
+#endif
     }
 
     /// <summary>
@@ -129,62 +117,61 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     public override InterceptionResult<DbDataReader> ReaderExecuting(DbCommand command,
         CommandEventData eventData,
         InterceptionResult<DbDataReader> result)
-    {
-        using var @lock = _lockProvider.Lock();
-
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
-    }
+        => processor.ProcessExecutingCommands(command, eventData?.Context, result);
 
     /// <summary>
     ///     Called just before EF intends to call System.Data.Common.DbCommand.ExecuteReaderAsync.
     /// </summary>
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
-    public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command,
+    public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command,
         CommandEventData eventData,
         InterceptionResult<DbDataReader> result,
         CancellationToken cancellationToken = default)
 #else
-        public override async Task<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
-            DbCommand command,
-            CommandEventData eventData,
-            InterceptionResult<DbDataReader> result,
-            CancellationToken cancellationToken = default)
+    public override Task<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<DbDataReader> result,
+        CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
-
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
+        var processExecutingCommandsAsync =
+            processor.ProcessExecutingCommandsAsync(command, eventData?.Context, result, cancellationToken);
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+        return new ValueTask<InterceptionResult<DbDataReader>>(processExecutingCommandsAsync);
+#else
+        return processExecutingCommandsAsync;
+#endif
     }
 
     /// <summary>
     ///     Called immediately after EF calls System.Data.Common.DbCommand.ExecuteScalar.
     /// </summary>
     public override object? ScalarExecuted(DbCommand command, CommandExecutedEventData eventData, object? result)
-    {
-        using var @lock = _lockProvider.Lock();
-
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
-    }
+        => processor.ProcessExecutedCommands(command, eventData?.Context, result);
 
     /// <summary>
     ///     Called immediately after EF calls System.Data.Common.DbCommand.ExecuteScalarAsync.
     /// </summary>
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
-    public override async ValueTask<object?> ScalarExecutedAsync(DbCommand command,
+    public override ValueTask<object?> ScalarExecutedAsync(DbCommand command,
         CommandExecutedEventData eventData,
         object? result,
         CancellationToken cancellationToken = default)
 #else
-        public override async Task<object> ScalarExecutedAsync(
-            DbCommand command,
-            CommandExecutedEventData eventData,
-            object result,
-            CancellationToken cancellationToken = default)
+    public override Task<object> ScalarExecutedAsync(DbCommand command,
+        CommandExecutedEventData eventData,
+        object result,
+        CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        var processExecutedCommandsAsync =
+            processor.ProcessExecutedCommandsAsync(command, eventData?.Context, result, cancellationToken);
 
-        return _processor.ProcessExecutedCommands(command, eventData?.Context, result);
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+        return new ValueTask<object?>(processExecutedCommandsAsync);
+#else
+        return processExecutedCommandsAsync;
+#endif
     }
 
     /// <summary>
@@ -193,30 +180,30 @@ public class SecondLevelCacheInterceptor(IDbCommandInterceptorProcessor processo
     public override InterceptionResult<object> ScalarExecuting(DbCommand command,
         CommandEventData eventData,
         InterceptionResult<object> result)
-    {
-        using var @lock = _lockProvider.Lock();
-
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
-    }
+        => processor.ProcessExecutingCommands(command, eventData?.Context, result);
 
     /// <summary>
     ///     Called just before EF intends to call System.Data.Common.DbCommand.ExecuteScalarAsync.
     /// </summary>
 #if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
-    public override async ValueTask<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command,
+    public override ValueTask<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command,
         CommandEventData eventData,
         InterceptionResult<object> result,
         CancellationToken cancellationToken = default)
 #else
-        public override async Task<InterceptionResult<object>> ScalarExecutingAsync(
-            DbCommand command,
-            CommandEventData eventData,
-            InterceptionResult<object> result,
-            CancellationToken cancellationToken = default)
+    public override Task<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<object> result,
+        CancellationToken cancellationToken = default)
 #endif
     {
-        using var lockAsync = await _lockProvider.LockAsync(cancellationToken);
+        var processExecutingCommandsAsync =
+            processor.ProcessExecutingCommandsAsync(command, eventData?.Context, result, cancellationToken);
 
-        return _processor.ProcessExecutingCommands(command, eventData?.Context, result);
+#if NET10_0 || NET9_0 || NET8_0 || NET7_0 || NET6_0 || NET5_0 || NETSTANDARD2_1
+        return new ValueTask<InterceptionResult<object>>(processExecutingCommandsAsync);
+#else
+        return processExecutingCommandsAsync;
+#endif
     }
 }

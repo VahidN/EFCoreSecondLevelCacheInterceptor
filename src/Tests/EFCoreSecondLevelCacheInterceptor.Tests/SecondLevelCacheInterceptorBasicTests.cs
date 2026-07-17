@@ -1,3 +1,4 @@
+#pragma warning disable CA1309
 using CacheManager.Serialization.Json;
 using EFCoreSecondLevelCacheInterceptor.Tests.DataLayer;
 using Microsoft.EntityFrameworkCore;
@@ -352,8 +353,7 @@ public class SecondLevelCacheInterceptorBasicTests
             (context, loggerProvider) =>
             {
                 var item1 = context.Products
-                    .Where(product
-                        => product.ProductId == 2 && product.ProductName.Equals("Product1", StringComparison.Ordinal))
+                    .Where(product => product.ProductId == 2 && product.ProductName.Equals("Product1"))
                     .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
                     .FirstOrDefault();
 
@@ -361,8 +361,7 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.IsNotNull(item1);
 
                 var item2 = context.Products
-                    .Where(product
-                        => product.ProductId == 2 && product.ProductName.Equals("Product1", StringComparison.Ordinal))
+                    .Where(product => product.ProductId == 2 && product.ProductName.Equals("Product1"))
                     .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
                     .FirstOrDefault();
 
@@ -370,8 +369,7 @@ public class SecondLevelCacheInterceptorBasicTests
                 Assert.IsNotNull(item2);
 
                 var item3 = context.Products
-                    .Where(product
-                        => product.ProductId == 1 && product.ProductName.Equals("Product1", StringComparison.Ordinal))
+                    .Where(product => product.ProductId == 1 && product.ProductName.Equals("Product1"))
                     .Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(minutes: 45))
                     .FirstOrDefault();
 
@@ -585,3 +583,5 @@ public class SecondLevelCacheInterceptorBasicTests
         }
     }
 }
+
+#pragma warning restore CA1309

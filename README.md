@@ -404,6 +404,33 @@ You can subscribe to caching events directly instead of parsing log files.
 })
 ```
 
+# Cache Locking (CacheLockOptions)
+
+This project supports configurable cache locking to avoid contention when multiple requests try to populate or read the same cache entry concurrently.
+
+Why this exists
+- The interceptor previously used a single global (non-keyed) in-process lock which can cause long stalls when many requests attempt to populate/read cache concurrently (especially with slow providers or networked redis).
+- The new configuration exposes modes that let you (a) preserve current behavior, (b) reduce contention by locking per cache key, or (c) opt out of locking entirely.
+
+Types / API
+- LockMode (enum)
+  - None — no locking at all.
+  - Global — single global lock (backwards-compatible).
+  - Keyed — lock per computed cache key.
+
+Configuration examples:
+
+- Enable keyed locking (recommended for single-process to reduce contention)
+```csharp
+// sample when registering the library
+services.AddEFSecondLevelCache(options =>
+{
+    // Other options...
+	// reduce contention between different cache keys
+    options.CacheLockOptions(LockMode.Keyed, TimeSpan.FromSeconds(15));
+});
+```
+
 ### Other Configurations
 
   * **Custom Hash Provider**: Replace the default `xxHash` algorithm by implementing `IEFHashProvider` and registering it with `options.UseCustomHashProvider<T>()`.

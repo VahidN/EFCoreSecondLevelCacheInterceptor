@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using CacheManager.Core;
 using Microsoft.Extensions.Logging;
 
@@ -79,17 +77,21 @@ public class EFCacheManagerCoreProvider : IEFCacheServiceProvider
         }
         else
         {
-            if (cachePolicy.CacheExpirationMode == CacheExpirationMode.NeverRemove ||
-                !cachePolicy.CacheTimeout.HasValue)
+            var cacheTimeout = cachePolicy.CacheTimeout;
+
+            if (cachePolicy.CacheExpirationMode == CacheExpirationMode.NeverRemove || !cacheTimeout.HasValue)
             {
                 _valuesCacheManager.Add(new CacheItem<EFCachedData>(keyHash, value));
             }
-            else if (cachePolicy.CacheTimeout.HasValue)
+            else
             {
+                var jitter = TimeSpan.FromSeconds(Math.Abs(Environment.TickCount) % 10); // to prevent thundering herds
+                var timeout = cacheTimeout.Value + jitter;
+
                 _valuesCacheManager.Add(new CacheItem<EFCachedData>(keyHash, value,
                     cachePolicy.CacheExpirationMode == CacheExpirationMode.Absolute
                         ? ExpirationMode.Absolute
-                        : ExpirationMode.Sliding, cachePolicy.CacheTimeout.Value));
+                        : ExpirationMode.Sliding, timeout));
             }
         }
     }

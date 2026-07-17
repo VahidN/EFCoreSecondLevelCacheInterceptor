@@ -36,6 +36,10 @@ public class EFStackExchangeRedisCacheProvider(
         var redisDb = RedisConnection.GetDatabase();
         var keyHash = cacheKey.KeyHash;
 
+        var cacheTimeout = cachePolicy.CacheTimeout;
+        var jitter = TimeSpan.FromSeconds(Math.Abs(Environment.TickCount) % 10); // to prevent thundering herds
+        cacheTimeout = cacheTimeout?.Add(jitter);
+
         foreach (var rootCacheKey in cacheKey.CacheDependencies)
         {
             if (string.IsNullOrWhiteSpace(rootCacheKey))
@@ -43,10 +47,9 @@ public class EFStackExchangeRedisCacheProvider(
                 continue;
             }
 
-            if (cachePolicy.CacheTimeout.HasValue)
+            if (cacheTimeout.HasValue)
             {
-                var expiryTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() +
-                                 cachePolicy.CacheTimeout.Value.TotalMilliseconds;
+                var expiryTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + cacheTimeout.Value.TotalMilliseconds;
 
                 redisDb.SortedSetAdd(rootCacheKey, keyHash, expiryTime);
             }
@@ -59,7 +62,7 @@ public class EFStackExchangeRedisCacheProvider(
 
         var data = dataSerializer.Serialize(value);
 
-        redisDb.StringSet(keyHash, data, cachePolicy.CacheTimeout, When.Always);
+        redisDb.StringSet(keyHash, data, cacheTimeout, When.Always);
     }
 
     /// <inheritdoc />

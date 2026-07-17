@@ -17,24 +17,24 @@
 	<PackageVersion Include="ZiggyCreatures.FusionCache.Serialization.NewtonsoftJson" Version="2.6.0" />
 	<PackageVersion Include="ZiggyCreatures.FusionCache.Serialization.SystemTextJson" Version="2.6.0" />
 	<PackageVersion Include="ZiggyCreatures.FusionCache.Backplane.StackExchangeRedis" Version="2.6.0" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="10.6.0" />
-    <PackageVersion Include="MessagePack" Version="3.1.7" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="10.8.0" />
+    <PackageVersion Include="MessagePack" Version="3.1.8" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="StackExchange.Redis" Version="3.0.11" />
+    <PackageVersion Include="StackExchange.Redis" Version="3.0.17" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
-    <PackageVersion Include="MSTest.TestFramework" Version="4.2.3" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="4.2.3" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+    <PackageVersion Include="MSTest.TestFramework" Version="4.3.2" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="4.3.2" />
     <PackageVersion Include="Moq" Version="4.20.72" />    
     <PackageVersion Include="IDisposableAnalyzers" Version="4.0.8" />
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.117" />
-    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.27.0.140913" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.123" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.29.0.143774" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Analyzers" Version="10.0.9" />
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.300" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.301" />
     <PackageVersion Include="AsyncKeyedLock" Version="8.0.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
@@ -67,19 +67,19 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[7,)" />
   </ItemGroup>
   <ItemGroup Condition="('$(TargetFramework)' == 'net8.0')">
-    <PackageVersion Include="System.IO.Hashing" Version="10.0.8" />
+    <PackageVersion Include="System.IO.Hashing" Version="10.0.10" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[8.0.0,)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[8.0.0,)" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="[8.0.1,)" />
   </ItemGroup>
   <ItemGroup Condition="('$(TargetFramework)' == 'net9.0')">
-    <PackageVersion Include="System.IO.Hashing" Version="10.0.8" />
+    <PackageVersion Include="System.IO.Hashing" Version="10.0.10" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[9.0.0,)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[9.0.0,)" />
   </ItemGroup>
 
   <ItemGroup Condition="('$(TargetFramework)' == 'net10.0')">
-    <PackageVersion Include="System.IO.Hashing" Version="10.0.8" />
+    <PackageVersion Include="System.IO.Hashing" Version="10.0.10" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[10.0.0,)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="[10.0.0,)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.0" />

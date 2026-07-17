@@ -9,7 +9,7 @@ using Moq.Protected;
 namespace EFCoreSecondLevelCacheInterceptor.UnitTests;
 
 [TestClass]
-public class DbCommandInterceptorProcessorTests
+public sealed class DbCommandInterceptorProcessorTests : IDisposable
 {
     private readonly Mock<IEFCacheDependenciesProcessor> _cacheDependenciesProcessorMock;
     private readonly Mock<IEFCacheKeyProvider> _cacheKeyProviderMock;
@@ -18,6 +18,7 @@ public class DbCommandInterceptorProcessorTests
     private readonly Mock<IEFCacheServiceProvider> _cacheServiceMock;
     private readonly EFCoreSecondLevelCacheSettings _cacheSettings;
     private readonly IDbCommandIgnoreCachingProcessor _ignoreCachingProcessor;
+    private readonly ILockProvider _lockProvider;
     private readonly Mock<IEFDebugLogger> _loggerMock;
     private readonly IDbCommandInterceptorProcessor _processor;
     private readonly Mock<IEFSqlCommandsProcessor> _sqlCommandsProcessorMock;
@@ -43,10 +44,14 @@ public class DbCommandInterceptorProcessorTests
             _sqlCommandsProcessorMock.Object, cacheSettingsMock.Object, _loggerMock.Object,
             intProcessorLoggerMock.Object);
 
+        _lockProvider = new LockProvider(cacheSettingsMock.Object);
+
         _processor = new DbCommandInterceptorProcessor(_loggerMock.Object, interceptorProcessorLoggerMock.Object,
             _cacheServiceMock.Object, _cacheDependenciesProcessorMock.Object, _cacheKeyProviderMock.Object,
-            cacheSettingsMock.Object, _cacheServiceCheckMock.Object, _ignoreCachingProcessor);
+            cacheSettingsMock.Object, _cacheServiceCheckMock.Object, _ignoreCachingProcessor, _lockProvider);
     }
+
+    public void Dispose() => _lockProvider.Dispose();
 
     [TestMethod]
     public void Constructor_ThrowsArgumentNullException_WhenCacheSettingsIsNull()
@@ -65,7 +70,7 @@ public class DbCommandInterceptorProcessorTests
             cacheService, cacheDependenciesProcessor, cacheKeyProvider,
 
             // ReSharper disable once AssignNullToNotNullAttribute
-            cacheSettings: null, cacheServiceCheck, ignoreCachingProcessor));
+            cacheSettings: null, cacheServiceCheck, ignoreCachingProcessor, _lockProvider));
     }
 
     [TestMethod]
@@ -83,7 +88,8 @@ public class DbCommandInterceptorProcessorTests
 
         // Act
         var processor = new DbCommandInterceptorProcessor(logger, interceptorProcessorLogger, cacheService,
-            cacheDependenciesProcessor, cacheKeyProvider, cacheSettings, cacheServiceCheck, ignoreCachingProcessor);
+            cacheDependenciesProcessor, cacheKeyProvider, cacheSettings, cacheServiceCheck, ignoreCachingProcessor,
+            _lockProvider);
 
         // Assert
         Assert.IsNotNull(processor);
@@ -299,7 +305,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -354,7 +364,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -384,7 +398,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -414,7 +432,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -444,7 +466,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -475,7 +501,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -504,7 +534,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -521,7 +555,7 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultCached,
-                "[2147483647] added to the cache[KeyHash: , DbContext: , CacheDependencies: .].", null, efCacheKey),
+                "[2147483647] added to the cache[KeyHash: Test, DbContext: , CacheDependencies: .].", null, efCacheKey),
             Times.Once);
     }
 
@@ -535,7 +569,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -562,7 +600,11 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
         var dataReaderMock = new Mock<DbDataReader>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -589,7 +631,11 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
         var dataReaderMock = new Mock<DbDataReader>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -618,7 +664,11 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
         var dataReaderMock = new Mock<DbDataReader>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -648,7 +698,11 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
         var dataReaderMock = new Mock<DbDataReader>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -676,7 +730,11 @@ public class DbCommandInterceptorProcessorTests
         var context = Mock.Of<DbContext>();
         var dataReaderMock = new Mock<DbDataReader>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -694,8 +752,8 @@ public class DbCommandInterceptorProcessorTests
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultCached,
                 It.Is<string>(message
-                    => message.Contains(" added to the cache[KeyHash: , DbContext: , CacheDependencies: .].")), null,
-                efCacheKey), Times.Once);
+                    => message.Contains(" added to the cache[KeyHash: Test, DbContext: , CacheDependencies: .].")),
+                null, efCacheKey), Times.Once);
     }
 
     [TestMethod]
@@ -707,7 +765,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -736,7 +798,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -766,7 +832,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -794,7 +864,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -811,8 +885,8 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultCached,
-                "[System.Object] added to the cache[KeyHash: , DbContext: , CacheDependencies: .].", null, efCacheKey),
-            Times.Once);
+                "[System.Object] added to the cache[KeyHash: Test, DbContext: , CacheDependencies: .].", null,
+                efCacheKey), Times.Once);
     }
 
     [TestMethod]
@@ -824,7 +898,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -852,7 +930,11 @@ public class DbCommandInterceptorProcessorTests
         var transaction = Mock.Of<DbTransaction>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         commandMock.Protected().Setup<DbTransaction>(methodOrPropertyName: "DbTransaction").Returns(transaction);
 
@@ -1104,7 +1186,11 @@ public class DbCommandInterceptorProcessorTests
         var commandMock = new Mock<DbCommand>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
         _sqlCommandsProcessorMock.Setup(x => x.IsCrudCommand(string.Empty)).Returns(value: true);
@@ -1128,7 +1214,12 @@ public class DbCommandInterceptorProcessorTests
         var commandMock = new Mock<DbCommand>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
+
         var cacheResult = new EFCachedData();
 
         _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
@@ -1156,7 +1247,12 @@ public class DbCommandInterceptorProcessorTests
         var commandMock = new Mock<DbCommand>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
+
         var cacheResult = new EFCachedData();
 
         _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
@@ -1182,7 +1278,11 @@ public class DbCommandInterceptorProcessorTests
         var commandMock = new Mock<DbCommand>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         var cacheResult = new EFCachedData
         {
@@ -1207,7 +1307,7 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed,
-                "Suppressed the result with the TableRows[] from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
+                "Suppressed the result with the TableRows[] from the cache[KeyHash: Test, DbContext: , CacheDependencies: .].",
                 null, efCacheKey), Times.Once);
     }
 
@@ -1219,7 +1319,11 @@ public class DbCommandInterceptorProcessorTests
         var commandMock = new Mock<DbCommand>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         var cacheResult = new EFCachedData
         {
@@ -1241,7 +1345,7 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed,
-                "Suppressed the result with 2147483647 from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
+                "Suppressed the result with 2147483647 from the cache[KeyHash: Test, DbContext: , CacheDependencies: .].",
                 null, efCacheKey), Times.Once);
     }
 
@@ -1255,7 +1359,11 @@ public class DbCommandInterceptorProcessorTests
         var commandMock = new Mock<DbCommand>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         var cacheResult = new EFCachedData
         {
@@ -1287,7 +1395,11 @@ public class DbCommandInterceptorProcessorTests
         var commandMock = new Mock<DbCommand>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         var cacheResult = new EFCachedData
         {
@@ -1309,7 +1421,7 @@ public class DbCommandInterceptorProcessorTests
         // Assert
         _loggerMock.Verify(
             x => x.NotifyCacheableEvent(CacheableLogEventId.QueryResultSuppressed,
-                "Suppressed the result with System.Object from the cache[KeyHash: , DbContext: , CacheDependencies: .].",
+                "Suppressed the result with System.Object from the cache[KeyHash: Test, DbContext: , CacheDependencies: .].",
                 null, efCacheKey), Times.Once);
     }
 
@@ -1322,7 +1434,11 @@ public class DbCommandInterceptorProcessorTests
         var commandMock = new Mock<DbCommand>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
 
         var cacheResult = new EFCachedData
         {
@@ -1354,7 +1470,12 @@ public class DbCommandInterceptorProcessorTests
         var commandMock = new Mock<DbCommand>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
+
         var cacheResult = new EFCachedData();
 
         _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);
@@ -1384,7 +1505,12 @@ public class DbCommandInterceptorProcessorTests
         var commandMock = new Mock<DbCommand>();
         var context = Mock.Of<DbContext>();
         var cachePolicy = new EFCachePolicy();
-        var efCacheKey = new EFCacheKey(new HashSet<string>());
+
+        var efCacheKey = new EFCacheKey(new HashSet<string>())
+        {
+            KeyHash = "Test"
+        };
+
         var cacheResult = new EFCachedData();
 
         _loggerMock.SetupGet(x => x.IsLoggerEnabled).Returns(value: true);

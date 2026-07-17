@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace EFCoreSecondLevelCacheInterceptor;
@@ -40,17 +38,21 @@ public class EFMemoryCacheServiceProvider(
             Size = 1
         };
 
+        var jitter = TimeSpan.FromSeconds(Math.Abs(Environment.TickCount) % 10); // to prevent thundering herds
+        var cacheTimeout = cachePolicy.CacheTimeout;
+        cacheTimeout = cacheTimeout?.Add(jitter);
+
         switch (cachePolicy.CacheExpirationMode)
         {
             case CacheExpirationMode.NeverRemove:
                 // the item will theoretically remain cached indefinitely
                 break;
             case CacheExpirationMode.Absolute:
-                options.AbsoluteExpirationRelativeToNow = cachePolicy.CacheTimeout;
+                options.AbsoluteExpirationRelativeToNow = cacheTimeout;
 
                 break;
             default:
-                options.SlidingExpiration = cachePolicy.CacheTimeout;
+                options.SlidingExpiration = cacheTimeout;
 
                 break;
         }

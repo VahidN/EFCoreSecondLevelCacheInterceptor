@@ -17,8 +17,7 @@ public static class ApplicationDbContextSeedData
 
     private static void addDateType(ApplicationDbContext context)
     {
-        var rnd = new Random();
-        var isEven = rnd.Next(minValue: 1, maxValue: 100000) % 2 == 0;
+        var isEven = Random.Shared.Next(minValue: 1, maxValue: 100000) % 2 == 0;
         var now = DateTime.UtcNow;
 
         var dateType1 = new DateType
@@ -41,11 +40,9 @@ public static class ApplicationDbContextSeedData
 
     private static void addUser(ApplicationDbContext context)
     {
-        var rnd = new Random();
-
         var user1 = new User
         {
-            Name = $"User {rnd.Next(minValue: 1, maxValue: 100000)}",
+            Name = $"User {Random.Shared.Next(minValue: 1, maxValue: 100000)}",
             AddDate = DateTime.UtcNow,
             UpdateDate = null,
             Points = 1000,

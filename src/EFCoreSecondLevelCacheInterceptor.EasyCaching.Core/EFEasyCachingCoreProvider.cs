@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using EasyCaching.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -70,6 +68,9 @@ public class EFEasyCachingCoreProvider : IEFCacheServiceProvider
 
         var keyHash = cacheKey.KeyHash;
         var timeout = cachePolicy.CacheTimeout ?? TimeSpan.MaxValue;
+
+        var jitter = TimeSpan.FromSeconds(Math.Abs(Environment.TickCount) % 10); // to prevent thundering herds
+        timeout += jitter;
 
         foreach (var rootCacheKey in cacheKey.CacheDependencies)
         {

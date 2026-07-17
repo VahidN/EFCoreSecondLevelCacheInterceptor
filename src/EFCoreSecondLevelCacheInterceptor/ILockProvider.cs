@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace EFCoreSecondLevelCacheInterceptor;
+﻿namespace EFCoreSecondLevelCacheInterceptor;
 
 /// <summary>
 ///     Reader writer locking service
@@ -10,12 +6,14 @@ namespace EFCoreSecondLevelCacheInterceptor;
 public interface ILockProvider : IDisposable
 {
     /// <summary>
-    ///     Tries to enter the sync lock
+    ///     Asynchronously locks and executes the action
     /// </summary>
-    IDisposable? Lock(CancellationToken cancellationToken = default);
+    Task<T> ExecuteWithLockAsync<T>(string lockKey,
+        Func<CancellationToken, Task<T>> func,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Tries to enter the async lock
+    ///     Synchronously locks and executes the action
     /// </summary>
-    ValueTask<IDisposable?> LockAsync(CancellationToken cancellationToken = default);
+    T ExecuteWithLock<T>(string lockKey, Func<T> func, CancellationToken cancellationToken = default);
 }
