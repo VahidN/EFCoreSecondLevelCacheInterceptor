@@ -404,7 +404,7 @@ You can subscribe to caching events directly instead of parsing log files.
 })
 ```
 
-# Cache Locking (CacheLockOptions)
+### Cache Locking (CacheLockOptions)
 
 This project supports configurable cache locking to avoid contention when multiple requests try to populate or read the same cache entry concurrently.
 
@@ -413,7 +413,7 @@ Why this exists
 - The new configuration exposes modes that let you (a) preserve current behavior, (b) reduce contention by locking per cache key, or (c) opt out of locking entirely.
 
 Types / API
-- LockMode (enum)
+- EFLockMode (enum)
   - None — no locking at all.
   - Global — single global lock (backwards-compatible).
   - Keyed — lock per computed cache key.
@@ -427,7 +427,7 @@ services.AddEFSecondLevelCache(options =>
 {
     // Other options...
 	// reduce contention between different cache keys
-    options.CacheLockOptions(LockMode.Keyed, TimeSpan.FromSeconds(15));
+    options.CacheLockOptions(EFLockMode.Keyed, TimeSpan.FromSeconds(15));
 });
 ```
 
