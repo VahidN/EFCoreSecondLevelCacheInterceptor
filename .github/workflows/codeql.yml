@@ -25,7 +25,7 @@ jobs:
       uses: actions/checkout@v7
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
+      uses: github/codeql-action/init@v4.37.3
       with:
         languages: ${{ matrix.language }}
         config-file: ./.github/workflows/codeql/codeql-config.yml
@@ -39,7 +39,7 @@ jobs:
       run: dotnet build --configuration Release    
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@v4.37.3
       with:
         category: "/language:${{matrix.language}}"
         upload: false
@@ -55,6 +55,6 @@ jobs:
         output: sarif-results/${{ matrix.language }}.sarif
 
     - name: Upload Filtered Results
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@v4.37.3
       with:
         sarif_file: sarif-results/${{ matrix.language }}.sarif
