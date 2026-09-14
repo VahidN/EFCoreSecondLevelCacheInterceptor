@@ -6,6 +6,8 @@ charset = utf-8-bom
 
 dotnet_diagnostic.IDISP005.severity = suggestion
 dotnet_diagnostic.S1481.severity = suggestion
+dotnet_diagnostic.S8969.severity = suggestion
+dotnet_diagnostic.S8970.severity = suggestion
 dotnet_diagnostic.MA0025.severity = suggestion
 dotnet_diagnostic.S3878.severity = suggestion
 dotnet_diagnostic.S127.severity = suggestion
