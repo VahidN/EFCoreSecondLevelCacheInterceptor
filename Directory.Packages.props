@@ -35,7 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
-    <PackageVersion Include="AsyncKeyedLock" Version="8.0.2" />
+    <PackageVersion Include="AsyncKeyedLock" Version="8.1.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[3.1,4)" />
