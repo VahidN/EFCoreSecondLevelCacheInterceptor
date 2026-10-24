@@ -10,6 +10,36 @@ public static class EFStackExchangeRedisCacheProviderOptions
 {
     /// <summary>
     ///     Introduces the `EFStackExchangeRedisCacheProvider` to be used as the CacheProvider.
+    ///     It takes a DI-backed connection factory.
+    ///     If you specify the `Cacheable()` method options, its setting will override this global setting.
+    /// </summary>
+    public static EFCoreSecondLevelCacheOptions UseStackExchangeRedisCacheProvider(
+        this EFCoreSecondLevelCacheOptions options,
+        Func<IServiceProvider, IConnectionMultiplexer> connectionFactory,
+        TimeSpan timeout,
+        bool enableCompression = false)
+    {
+        if (options == null)
+        {
+            throw new ArgumentNullException(nameof(options));
+        }
+
+        if (connectionFactory == null)
+        {
+            throw new ArgumentNullException(nameof(connectionFactory));
+        }
+
+        SetOptions(options, timeout, new EFRedisCacheConfigurationOptions
+        {
+            ConnectionMultiplexerFactory = connectionFactory,
+            EnableCompression = enableCompression
+        });
+
+        return options;
+    }
+
+    /// <summary>
+    ///     Introduces the `EFStackExchangeRedisCacheProvider` to be used as the CacheProvider.
     ///     If you specify the `Cacheable()` method options, its setting will override this global setting.
     /// </summary>
     public static EFCoreSecondLevelCacheOptions UseStackExchangeRedisCacheProvider(

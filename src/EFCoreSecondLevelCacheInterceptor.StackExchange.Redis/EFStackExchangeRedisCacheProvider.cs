@@ -9,11 +9,10 @@ namespace EFCoreSecondLevelCacheInterceptor;
 public class EFStackExchangeRedisCacheProvider(
     IOptions<EFCoreSecondLevelCacheSettings> cacheSettings,
     IEFDebugLogger logger,
-    IEFDataSerializer dataSerializer) : IEFCacheServiceProvider
+    IEFDataSerializer dataSerializer,
+    IServiceProvider serviceProvider) : IEFCacheServiceProvider
 {
-    private ConnectionMultiplexer? _redisConnection;
-
-    private ConnectionMultiplexer RedisConnection => _redisConnection ??= GetRedisConnection();
+    private ConnectionMultiplexer RedisConnection => field ??= GetRedisConnection();
 
     /// <inheritdoc />
     public void InsertValue(EFCacheKey cacheKey, EFCachedData? value, EFCachePolicy cachePolicy)
@@ -138,6 +137,11 @@ public class EFStackExchangeRedisCacheProvider(
                       throw new InvalidOperationException(
                           message: "Please call the UseStackExchangeRedisCacheProvider() method.");
 
+        if (options.ConnectionMultiplexerFactory is not null)
+        {
+            return (ConnectionMultiplexer)options.ConnectionMultiplexerFactory(serviceProvider);
+        }
+
         if (options.RedisConnectionString is not null)
         {
             return ConnectionMultiplexer.Connect(options.RedisConnectionString);
@@ -150,6 +154,6 @@ public class EFStackExchangeRedisCacheProvider(
 
         throw new InvalidOperationException(
             message:
-            "Please specify the `RedisConnectionString` or `ConfigurationOptions` by calling the UseStackExchangeRedisCacheProvider() method.");
+            "Please specify the `RedisConnectionString` or `ConfigurationOptions` , or a DI-backed IConnectionMultiplexer by calling the UseStackExchangeRedisCacheProvider() method.");
     }
 }

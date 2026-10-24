@@ -460,6 +460,30 @@ services.AddEFSecondLevelCache(options =>
     options.UseStackExchangeRedisCacheProvider(redisOptions, TimeSpan.FromMinutes(5)));
 ```
 
+Example usage with a DI-backed connection factory:
+
+```csharp
+services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect("localhost:6379"));
+
+services.AddEFSecondLevelCache(options =>
+    options.UseStackExchangeRedisCacheProvider(
+        sp => sp.GetRequiredService<IConnectionMultiplexer>(),
+        TimeSpan.FromMinutes(5)));
+```
+
+With keyed services:
+
+```csharp
+services.AddKeyedSingleton<IConnectionMultiplexer>("cache", (sp, key) =>
+    ConnectionMultiplexer.Connect("localhost:6379"));
+
+services.AddEFSecondLevelCache(options =>
+    options.UseStackExchangeRedisCacheProvider(
+        sp => sp.GetRequiredKeyedService<IConnectionMultiplexer>("cache"),
+        TimeSpan.FromMinutes(5)));
+```
+
 #### 2\. EFCoreSecondLevelCacheInterceptor.FusionCache
 
 This provider uses [FusionCache](https://github.com/ZiggyCreatures/FusionCache).
