@@ -66,6 +66,38 @@ public class EFTableRowsTests
     }
 
     [TestMethod]
+    [DataRow("bool[]", typeof(bool[]))]
+    [DataRow("int2[]", typeof(short[]))]
+    [DataRow("int4[]", typeof(int[]))]
+    [DataRow("int8[]", typeof(long[]))]
+    [DataRow("float4[]", typeof(float[]))]
+    [DataRow("float8[]", typeof(double[]))]
+    [DataRow("varchar(255)[]", typeof(string[]))]
+    [DataRow("bpchar(10)[]", typeof(string[]))]
+    [DataRow("timestamp[]", typeof(DateTime[]))]
+    [DataRow("timestamptz[]", typeof(DateTime[]))]
+    [DataRow("time[]", typeof(TimeSpan[]))]
+    [DataRow("timetz[]", typeof(DateTimeOffset[]))]
+    [DataRow("bit(8)[]", typeof(System.Collections.BitArray[]))]
+    [DataRow("bit varying(10)[]", typeof(System.Collections.BitArray[]))]
+    [DataRow("varbit(10)[]", typeof(System.Collections.BitArray[]))]
+    [DataRow("\"char\"[]", typeof(char[]))]
+    public void Constructor_MapsPostgresArrayTypeAliases(string dbTypeName, Type expectedType)
+    {
+        var readerMock = new Mock<DbDataReader>();
+
+        readerMock.Setup(r => r.FieldCount).Returns(1);
+        readerMock.Setup(r => r.GetName(0)).Returns("Column1");
+        readerMock.Setup(r => r.GetDataTypeName(0)).Returns(dbTypeName);
+        readerMock.Setup(r => r.GetFieldType(0)).Returns(typeof(Array));
+
+        var tableRows = new EFTableRows(readerMock.Object);
+
+        Assert.AreEqual(expectedType.FullName, tableRows.ColumnsInfo[0].TypeName);
+        Assert.AreEqual(expectedType, tableRows.GetFieldType(0));
+    }
+
+    [TestMethod]
     [DataRow("character varying[]", typeof(string[]))]
     [DataRow("character varying(255)[]", typeof(string[]))]
     [DataRow("character(10)[]", typeof(string[]))]

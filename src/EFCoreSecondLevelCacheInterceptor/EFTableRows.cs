@@ -1,5 +1,6 @@
 using System.Data.Common;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace EFCoreSecondLevelCacheInterceptor;
 
@@ -107,30 +108,31 @@ public class EFTableRows
     private static string GetPgTypeArrayFullName(string dbTypeName)
         => RemovePgTypeModifiers(dbTypeName) switch
         {
-            "boolean[]" => typeof(bool[]).FullName!,
-            "smallint[]" => typeof(short[]).FullName!,
-            "integer[]" => typeof(int[]).FullName!,
-            "bigint[]" => typeof(long[]).FullName!,
-            "real[]" => typeof(float[]).FullName!,
-            "double precision[]" => typeof(double[]).FullName!,
+            "boolean[]" or "bool[]" => typeof(bool[]).FullName!,
+            "smallint[]" or "int2[]" => typeof(short[]).FullName!,
+            "integer[]" or "int4[]" => typeof(int[]).FullName!,
+            "bigint[]" or "int8[]" => typeof(long[]).FullName!,
+            "real[]" or "float4[]" => typeof(float[]).FullName!,
+            "double precision[]" or "float8[]" => typeof(double[]).FullName!,
             "numeric[]" => typeof(decimal[]).FullName!,
             "money[]" => typeof(decimal[]).FullName!,
             "text[]" => typeof(string[]).FullName!,
-            "character varying[]" => typeof(string[]).FullName!,
-            "character[]" => typeof(string[]).FullName!,
+            "character varying[]" or "varchar[]" => typeof(string[]).FullName!,
+            "character[]" or "bpchar[]" => typeof(string[]).FullName!,
             "citext[]" => typeof(string[]).FullName!,
             "name[]" => typeof(string[]).FullName!,
             "json[]" => typeof(string[]).FullName!,
             "jsonb[]" => typeof(string[]).FullName!,
             "jsonpath[]" => typeof(string[]).FullName!,
             "xml[]" => typeof(string[]).FullName!,
+            "bit[]" or "bit varying[]" or "varbit[]" => typeof(System.Collections.BitArray[]).FullName!,
             "\"char\"[]" => typeof(char[]).FullName!,
             "uuid[]" => typeof(Guid[]).FullName!,
             "date[]" => typeof(DateTime[]).FullName!,
-            "timestamp without time zone[]" => typeof(DateTime[]).FullName!,
-            "timestamp with time zone[]" => typeof(DateTime[]).FullName!,
-            "time without time zone[]" => typeof(TimeSpan[]).FullName!,
-            "time with time zone[]" => typeof(DateTimeOffset[]).FullName!,
+            "timestamp[]" or "timestamp without time zone[]" => typeof(DateTime[]).FullName!,
+            "timestamptz[]" or "timestamp with time zone[]" => typeof(DateTime[]).FullName!,
+            "time[]" or "time without time zone[]" => typeof(TimeSpan[]).FullName!,
+            "timetz[]" or "time with time zone[]" => typeof(DateTimeOffset[]).FullName!,
             "interval[]" => typeof(TimeSpan[]).FullName!,
             "oid[]" => typeof(uint[]).FullName!,
             "xid[]" => typeof(uint[]).FullName!,
@@ -140,19 +142,62 @@ public class EFTableRows
             _ => throw new NotSupportedException(dbTypeName)
         };
 
-    // Npgsql includes facets in type names, e.g. "character varying(50)[]" or "timestamp(3) with time zone[]".
+    // Remove type modifiers such as (50) while preserving parentheses inside quoted identifiers.
     private static string RemovePgTypeModifiers(string dbTypeName)
     {
-        var start = dbTypeName.IndexOf(value: "(", StringComparison.Ordinal);
+        var result = new StringBuilder(dbTypeName.Length);
+        var modifierDepth = 0;
+        var insideQuotedIdentifier = false;
 
-        if (start < 0)
+        for (var i = 0; i < dbTypeName.Length; i++)
         {
-            return dbTypeName;
+            var character = dbTypeName[i];
+
+            if (character == '"')
+            {
+                if (modifierDepth == 0)
+                {
+                    result.Append(character);
+                }
+
+                if (insideQuotedIdentifier && i + 1 < dbTypeName.Length && dbTypeName[i + 1] == '"')
+                {
+                    if (modifierDepth == 0)
+                    {
+                        result.Append(dbTypeName[++i]);
+                    }
+                    else
+                    {
+                        i++;
+                    }
+
+                    continue;
+                }
+
+                insideQuotedIdentifier = !insideQuotedIdentifier;
+                continue;
+            }
+
+            if (!insideQuotedIdentifier && character == '(')
+            {
+                modifierDepth++;
+                continue;
+            }
+
+            if (!insideQuotedIdentifier && character == ')' && modifierDepth > 0)
+            {
+                modifierDepth--;
+                continue;
+            }
+
+            if (modifierDepth == 0)
+            {
+                result.Append(character);
+            }
         }
 
-        var end = dbTypeName.IndexOf(value: ")", start, StringComparison.Ordinal);
-
-        return end < 0 ? dbTypeName : dbTypeName.Remove(start, end - start + 1);
+        // Avoid silently changing malformed type names with an unmatched modifier or quote.
+        return modifierDepth == 0 && !insideQuotedIdentifier ? result.ToString() : dbTypeName;
     }
 
     /// <summary>
