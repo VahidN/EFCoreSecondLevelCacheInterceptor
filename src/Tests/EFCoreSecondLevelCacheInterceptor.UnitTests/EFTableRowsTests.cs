@@ -66,6 +66,34 @@ public class EFTableRowsTests
     }
 
     [TestMethod]
+    [DataRow("character varying[]", typeof(string[]))]
+    [DataRow("character varying(255)[]", typeof(string[]))]
+    [DataRow("character(10)[]", typeof(string[]))]
+    [DataRow("smallint[]", typeof(short[]))]
+    [DataRow("double precision[]", typeof(double[]))]
+    [DataRow("numeric(18,2)[]", typeof(decimal[]))]
+    [DataRow("timestamp(3) with time zone[]", typeof(DateTime[]))]
+    [DataRow("time with time zone[]", typeof(DateTimeOffset[]))]
+    [DataRow("interval[]", typeof(TimeSpan[]))]
+    public void Constructor_MapsPostgresArrayTypes(string dbTypeName, Type expectedType)
+    {
+        // Arrange
+        var readerMock = new Mock<DbDataReader>();
+
+        readerMock.Setup(r => r.FieldCount).Returns(value: 1);
+        readerMock.Setup(r => r.GetName(0)).Returns(value: "Column1");
+        readerMock.Setup(r => r.GetDataTypeName(0)).Returns(dbTypeName);
+        readerMock.Setup(r => r.GetFieldType(0)).Returns(typeof(Array));
+
+        // Act
+        var tableRows = new EFTableRows(readerMock.Object);
+
+        // Assert
+        Assert.AreEqual(expectedType.FullName, tableRows.ColumnsInfo[key: 0].TypeName);
+        Assert.AreEqual(expectedType, tableRows.GetFieldType(ordinal: 0));
+    }
+
+    [TestMethod]
     public void Constructor_ShouldInitializeColumnsInfo_WhenReaderIsValid()
     {
         // Arrange
