@@ -105,18 +105,55 @@ public class EFTableRows
     }
 
     private static string GetPgTypeArrayFullName(string dbTypeName)
-        => dbTypeName switch
+        => RemovePgTypeModifiers(dbTypeName) switch
         {
+            "boolean[]" => typeof(bool[]).FullName!,
+            "smallint[]" => typeof(short[]).FullName!,
             "integer[]" => typeof(int[]).FullName!,
             "bigint[]" => typeof(long[]).FullName!,
-            "text[]" => typeof(string[]).FullName!,
-            "uuid[]" => typeof(Guid[]).FullName!,
+            "real[]" => typeof(float[]).FullName!,
+            "double precision[]" => typeof(double[]).FullName!,
             "numeric[]" => typeof(decimal[]).FullName!,
+            "money[]" => typeof(decimal[]).FullName!,
+            "text[]" => typeof(string[]).FullName!,
+            "character varying[]" => typeof(string[]).FullName!,
+            "character[]" => typeof(string[]).FullName!,
+            "citext[]" => typeof(string[]).FullName!,
+            "name[]" => typeof(string[]).FullName!,
+            "json[]" => typeof(string[]).FullName!,
+            "jsonb[]" => typeof(string[]).FullName!,
+            "jsonpath[]" => typeof(string[]).FullName!,
+            "xml[]" => typeof(string[]).FullName!,
+            "\"char\"[]" => typeof(char[]).FullName!,
+            "uuid[]" => typeof(Guid[]).FullName!,
+            "date[]" => typeof(DateTime[]).FullName!,
+            "timestamp without time zone[]" => typeof(DateTime[]).FullName!,
+            "timestamp with time zone[]" => typeof(DateTime[]).FullName!,
+            "time without time zone[]" => typeof(TimeSpan[]).FullName!,
+            "time with time zone[]" => typeof(DateTimeOffset[]).FullName!,
+            "interval[]" => typeof(TimeSpan[]).FullName!,
+            "oid[]" => typeof(uint[]).FullName!,
+            "xid[]" => typeof(uint[]).FullName!,
+            "cid[]" => typeof(uint[]).FullName!,
             "bytea" => typeof(byte[]).FullName!,
             "bytea[]" => typeof(byte[][]).FullName!,
-            "boolean[]" => typeof(bool[]).FullName!,
             _ => throw new NotSupportedException(dbTypeName)
         };
+
+    // Npgsql includes facets in type names, e.g. "character varying(50)[]" or "timestamp(3) with time zone[]".
+    private static string RemovePgTypeModifiers(string dbTypeName)
+    {
+        var start = dbTypeName.IndexOf(value: "(", StringComparison.Ordinal);
+
+        if (start < 0)
+        {
+            return dbTypeName;
+        }
+
+        var end = dbTypeName.IndexOf(value: ")", start, StringComparison.Ordinal);
+
+        return end < 0 ? dbTypeName : dbTypeName.Remove(start, end - start + 1);
+    }
 
     /// <summary>
     ///     Adds an item to the EFTableRows
